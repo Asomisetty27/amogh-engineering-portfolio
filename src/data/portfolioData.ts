@@ -10,7 +10,7 @@ export interface EvidenceItem {
   type: "pdf" | "image" | "screenshot" | "code" | "link";
   description: string;
   path?: string; // local path if copied
-  url?: string;  // external URL
+  url?: string; // external URL
 }
 
 export interface TrackedValue {
@@ -157,7 +157,8 @@ export const projects: Project[] = [
         id: "riscv-asm-manual",
         fileName: "RISC-V_Assembler_Manual.pdf",
         type: "pdf",
-        description: "RISC-V OTTER Assembly Language Manual v4.04 by James Mealy & Paul Hummel. Covers ISA formats, opcodes, instruction descriptions, memory map, and register conventions.",
+        description:
+          "RISC-V OTTER Assembly Language Manual v4.04 by James Mealy & Paul Hummel. Covers ISA formats, opcodes, instruction descriptions, memory map, and register conventions.",
       },
     ],
     techStack: ["SystemVerilog", "Vivado", "RISC-V ISA", "FPGA"],
@@ -233,14 +234,16 @@ export const projects: Project[] = [
         id: "lab6-pdf",
         fileName: "EE_241_Lab_6_Electric_Circuit_Analysis_1.pdf",
         type: "pdf",
-        description: "Lab 6: 2nd Order Response & 555 Timer Metal Detector. Contains 555 timer schematic, RLC step response analysis requirements.",
+        description:
+          "Lab 6: 2nd Order Response & 555 Timer Metal Detector. Contains 555 timer schematic, RLC step response analysis requirements.",
         path: "/evidence/ee241-lab6-555timer.jpg",
       },
       {
         id: "lab7-pdf",
         fileName: "EE_241_Lab_7_Electric_Circuit_Analysis.pdf",
         type: "pdf",
-        description: "Lab 7: Metal Detector (cont.) — Solenoid & Electromagnet integration. Contains drive circuit schematic, solenoid background, B-field equation.",
+        description:
+          "Lab 7: Metal Detector (cont.) — Solenoid & Electromagnet integration. Contains drive circuit schematic, solenoid background, B-field equation.",
         path: "/evidence/ee241-lab7-solenoid.jpg",
       },
     ],
@@ -287,7 +290,8 @@ export const projects: Project[] = [
         title: "IME 144 Air Motor Assembly Reference",
         confidence: "VERIFIED",
         derivedFrom: ["IME_144_MANUAL.pdf"],
-        description: "Air motor assembly illustration from IME 144 course manual cover, showing frame, cylinder, flywheel, piston, mainshaft, and crank disk components.",
+        description:
+          "Air motor assembly illustration from IME 144 course manual cover, showing frame, cylinder, flywheel, piston, mainshaft, and crank disk components.",
         imagePath: "/evidence/ime144-cover.jpg",
       },
       {
@@ -322,17 +326,11 @@ export const projects: Project[] = [
     status: "COMPLETE",
     statusColor: "neon-amber",
     module: {
-      missionObjective:
-        "TODO: Add specific mission objective from project documentation",
-      systemArchitecture:
-        "TODO: Architecture details pending — upload final schematic, state diagram, or report",
-      implementationNotes: [
-        "TODO: Implementation details pending evidence upload",
-      ],
+      missionObjective: "TODO: Add specific mission objective from project documentation",
+      systemArchitecture: "TODO: Architecture details pending — upload final schematic, state diagram, or report",
+      implementationNotes: ["TODO: Implementation details pending evidence upload"],
       failureModes: [],
-      improvements: [
-        "TODO: Improvements pending project documentation",
-      ],
+      improvements: ["TODO: Improvements pending project documentation"],
     },
     diagrams: [
       {
@@ -341,7 +339,8 @@ export const projects: Project[] = [
         confidence: "CONCEPTUAL",
         derivedFrom: [],
         description: "TODO: No evidence uploaded for RGM Machine project",
-        conceptualNote: "Simulation evidence not uploaded yet. Upload final schematic, state diagram, or report to generate verified diagrams.",
+        conceptualNote:
+          "Simulation evidence not uploaded yet. Upload final schematic, state diagram, or report to generate verified diagrams.",
       },
     ],
     evidence: [],
@@ -390,8 +389,7 @@ export const projects: Project[] = [
         derivedFrom: [],
         description:
           "Client (React/Lovable) → Supabase (DB + Auth + Edge Functions) → Stripe (Payments + Connect) → Resend (Emails)",
-        conceptualNote:
-          "Architecture based on stated tech stack. No internal architecture diagram uploaded.",
+        conceptualNote: "Architecture based on stated tech stack. No internal architecture diagram uploaded.",
       },
       {
         id: "funck-ticket-fsm",
@@ -400,8 +398,7 @@ export const projects: Project[] = [
         derivedFrom: [],
         description:
           "UNPAID → PAID → ISSUED (QR generated) → SCANNED (at door) → LOCKED (fraud prevention, no re-scan)",
-        conceptualNote:
-          "State machine inferred from feature description. Actual implementation may differ.",
+        conceptualNote: "State machine inferred from feature description. Actual implementation may differ.",
       },
     ],
     evidence: [
@@ -458,25 +455,32 @@ export const experiences: ExperienceItem[] = [
 // ========== SKILLS ==========
 
 export const skills = {
-  core: [
-    "Systems Thinking",
-    "Test & Validation Mindset",
-    "Technical Documentation",
-    "Customer Service",
-  ],
+  core: ["Systems Thinking", "Test & Validation Mindset", "Technical Documentation", "Customer Service"],
   technical: [
     { name: "SystemVerilog / HDL", evidence: "OTTER CPU project (CPE 233)", confidence: "VERIFIED" as ConfidenceBadge },
     { name: "Analog Circuit Design", evidence: "EE 241 Labs 1-7", confidence: "VERIFIED" as ConfidenceBadge },
-    { name: "Manual Machining (Lathe & Mill)", evidence: "IME 144 Air Motor project", confidence: "VERIFIED" as ConfidenceBadge },
+    {
+      name: "Manual Machining (Lathe & Mill)",
+      evidence: "IME 144 Air Motor project",
+      confidence: "VERIFIED" as ConfidenceBadge,
+    },
     { name: "GD&T / Engineering Drawings", evidence: "IME 144 Manual", confidence: "VERIFIED" as ConfidenceBadge },
     { name: "CAD / Hand Drafting", evidence: "IME 144 coursework", confidence: "VERIFIED" as ConfidenceBadge },
     { name: "RISC-V Assembly", evidence: "RISC-V_Assembler_Manual.pdf", confidence: "VERIFIED" as ConfidenceBadge },
     { name: "LTSpice Simulation", evidence: "EE 241 Lab 6", confidence: "VERIFIED" as ConfidenceBadge },
-    { name: "Web Development (React/TypeScript)", evidence: "Funck platform (funck.live)", confidence: "VERIFIED" as ConfidenceBadge },
+    {
+      name: "Web Development (React/TypeScript)",
+      evidence: "Funck platform (funck.live)",
+      confidence: "VERIFIED" as ConfidenceBadge,
+    },
     { name: "MATLAB", evidence: "TODO: Provide coursework evidence", confidence: "CONCEPTUAL" as ConfidenceBadge },
     { name: "Python", evidence: "TODO: Provide coursework evidence", confidence: "CONCEPTUAL" as ConfidenceBadge },
     { name: "Soldering & Prototyping", evidence: "EE 241 lab work", confidence: "VERIFIED" as ConfidenceBadge },
-    { name: "Oscilloscope / Function Generator", evidence: "EE 241 lab equipment usage", confidence: "VERIFIED" as ConfidenceBadge },
+    {
+      name: "Oscilloscope / Function Generator",
+      evidence: "EE 241 lab equipment usage",
+      confidence: "VERIFIED" as ConfidenceBadge,
+    },
   ],
 };
 
@@ -491,7 +495,7 @@ export const personalInfo = {
   extras: [
     "Varsity wrestling athlete (high school)",
     "California state certified pharmacy technician",
-    "Boy Scouts — 16 years",
+    "Boy Scouts — 11 years",
     "Previously CPR/First Aid certified; open to recertification (not currently certified)",
   ],
 };
