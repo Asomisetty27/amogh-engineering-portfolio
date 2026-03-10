@@ -3,29 +3,31 @@ import { motion, AnimatePresence } from "framer-motion";
 import { projects, type Project, type DiagramItem } from "@/data/portfolioData";
 import { useViewMode } from "@/contexts/ViewModeContext";
 import {
-  ConfidenceBadgeTag,
-  StatusLight,
-  PanelHeader,
-  TodoField,
+  ConfidenceBadgeTag, StatusLight, PanelHeader, EvidencePending,
 } from "@/components/ui/mission-ui";
 import {
-  ChevronRight,
-  FileText,
-  Image as ImageIcon,
-  ExternalLink,
-  Search,
+  ChevronRight, ChevronDown, FileText, Image as ImageIcon,
+  ExternalLink, Search, Archive, Globe,
 } from "lucide-react";
 
 type FilterCategory = "All" | "Hardware" | "Systems" | "Ops" | "Web";
 
+const DEMO_PROJECT_IDS = ["otter-cpu", "metal-detector", "funck", "air-motor"];
+
 export default function ProjectsSection() {
-  const [selectedProject, setSelectedProject] = useState<Project>(projects[0]);
+  const { mode, demoMode } = useViewMode();
+
+  const activeProjects = demoMode
+    ? projects.filter((p) => DEMO_PROJECT_IDS.includes(p.id) && !p.archived)
+    : projects.filter((p) => !p.archived);
+  const archivedProjects = projects.filter((p) => p.archived);
+
+  const [selectedProject, setSelectedProject] = useState<Project>(activeProjects[0]);
   const [filter, setFilter] = useState<FilterCategory>("All");
   const [search, setSearch] = useState("");
-  const [evidenceDrawerOpen, setEvidenceDrawerOpen] = useState(false);
-  const { mode } = useViewMode();
+  const [archiveOpen, setArchiveOpen] = useState(false);
 
-  const filtered = projects.filter((p) => {
+  const filtered = activeProjects.filter((p) => {
     const matchesFilter = filter === "All" || p.category === filter;
     const matchesSearch =
       !search ||
@@ -115,9 +117,12 @@ export default function ProjectsSection() {
               transition={{ duration: 0.2 }}
               className="p-4 space-y-5 max-h-[70vh] overflow-y-auto"
             >
-              {/* Title & status */}
+              {/* Hero summary */}
               <div>
                 <h3 className="text-base font-semibold text-foreground mb-1">{selectedProject.name}</h3>
+                <p className="text-sm text-secondary-foreground leading-relaxed mb-2">
+                  {selectedProject.heroSummary}
+                </p>
                 <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
                   {selectedProject.course && <span>{selectedProject.course}</span>}
                   <span className="text-primary/40">|</span>
@@ -127,45 +132,74 @@ export default function ProjectsSection() {
                 </div>
               </div>
 
-              {/* Mission Objective */}
-              <div>
-                <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-1.5 uppercase">
-                  01 / Mission Objective
-                </h4>
-                <p className="text-sm text-secondary-foreground leading-relaxed">
-                  {selectedProject.module.missionObjective.startsWith("TODO") ? (
-                    <TodoField label="Add mission objective" />
-                  ) : (
-                    selectedProject.module.missionObjective
-                  )}
-                </p>
-              </div>
+              {/* Verification Summary Table */}
+              {selectedProject.module.verificationSummary && selectedProject.module.verificationSummary.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-2 uppercase">
+                    Verification Summary
+                  </h4>
+                  <div className="border border-panel-border rounded overflow-hidden">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-panel-border bg-panel-highlight/50">
+                          <th className="text-left px-3 py-1.5 font-mono text-muted-foreground">Parameter</th>
+                          <th className="text-left px-3 py-1.5 font-mono text-muted-foreground">Value</th>
+                          <th className="text-left px-3 py-1.5 font-mono text-muted-foreground hidden sm:table-cell">Source</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedProject.module.verificationSummary.map((row, i) => (
+                          <tr key={i} className="border-b border-panel-border/50 last:border-0">
+                            <td className="px-3 py-1.5 text-foreground">{row.parameter}</td>
+                            <td className="px-3 py-1.5 text-neon-cyan font-mono">
+                              {row.value} {row.unit}
+                            </td>
+                            <td className="px-3 py-1.5 text-muted-foreground hidden sm:table-cell">
+                              {row.evidence_source}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
 
-              {/* System Architecture */}
-              <div>
-                <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-1.5 uppercase">
-                  02 / System Architecture
-                </h4>
-                <p className="text-sm text-secondary-foreground leading-relaxed">
-                  {selectedProject.module.systemArchitecture.startsWith("TODO") ? (
-                    <TodoField label="Add architecture details" />
-                  ) : (
-                    selectedProject.module.systemArchitecture
-                  )}
-                </p>
-              </div>
+              {/* Mission Objective (engineer mode) */}
+              {mode === "engineer" && (
+                <div>
+                  <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-1.5 uppercase">
+                    Mission Objective
+                  </h4>
+                  <p className="text-sm text-secondary-foreground leading-relaxed">
+                    {selectedProject.module.missionObjective}
+                  </p>
+                </div>
+              )}
 
-              {/* Implementation Notes (engineer mode shows all, recruiter shows summary) */}
+              {/* System Architecture (engineer mode) */}
+              {mode === "engineer" && (
+                <div>
+                  <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-1.5 uppercase">
+                    System Architecture
+                  </h4>
+                  <p className="text-sm text-secondary-foreground leading-relaxed">
+                    {selectedProject.module.systemArchitecture}
+                  </p>
+                </div>
+              )}
+
+              {/* Implementation Notes (engineer only) */}
               {mode === "engineer" && selectedProject.module.implementationNotes.length > 0 && (
                 <div>
                   <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-1.5 uppercase">
-                    03 / Implementation Notes
+                    Implementation Notes
                   </h4>
                   <ul className="space-y-1">
                     {selectedProject.module.implementationNotes.map((note, i) => (
                       <li key={i} className="flex items-start gap-2 text-xs text-secondary-foreground">
                         <span className="text-primary/50 mt-0.5 font-mono">{String(i + 1).padStart(2, "0")}</span>
-                        {note.startsWith("TODO") ? <TodoField /> : note}
+                        {note}
                       </li>
                     ))}
                   </ul>
@@ -176,20 +210,16 @@ export default function ProjectsSection() {
               {selectedProject.module.failureModes.length > 0 && (
                 <div>
                   <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-1.5 uppercase">
-                    {mode === "engineer" ? "05" : "03"} / Failure Modes & Fixes
+                    Failure Modes & Fixes
                   </h4>
                   <div className="space-y-2">
                     {selectedProject.module.failureModes.map((fm, i) => (
                       <div key={i} className="text-xs border border-panel-border rounded p-2">
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <span className="text-neon-red font-mono">
-                            {fm.issue.startsWith("TODO") ? <TodoField /> : `⚠ ${fm.issue}`}
-                          </span>
+                          <span className="text-neon-red font-mono">⚠ {fm.issue}</span>
                           <ConfidenceBadgeTag confidence={fm.confidence} />
                         </div>
-                        {!fm.fix.startsWith("TODO") && (
-                          <span className="text-neon-green">✓ {fm.fix}</span>
-                        )}
+                        <span className="text-neon-green">✓ {fm.fix}</span>
                         {fm.evidence_source && (
                           <div className="mt-1 text-[10px] text-muted-foreground">
                             Source: {fm.evidence_source}
@@ -201,21 +231,48 @@ export default function ProjectsSection() {
                 </div>
               )}
 
+              {/* Ownership Disclosure (Funck) */}
+              {selectedProject.module.ownershipDisclosure && (
+                <div>
+                  <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-1.5 uppercase">
+                    What I Owned vs. AI-Assisted
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="border border-neon-green/20 rounded p-2.5 bg-neon-green/5">
+                      <div className="text-[10px] font-mono font-semibold text-neon-green mb-1.5 uppercase">I Owned</div>
+                      <ul className="space-y-1">
+                        {selectedProject.module.ownershipDisclosure.owned.map((item, i) => (
+                          <li key={i} className="text-xs text-secondary-foreground flex items-start gap-1.5">
+                            <span className="text-neon-green mt-0.5">▸</span>{item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="border border-neon-cyan/20 rounded p-2.5 bg-neon-cyan/5">
+                      <div className="text-[10px] font-mono font-semibold text-neon-cyan mb-1.5 uppercase">AI-Assisted</div>
+                      <ul className="space-y-1">
+                        {selectedProject.module.ownershipDisclosure.aiAssisted.map((item, i) => (
+                          <li key={i} className="text-xs text-secondary-foreground flex items-start gap-1.5">
+                            <span className="text-neon-cyan mt-0.5">▸</span>{item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Improvements */}
               {selectedProject.module.improvements.length > 0 && (
                 <div>
                   <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-1.5 uppercase">
-                    {mode === "engineer" ? "06" : "04"} / Next Steps
+                    Next Steps
                   </h4>
                   <ul className="space-y-1">
                     {selectedProject.module.improvements.map((imp, i) => (
                       <li key={i} className="flex items-start gap-2 text-xs text-secondary-foreground">
                         <span className="text-neon-cyan">→</span>
-                        {imp.startsWith("TODO") || imp.startsWith("Engineering TODO") ? (
-                          <span className="text-neon-amber">{imp}</span>
-                        ) : (
-                          imp
-                        )}
+                        {imp}
                       </li>
                     ))}
                   </ul>
@@ -229,7 +286,7 @@ export default function ProjectsSection() {
                     key={t}
                     className="px-2 py-0.5 text-[10px] font-mono rounded border border-panel-border text-muted-foreground"
                   >
-                    {t === "TODO" ? <TodoField /> : t}
+                    {t}
                   </span>
                 ))}
               </div>
@@ -239,9 +296,7 @@ export default function ProjectsSection() {
 
         {/* Right: Telemetry / Evidence */}
         <div className="lg:col-span-4 panel-glass rounded-lg overflow-hidden">
-          <PanelHeader>
-            Telemetry / Evidence
-          </PanelHeader>
+          <PanelHeader>Telemetry / Evidence</PanelHeader>
           <AnimatePresence mode="wait">
             <motion.div
               key={selectedProject.id + "-evidence"}
@@ -250,79 +305,205 @@ export default function ProjectsSection() {
               exit={{ opacity: 0 }}
               className="p-4 space-y-4 max-h-[70vh] overflow-y-auto"
             >
-              {/* Diagrams */}
-              <div>
-                <h4 className="text-xs font-mono font-semibold text-muted-foreground tracking-wider mb-3 uppercase">
-                  Diagrams
-                </h4>
-                <div className="space-y-3">
-                  {selectedProject.diagrams.map((d) => (
-                    <DiagramCard key={d.id} diagram={d} />
-                  ))}
-                </div>
-              </div>
+              {/* Visual Evidence Gallery */}
+              <VisualGallery project={selectedProject} />
+
+              {/* Engineering Notes Accordion (conceptual diagrams) */}
+              <EngineeringNotes project={selectedProject} />
 
               {/* Evidence Items */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-xs font-mono font-semibold text-muted-foreground tracking-wider uppercase">
-                    Evidence Vault
-                  </h4>
-                  <button
-                    onClick={() => setEvidenceDrawerOpen(!evidenceDrawerOpen)}
-                    className="text-[10px] font-mono text-primary hover:underline"
+              <EvidenceVault project={selectedProject} />
+
+              {/* Live Demo Link (Funck) */}
+              {selectedProject.id === "funck" && (
+                <div className="border border-neon-cyan/30 rounded-lg p-4 bg-neon-cyan/5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Globe size={14} className="text-neon-cyan" />
+                    <span className="text-xs font-mono font-semibold text-neon-cyan uppercase">Live Demo</span>
+                  </div>
+                  <a
+                    href="https://www.funck.live"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary hover:underline font-mono"
                   >
-                    {evidenceDrawerOpen ? "COLLAPSE" : "EXPAND"}
-                  </button>
+                    www.funck.live
+                  </a>
+                  <div className="mt-2 text-xs text-muted-foreground space-y-0.5">
+                    <p>Walkthrough: Browse events → Select tickets → Checkout (Stripe) → Receive QR email</p>
+                  </div>
                 </div>
-                {selectedProject.evidence.length === 0 ? (
-                  <div className="text-xs font-mono text-neon-amber border border-neon-amber/20 rounded p-3 bg-neon-amber/5">
-                    Simulation evidence not uploaded yet
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {selectedProject.evidence.map((ev) => (
-                      <div
-                        key={ev.id}
-                        className="border border-panel-border rounded p-2.5 text-xs"
-                      >
-                        <div className="flex items-center gap-2 mb-1">
-                          {ev.type === "pdf" ? (
-                            <FileText size={12} className="text-neon-cyan" />
-                          ) : ev.type === "link" ? (
-                            <ExternalLink size={12} className="text-neon-cyan" />
-                          ) : (
-                            <ImageIcon size={12} className="text-neon-cyan" />
-                          )}
-                          <span className="font-mono font-semibold text-foreground truncate">
-                            {ev.fileName}
-                          </span>
-                        </div>
-                        {evidenceDrawerOpen && (
-                          <p className="text-muted-foreground mt-1 leading-relaxed">
-                            {ev.description}
-                          </p>
-                        )}
-                        {ev.url && (
-                          <a
-                            href={ev.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:underline mt-1 inline-block font-mono"
-                          >
-                            {ev.url}
-                          </a>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Archive / Evidence Pending */}
+      {!demoMode && archivedProjects.length > 0 && (
+        <div className="mt-6">
+          <button
+            onClick={() => setArchiveOpen(!archiveOpen)}
+            className="flex items-center gap-2 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Archive size={14} />
+            <span className="uppercase tracking-wider">Archive / Evidence Pending ({archivedProjects.length})</span>
+            <ChevronDown size={12} className={`transition-transform ${archiveOpen ? "rotate-180" : ""}`} />
+          </button>
+
+          <AnimatePresence>
+            {archiveOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {archivedProjects.map((p) => (
+                    <div key={p.id} className="panel-glass rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <StatusLight color={p.statusColor} />
+                        <span className="text-sm font-semibold text-foreground">{p.name}</span>
+                      </div>
+                      <p className="text-xs text-secondary-foreground mb-3">{p.heroSummary}</p>
+                      <EvidencePending
+                        items={[
+                          "Upload final schematic or state diagram",
+                          "Add demonstration video or photos",
+                          "Document specific implementation details",
+                        ]}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
     </section>
+  );
+}
+
+/* ========== SUB-COMPONENTS ========== */
+
+function VisualGallery({ project }: { project: Project }) {
+  const mainDiagrams = project.diagrams.filter((d) => !d.engineeringNote);
+
+  if (mainDiagrams.length === 0) return null;
+
+  return (
+    <div>
+      <h4 className="text-xs font-mono font-semibold text-muted-foreground tracking-wider mb-3 uppercase">
+        Visual Evidence
+      </h4>
+      <div className="space-y-3">
+        {mainDiagrams.map((d) => (
+          <DiagramCard key={d.id} diagram={d} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function EngineeringNotes({ project }: { project: Project }) {
+  const [open, setOpen] = useState(false);
+  const conceptualDiagrams = project.diagrams.filter((d) => d.engineeringNote);
+
+  if (conceptualDiagrams.length === 0) return null;
+
+  return (
+    <div className="border border-panel-border rounded-lg overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-3 py-2 text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-panel-highlight transition-colors"
+      >
+        <span className="uppercase tracking-wider">Engineering Notes (Conceptual)</span>
+        <ChevronDown size={12} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="px-3 pb-3 space-y-3 border-t border-panel-border pt-3">
+              {conceptualDiagrams.map((d) => (
+                <DiagramCard key={d.id} diagram={d} />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function EvidenceVault({ project }: { project: Project }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="text-xs font-mono font-semibold text-muted-foreground tracking-wider uppercase">
+          Evidence Vault
+        </h4>
+        {project.evidence.length > 0 && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="text-[10px] font-mono text-primary hover:underline"
+          >
+            {expanded ? "COLLAPSE" : "EXPAND"}
+          </button>
+        )}
+      </div>
+      {project.evidence.length === 0 ? (
+        <EvidencePending
+          items={[
+            "Upload project documentation",
+            "Add photos or screenshots",
+            "Include test results or reports",
+          ]}
+        />
+      ) : (
+        <div className="space-y-2">
+          {project.evidence.map((ev) => (
+            <div key={ev.id} className="border border-panel-border rounded p-2.5 text-xs">
+              <div className="flex items-center gap-2 mb-1">
+                {ev.type === "pdf" ? (
+                  <FileText size={12} className="text-neon-cyan" />
+                ) : ev.type === "link" ? (
+                  <ExternalLink size={12} className="text-neon-cyan" />
+                ) : (
+                  <ImageIcon size={12} className="text-neon-cyan" />
+                )}
+                <span className="font-mono font-semibold text-foreground truncate">
+                  {ev.fileName}
+                </span>
+              </div>
+              {expanded && (
+                <p className="text-muted-foreground mt-1 leading-relaxed">
+                  {ev.description}
+                </p>
+              )}
+              {ev.url && (
+                <a
+                  href={ev.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline mt-1 inline-block font-mono"
+                >
+                  {ev.url}
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -382,7 +563,7 @@ function DiagramCard({ diagram }: { diagram: DiagramItem }) {
                 Derived from:{" "}
                 {diagram.derivedFrom.length > 0
                   ? diagram.derivedFrom.join(", ")
-                  : "No direct simulation/capture uploaded yet"}
+                  : "No direct evidence uploaded"}
               </div>
             </div>
           </motion.div>

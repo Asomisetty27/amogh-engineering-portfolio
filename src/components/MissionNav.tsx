@@ -2,16 +2,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useViewMode } from "@/contexts/ViewModeContext";
 import {
-  Compass,
-  Rocket,
-  Briefcase,
-  Cpu,
-  Mail,
-  FileText,
-  Eye,
-  Wrench,
-  Menu,
-  X,
+  Compass, Rocket, Briefcase, Cpu, Mail, FileText,
+  Eye, Wrench, Menu, X, Link2, Check, Monitor,
 } from "lucide-react";
 
 const navItems = [
@@ -29,12 +21,18 @@ interface MissionNavProps {
 }
 
 export default function MissionNav({ activeSection, onNavigate }: MissionNavProps) {
-  const { mode, toggle } = useViewMode();
+  const { mode, toggle, demoMode, toggleDemo } = useViewMode();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
 
   return (
     <>
-      {/* Desktop nav */}
       <nav className="no-print fixed top-0 left-0 right-0 z-40 panel-glass border-b border-panel-border">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -77,11 +75,34 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
             })}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            {/* Demo Mode toggle */}
+            <button
+              onClick={toggleDemo}
+              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono rounded border transition-colors ${
+                demoMode
+                  ? "border-neon-green/40 bg-neon-green/10 text-neon-green"
+                  : "border-panel-border text-muted-foreground hover:text-foreground"
+              }`}
+              title="Demo Mode: shows only strongest projects"
+            >
+              <Monitor size={12} />
+              <span className="hidden lg:inline">DEMO</span>
+            </button>
+
+            {/* Copy link */}
+            <button
+              onClick={copyLink}
+              className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-mono rounded border border-panel-border text-muted-foreground hover:text-foreground transition-colors"
+              title="Copy site link"
+            >
+              {linkCopied ? <Check size={12} className="text-neon-green" /> : <Link2 size={12} />}
+            </button>
+
             {/* Mode toggle */}
             <button
               onClick={toggle}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded border border-panel-border bg-panel hover:bg-panel-highlight transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono rounded border border-panel-border bg-panel hover:bg-panel-highlight transition-colors"
             >
               {mode === "recruiter" ? (
                 <>
@@ -133,6 +154,17 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
                 </button>
               );
             })}
+            <div className="pt-2 border-t border-panel-border">
+              <button
+                onClick={toggleDemo}
+                className={`w-full flex items-center gap-2 px-3 py-2 text-sm font-mono rounded ${
+                  demoMode ? "text-neon-green bg-neon-green/10" : "text-muted-foreground"
+                }`}
+              >
+                <Monitor size={14} />
+                Demo Mode {demoMode ? "ON" : "OFF"}
+              </button>
+            </div>
           </motion.div>
         )}
       </nav>
