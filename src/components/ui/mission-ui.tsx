@@ -1,5 +1,5 @@
 import type { ConfidenceBadge } from "@/data/portfolioData";
-import { Shield, AlertTriangle } from "lucide-react";
+import { Shield, AlertTriangle, Clock } from "lucide-react";
 
 export function ConfidenceBadgeTag({ confidence }: { confidence: ConfidenceBadge }) {
   if (confidence === "VERIFIED") {
@@ -28,7 +28,7 @@ export function StatusLight({ color }: { color: string }) {
   };
   const cls = colorMap[color] || "bg-neon-cyan";
   return (
-    <span className={`inline-block w-2 h-2 rounded-full ${cls} animate-status-pulse`} style={{ color: `var(--${color?.replace('neon-', 'neon-')})` }} />
+    <span className={`inline-block w-2 h-2 rounded-full ${cls} animate-status-pulse`} />
   );
 }
 
@@ -55,10 +55,23 @@ export function SectionTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function TodoField({ label }: { label?: string }) {
+export function EvidencePending({ items }: { items: string[] }) {
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono tracking-wider rounded border border-neon-amber/30 bg-neon-amber/5 text-neon-amber">
-      TODO{label ? `: ${label}` : ""}
-    </span>
+    <div className="border border-neon-amber/20 rounded-lg p-4 bg-neon-amber/5">
+      <div className="flex items-center gap-2 mb-2">
+        <Clock size={14} className="text-neon-amber" />
+        <span className="text-xs font-mono font-semibold tracking-wider text-neon-amber uppercase">
+          Evidence Pending
+        </span>
+      </div>
+      <ul className="space-y-1">
+        {items.map((item, i) => (
+          <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
+            <span className="text-neon-amber/60">→</span>
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

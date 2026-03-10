@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { experiences } from "@/data/portfolioData";
 import { useViewMode } from "@/contexts/ViewModeContext";
 import { ConfidenceBadgeTag, SectionTitle } from "@/components/ui/mission-ui";
-import { Building2, Calendar } from "lucide-react";
+import { Building2, Calendar, TrendingDown } from "lucide-react";
 
 export default function ExperienceSection() {
   const { mode } = useViewMode();
@@ -30,11 +30,7 @@ export default function ExperienceSection() {
               </div>
               <span className="text-xs font-mono text-muted-foreground flex items-center gap-1">
                 <Calendar size={12} />
-                {exp.period.startsWith("TODO") ? (
-                  <span className="text-neon-amber">TODO</span>
-                ) : (
-                  exp.period
-                )}
+                {exp.period}
               </span>
             </div>
 
@@ -58,6 +54,47 @@ export default function ExperienceSection() {
                 </li>
               ))}
             </ul>
+
+            {/* Process Improvement Card (Natera) */}
+            {exp.processImprovement && (
+              <div className="mt-4 border border-panel-border rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <TrendingDown size={14} className="text-neon-green" />
+                  <span className="text-xs font-mono font-semibold text-neon-green uppercase tracking-wider">
+                    Process Improvement
+                  </span>
+                </div>
+
+                {/* Before / After */}
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="border border-neon-red/20 rounded p-2.5 bg-neon-red/5">
+                    <div className="text-[10px] font-mono text-neon-red mb-1 uppercase">Before</div>
+                    <div className="text-sm text-foreground font-mono">{exp.processImprovement.before}</div>
+                  </div>
+                  <div className="border border-neon-green/20 rounded p-2.5 bg-neon-green/5">
+                    <div className="text-[10px] font-mono text-neon-green mb-1 uppercase">After</div>
+                    <div className="text-sm text-foreground font-mono">{exp.processImprovement.after}</div>
+                  </div>
+                </div>
+
+                {/* What Changed */}
+                <div className="mb-3">
+                  <div className="text-[10px] font-mono text-muted-foreground mb-1.5 uppercase">What Changed</div>
+                  <ul className="space-y-1">
+                    {exp.processImprovement.whatChanged.map((item, k) => (
+                      <li key={k} className="text-xs text-secondary-foreground flex items-start gap-1.5">
+                        <span className="text-neon-cyan mt-0.5">→</span>{item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Measurement Method */}
+                <div className="text-[10px] font-mono text-neon-amber border border-neon-amber/20 rounded p-2 bg-neon-amber/5">
+                  ⚠ {exp.processImprovement.measurementMethod}
+                </div>
+              </div>
+            )}
           </motion.div>
         ))}
       </div>
