@@ -5,10 +5,10 @@ import { Clock, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const topProjects = [
+  projects.find((p) => p.id === "rgm-machine")!,
   projects.find((p) => p.id === "otter-cpu")!,
-  projects.find((p) => p.id === "metal-detector")!,
   projects.find((p) => p.id === "funck")!,
-];
+].filter(Boolean);
 
 type WalkthroughKey = "oneMinute" | "threeMinute" | "tenMinute";
 
