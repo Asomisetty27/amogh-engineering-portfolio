@@ -3,14 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { projects, type RGMStage, type FailureMode } from "@/data/portfolioData";
 import { useViewMode } from "@/contexts/ViewModeContext";
 import { ConfidenceBadgeTag, PanelHeader } from "@/components/ui/mission-ui";
-import { ChevronDown, Zap, AlertTriangle, CheckCircle2, Box } from "lucide-react";
+import { ChevronDown, AlertTriangle, CheckCircle2, Box, Play, ArrowRight } from "lucide-react";
 
 const RGMHologram = lazy(() => import("@/components/holograms/RGMHologram"));
 
 const rgmProject = projects.find(p => p.id === "rgm-machine")!;
 const stages = rgmProject.module.rgmStages || [];
 const failureModes = rgmProject.module.failureModes;
-const achievements = rgmProject.module.achievements || [];
+const validationResults = rgmProject.module.validationResults || [];
 
 const stageColors = [
   "#00d4aa", "#44aaff", "#ffaa00", "#ff4488", "#00aaff",
@@ -35,7 +35,7 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
             Rube Goldberg Machine
           </h1>
           <p className="text-sm text-muted-foreground font-mono mt-1">
-            The Electronic Chain Reaction — EE 241-01 | Winter 2026
+            9-Stage Electromechanical Chain Reaction — EE 241-01 | Winter 2026
           </p>
         </div>
         <button
@@ -49,44 +49,89 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
         </button>
       </div>
 
-      {/* Hero image */}
-      {rgmProject.heroImage && (
-        <div className="panel-glass rounded-lg overflow-hidden">
-          <PanelHeader>Complete RGM Setup — VERIFIED Evidence</PanelHeader>
-          <div className="p-2">
-            <img src={rgmProject.heroImage} alt="Complete RGM Setup" className="w-full rounded" loading="lazy" />
-            <div className="text-[10px] font-mono text-muted-foreground mt-1 px-1">
-              Source: Lab_Final_Report_Amogh_Somisetty.pdf, p1 (Figure 1)
+      {/* Problem + System Overview */}
+      <div className="panel-glass rounded-lg p-4 border-l-2 border-l-neon-green">
+        <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-2 uppercase">System Problem</h4>
+        <p className="text-sm text-secondary-foreground leading-relaxed mb-3">{rgmProject.module.problemStatement}</p>
+        <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-2 uppercase">System Overview</h4>
+        <p className="text-sm text-secondary-foreground leading-relaxed">{rgmProject.module.systemOverview}</p>
+      </div>
+
+      {/* Hero evidence */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {rgmProject.heroImage && (
+          <div className="panel-glass rounded-lg overflow-hidden">
+            <PanelHeader>Setup Photo — VERIFIED</PanelHeader>
+            <div className="p-2">
+              <img src={rgmProject.heroImage} alt="Complete RGM Setup" className="w-full rounded" loading="lazy" />
+              <div className="text-[10px] font-mono text-muted-foreground mt-1 px-1">
+                Source: Lab_Final_Report, p1 (Figure 1)
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+        {rgmProject.videoPath && (
+          <div className="panel-glass rounded-lg overflow-hidden">
+            <PanelHeader>
+              <span className="flex items-center gap-1.5"><Play size={12} /> Video Demonstration — VERIFIED</span>
+            </PanelHeader>
+            <div className="p-2">
+              <video controls className="w-full rounded" preload="metadata">
+                <source src={rgmProject.videoPath} type="video/mp4" />
+              </video>
+              <div className="text-[10px] font-mono text-muted-foreground mt-1 px-1">
+                EE_241_Final_Demonstration.mp4 — March 10, 2026
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* 3D Hologram */}
       <AnimatePresence>
         {showHologram && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-            <Suspense fallback={<div className="h-96 flex items-center justify-center text-muted-foreground font-mono text-sm">Loading 3D viewer...</div>}>
+            <Suspense fallback={<div className="h-96 flex items-center justify-center text-muted-foreground font-mono text-sm">Loading holographic display...</div>}>
               <RGMHologram />
             </Suspense>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Stage Flow Map */}
+      {/* System Flow */}
       <div className="panel-glass rounded-lg overflow-hidden">
-        <PanelHeader>Nine-Stage Chain Reaction Flow</PanelHeader>
+        <PanelHeader>Nine-Stage Signal Chain</PanelHeader>
         <div className="p-4">
-          {/* Block diagram image */}
+          {/* Block diagram */}
           <div className="mb-4 border border-panel-border rounded overflow-hidden">
             <img src="/evidence/rgm-block-diagram.png" alt="RGM Block Diagram" className="w-full" loading="lazy" />
             <div className="text-[10px] font-mono text-muted-foreground px-2 py-1 border-t border-panel-border flex items-center gap-2">
               <ConfidenceBadgeTag confidence="VERIFIED" />
-              Lab_Final_Report, p2 (Figure 1)
+              Lab_Final_Report, p2
             </div>
           </div>
 
-          {/* Interactive stages */}
+          {/* Signal chain visualization */}
+          <div className="flex flex-wrap items-center gap-1 mb-4 px-2">
+            {stages.map((stage, i) => (
+              <div key={stage.number} className="flex items-center gap-1">
+                <button
+                  onClick={() => setSelectedStage(selectedStage?.number === stage.number ? null : stage)}
+                  className={`px-2 py-1 text-[10px] font-mono rounded transition-all ${
+                    selectedStage?.number === stage.number
+                      ? "bg-primary/20 text-primary border border-primary/40"
+                      : "text-muted-foreground hover:text-foreground border border-transparent hover:border-panel-border"
+                  }`}
+                  style={selectedStage?.number === stage.number ? { color: stageColors[i] } : {}}
+                >
+                  {stage.number}
+                </button>
+                {i < stages.length - 1 && <ArrowRight size={10} className="text-muted-foreground/30" />}
+              </div>
+            ))}
+          </div>
+
+          {/* Interactive stages grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
             {stages.map((stage, i) => {
               const isSelected = selectedStage?.number === stage.number;
@@ -141,7 +186,6 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
                 </div>
               </div>
 
-              {/* Input/Output */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="border border-neon-amber/20 rounded p-2.5 bg-neon-amber/5">
                   <div className="text-[10px] font-mono text-neon-amber mb-1 uppercase">Stage Input</div>
@@ -153,7 +197,6 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
                 </div>
               </div>
 
-              {/* Key Components */}
               {selectedStage.keyComponents && (
                 <div>
                   <h4 className="text-xs font-mono font-semibold text-muted-foreground uppercase mb-1.5">Key Components</h4>
@@ -204,26 +247,38 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
         </div>
       )}
 
-      {/* Last Step Schematic */}
-      <div className="panel-glass rounded-lg overflow-hidden">
-        <PanelHeader>Last Step — Tilt Switch + I2C LCD Schematic</PanelHeader>
-        <div className="p-2">
-          <img src="/evidence/rgm-last-step-schematic.png" alt="Last Step Schematic" className="w-full rounded" loading="lazy" />
-          <div className="text-[10px] font-mono text-muted-foreground mt-1 px-1 flex items-center gap-2">
-            <ConfidenceBadgeTag confidence="VERIFIED" />
-            Lab_Final_Report, p6
+      {/* Schematics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="panel-glass rounded-lg overflow-hidden">
+          <PanelHeader>Last Step — Tilt Switch + I2C LCD</PanelHeader>
+          <div className="p-2">
+            <img src="/evidence/rgm-last-step-schematic.png" alt="Last Step Schematic" className="w-full rounded" loading="lazy" />
+            <div className="text-[10px] font-mono text-muted-foreground mt-1 px-1 flex items-center gap-2">
+              <ConfidenceBadgeTag confidence="VERIFIED" />
+              Lab_Final_Report, p6
+            </div>
+          </div>
+          {mode === "engineer" && (
+            <div className="px-4 pb-4 text-xs text-secondary-foreground space-y-1">
+              <p>• TILT_PIN uses INPUT_PULLUP — default HIGH, closure pulls LOW</p>
+              <p>• I2C LCD: 0x27 via PCF8574 backpack</p>
+              <p>• fillLCD() writes custom 0xFF block to all 32 positions</p>
+            </div>
+          )}
+        </div>
+        <div className="panel-glass rounded-lg overflow-hidden">
+          <PanelHeader>555 Timer Metal Detector</PanelHeader>
+          <div className="p-2">
+            <img src="/evidence/ee241-lab6-555timer.jpg" alt="555 Timer Schematic" className="w-full rounded" loading="lazy" />
+            <div className="text-[10px] font-mono text-muted-foreground mt-1 px-1 flex items-center gap-2">
+              <ConfidenceBadgeTag confidence="VERIFIED" />
+              EE_241_Lab_6
+            </div>
           </div>
         </div>
-        {mode === "engineer" && (
-          <div className="px-4 pb-4 text-xs text-secondary-foreground space-y-1">
-            <p>• TILT_PIN uses INPUT_PULLUP — default HIGH, switch closure to GND pulls LOW (trigger)</p>
-            <p>• I2C LCD address: 0x27 (alt 0x3F) via PCF8574 backpack</p>
-            <p>• fillLCD() creates custom 0xFF block char, writes to all 32 positions</p>
-          </div>
-        )}
       </div>
 
-      {/* Debugging & Failure Modes */}
+      {/* Failure Modes */}
       <div className="panel-glass rounded-lg overflow-hidden">
         <button
           onClick={() => setShowFailures(!showFailures)}
@@ -237,7 +292,6 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
           </div>
           <ChevronDown size={14} className={`text-muted-foreground transition-transform ${showFailures ? "rotate-180" : ""}`} />
         </button>
-
         <AnimatePresence>
           {showFailures && (
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
@@ -251,21 +305,29 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
         </AnimatePresence>
       </div>
 
-      {/* Achievements */}
-      {achievements.length > 0 && (
+      {/* Validation */}
+      {validationResults.length > 0 && (
         <div className="panel-glass rounded-lg overflow-hidden">
-          <PanelHeader>Demo Day Achievements — All 9 Stages Verified</PanelHeader>
+          <PanelHeader>Demo Day — All 9 Stages Verified</PanelHeader>
           <div className="p-4 space-y-1.5">
-            {achievements.map((a, i) => (
+            {validationResults.map((a, i) => (
               <div key={i} className="flex items-start gap-2 text-xs text-secondary-foreground">
                 <CheckCircle2 size={12} className="text-neon-green mt-0.5 flex-shrink-0" />
                 <span>{a}</span>
               </div>
             ))}
             <div className="text-[10px] font-mono text-muted-foreground mt-2 pt-2 border-t border-panel-border">
-              Source: Lab_Final_Report, p13 (Section: Project Achievements)
+              Source: Lab_Final_Report, p13
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Key Insight */}
+      {rgmProject.module.keyInsight && (
+        <div className="panel-glass rounded-lg p-4 border-l-2 border-l-primary">
+          <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-1 uppercase">Key Insight</h4>
+          <p className="text-sm text-secondary-foreground leading-relaxed">{rgmProject.module.keyInsight}</p>
         </div>
       )}
     </div>
@@ -281,9 +343,13 @@ function FailureModeCard({ fm, index }: { fm: FailureMode; index: number }) {
         </span>
         <ConfidenceBadgeTag confidence={fm.confidence} />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
         <div className="border border-neon-red/15 rounded p-2 bg-neon-red/5">
-          <div className="text-[10px] font-mono text-neon-red mb-0.5 uppercase">Cause</div>
+          <div className="text-[10px] font-mono text-neon-red mb-0.5 uppercase">Problem</div>
+          <div className="text-secondary-foreground">{fm.problem}</div>
+        </div>
+        <div className="border border-neon-amber/15 rounded p-2 bg-neon-amber/5">
+          <div className="text-[10px] font-mono text-neon-amber mb-0.5 uppercase">Cause</div>
           <div className="text-secondary-foreground">{fm.cause}</div>
         </div>
         <div className="border border-neon-green/15 rounded p-2 bg-neon-green/5">
@@ -292,7 +358,7 @@ function FailureModeCard({ fm, index }: { fm: FailureMode; index: number }) {
         </div>
       </div>
       <div className="text-xs text-muted-foreground">
-        <span className="text-neon-amber">Impact:</span> {fm.systemImpact}
+        <span className="text-neon-magenta">System Impact:</span> {fm.systemImpact}
       </div>
       {fm.evidence_source && (
         <div className="text-[10px] font-mono text-muted-foreground">Source: {fm.evidence_source}</div>
