@@ -5,7 +5,7 @@ export interface EvidenceItem {
   id: string;
   fileName: string;
   page?: number;
-  type: "pdf" | "image" | "screenshot" | "code" | "link";
+  type: "pdf" | "image" | "screenshot" | "code" | "link" | "video";
   description: string;
   path?: string;
   url?: string;
@@ -58,26 +58,44 @@ export interface RGMStage {
   keyComponents?: string[];
 }
 
+export interface Subsystem {
+  id: string;
+  title: string;
+  description: string;
+  details: string[];
+  confidence: ConfidenceBadge;
+  evidenceSource?: string;
+}
+
 export interface ProjectModule {
-  missionObjective: string;
+  problemStatement: string;
+  systemOverview: string;
   systemArchitecture: string;
+  subsystems?: Subsystem[];
   implementationNotes: string[];
   failureModes: FailureMode[];
   improvements: string[];
+  validationResults?: string[];
+  keyInsight?: string;
   verificationSummary?: VerificationRow[];
   ownershipDisclosure?: { owned: string[]; aiAssisted: string[] };
   rgmStages?: RGMStage[];
   achievements?: string[];
 }
 
-export type ProjectCategory = "Hardware" | "Systems" | "Ops" | "Web";
-export type ProjectStatus = "COMPLETE" | "IN_PROGRESS" | "ARCHIVED" | "ACTIVE";
+export type SystemDomain =
+  | "signal-systems"
+  | "electromechanical"
+  | "digital-systems"
+  | "manufacturing";
+
+export type ProjectStatus = "COMPLETE" | "IN_PROGRESS" | "EVIDENCE_PENDING" | "ACTIVE";
 
 export interface Project {
   id: string;
   name: string;
   codename: string;
-  category: ProjectCategory;
+  domain: SystemDomain;
   status: ProjectStatus;
   course?: string;
   statusColor: string;
@@ -85,12 +103,51 @@ export interface Project {
   diagrams: DiagramItem[];
   evidence: EvidenceItem[];
   techStack: string[];
-  archived?: boolean;
   heroSummary: string;
   heroImage?: string;
   has3D?: boolean;
   hologramType?: "physical" | "system" | "network" | "interactive";
+  videoPath?: string;
 }
+
+export interface SystemDomainInfo {
+  id: SystemDomain;
+  name: string;
+  subtitle: string;
+  icon: string;
+  color: string;
+}
+
+export const systemDomains: SystemDomainInfo[] = [
+  {
+    id: "signal-systems",
+    name: "System Integration & Signal Pipelines",
+    subtitle: "End-to-end analog↔digital systems, signal conditioning, ADC/DAC",
+    icon: "signal",
+    color: "neon-cyan",
+  },
+  {
+    id: "electromechanical",
+    name: "Electromechanical Systems",
+    subtitle: "Multi-stage chain reactions, sensors, actuators, control loops",
+    icon: "zap",
+    color: "neon-green",
+  },
+  {
+    id: "digital-systems",
+    name: "Digital Systems & Computation",
+    subtitle: "CPU architecture, FSMs, FPGA implementation, HDL design",
+    icon: "cpu",
+    color: "neon-magenta",
+  },
+  {
+    id: "manufacturing",
+    name: "Manufacturing & Physical Realization",
+    subtitle: "CAD → fabrication → assembly, GD&T, machining, PCB",
+    icon: "wrench",
+    color: "neon-amber",
+  },
+];
 
 export interface ExperienceItem {
   company: string;
@@ -263,23 +320,225 @@ const rgmFailureModes: FailureMode[] = [
 
 // ========== PROJECTS ==========
 export const projects: Project[] = [
+  // ===== DOMAIN: SIGNAL SYSTEMS =====
+  {
+    id: "ee143-signal-system",
+    name: "End-to-End Analog ↔ Digital Signal System",
+    codename: "EE143-SYS",
+    domain: "signal-systems",
+    course: "EE 143",
+    status: "EVIDENCE_PENDING",
+    statusColor: "neon-amber",
+    heroSummary: "Full signal pipeline: analog input → op-amp conditioning → Arduino ADC → 4-bit digital processing → binary-weighted DAC → analog output. 16 discrete voltage levels, ~62.5 mV resolution.",
+    has3D: false,
+    hologramType: "system",
+    module: {
+      problemStatement: "How do you convert an analog signal to digital, process it, and reconstruct it — understanding every loss and distortion introduced at each stage?",
+      systemOverview: "Complete analog-to-digital-to-analog pipeline spanning measurement, conditioning, conversion, processing, and reconstruction. Built across EE 143 labs culminating in a working ADC→DAC system.",
+      systemArchitecture: "Signal Source → Op-Amp Conditioning (level shift, buffer) → Arduino ADC (10-bit, mapped to 4-bit) → Digital Processing → 4-bit Binary Weighted DAC → Output Stage → Speaker",
+      subsystems: [
+        {
+          id: "measurement",
+          title: "Measurement & Instrumentation",
+          description: "Oscilloscope triggering, waveform measurement, frequency/time domain analysis, function generator behavior (50Ω vs Hi-Z loading)",
+          details: [
+            "Oscilloscope trigger modes: edge, auto, single",
+            "Function generator 50Ω output impedance vs Hi-Z termination effects",
+            "Frequency measurement: period method vs frequency counter",
+            "Rise/fall time measurement techniques",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "EE 143 labs — evidence upload pending",
+        },
+        {
+          id: "analog-conditioning",
+          title: "Analog Conditioning (Op-Amp Systems)",
+          description: "Summing amplifier for audio level shifting, voltage follower for buffering, practical current source design",
+          details: [
+            "Summing amplifier: shifts AC signal into ADC-compatible 0–5V range",
+            "Voltage follower: unity gain buffer prevents loading from ADC input impedance",
+            "Current source: provides stable bias for sensor circuits",
+            "Op-amp non-idealities: input offset voltage, slew rate, CMRR effects",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "EE 143 labs — evidence upload pending",
+        },
+        {
+          id: "pcb-dac",
+          title: "PCB Design & 4-bit DAC",
+          description: "Binary-weighted resistor DAC: LTSpice simulation → Fusion 360 PCB design → physical board via reflow soldering",
+          details: [
+            "4-bit binary weighted DAC: R, 2R, 4R, 8R resistor network",
+            "16 discrete output levels from 4 digital input bits",
+            "~62.5 mV resolution (5V / 2⁴ = 312.5 mV per step, output dependent on weighting)",
+            "LTSpice simulation verified step response before fabrication",
+            "Eagle/Fusion PCB layout with proper trace routing",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "EE 143 labs — evidence upload pending",
+        },
+        {
+          id: "hardware-assembly",
+          title: "Hardware Assembly & Manufacturing",
+          description: "Reflow soldering process, thermal profile stages, manual vs reflow comparison",
+          details: [
+            "Reflow soldering: preheat → soak → reflow → cooling stages",
+            "Solder paste application via stencil",
+            "Component placement and alignment",
+            "Manual soldering for through-hole components",
+            "Failure modes: tombstoning, bridging, cold joints",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "EE 143 labs — evidence upload pending",
+        },
+        {
+          id: "system-integration",
+          title: "System Integration — ADC→DAC Pipeline",
+          description: "Arduino ADC sampling → 4-bit quantization → DAC reconstruction with staircase output and quantization error analysis",
+          details: [
+            "Arduino 10-bit ADC (0–1023) mapped to 4-bit (0–15)",
+            "Quantization: continuous signal → 16 discrete levels",
+            "Staircase waveform output from DAC",
+            "Quantization error = ±½ LSB = ±31.25 mV",
+            "Audio distortion audible due to low bit-depth",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "EE 143 labs — evidence upload pending",
+        },
+      ],
+      implementationNotes: [
+        "Full pipeline: analog signal → level shifting → ADC → 4-bit quantization → DAC → analog output",
+        "Op-amp conditioning stage shifts signal into ADC-compatible range",
+        "Arduino samples at 10-bit resolution, maps to 4-bit for DAC",
+        "Binary-weighted DAC produces 16 discrete voltage levels",
+        "Staircase output waveform demonstrates quantization effects",
+        "Audio output through speaker shows distortion from low bit-depth",
+      ],
+      failureModes: [
+        {
+          problem: "Loading effects on signal source",
+          cause: "ADC input impedance drawing current from signal source, causing voltage drop",
+          fix: "Added voltage follower (unity gain buffer) between source and ADC",
+          systemImpact: "Measured voltage did not match source voltage without buffer",
+          confidence: "CONCEPTUAL",
+        },
+        {
+          problem: "Signal clipping at ADC input",
+          cause: "Input signal exceeding 0–5V ADC range after level shifting",
+          fix: "Adjusted summing amplifier gain and offset to keep signal within range",
+          systemImpact: "Clipped peaks caused distortion in reconstructed output",
+          confidence: "CONCEPTUAL",
+        },
+        {
+          problem: "Quantization distortion in audio output",
+          cause: "4-bit resolution provides only 16 levels — insufficient for clean audio reproduction",
+          fix: "Expected behavior at this bit-depth; documented as fundamental limitation of low-resolution conversion",
+          systemImpact: "Audible staircase artifacts in speaker output",
+          confidence: "CONCEPTUAL",
+        },
+      ],
+      improvements: [
+        "Increase to 8-bit or 12-bit DAC for significantly reduced quantization noise",
+        "Add anti-aliasing filter before ADC input",
+        "Add reconstruction filter (low-pass) after DAC output",
+        "Implement higher sampling rate for better audio fidelity",
+      ],
+      keyInsight: "Low bit-depth causes audible distortion because the continuous analog signal is approximated by only 16 discrete levels. Each conversion stage (analog→digital→analog) introduces quantization error. Analog systems behave non-ideally due to loading, offset voltages, and component tolerances — understanding these is essential for system-level design.",
+    },
+    diagrams: [],
+    evidence: [],
+    techStack: ["Op-Amps", "Arduino ADC", "Binary-Weighted DAC", "LTSpice", "PCB Design", "Reflow Soldering", "Oscilloscope"],
+  },
+
+  // ===== DOMAIN: ELECTROMECHANICAL =====
   {
     id: "rgm-machine",
-    name: "Rube Goldberg Machine: The Electronic Chain Reaction",
-    codename: "RGM",
-    category: "Systems",
+    name: "Rube Goldberg Electromechanical System",
+    codename: "RGM-9",
+    domain: "electromechanical",
     course: "EE 241",
     status: "COMPLETE",
     statusColor: "neon-green",
-    heroSummary: "Nine-stage electromechanical chain reaction integrating capacitive piano, strobe, light detector, solenoid, 555 metal detector, electromagnet, tilt switch, and LCD — all working in sequence for live demo.",
+    heroSummary: "Nine-stage electromechanical chain reaction: capacitive piano → relay → strobe → light detector → solenoid → 555 metal detector → electromagnet → tilt switch → LCD. All 9 stages verified in live demo.",
     heroImage: "/evidence/rgm-complete-setup.jpg",
+    videoPath: "/evidence/rgm-demo.mp4",
     has3D: true,
     hologramType: "physical",
     module: {
-      missionObjective:
-        "Design and integrate a nine-stage Rube Goldberg Machine using circuits from EE 241 Labs 2–7, plus a team-designed final step. The RGM must execute a complete chain reaction from capacitive piano input to LCD output with no manual intervention after the initial trigger.",
-      systemArchitecture:
-        "Piano (capacitive touch) → Relay (5V→9V isolation) → Strobe (~580V flash) → Light Detector (Schmitt trigger) → Solenoid (marble launch) → 555 Metal Detector (8,760→8,310 Hz) → Electromagnet (MOSFET release) → Tilt Switch → LCD (2×16 white blocks). Arduino Mega controls detection, threshold logic, and LCD output.",
+      problemStatement: "Design a nine-stage Rube Goldberg Machine where each stage must reliably trigger the next with no manual intervention. Any single failure breaks the entire chain.",
+      systemOverview: "Nine-stage electromechanical chain reaction integrating circuits from EE 241 Labs 2–7 plus a team-designed final step. The system spans capacitive sensing, power switching, high-voltage generation, optical detection, electromagnetic actuation, frequency-based metal detection, and digital I/O — all sequentially dependent.",
+      systemArchitecture: "Piano (capacitive touch) → Relay (5V→9V isolation) → Strobe (~580V flash) → Light Detector (Schmitt trigger) → Solenoid (marble launch) → 555 Metal Detector (8,760→8,310 Hz) → Electromagnet (MOSFET release) → Tilt Switch → LCD (2×16 white blocks)",
+      subsystems: [
+        {
+          id: "capacitive-input",
+          title: "Capacitive Input Detection",
+          description: "Four copper foil touch pads with RC circuits detect finger touch via capacitance change exceeding 1000 counts",
+          details: [
+            "2.2 MΩ resistors create RC time constant",
+            "CapacitiveSensor library measures charge time",
+            "5-note sequence validation (1, 3, 2, 4, 1)",
+            "Buzzer feedback: C4, D4, E4, F4 tones",
+          ],
+          confidence: "VERIFIED",
+          evidenceSource: "Lab_Final_Report, p3",
+        },
+        {
+          id: "light-sensing",
+          title: "Light Sensing + Schmitt Trigger",
+          description: "Photoresistor voltage divider with hysteresis-based Schmitt trigger discriminates strobe flash from ambient light",
+          details: [
+            "Photoresistor + VR1 voltage divider sets threshold",
+            "LM324 op-amp comparator with hysteresis",
+            "VR1 adjusted to reject room lighting",
+            "Clean digital output for solenoid trigger",
+          ],
+          confidence: "VERIFIED",
+          evidenceSource: "Lab_Final_Report, p3-4",
+        },
+        {
+          id: "solenoid-actuation",
+          title: "Solenoid Actuation",
+          description: "Electromagnetic solenoid launches steel marble from custom track into inductor coil",
+          details: [
+            "Custom track: 6×2×1 in with 0.75 in cylindrical cutout",
+            "Solenoid plunger pushes steel ball",
+            "BJT drive circuit with flyback diode protection",
+          ],
+          confidence: "VERIFIED",
+          evidenceSource: "Lab_Final_Report, p4",
+        },
+        {
+          id: "metal-detection",
+          title: "Metal Detection via Frequency Shift",
+          description: "NE555 LC oscillator baseline 8,760 Hz drops to 8,310 Hz (5.1%) when steel marble enters coil",
+          details: [
+            "NE555 astable mode with L1=0.5mH, C2/C3=2.2µF",
+            "Baseline: 8,760 Hz → Metal-present: 8,310 Hz",
+            "5.1% drop exceeds 4% minimum threshold",
+            "Arduino pulseIn() on pin 12 measures frequency",
+            "STREAK_N=5 consecutive readings required",
+            "TRIP_DELTA=150 Hz fixed threshold",
+            "RELEASE_DELAY=600ms debounce",
+          ],
+          confidence: "VERIFIED",
+          evidenceSource: "Lab_Final_Report, p4",
+        },
+        {
+          id: "electromagnet-release",
+          title: "Electromagnet Release",
+          description: "MOSFET-controlled electromagnet holds ball; releases on confirmed frequency drop detection",
+          details: [
+            "N-channel MOSFET on Arduino pin 11",
+            "Initially HIGH (holding ball)",
+            "Arduino sets LOW after streak confirmation",
+            "Shared ground critical between Arduino and 9V",
+            "Flyback diode protects MOSFET from back-EMF",
+            "Holding force: 2.5 kg at 5V",
+          ],
+          confidence: "VERIFIED",
+          evidenceSource: "Lab_Final_Report, p4",
+        },
+      ],
       implementationNotes: [
         "5-note capacitive sequence (1,3,2,4,1) with 2.2MΩ RC pads triggers relay",
         "BC548 NPN transistor switches relay; flyback diode protects from relay coil spikes",
@@ -294,10 +553,21 @@ export const projects: Project[] = [
       ],
       failureModes: rgmFailureModes,
       improvements: [
-        "Add digital frequency counter for more precise threshold detection",
-        "Implement PCB-based integration instead of breadboard for reliability",
-        "Add timing measurement between stages for performance analysis",
-        "Consider wireless monitoring of each stage status",
+        "Digital frequency counter for more precise threshold detection",
+        "PCB-based integration instead of breadboard for reliability",
+        "Timing measurement between stages for performance analysis",
+        "Wireless monitoring of each stage status",
+      ],
+      validationResults: [
+        "Capacitive piano recognized proper 5-note sequence",
+        "Relay successfully switched 9V power supply",
+        "Strobe flashed in sequence",
+        "Light detector only responded to strobe flash (not ambient)",
+        "Solenoid successfully launched steel ball",
+        "555 metal detector achieved 5.1% frequency change",
+        "Electromagnet released only after confirmed detection",
+        "Tilt switch triggered correctly (LOW with INPUT_PULLUP)",
+        "LCD displayed 2 rows of 16 white blocks",
       ],
       verificationSummary: [
         { parameter: "Baseline Frequency", value: "8,760", unit: "Hz", evidence_source: "Lab_Final_Report, p4", confidence: "VERIFIED" },
@@ -313,16 +583,17 @@ export const projects: Project[] = [
       ],
       rgmStages,
       achievements: [
-        "Capacitive piano recognized proper 5-note sequence",
+        "Capacitive piano successfully recognized the proper sequence of 5 notes",
         "Relay successfully switched 9V power supply",
-        "Strobe flashed in sequence",
-        "Light detector only responded to strobe flash (not ambient)",
+        "Strobe successfully flashed in sequence",
+        "Light detector only responded to strobe flash",
         "Solenoid successfully launched steel ball",
         "555 metal detector achieved 5.1% frequency change",
-        "Electromagnet released only after confirmed detection",
+        "Electromagnet only released after confirmed detection",
         "Tilt switch triggered correctly (LOW with INPUT_PULLUP)",
         "LCD displayed 2 rows of 16 white blocks",
       ],
+      keyInsight: "Each stage must correctly produce an output that triggers the next. A single failure anywhere in the chain halts the entire system. Debugging required understanding signal propagation across domain boundaries — capacitive, optical, mechanical, electromagnetic, and digital.",
     },
     diagrams: [
       {
@@ -349,105 +620,6 @@ export const projects: Project[] = [
         description: "Arduino digital input with INPUT_PULLUP, tilt switch SPST connection, Inland 16×2 LCD I2C backpack (PCF8574, address 0x27).",
         imagePath: "/evidence/rgm-last-step-schematic.png",
       },
-    ],
-    evidence: [
-      {
-        id: "rgm-report",
-        fileName: "Lab_Final_Report_Amogh_Somisetty.pdf",
-        type: "pdf",
-        description: "EE 241-01 Final RGM Project Report (15 pages). All 9 stages, schematics, code, failure modes, and discussion.",
-      },
-      {
-        id: "rgm-solenoid-cad",
-        fileName: "Solenoid_Track_v2.f3d",
-        type: "image",
-        description: "Fusion 360 CAD file for solenoid track piece (6×2×1 in, 0.75 in cylindrical cutout). VERIFIED model file uploaded.",
-      },
-      {
-        id: "rgm-light-detector-cad",
-        fileName: "Light_detector_Somisetty_A_CA.f3d",
-        type: "image",
-        description: "Fusion 360 CAD file for light detector housing.",
-      },
-      {
-        id: "rgm-arduino-cad",
-        fileName: "Arduino_Uno_Model_1.f3d",
-        type: "image",
-        description: "Fusion 360 CAD model of Arduino board.",
-      },
-      {
-        id: "rgm-pcb-cad",
-        fileName: "Eagle_1_Inch_Square_PCB_Model.f3d",
-        type: "image",
-        description: "Fusion 360 CAD model of 1-inch square PCB.",
-      },
-    ],
-    techStack: ["Arduino Mega", "555 Timer", "MOSFET", "Solenoid", "Electromagnet", "Schmitt Trigger", "I2C LCD", "Capacitive Touch"],
-  },
-  {
-    id: "metal-detector",
-    name: "RGM Stage: Metal Detection & Electromagnet Release",
-    codename: "DETECT-7",
-    category: "Hardware",
-    course: "EE 241",
-    status: "COMPLETE",
-    statusColor: "neon-green",
-    heroSummary: "555 timer LC oscillator detects steel marble via 5.1% frequency drop (8,760→8,310 Hz); MOSFET-controlled electromagnet releases retained ball on confirmed detection.",
-    has3D: true,
-    hologramType: "physical",
-    module: {
-      missionObjective:
-        "Build the metal detection and electromagnet release subsystem (RGM Stages 6–7). 555 timer LC oscillator detects metal presence via frequency shift; MOSFET-controlled electromagnet releases ball when detection confirmed by Arduino streak logic.",
-      systemArchitecture:
-        "NE555 astable LC oscillator → Arduino pulseIn() frequency measurement → Streak counter (N=5) → TRIP_DELTA threshold (150 Hz) → RELEASE_DELAY (600ms) → MOSFET gate LOW → Electromagnet de-energizes → Ball released",
-      implementationNotes: [
-        "555 timer with L1=0.5mH inductor, C2/C3=2.2µF capacitors",
-        "Baseline frequency: 8,760 Hz without metal",
-        "Metal-present frequency: 8,310 Hz (5.1% drop > 4% minimum)",
-        "Arduino reads frequency via pulseIn() on pin 12",
-        "STREAK_N=5 consecutive readings required before release",
-        "TRIP_DELTA=150 Hz fixed threshold (more reliable than percent calculation)",
-        "RELEASE_DELAY=600ms debounce before electromagnet off",
-        "MOSFET on pin 11 controls electromagnet; shared ground critical",
-        "Flyback diode (1N4004/MUR348) protects MOSFET from back-EMF",
-        "Electromagnet holding force: 2.5 kg (5V spec)",
-      ],
-      failureModes: [
-        {
-          problem: "Solenoid back-EMF damaging MOSFET",
-          cause: "Inductive kickback from solenoid coil de-energization",
-          fix: "Added 1N4004 flyback diode across solenoid coil",
-          systemImpact: "MOSFET failure would prevent electromagnet control",
-          evidence_source: "EE_241_Lab_7, p1",
-          confidence: "VERIFIED",
-        },
-        {
-          problem: "MOSFET not switching — no common ground",
-          cause: "Arduino USB 5V and external 9V had separate grounds → undefined V_GS",
-          fix: "Connected both grounds; MOSFET operated correctly",
-          systemImpact: "Electromagnet could not be controlled at all",
-          evidence_source: "Lab_Final_Report, p12",
-          confidence: "VERIFIED",
-        },
-      ],
-      improvements: [
-        "Digital frequency counter for precise threshold detection",
-        "Adjustable sensitivity via potentiometer on TRIP_DELTA",
-        "Visual/audio indicator for detection events",
-      ],
-      verificationSummary: [
-        { parameter: "Baseline Frequency", value: "8,760", unit: "Hz", evidence_source: "Lab_Final_Report, p4", confidence: "VERIFIED" },
-        { parameter: "Metal-Present Freq", value: "8,310", unit: "Hz", evidence_source: "Lab_Final_Report, p4", confidence: "VERIFIED" },
-        { parameter: "Frequency Drop", value: "5.1", unit: "%", evidence_source: "Lab_Final_Report, p4", confidence: "VERIFIED" },
-        { parameter: "Inductor (L1)", value: "0.5", unit: "mH", evidence_source: "EE_241_Lab_6, schematic", confidence: "VERIFIED" },
-        { parameter: "Capacitor (C2,C3)", value: "2.2", unit: "µF", evidence_source: "EE_241_Lab_6, schematic", confidence: "VERIFIED" },
-        { parameter: "Supply Voltage", value: "9", unit: "VDC", evidence_source: "EE_241_Lab_6, schematic", confidence: "VERIFIED" },
-        { parameter: "Electromagnet Hold", value: "2.5", unit: "kg", evidence_source: "EE_241_Lab_7, p1", confidence: "VERIFIED" },
-        { parameter: "MOSFET Rating", value: "30V / 40A", unit: "N-Ch FET", evidence_source: "EE_241_Lab_7, p2", confidence: "VERIFIED" },
-        { parameter: "Flyback Diode", value: "1N4004 / MUR348", unit: "", evidence_source: "EE_241_Lab_7, p1", confidence: "VERIFIED" },
-      ],
-    },
-    diagrams: [
       {
         id: "lab6-555-schematic",
         title: "555 Timer Metal Detector Schematic",
@@ -466,37 +638,104 @@ export const projects: Project[] = [
       },
     ],
     evidence: [
-      { id: "lab6-pdf", fileName: "EE_241_Lab_6_Electric_Circuit_Analysis_1.pdf", type: "pdf", description: "Lab 6: 555 Timer Metal Detector schematic and RLC analysis.", path: "/evidence/ee241-lab6-555timer.jpg" },
-      { id: "lab7-pdf", fileName: "EE_241_Lab_7_Electric_Circuit_Analysis.pdf", type: "pdf", description: "Lab 7: Solenoid & Electromagnet integration, drive circuit.", path: "/evidence/ee241-lab7-solenoid.jpg" },
-      { id: "rgm-report-ref", fileName: "Lab_Final_Report_Amogh_Somisetty.pdf", type: "pdf", description: "Full RGM report with metal detector/electromagnet integration details and failure modes." },
+      {
+        id: "rgm-report",
+        fileName: "Lab_Final_Report_Amogh_Somisetty.pdf",
+        type: "pdf",
+        description: "EE 241-01 Final RGM Project Report (15 pages). All 9 stages, schematics, code, failure modes, and discussion.",
+      },
+      {
+        id: "rgm-demo-video",
+        fileName: "EE_241_Final_Demonstration.mp4",
+        type: "video",
+        description: "Video demonstration of all nine RGM stages operating in sequence during class demo on March 10, 2026.",
+        path: "/evidence/rgm-demo.mp4",
+      },
+      {
+        id: "rgm-solenoid-cad",
+        fileName: "Solenoid_Track_v2.f3d",
+        type: "image",
+        description: "Fusion 360 CAD file for solenoid track piece (6×2×1 in, 0.75 in cylindrical cutout).",
+      },
+      {
+        id: "rgm-light-detector-cad",
+        fileName: "Light_detector_Somisetty_A_CA.f3d",
+        type: "image",
+        description: "Fusion 360 CAD file for light detector housing.",
+      },
     ],
-    techStack: ["555 Timer", "MOSFET", "Arduino", "Electromagnet", "LC Oscillator", "Soldering"],
+    techStack: ["Arduino Mega", "555 Timer", "MOSFET", "Solenoid", "Electromagnet", "Schmitt Trigger", "I2C LCD", "Capacitive Touch", "Op-Amps"],
   },
+
+  // ===== DOMAIN: DIGITAL SYSTEMS =====
   {
-    id: "otter-cpu",
-    name: "OTTER Multi-Cycle RISC-V CPU",
-    codename: "OTTER",
-    category: "Hardware",
-    course: "CPE 233",
+    id: "digital-systems",
+    name: "Digital Systems — FPGA & CPU Architecture",
+    codename: "DIGI-SYS",
+    domain: "digital-systems",
+    course: "CPE 233 / CPE 133",
     status: "COMPLETE",
     statusColor: "neon-green",
-    heroSummary: "Multi-cycle RISC-V processor in SystemVerilog with full RV32I support, 10 ALU operations, dual-port memory, and FSM control unit.",
+    heroSummary: "Multi-cycle RISC-V CPU (OTTER MCU) with full RV32I support, 10 ALU operations, FSM control, and FPGA-based digital systems including state machines and sequential logic.",
     has3D: true,
     hologramType: "interactive",
     module: {
-      missionObjective:
-        "Design and implement a multi-cycle RISC-V processor (OTTER MCU) in SystemVerilog, supporting the RV32I base instruction set with PC, register file, ALU, memory, immediate generation, branch logic, and FSM control unit.",
-      systemArchitecture:
-        "Multi-cycle datapath: PC (4 sources via pcSource MUX), IMEM, Register File (32×32), ALU (10 ops), Immediate Generator (I/S/B/U/J), Branch Condition Generator, CU_FSM + CU_DCDR, dual-port Memory, IOBUS interface.",
+      problemStatement: "How do you design a complete CPU from gates up — implementing instruction fetch, decode, execute, and memory access cycles with correct timing and control?",
+      systemOverview: "Comprehensive digital systems work spanning CPU architecture (OTTER MCU in SystemVerilog), finite state machines, and FPGA implementation of combinational and sequential logic.",
+      systemArchitecture: "OTTER MCU: PC → IMEM → Decode → RF(32×32) → ALU(10 ops) → Memory → Writeback. CU_FSM: FETCH→EXEC. Branch logic: br_eq, br_lt, br_ltu. Immediate Gen: I/S/B/U/J types.",
+      subsystems: [
+        {
+          id: "otter-cpu",
+          title: "OTTER Multi-Cycle RISC-V CPU",
+          description: "Complete RV32I processor with multi-cycle datapath, FSM control unit, and dual-port memory",
+          details: [
+            "PC supports 4 sources: PC+4, jalr, branch, jal",
+            "ALU: add, sub, and, or, xor, slt, sltu, sra, sll, lui-copy",
+            "Branch Condition Generator: br_eq, br_lt, br_ltu → CU_DCDR",
+            "Register File: 32×32 dual-read, single-write with rf_wr_sel MUX",
+            "Memory: dual-port (ADDR1=PC, ADDR2=ALU), RDEN1/2, WE2, SIZE, SIGN",
+            "FSM: FETCH → EXEC (2-cycle minimum)",
+            "Immediate Generator: I, S, B, U, J type encoding",
+            "IOBUS interface for peripheral I/O",
+          ],
+          confidence: "VERIFIED",
+          evidenceSource: "OTTER_Architecture_No_Interrupts_1.pdf",
+        },
+        {
+          id: "fsm-systems",
+          title: "FSM-Based Control Systems",
+          description: "State machine design for sequential control including timing and transition logic",
+          details: [
+            "Moore and Mealy machine implementations",
+            "State encoding strategies: binary, one-hot, gray",
+            "Timing control via clock division",
+            "Output logic and state transition tables",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "CPE 133 / CPE 233 coursework — evidence upload pending",
+        },
+        {
+          id: "fpga-implementation",
+          title: "FPGA Implementation",
+          description: "Digital logic building blocks implemented on FPGA: multiplexers, flip-flops, shift registers, clock dividers",
+          details: [
+            "Combinational: MUX, decoder, encoder",
+            "Sequential: D-FF, shift registers, counters",
+            "Clock domain management and division",
+            "Synthesis and place-and-route via Vivado",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "CPE 133 labs — evidence upload pending",
+        },
+      ],
       implementationNotes: [
-        "PC supports 4 sources: PC+4, jalr, branch, jal",
-        "ALU: add, sub, and, or, xor, slt, sltu, sra, sll, lui-copy",
-        "Branch Cond Gen: br_eq, br_lt, br_ltu → CU_DCDR",
-        "RF: dual-read (rs1, rs2), single-write with rf_wr_sel MUX (PC+4, CSR_reg, DOUT2)",
-        "Memory: dual-port (ADDR1=PC, ADDR2=ALU result), RDEN1, RDEN2, WE2, SIZE, SIGN",
-        "FSM: FETCH → EXEC (2-cycle minimum)",
-        "Immediate Gen: ir[31:7] → I, S, B, U, J types",
-        "IOBUS: IO_IN, IO_WR, IOBUS_OUT, IOBUS_ADDR for peripherals",
+        "OTTER MCU written in SystemVerilog, synthesized in Vivado",
+        "PC supports 4 sources: PC+4, jalr, branch, jal via pcSource MUX",
+        "ALU: 10 operations selected by alu_fun[3:0]",
+        "Branch: br_eq, br_lt, br_ltu signals to CU_DCDR",
+        "RF: dual-read (rs1, rs2), single-write with rf_wr_sel MUX",
+        "Memory: dual-port BRAM, byte/half/word access with sign extension",
+        "FSM states: FETCH, EXEC — minimum 2 cycles per instruction",
       ],
       failureModes: [
         {
@@ -514,12 +753,13 @@ export const projects: Project[] = [
         "Hazard detection and forwarding logic",
         "Expand to RV32IM (multiply/divide)",
       ],
+      keyInsight: "Timing is everything in digital systems. The difference between combinational and sequential logic determines when data is valid. State machines control the system — every instruction's execution is a sequence of precisely-timed control signals that must be generated in the correct order.",
       verificationSummary: [
-        { parameter: "ISA", value: "RV32I", unit: "", evidence_source: "OTTER_Architecture_No_Interrupts_1.pdf, p1", confidence: "VERIFIED" },
-        { parameter: "ALU Operations", value: "10", unit: "functions", evidence_source: "OTTER_Architecture_No_Interrupts_1.pdf, p1", confidence: "VERIFIED" },
-        { parameter: "Register File", value: "32×32", unit: "bit", evidence_source: "OTTER_Architecture_No_Interrupts_1.pdf, p1", confidence: "VERIFIED" },
-        { parameter: "FSM States", value: "2", unit: "(FETCH, EXEC)", evidence_source: "OTTER_Architecture_No_Interrupts_1.pdf, p1", confidence: "VERIFIED" },
-        { parameter: "PC Sources", value: "4", unit: "MUX inputs", evidence_source: "OTTER_Architecture_No_Interrupts_1.pdf, p1", confidence: "VERIFIED" },
+        { parameter: "ISA", value: "RV32I", unit: "", evidence_source: "OTTER_Architecture, p1", confidence: "VERIFIED" },
+        { parameter: "ALU Operations", value: "10", unit: "functions", evidence_source: "OTTER_Architecture, p1", confidence: "VERIFIED" },
+        { parameter: "Register File", value: "32×32", unit: "bit", evidence_source: "OTTER_Architecture, p1", confidence: "VERIFIED" },
+        { parameter: "FSM States", value: "2", unit: "(FETCH, EXEC)", evidence_source: "OTTER_Architecture, p1", confidence: "VERIFIED" },
+        { parameter: "PC Sources", value: "4", unit: "MUX inputs", evidence_source: "OTTER_Architecture, p1", confidence: "VERIFIED" },
       ],
     },
     diagrams: [
@@ -536,24 +776,66 @@ export const projects: Project[] = [
       { id: "otter-arch-pdf", fileName: "OTTER_Architecture_No_Interrupts_1.pdf", type: "pdf", description: "Full OTTER MCU architecture diagram with datapath, control unit, and ALU table", path: "/evidence/otter-datapath.jpg" },
       { id: "riscv-asm-manual", fileName: "RISC-V_Assembler_Manual.pdf", type: "pdf", description: "RISC-V OTTER Assembly Manual v4.04 — ISA formats, opcodes, instructions" },
     ],
-    techStack: ["SystemVerilog", "Vivado", "RISC-V ISA", "FPGA"],
+    techStack: ["SystemVerilog", "Vivado", "RISC-V ISA", "FPGA", "FSM Design"],
   },
+
+  // ===== DOMAIN: MANUFACTURING =====
   {
-    id: "air-motor",
-    name: "Pneumatic Air Motor — Manufacturing Skills",
-    codename: "AERO-MFG",
-    category: "Hardware",
+    id: "manufacturing-systems",
+    name: "Manufacturing & CAD Systems",
+    codename: "MFG-SYS",
+    domain: "manufacturing",
     course: "IME 144",
     status: "COMPLETE",
     statusColor: "neon-green",
-    heroSummary: "Precision-machined pneumatic air motor: lathe, mill, GD&T, and production planning for 6 custom parts.",
+    heroSummary: "Design-to-manufacturing pipeline: parametric CAD → engineering drawings with GD&T → manual machining (lathe, mill) → assembly. 6 precision-machined parts for pneumatic air motor.",
     has3D: true,
     hologramType: "physical",
     module: {
-      missionObjective:
-        "Design and manufacture a functional pneumatic air motor through precision machining. Develop production planning, engineering drawings, GD&T, and hands-on fabrication skills.",
-      systemArchitecture:
-        "Air motor assembly: Crank Disk, Cylinder, Flywheel, Frame, Mainshaft, Piston. Manufactured using manual lathe and milling machines.",
+      problemStatement: "How do you take a design from CAD model to physical part — accounting for tolerances, material properties, and manufacturing constraints at every step?",
+      systemOverview: "Complete design-to-manufacturing pipeline for a pneumatic air motor. Covers parametric CAD modeling, engineering drawings with GD&T per ASME Y14.5, manual machining on lathe and mill, metrology, and final assembly.",
+      systemArchitecture: "CAD Model (SolidWorks) → Engineering Drawing (GD&T) → Production Plan → Material Selection → Machining (Lathe/Mill) → Inspection (Metrology) → Assembly",
+      subsystems: [
+        {
+          id: "cad-modeling",
+          title: "CAD Modeling & Parametric Design",
+          description: "SolidWorks parametric models with dimensional constraints, mates, and assembly verification",
+          details: [
+            "Parametric feature-based modeling",
+            "Assembly constraints and mate definitions",
+            "Interference detection",
+            "Drawing generation from 3D models",
+          ],
+          confidence: "VERIFIED",
+          evidenceSource: "SolidWorks part files (.SLDPRT)",
+        },
+        {
+          id: "machining",
+          title: "Manual Machining Operations",
+          description: "Precision machining on manual lathe and milling machine with calculated feeds and speeds",
+          details: [
+            "Lathe operations: facing, turning, boring, threading",
+            "Mill operations: face milling, slot milling, drilling",
+            "Feeds & speeds calculated per material and tool",
+            "Sawing, threading, broaching operations",
+          ],
+          confidence: "VERIFIED",
+          evidenceSource: "IME_144_MANUAL.pdf, pp.224-285",
+        },
+        {
+          id: "metrology",
+          title: "Metrology & Inspection",
+          description: "Dimensional inspection using precision measurement tools",
+          details: [
+            "Calipers: ±0.001 in resolution",
+            "Micrometers: ±0.0001 in resolution",
+            "Dial indicators for runout and flatness",
+            "Gage blocks for calibration verification",
+          ],
+          confidence: "VERIFIED",
+          evidenceSource: "IME_144_MANUAL.pdf",
+        },
+      ],
       implementationNotes: [
         "Parts: Crank Disk, Cylinder, Flywheel, Frame, Mainshaft, Piston",
         "Processes: Turning (lathe), Milling, Sawing, Threading, Broaching",
@@ -567,6 +849,7 @@ export const projects: Project[] = [
         "CNC machining for higher precision repeatability",
         "Alternative materials (aluminum alloys) for weight reduction",
       ],
+      keyInsight: "The gap between a CAD model and a physical part is defined by tolerances. Real-world manufacturing introduces variation from tool wear, thermal expansion, fixturing, and operator technique. GD&T communicates design intent so manufacturing and inspection can verify parts independently.",
     },
     diagrams: [
       {
@@ -587,21 +870,23 @@ export const projects: Project[] = [
     ],
     techStack: ["Manual Lathe", "Manual Mill", "GD&T", "SolidWorks", "Metrology", "Production Planning"],
   },
+
+  // ===== FUNCK (cross-domain: web/systems) =====
   {
     id: "funck",
     name: "Funck — Event Ticketing Platform",
     codename: "FUNCK",
-    category: "Web",
+    domain: "signal-systems",
+    course: undefined,
     status: "ACTIVE",
     statusColor: "neon-cyan",
-    heroSummary: "Live event ticketing platform with QR tickets, Stripe payments, fraud prevention, and demand-based pricing.",
+    heroSummary: "Live event ticketing platform with QR tickets, Stripe payments, fraud prevention, and demand-based pricing. Shipped and operating at funck.live.",
     has3D: true,
     hologramType: "network",
     module: {
-      missionObjective:
-        "Build and operate a live event ticketing platform with presale tickets, QR code issuance, fraud prevention, demand-based pricing, Stripe Connect payouts, group split-pay, and analytics.",
-      systemArchitecture:
-        "Client (React) → Lovable App → Supabase (PostgreSQL + Auth + Edge Functions) → Stripe (payments + Connect payouts) → Resend (email delivery). QR ticket lifecycle managed server-side.",
+      problemStatement: "How do you build a production ticketing system that handles payments, fraud prevention, and real-time event management?",
+      systemOverview: "Full-stack event ticketing platform with presale tickets, QR code issuance, fraud prevention, demand-based pricing, Stripe Connect payouts, group split-pay, and analytics.",
+      systemArchitecture: "Client (React) → Lovable App → Supabase (PostgreSQL + Auth + Edge Functions) → Stripe (payments + Connect payouts) → Resend (email delivery)",
       implementationNotes: [
         "Built using Lovable, Supabase, Stripe, Resend",
         "Live at www.funck.live",
@@ -639,16 +924,7 @@ export const projects: Project[] = [
         confidence: "CONCEPTUAL",
         derivedFrom: [],
         description: "Client (React/Lovable) → Supabase (DB + Auth + Edge Functions) → Stripe (Payments + Connect) → Resend (Emails)",
-        conceptualNote: "Architecture based on stated tech stack. Reflects actual production system at funck.live.",
-      },
-      {
-        id: "funck-ticket-fsm",
-        title: "Ticket Lifecycle State Machine",
-        confidence: "CONCEPTUAL",
-        derivedFrom: [],
-        description: "UNPAID → PAID → ISSUED (QR) → SCANNED (door) → LOCKED (fraud prevention)",
-        conceptualNote: "State machine reflects designed ticket flow.",
-        engineeringNote: true,
+        conceptualNote: "Architecture reflects actual production system at funck.live.",
       },
     ],
     evidence: [
@@ -696,7 +972,7 @@ export const experiences: ExperienceItem[] = [
 
 // ========== SKILLS ==========
 export const skills = {
-  core: ["Systems Thinking", "Test & Validation Mindset", "Technical Documentation", "Customer Service"],
+  core: ["Systems Thinking", "Test & Validation Mindset", "Technical Documentation", "Debugging & Root Cause Analysis"],
   technical: [
     { name: "SystemVerilog / HDL", evidence: "OTTER CPU project (CPE 233)", confidence: "VERIFIED" as ConfidenceBadge },
     { name: "Analog Circuit Design", evidence: "EE 241 Labs 1-7 + RGM", confidence: "VERIFIED" as ConfidenceBadge },
@@ -709,13 +985,14 @@ export const skills = {
     { name: "Web Development (React/TS)", evidence: "Funck platform (funck.live)", confidence: "VERIFIED" as ConfidenceBadge },
     { name: "Soldering & Prototyping", evidence: "EE 241 lab work + RGM", confidence: "VERIFIED" as ConfidenceBadge },
     { name: "Test Equipment (Scope/FGen)", evidence: "EE 241 lab equipment", confidence: "VERIFIED" as ConfidenceBadge },
+    { name: "PCB Design & Reflow", evidence: "EE 143 DAC PCB", confidence: "CONCEPTUAL" as ConfidenceBadge },
   ],
 };
 
 // ========== PERSONAL INFO ==========
 export const personalInfo = {
   name: "Amogh Somisetty",
-  title: "Electrical Engineering Student",
+  title: "Electrical Engineering",
   university: "California Polytechnic State University, San Luis Obispo",
   phone: "(925) 236-2600",
   email: "somisett@calpoly.edu",
@@ -724,31 +1001,5 @@ export const personalInfo = {
     "California state certified pharmacy technician",
     "Boy Scouts — 11 years",
     "Previously CPR/First Aid certified; open to recertification",
-  ],
-};
-
-// ========== WALKTHROUGH SCRIPTS ==========
-export const walkthroughScripts = {
-  oneMinute: [
-    "\"I'm Amogh, EE student at Cal Poly SLO. I build things that work — from RISC-V CPUs to nine-stage chain-reaction machines to live ticketing platforms.\"",
-    "Show: RGM hero photo → \"Built a 9-stage Rube Goldberg Machine integrating capacitive touch, strobe, metal detection, and electromagnet release — all working for live demo.\"",
-    "Show: OTTER datapath → \"Designed a multi-cycle RISC-V processor with 10 ALU operations and dual-port memory.\"",
-    "Show: Funck → \"Shipped a live ticketing platform with Stripe payments, QR tickets, and fraud prevention at funck.live.\"",
-  ],
-  threeMinute: [
-    "Start with 1-minute pitch.",
-    "RGM deep dive: Walk through 9-stage flow diagram. Highlight metal detector (8,760→8,310 Hz, 5.1% drop). Show 6 failure modes with root causes and fixes.",
-    "OTTER: Walk through datapath — PC source MUX, ALU function select, branch condition generation, FETCH→EXEC FSM.",
-    "Funck: Ownership — requirements, integration architecture, testing, deployment. AI assisted code generation only.",
-    "Natera: ~40% time reduction through bottleneck removal (observed estimate).",
-  ],
-  tenMinute: [
-    "Follow 3-minute structure with additions:",
-    "RGM: Discuss each of 6 failure modes in detail — strobe transistor, ambient light, premature release, MOSFET ground, threshold tuning, RC discrepancy. Show Arduino code for streak counter and frequency detection.",
-    "OTTER: ALU operations table, immediate generation for I/S/B/U/J types, branch target calculation, PCWrite gating.",
-    "Metal Detector stage: 555 astable mode, LC oscillation, inductance shift, BJT vs MOSFET drive circuit, flyback diode, B = μ₀μᵣ(N/l)I.",
-    "Air Motor: Manufacturing snapshot — lathe/mill ops, GD&T, production planning for 6 parts. Show CAD files.",
-    "Funck: Ticket lifecycle, engineering TODOs (concurrency, idempotency, rate limiting). Show live demo.",
-    "Skills: Systems thinking thread across hardware, analog, manufacturing, and software.",
   ],
 };
