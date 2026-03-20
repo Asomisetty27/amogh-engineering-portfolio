@@ -87,7 +87,8 @@ export type SystemDomain =
   | "signal-systems"
   | "electromechanical"
   | "digital-systems"
-  | "manufacturing";
+  | "manufacturing"
+  | "materials";
 
 export type ProjectStatus = "COMPLETE" | "IN_PROGRESS" | "EVIDENCE_PENDING" | "ACTIVE";
 
@@ -106,7 +107,7 @@ export interface Project {
   heroSummary: string;
   heroImage?: string;
   has3D?: boolean;
-  hologramType?: "physical" | "system" | "network" | "interactive";
+  hologramType?: "physical" | "system" | "network" | "interactive" | "scientific";
   videoPath?: string;
 }
 
@@ -147,21 +148,14 @@ export const systemDomains: SystemDomainInfo[] = [
     icon: "wrench",
     color: "neon-amber",
   },
+  {
+    id: "materials",
+    name: "Materials Engineering & Material Selection",
+    subtitle: "Structure–property–processing reasoning, phase transformations, degradation",
+    icon: "flask",
+    color: "neon-magenta",
+  },
 ];
-
-export interface ExperienceItem {
-  company: string;
-  role: string;
-  location: string;
-  period: string;
-  bullets: { text: string; confidence: ConfidenceBadge; evidence_source?: string }[];
-  processImprovement?: {
-    before: string;
-    after: string;
-    whatChanged: string[];
-    measurementMethod: string;
-  };
-}
 
 // ========== RGM STAGES (from Lab_Final_Report_Amogh_Somisetty.pdf) ==========
 const rgmStages: RGMStage[] = [
@@ -932,6 +926,272 @@ export const projects: Project[] = [
     ],
     techStack: ["React", "Lovable", "Supabase", "Stripe", "Resend", "TypeScript"],
   },
+
+  // ===== DOMAIN: MATERIALS ENGINEERING =====
+  // PROJECT GROUP A: Phases, Transformations, Microstructure
+  {
+    id: "materials-phases",
+    name: "Phases, Microstructure, and Property Control in Engineering Alloys",
+    codename: "MATE-PHASE",
+    domain: "materials",
+    course: "MATE 210 / MATE 215",
+    status: "EVIDENCE_PENDING",
+    statusColor: "neon-amber",
+    heroSummary: "Phase diagram reasoning, cold work/recrystallization mechanics, and heat treatment of steels. Structure–property–processing control from eutectic solidification through eutectoid transformation.",
+    has3D: true,
+    hologramType: "scientific",
+    module: {
+      problemStatement: "How do phase diagrams, deformation history, and thermal processing combine to control the microstructure and mechanical properties of engineering alloys?",
+      systemOverview: "Integrates three interconnected materials concepts: (1) binary phase diagram interpretation and cooling behavior, (2) cold work → recovery → recrystallization → grain growth progression, and (3) Fe-C phase transformations and heat treatment logic for steels.",
+      systemArchitecture: "Composition + Temperature → Phase Diagram → Phase Fields → Microstructure Prediction → Property Control | Deformation → Dislocation Density → Annealing → Recrystallization → Grain Size → Properties | Austenitize → Cooling Rate → Pearlite/Bainite/Martensite → Hardness/Ductility",
+      subsystems: [
+        {
+          id: "phase-diagrams",
+          title: "Phase Diagram Reasoning (Pb-Sn Eutectic)",
+          description: "Binary eutectic phase diagram interpretation: phase fields, eutectic composition/temperature, cooling paths, and primary/proeutectic phase formation",
+          details: [
+            "Pb-Sn eutectic system: eutectic at 61.9 wt% Sn, 183°C",
+            "Phase fields: liquid (L), α (Pb-rich), β (Sn-rich), α+L, β+L, α+β",
+            "Cooling behavior: proeutectic phase forms first, then eutectic microstructure",
+            "Lever rule for phase fraction calculation",
+            "Hypoeutectic vs hypereutectic composition effects on microstructure",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "MATE course materials — evidence upload pending",
+        },
+        {
+          id: "cold-work-recrystallization",
+          title: "Cold Work and Recrystallization",
+          description: "Dislocation mechanics linking strain hardening, recovery, recrystallization, and grain growth to mechanical property changes",
+          details: [
+            "Cold working increases dislocation density → strain hardening",
+            "Recovery: dislocation rearrangement, reduced internal stress, minimal property change",
+            "Recrystallization: nucleation of new strain-free grains at critical temperature",
+            "Grain growth: larger grains consume smaller ones at elevated temperature",
+            "Property trends: cold work ↑ strength/hardness, ↓ ductility; annealing reverses",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "MATE course materials — evidence upload pending",
+        },
+        {
+          id: "heat-treatment-steels",
+          title: "Heat Treatment of Steels",
+          description: "Fe-C eutectoid transformation: austenite → pearlite/ferrite/cementite, with TTT diagram interpretation for non-equilibrium structures",
+          details: [
+            "Eutectoid composition: 0.76 wt% C at 727°C",
+            "Austenite (γ-FCC) → Pearlite (α-ferrite + Fe₃C cementite) on slow cooling",
+            "Hypoeutectoid steel: proeutectoid ferrite + pearlite",
+            "Hypereutectoid steel: proeutectoid cementite + pearlite",
+            "Rapid cooling → martensite (BCT, hard, brittle) — diffusionless transformation",
+            "TTT/IT diagrams: cooling rate determines final microstructure and properties",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "MATE course materials — evidence upload pending",
+        },
+      ],
+      implementationNotes: [
+        "Phase diagram interpretation requires understanding of Gibbs phase rule: F = C - P + 1 (for constant pressure)",
+        "Lever rule provides quantitative phase fractions at any T and composition",
+        "Recrystallization temperature typically 0.3–0.5 × melting point (K)",
+        "TTT diagrams are isothermal; CCT diagrams better represent continuous cooling",
+      ],
+      failureModes: [
+        {
+          problem: "Unexpected brittleness after cold working",
+          cause: "Excessive cold work without intermediate annealing — ductility exhausted",
+          fix: "Introduce intermediate annealing steps to restore ductility before further deformation",
+          systemImpact: "Part fractures during forming or in service",
+          confidence: "CONCEPTUAL",
+        },
+        {
+          problem: "Inconsistent hardness after heat treatment",
+          cause: "Non-uniform cooling rate — section thickness variations cause different transformation products",
+          fix: "Control quench severity and part geometry; consider jominy hardenability analysis",
+          systemImpact: "Mixed martensite/pearlite regions with unpredictable mechanical behavior",
+          confidence: "CONCEPTUAL",
+        },
+      ],
+      improvements: [
+        "Add quantitative lever rule calculator",
+        "Include real micrograph annotations when evidence uploaded",
+        "Add Jominy hardenability exploration",
+      ],
+      keyInsight: "Structure controls properties. Processing controls structure. Therefore, processing controls properties. Every decision about composition, temperature, time, and cooling rate determines what phases form, what microstructure develops, and what mechanical behavior results.",
+    },
+    diagrams: [],
+    evidence: [],
+    techStack: ["Phase Diagrams", "Metallography", "Heat Treatment", "Mechanical Testing", "Microstructure Analysis"],
+  },
+
+  // PROJECT GROUP B: Corrosion
+  {
+    id: "materials-corrosion",
+    name: "Corrosion, Electrochemical Failure, and Prevention",
+    codename: "MATE-CORR",
+    domain: "materials",
+    course: "MATE 210",
+    status: "EVIDENCE_PENDING",
+    statusColor: "neon-amber",
+    heroSummary: "Electrochemical corrosion fundamentals: anode/cathode/electrolyte/path model, galvanic series reasoning, and design strategies for corrosion prevention in engineering systems.",
+    has3D: true,
+    hologramType: "scientific",
+    module: {
+      problemStatement: "How does electrochemical corrosion degrade materials, and how can engineers interrupt the corrosion mechanism through design?",
+      systemOverview: "Corrosion as a systems-level failure mode: four required elements (anode, cathode, electrolyte, electrical path), galvanic series for material selection, and engineering strategies to prevent or mitigate material degradation.",
+      systemArchitecture: "Anode (oxidation: M → M²⁺ + 2e⁻) → Electrical Path (e⁻ flow) → Cathode (reduction: O₂ + 2H₂O + 4e⁻ → 4OH⁻) → Electrolyte (ion transport) → Anode (cycle)",
+      subsystems: [
+        {
+          id: "corrosion-fundamentals",
+          title: "Corrosion Fundamentals",
+          description: "Four required elements for corrosion: anode, cathode, electrolyte, and electrical path. Remove any one to stop corrosion.",
+          details: [
+            "Anode: metal that undergoes oxidation (loses electrons, dissolves)",
+            "Cathode: site where reduction occurs (gains electrons)",
+            "Electrolyte: ionic conduction medium (water, soil, etc.)",
+            "Electrical path: metallic connection for electron flow",
+            "Oxidation reaction: M → Mⁿ⁺ + ne⁻",
+            "Reduction reaction: O₂ + 2H₂O + 4e⁻ → 4OH⁻ (in neutral/basic solution)",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "MATE course materials — evidence upload pending",
+        },
+        {
+          id: "galvanic-series",
+          title: "Corrosion Potential & Galvanic Series",
+          description: "Why some metals corrode preferentially when coupled — electrode potential determines anodic/cathodic behavior",
+          details: [
+            "More negative potential → more anodic → preferentially corrodes",
+            "Galvanic series ranks metals by corrosion potential in seawater",
+            "Large potential difference → faster galvanic corrosion",
+            "Area ratio effect: small anode + large cathode → accelerated attack",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "MATE course materials — evidence upload pending",
+        },
+        {
+          id: "corrosion-prevention",
+          title: "Design Implications & Prevention",
+          description: "Engineering strategies to interrupt the corrosion cell by removing one of the four required elements",
+          details: [
+            "Coatings/barriers: remove electrolyte contact (paint, anodizing)",
+            "Cathodic protection: sacrificial anode or impressed current",
+            "Material selection: choose compatible metals (minimize galvanic potential)",
+            "Design: avoid crevices, ensure drainage, minimize dissimilar metal contact",
+            "Inhibitors: chemical additives that passivate metal surface",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "MATE course materials — evidence upload pending",
+        },
+      ],
+      implementationNotes: [
+        "Corrosion requires ALL FOUR elements simultaneously",
+        "Removing any single element stops the corrosion process",
+        "Galvanic corrosion is the most common in multi-material assemblies",
+        "Design review should check for dissimilar metal contact in electrolyte",
+      ],
+      failureModes: [
+        {
+          problem: "Accelerated galvanic corrosion at fastener joints",
+          cause: "Steel fasteners in aluminum structure with moisture ingress — large cathode/small anode ratio",
+          fix: "Use insulating washers, select compatible alloys, or apply protective coatings",
+          systemImpact: "Rapid localized metal loss at fastener holes, structural integrity compromised",
+          confidence: "CONCEPTUAL",
+        },
+      ],
+      improvements: [
+        "Add interactive galvanic series explorer",
+        "Include real corrosion sample images when evidence uploaded",
+      ],
+      keyInsight: "Corrosion is not random — it is a predictable electrochemical process. Every corrosion failure can be traced to the presence of all four elements: anode, cathode, electrolyte, and electrical path. Engineering prevention means deliberately eliminating at least one.",
+    },
+    diagrams: [],
+    evidence: [],
+    techStack: ["Electrochemistry", "Galvanic Series", "Failure Analysis", "Material Selection", "Corrosion Prevention"],
+  },
+
+  // PROJECT GROUP C: Polymers & Lightweight Materials
+  {
+    id: "materials-polymers",
+    name: "Lightweight Materials, Mechanical Behavior, and Transport Design",
+    codename: "MATE-POLY",
+    domain: "materials",
+    course: "MATE 210 / MATE 215",
+    status: "EVIDENCE_PENDING",
+    statusColor: "neon-amber",
+    heroSummary: "Thermoplastic structure–property relationships and CFRP vs 6061-T6 aluminum analysis for transit vehicle design. Structure–properties–processing–performance framework applied to real transport engineering decisions.",
+    has3D: true,
+    hologramType: "scientific",
+    module: {
+      problemStatement: "How do molecular structure and processing control the mechanical behavior of polymers, and how do composite materials compare to metals for lightweight transport applications?",
+      systemOverview: "Two interconnected modules: (1) thermoplastic polymer mechanical behavior driven by molecular structure and secondary bonding, and (2) CFRP vs 6061-T6 aluminum material selection analysis for bus rapid transit and rail applications.",
+      systemArchitecture: "Molecular Structure (chain architecture, bonding) → Processing (temperature, forming) → Microstructure (crystallinity, orientation) → Properties (E, σy, εf) → Performance (specific strength, cost, lifecycle)",
+      subsystems: [
+        {
+          id: "thermoplastics",
+          title: "Thermoplastic Mechanical Behavior",
+          description: "How molecular structure, secondary bonding, and chain motion control stiffness, strength, and ductility in engineering polymers",
+          details: [
+            "PE: flexible chains, low Tg, high ductility, low stiffness",
+            "PVC: Cl side groups restrict chain motion → higher stiffness",
+            "PS: bulky phenyl groups → rigid, brittle, high Tg",
+            "PC: carbonate linkages → high impact resistance, optical clarity",
+            "PMMA: polar side groups → stiff, brittle, excellent optical clarity",
+            "Secondary bonding (van der Waals, dipole, H-bond) determines Tg and melt behavior",
+            "Crystallinity increases stiffness and strength but may reduce ductility",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "MATE course materials — evidence upload pending",
+        },
+        {
+          id: "cfrp-vs-aluminum",
+          title: "CFRP vs 6061-T6 Aluminum for Transit",
+          description: "Structure–properties–processing–performance comparison for short-haul BRT and longer-range rail applications",
+          details: [
+            "CFRP: high specific strength (σ/ρ), excellent fatigue, but high cost and complex repair",
+            "6061-T6: moderate specific strength, well-understood processing, lower cost, easier repair",
+            "Short-haul BRT: frequent acceleration/braking → weight savings from CFRP maximize energy efficiency",
+            "Long-range rail: constant speed operation → cost-effectiveness of aluminum may dominate",
+            "Lifecycle considerations: CFRP repair costs vs aluminum recyclability",
+            "Density: CFRP ~1.6 g/cm³ vs 6061-T6 ~2.7 g/cm³",
+            "Tensile strength: CFRP ~600-3000 MPa vs 6061-T6 ~310 MPa",
+          ],
+          confidence: "CONCEPTUAL",
+          evidenceSource: "CFRP vs Aluminum white paper — evidence upload pending",
+        },
+      ],
+      implementationNotes: [
+        "Structure–properties–processing–performance is the central framework",
+        "Specific strength (σ/ρ) is the critical metric for weight-sensitive transport",
+        "Material selection is always application-dependent — no universally 'best' material",
+        "CFRP advantages diminish when weight savings don't significantly affect energy consumption",
+      ],
+      failureModes: [
+        {
+          problem: "Polymer creep under sustained load",
+          cause: "Viscoelastic behavior — chain sliding under stress at temperatures near Tg",
+          fix: "Select polymer with Tg well above service temperature; reduce sustained stress",
+          systemImpact: "Dimensional instability and eventual failure under constant load",
+          confidence: "CONCEPTUAL",
+        },
+        {
+          problem: "CFRP delamination under impact",
+          cause: "Interlaminar shear failure — weak matrix-dominated property in through-thickness direction",
+          fix: "Add interleaved toughening layers; design for damage tolerance inspection",
+          systemImpact: "Hidden internal damage not visible on surface — requires NDT for detection",
+          confidence: "CONCEPTUAL",
+        },
+      ],
+      improvements: [
+        "Add cost-per-performance comparison calculator",
+        "Include stress-strain data from actual tensile tests when evidence uploaded",
+        "Add Ashby chart exploration module",
+      ],
+      keyInsight: "Material selection is never about finding the 'strongest' material — it's about matching the structure–properties–processing–performance chain to application requirements. CFRP wins on specific strength; aluminum wins on cost and repairability. The right choice depends on the system context.",
+    },
+    diagrams: [],
+    evidence: [],
+    techStack: ["Polymer Science", "Composite Materials", "Material Selection", "Mechanical Testing", "Transport Engineering"],
+  },
 ];
 
 // ========== EXPERIENCE ==========
@@ -986,6 +1246,8 @@ export const skills = {
     { name: "Soldering & Prototyping", evidence: "EE 241 lab work + RGM", confidence: "VERIFIED" as ConfidenceBadge },
     { name: "Test Equipment (Scope/FGen)", evidence: "EE 241 lab equipment", confidence: "VERIFIED" as ConfidenceBadge },
     { name: "PCB Design & Reflow", evidence: "EE 143 DAC PCB", confidence: "CONCEPTUAL" as ConfidenceBadge },
+    { name: "Materials Engineering", evidence: "MATE 210/215 coursework", confidence: "CONCEPTUAL" as ConfidenceBadge },
+    { name: "Phase Diagram Analysis", evidence: "MATE 210 labs", confidence: "CONCEPTUAL" as ConfidenceBadge },
   ],
 };
 
