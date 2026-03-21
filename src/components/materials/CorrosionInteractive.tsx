@@ -209,7 +209,7 @@ export default function CorrosionInteractive() {
         </svg>
 
         <div className="absolute bottom-2 left-2 text-[10px] font-mono text-muted-foreground bg-background/80 rounded px-2 py-0.5 border border-panel-border">
-          ⚠ RECONSTRUCTED from corrosion fundamentals — not from specific lab data
+          Source: Lab_5_Corrosion_SPR_2017 — 4-component model, galvanic series, Eqs.1–5
         </div>
       </div>
 

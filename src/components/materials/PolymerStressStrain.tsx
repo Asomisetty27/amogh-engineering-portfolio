@@ -177,7 +177,7 @@ export default function PolymerStressStrain() {
         </svg>
 
         <div className="absolute bottom-2 left-2 text-[10px] font-mono text-muted-foreground bg-background/80 rounded px-2 py-0.5 border border-panel-border">
-          ⚠ CONCEPTUAL — illustrative curves, not from specific tensile test data
+          Source: Lab_6_Polymer_Mechanical_Properties_SPR_2017 — conceptual curve shapes, property ranges from lab background
         </div>
       </div>
 

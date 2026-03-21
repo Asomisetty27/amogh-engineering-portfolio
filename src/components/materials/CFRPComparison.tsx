@@ -95,7 +95,7 @@ export default function CFRPComparison() {
       </div>
 
       <div className="text-[10px] font-mono text-muted-foreground">
-        ⚠ CONCEPTUAL — values reconstructed from white paper and standard material databases. Upload white paper for VERIFIED status.
+        ⚠ CONCEPTUAL — values from white paper and standard material databases. Upload white paper for VERIFIED status.
       </div>
     </div>
   );

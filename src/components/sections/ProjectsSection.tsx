@@ -11,7 +11,7 @@ import {
 import {
   ChevronRight, ChevronDown, FileText, Image as ImageIcon,
   ExternalLink, Box, Zap, Cpu, Wrench, Radio,
-  Globe, AlertTriangle, CheckCircle2, Play,
+  Globe, AlertTriangle, CheckCircle2, Play, FlaskConical,
 } from "lucide-react";
 import RGMSystemPage from "@/components/RGMSystemPage";
 
@@ -19,6 +19,10 @@ const OtterInteractive = lazy(() => import("@/components/holograms/OtterInteract
 const FunckNetworkHologram = lazy(() => import("@/components/holograms/FunckNetworkHologram"));
 const AirMotorHologram = lazy(() => import("@/components/holograms/AirMotorHologram"));
 const RGMHologram = lazy(() => import("@/components/holograms/RGMHologram"));
+const PhaseDiagramInteractive = lazy(() => import("@/components/materials/PhaseDiagramInteractive"));
+const CorrosionInteractive = lazy(() => import("@/components/materials/CorrosionInteractive"));
+const PolymerStressStrain = lazy(() => import("@/components/materials/PolymerStressStrain"));
+const CFRPComparison = lazy(() => import("@/components/materials/CFRPComparison"));
 
 type ProjectTab = "brief" | "hologram" | "deep-dive";
 
@@ -27,6 +31,7 @@ const domainIcons: Record<string, React.ElementType> = {
   zap: Zap,
   cpu: Cpu,
   wrench: Wrench,
+  flask: FlaskConical,
 };
 
 function HologramLoader() {
@@ -162,10 +167,18 @@ export default function ProjectsSection() {
             {activeTab === "hologram" && selectedProject.has3D ? (
               <motion.div key={selectedProject.id + "-holo"} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <Suspense fallback={<HologramLoader />}>
-                  {(selectedProject.id === "digital-systems") && <OtterInteractive />}
+                  {selectedProject.id === "digital-systems" && <OtterInteractive />}
                   {selectedProject.id === "funck" && <FunckNetworkHologram />}
                   {selectedProject.id === "manufacturing-systems" && <AirMotorHologram />}
                   {selectedProject.id === "rgm-machine" && <RGMHologram />}
+                  {selectedProject.id === "materials-phases" && <PhaseDiagramInteractive />}
+                  {selectedProject.id === "materials-corrosion" && <CorrosionInteractive />}
+                  {selectedProject.id === "materials-polymers" && (
+                    <div className="space-y-6">
+                      <PolymerStressStrain />
+                      <CFRPComparison />
+                    </div>
+                  )}
                 </Suspense>
               </motion.div>
             ) : activeTab === "deep-dive" && selectedProject.module.subsystems ? (
