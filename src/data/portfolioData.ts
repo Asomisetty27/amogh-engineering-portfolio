@@ -1206,7 +1206,9 @@ export const projects: Project[] = [
       keyInsight: "Material selection is never about finding the 'strongest' material — it's about matching the structure–properties–processing–performance chain to application requirements. CFRP wins on specific strength; aluminum wins on cost and repairability. The right choice depends on the system context.",
     },
     diagrams: [],
-    evidence: [],
+    evidence: [
+      { id: "lab6-pdf", fileName: "Lab_6_Polymer_Mechanical_Properties_SPR_2017.pdf", type: "pdf", description: "Thermoplastic polymer mechanical properties — tensile testing, structure-property relationships, PE/PVC/PS/PC/PMMA" },
+    ],
     techStack: ["Polymer Science", "Composite Materials", "Material Selection", "Mechanical Testing", "Transport Engineering"],
   },
 ];
