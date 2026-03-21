@@ -935,7 +935,7 @@ export const projects: Project[] = [
     codename: "MATE-PHASE",
     domain: "materials",
     course: "MATE 210 / MATE 215",
-    status: "EVIDENCE_PENDING",
+    status: "COMPLETE",
     statusColor: "neon-amber",
     heroSummary: "Phase diagram reasoning, cold work/recrystallization mechanics, and heat treatment of steels. Structure–property–processing control from eutectic solidification through eutectoid transformation.",
     has3D: true,
