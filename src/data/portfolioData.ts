@@ -1170,10 +1170,10 @@ export const projects: Project[] = [
             "Long-range rail: constant speed operation → cost-effectiveness of aluminum may dominate",
             "Lifecycle considerations: CFRP repair costs vs aluminum recyclability",
             "Density: CFRP ~1.6 g/cm³ vs 6061-T6 ~2.7 g/cm³",
-            "Tensile strength: CFRP ~600-3000 MPa vs 6061-T6 ~310 MPa",
+            "Tensile strength: CFRP ~600–3000 MPa vs 6061-T6 ~310 MPa",
           ],
           confidence: "CONCEPTUAL",
-          evidenceSource: "CFRP vs Aluminum white paper — evidence upload pending",
+          evidenceSource: "CFRP vs Aluminum white paper — upload pending for VERIFIED status",
         },
       ],
       implementationNotes: [
