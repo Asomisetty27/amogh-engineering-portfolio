@@ -1195,6 +1195,20 @@ export const projects: Project[] = [
 ];
 
 // ========== EXPERIENCE ==========
+export interface ExperienceItem {
+  company: string;
+  role: string;
+  location: string;
+  period: string;
+  bullets: { text: string; confidence: ConfidenceBadge; evidence_source?: string }[];
+  processImprovement?: {
+    before: string;
+    after: string;
+    whatChanged: string[];
+    measurementMethod: string;
+  };
+}
+
 export const experiences: ExperienceItem[] = [
   {
     company: "Natera",
