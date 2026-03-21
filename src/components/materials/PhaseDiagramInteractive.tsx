@@ -178,7 +178,7 @@ export default function PhaseDiagramInteractive() {
           <span className="text-xs font-mono font-semibold text-primary tracking-wider uppercase">
             Pb-Sn Eutectic Phase Diagram — Interactive
           </span>
-          <ConfidenceBadgeTag confidence="CONCEPTUAL" />
+          <ConfidenceBadgeTag confidence="VERIFIED" />
         </div>
 
         <svg
