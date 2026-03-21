@@ -1043,7 +1043,7 @@ export const projects: Project[] = [
     codename: "MATE-CORR",
     domain: "materials",
     course: "MATE 210",
-    status: "EVIDENCE_PENDING",
+    status: "COMPLETE",
     statusColor: "neon-amber",
     heroSummary: "Electrochemical corrosion fundamentals: anode/cathode/electrolyte/path model, galvanic series reasoning, and design strategies for corrosion prevention in engineering systems.",
     has3D: true,
