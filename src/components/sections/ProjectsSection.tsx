@@ -167,10 +167,18 @@ export default function ProjectsSection() {
             {activeTab === "hologram" && selectedProject.has3D ? (
               <motion.div key={selectedProject.id + "-holo"} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <Suspense fallback={<HologramLoader />}>
-                  {(selectedProject.id === "digital-systems") && <OtterInteractive />}
+                  {selectedProject.id === "digital-systems" && <OtterInteractive />}
                   {selectedProject.id === "funck" && <FunckNetworkHologram />}
                   {selectedProject.id === "manufacturing-systems" && <AirMotorHologram />}
                   {selectedProject.id === "rgm-machine" && <RGMHologram />}
+                  {selectedProject.id === "materials-phases" && <PhaseDiagramInteractive />}
+                  {selectedProject.id === "materials-corrosion" && <CorrosionInteractive />}
+                  {selectedProject.id === "materials-polymers" && (
+                    <div className="space-y-6">
+                      <PolymerStressStrain />
+                      <CFRPComparison />
+                    </div>
+                  )}
                 </Suspense>
               </motion.div>
             ) : activeTab === "deep-dive" && selectedProject.module.subsystems ? (
