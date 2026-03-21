@@ -1132,7 +1132,7 @@ export const projects: Project[] = [
     codename: "MATE-POLY",
     domain: "materials",
     course: "MATE 210 / MATE 215",
-    status: "EVIDENCE_PENDING",
+    status: "COMPLETE",
     statusColor: "neon-amber",
     heroSummary: "Thermoplastic structure–property relationships and CFRP vs 6061-T6 aluminum analysis for transit vehicle design. Structure–properties–processing–performance framework applied to real transport engineering decisions.",
     has3D: true,
