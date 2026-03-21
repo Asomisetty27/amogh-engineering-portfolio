@@ -1119,7 +1119,9 @@ export const projects: Project[] = [
       keyInsight: "Corrosion is not random — it is a predictable electrochemical process. Every corrosion failure can be traced to the presence of all four elements: anode, cathode, electrolyte, and electrical path. Engineering prevention means deliberately eliminating at least one.",
     },
     diagrams: [],
-    evidence: [],
+    evidence: [
+      { id: "lab5-pdf", fileName: "Lab_5_Corrosion_SPR_2017_Materials_Lab.pdf", type: "pdf", description: "Metal corrosion lab — electrochemical fundamentals, galvanic series, 4-component model, prevention" },
+    ],
     techStack: ["Electrochemistry", "Galvanic Series", "Failure Analysis", "Material Selection", "Corrosion Prevention"],
   },
 
