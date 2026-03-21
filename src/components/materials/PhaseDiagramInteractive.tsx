@@ -275,7 +275,7 @@ export default function PhaseDiagramInteractive() {
           </div>
         )}
         <div className="absolute bottom-2 left-2 text-[10px] font-mono text-muted-foreground bg-background/80 rounded px-2 py-0.5 border border-panel-border">
-          ⚠ RECONSTRUCTED from standard Pb-Sn eutectic data — not from specific lab measurement
+          Source: Lab_4_Phase_Diagrams_Spring_2017_1.pdf — Pb-Sn eutectic data (61.9 wt% Sn, 183°C, α max 18.3 wt% Sn)
         </div>
       </div>
 
