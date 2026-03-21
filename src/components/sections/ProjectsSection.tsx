@@ -11,7 +11,7 @@ import {
 import {
   ChevronRight, ChevronDown, FileText, Image as ImageIcon,
   ExternalLink, Box, Zap, Cpu, Wrench, Radio,
-  Globe, AlertTriangle, CheckCircle2, Play,
+  Globe, AlertTriangle, CheckCircle2, Play, FlaskConical,
 } from "lucide-react";
 import RGMSystemPage from "@/components/RGMSystemPage";
 
@@ -19,6 +19,10 @@ const OtterInteractive = lazy(() => import("@/components/holograms/OtterInteract
 const FunckNetworkHologram = lazy(() => import("@/components/holograms/FunckNetworkHologram"));
 const AirMotorHologram = lazy(() => import("@/components/holograms/AirMotorHologram"));
 const RGMHologram = lazy(() => import("@/components/holograms/RGMHologram"));
+const PhaseDiagramInteractive = lazy(() => import("@/components/materials/PhaseDiagramInteractive"));
+const CorrosionInteractive = lazy(() => import("@/components/materials/CorrosionInteractive"));
+const PolymerStressStrain = lazy(() => import("@/components/materials/PolymerStressStrain"));
+const CFRPComparison = lazy(() => import("@/components/materials/CFRPComparison"));
 
 type ProjectTab = "brief" | "hologram" | "deep-dive";
 
@@ -27,6 +31,7 @@ const domainIcons: Record<string, React.ElementType> = {
   zap: Zap,
   cpu: Cpu,
   wrench: Wrench,
+  flask: FlaskConical,
 };
 
 function HologramLoader() {
