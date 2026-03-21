@@ -1028,7 +1028,11 @@ export const projects: Project[] = [
       keyInsight: "Structure controls properties. Processing controls structure. Therefore, processing controls properties. Every decision about composition, temperature, time, and cooling rate determines what phases form, what microstructure develops, and what mechanical behavior results.",
     },
     diagrams: [],
-    evidence: [],
+    evidence: [
+      { id: "lab4-pdf", fileName: "Lab_4_Phase_Diagrams_Spring_2017_1.pdf", type: "pdf", description: "Pb-Sn eutectic phase diagram lab — cooling curves, phase fields, lever rule, microstructure" },
+      { id: "lab7-pdf", fileName: "Lab_7_Cold_Work_and_Annealing_SPR_2017.pdf", type: "pdf", description: "α-brass cold work and annealing — dislocation mechanics, recrystallization, micrographs" },
+      { id: "lab8-pdf", fileName: "Lab_8_Steel_Heat_Treatment_SPR_2017.pdf", type: "pdf", description: "Fe-C heat treatment — austenite transformation, pearlite, martensite, TTT diagrams" },
+    ],
     techStack: ["Phase Diagrams", "Metallography", "Heat Treatment", "Mechanical Testing", "Microstructure Analysis"],
   },
 
