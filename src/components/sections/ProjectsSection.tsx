@@ -19,12 +19,13 @@ const OtterInteractive = lazy(() => import("@/components/holograms/OtterInteract
 const FunckNetworkHologram = lazy(() => import("@/components/holograms/FunckNetworkHologram"));
 const AirMotorHologram = lazy(() => import("@/components/holograms/AirMotorHologram"));
 const RGMHologram = lazy(() => import("@/components/holograms/RGMHologram"));
+const MetalDetectorHologram = lazy(() => import("@/components/holograms/MetalDetectorHologram"));
 const PhaseDiagramInteractive = lazy(() => import("@/components/materials/PhaseDiagramInteractive"));
 const CorrosionInteractive = lazy(() => import("@/components/materials/CorrosionInteractive"));
 const PolymerStressStrain = lazy(() => import("@/components/materials/PolymerStressStrain"));
 const CFRPComparison = lazy(() => import("@/components/materials/CFRPComparison"));
 
-type ProjectTab = "brief" | "hologram" | "deep-dive";
+type DetailTab = "brief" | "subsystems";
 
 const domainIcons: Record<string, React.ElementType> = {
   signal: Radio,
@@ -36,9 +37,30 @@ const domainIcons: Record<string, React.ElementType> = {
 
 function HologramLoader() {
   return (
-    <div className="h-96 flex items-center justify-center text-muted-foreground font-mono text-sm animate-pulse">
+    <div className="h-80 flex items-center justify-center text-muted-foreground font-mono text-sm animate-pulse">
       Initializing holographic display...
     </div>
+  );
+}
+
+function ProjectHologram({ project }: { project: Project }) {
+  if (!project.has3D) return null;
+  return (
+    <Suspense fallback={<HologramLoader />}>
+      {project.id === "digital-systems" && <OtterInteractive />}
+      {project.id === "funck" && <FunckNetworkHologram />}
+      {project.id === "manufacturing-systems" && <AirMotorHologram />}
+      {project.id === "rgm-machine" && <RGMHologram />}
+      {project.id === "detect-7" && <MetalDetectorHologram />}
+      {project.id === "materials-phases" && <PhaseDiagramInteractive />}
+      {project.id === "materials-corrosion" && <CorrosionInteractive />}
+      {project.id === "materials-polymers" && (
+        <div className="space-y-4">
+          <PolymerStressStrain />
+          <CFRPComparison />
+        </div>
+      )}
+    </Suspense>
   );
 }
 
@@ -49,7 +71,7 @@ export default function ProjectsSection() {
   const [selectedProject, setSelectedProject] = useState<Project>(
     projects.find((p) => p.id === "rgm-machine")!
   );
-  const [activeTab, setActiveTab] = useState<ProjectTab>("brief");
+  const [detailTab, setDetailTab] = useState<DetailTab>("brief");
   const [expandedSubsystems, setExpandedSubsystems] = useState<Set<string>>(new Set());
 
   const domainProjects = projects.filter((p) => p.domain === activeDomain);
@@ -70,7 +92,7 @@ export default function ProjectsSection() {
   return (
     <section className="max-w-7xl mx-auto">
       {/* Domain Selector */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 mb-6">
         {systemDomains.map((domain) => {
           const Icon = domainIcons[domain.icon] || Zap;
           const isActive = activeDomain === domain.id;
@@ -83,12 +105,12 @@ export default function ProjectsSection() {
                 const firstProject = projects.find((p) => p.domain === domain.id);
                 if (firstProject) {
                   setSelectedProject(firstProject);
-                  setActiveTab("brief");
+                  setDetailTab("brief");
                 }
               }}
               className={`text-left p-3 rounded-lg border transition-all ${
                 isActive
-                  ? `border-${domain.color}/40 bg-${domain.color}/5`
+                  ? "border-primary/40 bg-primary/5"
                   : "border-panel-border hover:border-panel-highlight"
               }`}
               style={isActive ? {
@@ -97,7 +119,7 @@ export default function ProjectsSection() {
               } : {}}
             >
               <div className="flex items-center gap-2 mb-1">
-                <Icon size={14} className={isActive ? `text-${domain.color}` : "text-muted-foreground"} style={isActive ? { color: `hsl(var(--${domain.color}))` } : {}} />
+                <Icon size={14} className={isActive ? "text-primary" : "text-muted-foreground"} style={isActive ? { color: `hsl(var(--${domain.color}))` } : {}} />
                 <span className="text-[10px] font-mono text-muted-foreground">{count} {count === 1 ? "system" : "systems"}</span>
               </div>
               <div className="text-xs font-semibold text-foreground leading-tight">{domain.name}</div>
@@ -109,17 +131,17 @@ export default function ProjectsSection() {
 
       {/* Three-panel layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Left: Project Index */}
-        <div className="lg:col-span-3 panel-glass rounded-lg overflow-hidden">
+        {/* Left: Project Navigator */}
+        <div className="lg:col-span-2 panel-glass rounded-lg overflow-hidden">
           <PanelHeader>
             {systemDomains.find((d) => d.id === activeDomain)?.name || "Projects"}
           </PanelHeader>
-          <div className="p-2 space-y-0.5 max-h-[70vh] overflow-y-auto">
+          <div className="p-2 space-y-0.5 max-h-[80vh] overflow-y-auto">
             {domainProjects.map((p) => (
               <button
                 key={p.id}
-                onClick={() => { setSelectedProject(p); setActiveTab("brief"); setExpandedSubsystems(new Set()); }}
-                className={`w-full flex items-center gap-2 px-3 py-2.5 rounded text-left transition-colors ${
+                onClick={() => { setSelectedProject(p); setDetailTab("brief"); setExpandedSubsystems(new Set()); }}
+                className={`w-full flex items-center gap-2 px-2 py-2 rounded text-left transition-colors ${
                   selectedProject.id === p.id
                     ? "bg-primary/10 border border-primary/20"
                     : "hover:bg-panel-highlight border border-transparent"
@@ -127,62 +149,55 @@ export default function ProjectsSection() {
               >
                 <StatusLight color={p.statusColor} />
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs font-mono font-semibold text-foreground truncate">{p.codename}</div>
-                  <div className="text-[10px] text-muted-foreground truncate">{p.name}</div>
+                  <div className="text-[10px] font-mono font-semibold text-foreground truncate">{p.codename}</div>
+                  <div className="text-[9px] text-muted-foreground truncate">{p.name}</div>
                 </div>
-                {p.has3D && <Box size={10} className="text-primary/50 flex-shrink-0" />}
-                <ChevronRight size={12} className={`text-muted-foreground transition-transform ${selectedProject.id === p.id ? "rotate-90 text-primary" : ""}`} />
+                {p.has3D && <Box size={9} className="text-primary/50 flex-shrink-0" />}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Center + Right: Content area */}
-        <div className="lg:col-span-9 space-y-4">
-          {/* Tab bar */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <button onClick={() => setActiveTab("brief")} className={`px-3 py-1.5 text-xs font-mono rounded border transition-colors ${activeTab === "brief" ? "border-primary/40 bg-primary/10 text-primary" : "border-panel-border text-muted-foreground hover:text-foreground"}`}>
+        {/* Center + Right: Hologram-first layout */}
+        <div className="lg:col-span-10 space-y-4">
+          {/* HOLOGRAM — always visible */}
+          {selectedProject.has3D && (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedProject.id + "-holo"}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ProjectHologram project={selectedProject} />
+              </motion.div>
+            </AnimatePresence>
+          )}
+
+          {/* RGM full view button */}
+          {selectedProject.id === "rgm-machine" && (
+            <button onClick={() => setRgmFullView(true)} className="px-3 py-1.5 text-xs font-mono rounded border border-neon-green/30 text-neon-green hover:bg-neon-green/10 transition-colors">
+              FULL SYSTEM VIEW →
+            </button>
+          )}
+
+          {/* Detail tabs */}
+          <div className="flex items-center gap-2">
+            <button onClick={() => setDetailTab("brief")} className={`px-3 py-1.5 text-xs font-mono rounded border transition-colors ${detailTab === "brief" ? "border-primary/40 bg-primary/10 text-primary" : "border-panel-border text-muted-foreground hover:text-foreground"}`}>
               SYSTEM BRIEF
             </button>
-            {selectedProject.has3D && (
-              <button onClick={() => setActiveTab("hologram")} className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded border transition-colors ${activeTab === "hologram" ? "border-primary/40 bg-primary/10 text-primary" : "border-panel-border text-muted-foreground hover:text-foreground"}`}>
-                <Box size={12} />
-                HOLOGRAM
-              </button>
-            )}
             {selectedProject.module.subsystems && selectedProject.module.subsystems.length > 0 && (
-              <button onClick={() => setActiveTab("deep-dive")} className={`px-3 py-1.5 text-xs font-mono rounded border transition-colors ${activeTab === "deep-dive" ? "border-primary/40 bg-primary/10 text-primary" : "border-panel-border text-muted-foreground hover:text-foreground"}`}>
+              <button onClick={() => setDetailTab("subsystems")} className={`px-3 py-1.5 text-xs font-mono rounded border transition-colors ${detailTab === "subsystems" ? "border-primary/40 bg-primary/10 text-primary" : "border-panel-border text-muted-foreground hover:text-foreground"}`}>
                 SUBSYSTEMS
-              </button>
-            )}
-            {selectedProject.id === "rgm-machine" && (
-              <button onClick={() => setRgmFullView(true)} className="px-3 py-1.5 text-xs font-mono rounded border border-neon-green/30 text-neon-green hover:bg-neon-green/10 transition-colors">
-                FULL SYSTEM VIEW →
               </button>
             )}
           </div>
 
-          {/* Tab content */}
+          {/* Detail content */}
           <AnimatePresence mode="wait">
-            {activeTab === "hologram" && selectedProject.has3D ? (
-              <motion.div key={selectedProject.id + "-holo"} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <Suspense fallback={<HologramLoader />}>
-                  {selectedProject.id === "digital-systems" && <OtterInteractive />}
-                  {selectedProject.id === "funck" && <FunckNetworkHologram />}
-                  {selectedProject.id === "manufacturing-systems" && <AirMotorHologram />}
-                  {selectedProject.id === "rgm-machine" && <RGMHologram />}
-                  {selectedProject.id === "materials-phases" && <PhaseDiagramInteractive />}
-                  {selectedProject.id === "materials-corrosion" && <CorrosionInteractive />}
-                  {selectedProject.id === "materials-polymers" && (
-                    <div className="space-y-6">
-                      <PolymerStressStrain />
-                      <CFRPComparison />
-                    </div>
-                  )}
-                </Suspense>
-              </motion.div>
-            ) : activeTab === "deep-dive" && selectedProject.module.subsystems ? (
-              <motion.div key={selectedProject.id + "-deep"} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            {detailTab === "subsystems" && selectedProject.module.subsystems ? (
+              <motion.div key={selectedProject.id + "-sub"} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <SubsystemsPanel
                   subsystems={selectedProject.module.subsystems}
                   expanded={expandedSubsystems}
@@ -195,7 +210,7 @@ export default function ProjectsSection() {
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
                   <div className="lg:col-span-3 panel-glass rounded-lg overflow-hidden">
                     <PanelHeader>System Brief — {selectedProject.codename}</PanelHeader>
-                    <div className="p-4 space-y-5 max-h-[70vh] overflow-y-auto">
+                    <div className="p-4 space-y-5 max-h-[60vh] overflow-y-auto">
                       {/* Hero */}
                       <div>
                         <h3 className="text-base font-semibold text-foreground mb-1">{selectedProject.name}</h3>
@@ -237,16 +252,9 @@ export default function ProjectsSection() {
                           <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-1.5 uppercase flex items-center gap-1.5">
                             <Play size={12} /> Video Demonstration
                           </h4>
-                          <video
-                            controls
-                            className="w-full rounded border border-panel-border"
-                            preload="metadata"
-                          >
+                          <video controls className="w-full rounded border border-panel-border" preload="metadata">
                             <source src={selectedProject.videoPath} type="video/mp4" />
                           </video>
-                          <div className="text-[10px] font-mono text-muted-foreground mt-1">
-                            Source: EE_241_Final_Demonstration.mp4 — March 10, 2026
-                          </div>
                         </div>
                       )}
 
@@ -358,7 +366,7 @@ export default function ProjectsSection() {
                   {/* Right: Evidence */}
                   <div className="lg:col-span-2 panel-glass rounded-lg overflow-hidden">
                     <PanelHeader>Evidence</PanelHeader>
-                    <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
+                    <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
                       {selectedProject.status === "EVIDENCE_PENDING" && (
                         <EvidencePending items={["Upload lab reports and screenshots", "Add schematics and waveform captures", "Include PCB layouts and simulation files"]} />
                       )}

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { projects, type RGMStage, type FailureMode } from "@/data/portfolioData";
 import { useViewMode } from "@/contexts/ViewModeContext";
 import { ConfidenceBadgeTag, PanelHeader } from "@/components/ui/mission-ui";
-import { ChevronDown, AlertTriangle, CheckCircle2, Box, Play, ArrowRight } from "lucide-react";
+import { ChevronDown, AlertTriangle, CheckCircle2, Play, ArrowRight } from "lucide-react";
 
 const RGMHologram = lazy(() => import("@/components/holograms/RGMHologram"));
 
@@ -20,34 +20,27 @@ const stageColors = [
 export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
   const { mode } = useViewMode();
   const [selectedStage, setSelectedStage] = useState<RGMStage | null>(null);
-  const [showHologram, setShowHologram] = useState(false);
   const [showFailures, setShowFailures] = useState(false);
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <button onClick={onBack} className="text-xs font-mono text-muted-foreground hover:text-primary mb-2 flex items-center gap-1">
-            ← Back to Projects
-          </button>
-          <h1 className="font-display text-2xl md:text-3xl tracking-wider text-primary neon-text-cyan">
-            Rube Goldberg Machine
-          </h1>
-          <p className="text-sm text-muted-foreground font-mono mt-1">
-            9-Stage Electromechanical Chain Reaction — EE 241-01 | Winter 2026
-          </p>
-        </div>
-        <button
-          onClick={() => setShowHologram(!showHologram)}
-          className={`flex items-center gap-2 px-3 py-2 text-xs font-mono rounded border transition-colors ${
-            showHologram ? "border-primary/40 bg-primary/10 text-primary" : "border-panel-border text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <Box size={14} />
-          3D HOLOGRAM
+      <div>
+        <button onClick={onBack} className="text-xs font-mono text-muted-foreground hover:text-primary mb-2 flex items-center gap-1">
+          ← Back to Projects
         </button>
+        <h1 className="font-display text-2xl md:text-3xl tracking-wider text-primary neon-text-cyan">
+          Rube Goldberg Machine
+        </h1>
+        <p className="text-sm text-muted-foreground font-mono mt-1">
+          9-Stage Electromechanical Chain Reaction — EE 241-01 | Winter 2026
+        </p>
       </div>
+
+      {/* HOLOGRAM — always visible */}
+      <Suspense fallback={<div className="h-80 flex items-center justify-center text-muted-foreground font-mono text-sm animate-pulse">Loading holographic display...</div>}>
+        <RGMHologram />
+      </Suspense>
 
       {/* Problem + System Overview */}
       <div className="panel-glass rounded-lg p-4 border-l-2 border-l-neon-green">
@@ -86,17 +79,6 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
           </div>
         )}
       </div>
-
-      {/* 3D Hologram */}
-      <AnimatePresence>
-        {showHologram && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-            <Suspense fallback={<div className="h-96 flex items-center justify-center text-muted-foreground font-mono text-sm">Loading holographic display...</div>}>
-              <RGMHologram />
-            </Suspense>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* System Flow */}
       <div className="panel-glass rounded-lg overflow-hidden">
@@ -185,7 +167,6 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
                   <p className="text-sm text-secondary-foreground leading-relaxed">{selectedStage.howItWorks}</p>
                 </div>
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div className="border border-neon-amber/20 rounded p-2.5 bg-neon-amber/5">
                   <div className="text-[10px] font-mono text-neon-amber mb-1 uppercase">Stage Input</div>
@@ -196,7 +177,6 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
                   <div className="text-xs text-foreground">{selectedStage.output}</div>
                 </div>
               </div>
-
               {selectedStage.keyComponents && (
                 <div>
                   <h4 className="text-xs font-mono font-semibold text-muted-foreground uppercase mb-1.5">Key Components</h4>
@@ -207,10 +187,7 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
                   </div>
                 </div>
               )}
-
-              <div className="text-[10px] font-mono text-muted-foreground">
-                Evidence: {selectedStage.evidenceSource}
-              </div>
+              <div className="text-[10px] font-mono text-muted-foreground">Evidence: {selectedStage.evidenceSource}</div>
             </div>
           </motion.div>
         )}
