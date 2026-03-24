@@ -7,6 +7,8 @@ interface ViewModeContextType {
   toggle: () => void;
   demoMode: boolean;
   toggleDemo: () => void;
+  interviewMode: boolean;
+  toggleInterview: () => void;
 }
 
 const ViewModeContext = createContext<ViewModeContextType>({
@@ -14,6 +16,8 @@ const ViewModeContext = createContext<ViewModeContextType>({
   toggle: () => {},
   demoMode: false,
   toggleDemo: () => {},
+  interviewMode: false,
+  toggleInterview: () => {},
 });
 
 export const useViewMode = () => useContext(ViewModeContext);
@@ -21,10 +25,12 @@ export const useViewMode = () => useContext(ViewModeContext);
 export function ViewModeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<ViewMode>("recruiter");
   const [demoMode, setDemoMode] = useState(false);
+  const [interviewMode, setInterviewMode] = useState(false);
   const toggle = () => setMode((m) => (m === "recruiter" ? "engineer" : "recruiter"));
   const toggleDemo = () => setDemoMode((d) => !d);
+  const toggleInterview = () => setInterviewMode((d) => !d);
   return (
-    <ViewModeContext.Provider value={{ mode, toggle, demoMode, toggleDemo }}>
+    <ViewModeContext.Provider value={{ mode, toggle, demoMode, toggleDemo, interviewMode, toggleInterview }}>
       {children}
     </ViewModeContext.Provider>
   );
