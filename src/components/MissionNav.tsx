@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useViewMode } from "@/contexts/ViewModeContext";
 import {
   Compass, Rocket, Briefcase, Cpu, Mail, FileText,
-  Eye, Wrench, Menu, X, Link2, Check, Monitor,
+  Eye, Wrench, Menu, X, Link2, Check, Monitor, MessageSquare,
 } from "lucide-react";
 
 const navItems = [
@@ -21,7 +21,7 @@ interface MissionNavProps {
 }
 
 export default function MissionNav({ activeSection, onNavigate }: MissionNavProps) {
-  const { mode, toggle, demoMode, toggleDemo } = useViewMode();
+  const { mode, toggle, demoMode, toggleDemo, interviewMode, toggleInterview } = useViewMode();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
 
@@ -76,6 +76,20 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
           </div>
 
           <div className="flex items-center gap-1.5">
+            {/* Interview Mode toggle */}
+            <button
+              onClick={toggleInterview}
+              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono rounded border transition-colors ${
+                interviewMode
+                  ? "border-neon-cyan/40 bg-neon-cyan/10 text-neon-cyan"
+                  : "border-panel-border text-muted-foreground hover:text-foreground"
+              }`}
+              title="Interview Mode: shows Q&A and resume highlights"
+            >
+              <MessageSquare size={12} />
+              <span className="hidden lg:inline">INTERVIEW</span>
+            </button>
+
             {/* Demo Mode toggle */}
             <button
               onClick={toggleDemo}
@@ -154,7 +168,16 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
                 </button>
               );
             })}
-            <div className="pt-2 border-t border-panel-border">
+            <div className="pt-2 border-t border-panel-border space-y-1">
+              <button
+                onClick={toggleInterview}
+                className={`w-full flex items-center gap-2 px-3 py-2 text-sm font-mono rounded ${
+                  interviewMode ? "text-neon-cyan bg-neon-cyan/10" : "text-muted-foreground"
+                }`}
+              >
+                <MessageSquare size={14} />
+                Interview Mode {interviewMode ? "ON" : "OFF"}
+              </button>
               <button
                 onClick={toggleDemo}
                 className={`w-full flex items-center gap-2 px-3 py-2 text-sm font-mono rounded ${

@@ -1,0 +1,186 @@
+// Interview questions, recruiter summaries, and resume-aligned highlights per project
+
+export interface InterviewQA {
+  question: string;
+  answer: string;
+}
+
+export interface RecruiterSummary {
+  whatIsIt: string;
+  whyItMatters: string;
+  whatYouBuilt: string;
+  keyOutcomes: string[];
+  skillsDemonstrated: string[];
+}
+
+export interface ResumeHighlight {
+  resumeBullet: string;
+  projectEvidence: string;
+}
+
+export const recruiterSummaries: Record<string, RecruiterSummary> = {
+  "ee143-signal-system": {
+    whatIsIt: "A complete analog-to-digital-to-analog signal processing pipeline built from individual circuits.",
+    whyItMatters: "Demonstrates end-to-end systems thinking — designing, integrating, and debugging across analog and digital domains.",
+    whatYouBuilt: "Full signal chain: op-amp conditioning → Arduino ADC → 4-bit digital processing → custom PCB DAC → reconstructed output.",
+    keyOutcomes: [
+      "Built a 4-bit DAC producing 16 discrete voltage levels (~62.5 mV resolution)",
+      "Designed and fabricated PCB using Fusion 360 and reflow soldering",
+      "Integrated full signal chain from analog input to reconstructed audio output",
+      "Identified and resolved loading effects using voltage follower buffering",
+    ],
+    skillsDemonstrated: ["Circuit Design", "PCB Design & Fabrication", "Signal Conditioning", "System Integration", "Debugging", "LTSpice Simulation"],
+  },
+  "rgm-machine": {
+    whatIsIt: "A 9-stage electromechanical chain reaction where each stage must reliably trigger the next.",
+    whyItMatters: "Proves ability to debug complex multi-domain systems with sequential dependencies — one failure breaks everything.",
+    whatYouBuilt: "Capacitive piano → relay → 580V strobe → light detector → solenoid → 555 metal detector → electromagnet → tilt switch → LCD display.",
+    keyOutcomes: [
+      "All 9 stages operated in sequence during live class demonstration",
+      "Resolved 6 distinct failure modes across electrical, mechanical, and software domains",
+      "Implemented robust metal detection: 5.1% frequency shift with streak-based filtering",
+      "Designed custom mechanical track and sensor housings in Fusion 360",
+    ],
+    skillsDemonstrated: ["Analog Circuit Design", "Embedded Programming", "Sensor Integration", "Debugging & Root Cause Analysis", "System Integration", "CAD"],
+  },
+  "detect-7": {
+    whatIsIt: "A 555-timer-based metal detection system with automated electromagnet release.",
+    whyItMatters: "Shows precision in frequency-domain sensing and robust threshold logic under noise.",
+    whatYouBuilt: "LC oscillator metal detector with Arduino-based frequency monitoring and MOSFET-controlled electromagnet.",
+    keyOutcomes: [
+      "Achieved 5.1% frequency drop detection (8,760 Hz → 8,310 Hz)",
+      "Implemented streak-based filtering to eliminate false triggers",
+      "Resolved MOSFET common ground issue for reliable switching",
+    ],
+    skillsDemonstrated: ["555 Timer Design", "Frequency Analysis", "MOSFET Switching", "Arduino Programming", "Debugging"],
+  },
+  "digital-systems": {
+    whatIsIt: "A multi-cycle RISC-V CPU designed from gates up, synthesized onto an FPGA.",
+    whyItMatters: "Demonstrates deep understanding of computer architecture — instruction fetch, decode, execute, and memory access.",
+    whatYouBuilt: "Complete OTTER MCU with RV32I ISA support, 10 ALU operations, FSM control unit, and 32×32 register file.",
+    keyOutcomes: [
+      "Implemented full RV32I instruction set in SystemVerilog",
+      "10 ALU operations with branch condition generation",
+      "2-state FSM (FETCH/EXEC) with correct timing control",
+      "Synthesized and verified on FPGA via Vivado",
+    ],
+    skillsDemonstrated: ["SystemVerilog / HDL", "RISC-V Architecture", "FPGA Synthesis", "FSM Design", "Digital Logic", "Timing Analysis"],
+  },
+  "manufacturing-systems": {
+    whatIsIt: "A precision air motor built through the complete CAD-to-fabrication pipeline.",
+    whyItMatters: "Demonstrates hands-on manufacturing skills — from digital design to physical parts with measured tolerances.",
+    whatYouBuilt: "6 precision-machined parts using lathe and mill, with engineering drawings per ASME Y14.5 GD&T standards.",
+    keyOutcomes: [
+      "Machined 6 parts: crank disk, cylinder, flywheel, frame, mainshaft, piston",
+      "Applied GD&T per ASME Y14.5 for all engineering drawings",
+      "Calculated feeds and speeds per material and operation",
+      "Assembled working pneumatic air motor",
+    ],
+    skillsDemonstrated: ["Manual Machining (Lathe & Mill)", "CAD (SolidWorks)", "GD&T / Engineering Drawings", "Metrology", "Production Planning"],
+  },
+  "funck": {
+    whatIsIt: "A full-stack event ticketing platform handling real payments and user management.",
+    whyItMatters: "Shows ability to build production-grade software with authentication, payments, and database management.",
+    whatYouBuilt: "React/TypeScript platform with Supabase backend, Stripe payments, automated email via Resend, deployed at funck.live.",
+    keyOutcomes: [
+      "Live production system at funck.live with real users",
+      "Integrated Stripe payment processing with webhook handling",
+      "Built role-based access control and event management",
+      "Automated transactional emails via Resend API",
+    ],
+    skillsDemonstrated: ["React / TypeScript", "Supabase / PostgreSQL", "Stripe Integration", "API Design", "Full-Stack Development"],
+  },
+};
+
+export const interviewQuestions: Record<string, InterviewQA[]> = {
+  "ee143-signal-system": [
+    {
+      question: "What was the hardest part of this system?",
+      answer: "Managing signal integrity and loading effects in the analog front end. The ADC input impedance drew current from the signal source, causing voltage drop. I resolved this by adding a voltage follower (unity gain buffer) between the source and ADC.",
+    },
+    {
+      question: "How did you validate the DAC output?",
+      answer: "I first simulated the binary-weighted resistor network in LTSpice to verify step response. After PCB fabrication via reflow soldering, I compared the physical staircase output against the simulation using an oscilloscope, checking each of the 16 discrete voltage levels.",
+    },
+    {
+      question: "What would you change if you rebuilt this?",
+      answer: "I'd increase to at least 8-bit resolution to reduce quantization noise, add anti-aliasing and reconstruction filters, and implement a higher sampling rate. The 4-bit resolution was intentionally limiting to study quantization effects, but it produces audible distortion.",
+    },
+    {
+      question: "How does quantization error affect the output?",
+      answer: "With 4 bits, the continuous analog signal is approximated by only 16 discrete levels, giving ±½ LSB (±31.25 mV) quantization error. This creates audible staircase artifacts in the speaker output — the fundamental tradeoff between bit depth and signal fidelity.",
+    },
+  ],
+  "rgm-machine": [
+    {
+      question: "What failed and how did you fix it?",
+      answer: "Six distinct failures. The most critical was a ground reference mismatch — the MOSFET controlling the electromagnet had no common ground between the Arduino (USB 5V) and external 9V supply, causing undefined gate-source voltage. Connecting both grounds fixed it immediately.",
+    },
+    {
+      question: "How did you ensure reliable metal detection?",
+      answer: "The 555 timer LC oscillator drops from 8,760 Hz to 8,310 Hz (5.1%) with the steel marble. I implemented a streak counter requiring 5 consecutive readings above threshold, plus a 600ms release delay and a fixed 150 Hz trip delta instead of noisy percentage calculations.",
+    },
+    {
+      question: "How did you debug across 9 sequential stages?",
+      answer: "I isolated each stage independently first, verifying input/output at every boundary. The strobe (Stage 3) was the hardest — a broken transistor lead in the oscillator blocked the entire downstream chain. I systematically tested each component until I found the failed lead.",
+    },
+    {
+      question: "What's the most important lesson from this project?",
+      answer: "Sequential dependency amplifies risk. Any single failure halts the entire chain. This taught me to design for testability — each stage needs independent verification points. It's the same principle used in production test engineering.",
+    },
+  ],
+  "digital-systems": [
+    {
+      question: "Walk me through how an instruction executes in your CPU.",
+      answer: "In the FETCH state, the PC addresses instruction memory, loading the instruction register. In EXEC, the decoder generates control signals based on opcode/funct3/funct7. For R-type: both register operands feed the ALU, result writes back to the register file. For branches: the branch condition generator produces br_eq/br_lt/br_ltu signals, and the PC MUX selects the branch target if taken.",
+    },
+    {
+      question: "What was the hardest bug to find?",
+      answer: "Branch target miscalculation. The pcSource MUX wasn't properly gated by the PCWrite signal, causing the PC to update during FETCH instead of only during EXEC. The fix was ensuring PCWrite only asserts in the EXEC state, verified through simulation waveforms.",
+    },
+    {
+      question: "Why multi-cycle instead of pipelined?",
+      answer: "Multi-cycle was the pedagogical starting point — it simplifies control by using a 2-state FSM (FETCH/EXEC). The natural next step would be a 5-stage pipeline, which I'd implement by adding IF/ID/EX/MEM/WB stages with hazard detection and forwarding logic.",
+    },
+  ],
+  "manufacturing-systems": [
+    {
+      question: "How do you go from a CAD model to a finished part?",
+      answer: "Start with a parametric SolidWorks model, then generate engineering drawings with GD&T per ASME Y14.5. Create a production plan specifying operations, tools, feeds/speeds. Machine on lathe and mill, then inspect dimensions with calipers (±0.001\") and micrometers (±0.0001\"). Iterate if out of tolerance.",
+    },
+    {
+      question: "What's the gap between CAD and reality?",
+      answer: "Tolerances. Real manufacturing introduces variation from tool wear, thermal expansion, fixturing, and operator technique. GD&T communicates design intent so manufacturing and inspection can verify parts independently. The CAD model is the ideal — the drawing defines what's acceptable.",
+    },
+  ],
+  "funck": [
+    {
+      question: "How did you handle payments?",
+      answer: "Stripe Checkout with server-side webhook handling. The webhook verifies payment completion, updates the database via Supabase, and triggers confirmation emails through Resend. This ensures the database only reflects verified transactions, not client-side claims.",
+    },
+    {
+      question: "What's the architecture?",
+      answer: "React/TypeScript frontend, Supabase (PostgreSQL + Auth + Storage) backend, Stripe for payments, Resend for transactional emails. Row-Level Security policies enforce access control at the database level. Deployed on Vercel with the backend on Supabase cloud.",
+    },
+  ],
+};
+
+export const resumeHighlights: Record<string, ResumeHighlight[]> = {
+  "ee143-signal-system": [
+    { resumeBullet: "Designed and built complete analog-to-digital signal processing pipeline", projectEvidence: "Full signal chain: op-amp → ADC → 4-bit processing → DAC → output" },
+    { resumeBullet: "Designed PCB for 4-bit binary-weighted DAC using Fusion 360", projectEvidence: "LTSpice simulation → PCB layout → reflow soldering → hardware validation" },
+  ],
+  "rgm-machine": [
+    { resumeBullet: "Debugged and integrated 9-stage electromechanical system with 6 resolved failure modes", projectEvidence: "6 documented failure modes with root cause analysis and fixes" },
+    { resumeBullet: "Implemented frequency-domain metal detection with 5.1% shift threshold and streak filtering", projectEvidence: "555 timer LC oscillator: 8,760 Hz baseline → 8,310 Hz detection" },
+  ],
+  "digital-systems": [
+    { resumeBullet: "Designed multi-cycle RISC-V CPU (RV32I) in SystemVerilog with 10 ALU operations", projectEvidence: "OTTER MCU: full datapath + FSM control synthesized on FPGA" },
+  ],
+  "manufacturing-systems": [
+    { resumeBullet: "Machined 6 precision parts for pneumatic air motor on manual lathe and mill", projectEvidence: "Crank disk, cylinder, flywheel, frame, mainshaft, piston — all per GD&T specs" },
+  ],
+  "funck": [
+    { resumeBullet: "Built and deployed full-stack event platform with Stripe payments at funck.live", projectEvidence: "Live production system with auth, payments, email, and role-based access" },
+  ],
+};

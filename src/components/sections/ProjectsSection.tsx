@@ -25,6 +25,8 @@ const CorrosionInteractive = lazy(() => import("@/components/materials/Corrosion
 const PolymerStressStrain = lazy(() => import("@/components/materials/PolymerStressStrain"));
 const CFRPComparison = lazy(() => import("@/components/materials/CFRPComparison"));
 
+import RecruiterProjectView from "@/components/sections/RecruiterProjectView";
+
 type DetailTab = "brief" | "subsystems";
 
 const domainIcons: Record<string, React.ElementType> = {
@@ -64,12 +66,23 @@ function ProjectHologram({ project }: { project: Project }) {
   );
 }
 
-export default function ProjectsSection() {
-  const { mode, demoMode } = useViewMode();
+interface ProjectsSectionProps {
+  initialProjectId?: string | null;
+}
+
+export default function ProjectsSection({ initialProjectId }: ProjectsSectionProps) {
+  const { mode, demoMode, interviewMode } = useViewMode();
   const [rgmFullView, setRgmFullView] = useState(false);
-  const [activeDomain, setActiveDomain] = useState<SystemDomain>("electromechanical");
+
+  const initialProject = initialProjectId 
+    ? projects.find((p) => p.id === initialProjectId) 
+    : undefined;
+
+  const [activeDomain, setActiveDomain] = useState<SystemDomain>(
+    initialProject?.domain || "electromechanical"
+  );
   const [selectedProject, setSelectedProject] = useState<Project>(
-    projects.find((p) => p.id === "rgm-machine")!
+    initialProject || projects.find((p) => p.id === "rgm-machine")!
   );
   const [detailTab, setDetailTab] = useState<DetailTab>("brief");
   const [expandedSubsystems, setExpandedSubsystems] = useState<Set<string>>(new Set());
@@ -160,8 +173,13 @@ export default function ProjectsSection() {
 
         {/* Center + Right: Hologram-first layout */}
         <div className="lg:col-span-10 space-y-4">
-          {/* HOLOGRAM — always visible */}
-          {selectedProject.has3D && (
+          {/* RECRUITER VIEW — always shown first in recruiter mode */}
+          {mode === "recruiter" && (
+            <RecruiterProjectView project={selectedProject} />
+          )}
+
+          {/* HOLOGRAM — always visible (but after recruiter summary in recruiter mode) */}
+          {selectedProject.has3D && (mode === "engineer" || detailTab === "brief") && (
             <AnimatePresence mode="wait">
               <motion.div
                 key={selectedProject.id + "-holo"}

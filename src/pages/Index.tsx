@@ -10,22 +10,36 @@ import SkillsSection from "@/components/sections/SkillsSection";
 import ContactSection from "@/components/sections/ContactSection";
 import QuickviewSection from "@/components/sections/QuickviewSection";
 
-const sections: Record<string, React.ComponentType> = {
-  overview: OverviewSection,
-  projects: ProjectsSection,
-  experience: ExperienceSection,
-  skills: SkillsSection,
-  contact: ContactSection,
-  quickview: QuickviewSection,
-};
-
 export default function Index() {
   const [booted, setBooted] = useState(false);
   const [activeSection, setActiveSection] = useState("overview");
+  const [targetProjectId, setTargetProjectId] = useState<string | null>(null);
 
   const handleBootComplete = useCallback(() => setBooted(true), []);
 
-  const ActiveComponent = sections[activeSection] || OverviewSection;
+  const handleNavigateToProject = useCallback((projectId: string) => {
+    setTargetProjectId(projectId);
+    setActiveSection("projects");
+  }, []);
+
+  const renderSection = () => {
+    switch (activeSection) {
+      case "overview":
+        return <OverviewSection onNavigateToProject={handleNavigateToProject} />;
+      case "projects":
+        return <ProjectsSection initialProjectId={targetProjectId} />;
+      case "experience":
+        return <ExperienceSection />;
+      case "skills":
+        return <SkillsSection />;
+      case "contact":
+        return <ContactSection />;
+      case "quickview":
+        return <QuickviewSection />;
+      default:
+        return <OverviewSection onNavigateToProject={handleNavigateToProject} />;
+    }
+  };
 
   return (
     <ViewModeProvider>
@@ -33,7 +47,7 @@ export default function Index() {
 
       {booted && (
         <div className="min-h-screen bg-background">
-          <MissionNav activeSection={activeSection} onNavigate={setActiveSection} />
+          <MissionNav activeSection={activeSection} onNavigate={(s) => { setActiveSection(s); if (s !== "projects") setTargetProjectId(null); }} />
 
           <main className="pt-20 pb-16 px-4">
             <AnimatePresence mode="wait">
@@ -44,7 +58,7 @@ export default function Index() {
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.25 }}
               >
-                <ActiveComponent />
+                {renderSection()}
               </motion.div>
             </AnimatePresence>
           </main>
