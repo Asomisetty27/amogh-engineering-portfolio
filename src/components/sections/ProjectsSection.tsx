@@ -173,8 +173,13 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
 
         {/* Center + Right: Hologram-first layout */}
         <div className="lg:col-span-10 space-y-4">
-          {/* HOLOGRAM — always visible */}
-          {selectedProject.has3D && (
+          {/* RECRUITER VIEW — always shown first in recruiter mode */}
+          {mode === "recruiter" && (
+            <RecruiterProjectView project={selectedProject} />
+          )}
+
+          {/* HOLOGRAM — always visible (but after recruiter summary in recruiter mode) */}
+          {selectedProject.has3D && (mode === "engineer" || detailTab === "brief") && (
             <AnimatePresence mode="wait">
               <motion.div
                 key={selectedProject.id + "-holo"}
