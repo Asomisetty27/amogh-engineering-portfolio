@@ -66,12 +66,23 @@ function ProjectHologram({ project }: { project: Project }) {
   );
 }
 
-export default function ProjectsSection() {
-  const { mode, demoMode } = useViewMode();
+interface ProjectsSectionProps {
+  initialProjectId?: string | null;
+}
+
+export default function ProjectsSection({ initialProjectId }: ProjectsSectionProps) {
+  const { mode, demoMode, interviewMode } = useViewMode();
   const [rgmFullView, setRgmFullView] = useState(false);
-  const [activeDomain, setActiveDomain] = useState<SystemDomain>("electromechanical");
+
+  const initialProject = initialProjectId 
+    ? projects.find((p) => p.id === initialProjectId) 
+    : undefined;
+
+  const [activeDomain, setActiveDomain] = useState<SystemDomain>(
+    initialProject?.domain || "electromechanical"
+  );
   const [selectedProject, setSelectedProject] = useState<Project>(
-    projects.find((p) => p.id === "rgm-machine")!
+    initialProject || projects.find((p) => p.id === "rgm-machine")!
   );
   const [detailTab, setDetailTab] = useState<DetailTab>("brief");
   const [expandedSubsystems, setExpandedSubsystems] = useState<Set<string>>(new Set());
