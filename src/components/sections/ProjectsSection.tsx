@@ -25,6 +25,8 @@ const CorrosionInteractive = lazy(() => import("@/components/materials/Corrosion
 const PolymerStressStrain = lazy(() => import("@/components/materials/PolymerStressStrain"));
 const CFRPComparison = lazy(() => import("@/components/materials/CFRPComparison"));
 
+import RecruiterProjectView from "@/components/sections/RecruiterProjectView";
+
 type DetailTab = "brief" | "subsystems";
 
 const domainIcons: Record<string, React.ElementType> = {
