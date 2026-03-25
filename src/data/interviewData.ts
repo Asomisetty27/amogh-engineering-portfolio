@@ -90,6 +90,19 @@ export const recruiterSummaries: Record<string, RecruiterSummary> = {
     ],
     skillsDemonstrated: ["React / TypeScript", "Supabase / PostgreSQL", "Stripe Integration", "API Design", "Full-Stack Development"],
   },
+  "fpv-drone": {
+    whatIsIt: "A 75 mm HD brushless FPV drone analyzed as a densely integrated electromechanical system — not a hobby toy.",
+    whyItMatters: "Demonstrates ability to reason about a tightly constrained system where power, control, RF, packaging, vibration, and performance all interact.",
+    whatYouBuilt: "Comprehensive systems-level analysis: six interconnected subsystems, power architecture mapping, control-link integration analysis, and failure mode identification.",
+    keyOutcomes: [
+      "Analyzed embedded flight control + ESC + sensor architecture on STM32G474 AIO platform",
+      "Mapped multi-rail power architecture: 2S → ESC (unregulated), 10V BEC (O3), 5V BEC (logic)",
+      "Identified control-link ecosystem mismatch (ELRS vs Tracer) as a system integration challenge",
+      "Documented 5 failure hotspots with propagation analysis across subsystem boundaries",
+      "Characterized tight mechanical/thermal/RF packaging constraints at 70 g dry weight",
+    ],
+    skillsDemonstrated: ["Embedded Hardware Systems", "RF / Control-Link Architecture", "Electromechanical Integration", "Power Distribution", "Systems Analysis", "Failure Mode Analysis"],
+  },
 };
 
 export const interviewQuestions: Record<string, InterviewQA[]> = {
@@ -163,6 +176,28 @@ export const interviewQuestions: Record<string, InterviewQA[]> = {
       answer: "React/TypeScript frontend, Supabase (PostgreSQL + Auth + Storage) backend, Stripe for payments, Resend for transactional emails. Row-Level Security policies enforce access control at the database level. Deployed on Vercel with the backend on Supabase cloud.",
     },
   ],
+  "fpv-drone": [
+    {
+      question: "Why is this more than just a hobby drone?",
+      answer: "It's a 70-gram system where six tightly coupled subsystems — propulsion, flight control, power regulation, RF control, digital video, and mechanical packaging — all impose constraints on each other. Battery sag affects motor authority and video stability. Motor vibration degrades gyro accuracy and camera output. Antenna placement inside a carbon fiber frame creates RF dead zones. Every design choice has system-level consequences.",
+    },
+    {
+      question: "Why does the control-link mismatch matter?",
+      answer: "The onboard ELRS receiver and TBS Mambo transmitter (Tracer protocol) use incompatible RF protocols. This isn't a binding issue — it's a fundamental serial/RF architecture mismatch. Resolving it requires either an ELRS transmitter module or an external Tracer receiver, each with different UART allocation, packaging, and antenna routing implications.",
+    },
+    {
+      question: "Why does the DJI O3 change the design trade space?",
+      answer: "O3 is the heaviest single component and requires a dedicated 10V 2A regulated rail. It generates heat in an enclosed canopy, affects center of gravity, and its video quality is directly degraded by motor vibration. The entire platform's power budget, thermal management, and structural design revolve around supporting O3.",
+    },
+    {
+      question: "What role does bidirectional DShot play?",
+      answer: "Bidirectional DShot600 enables motors to report RPM back to the flight controller. This allows RPM-based notch filtering in Betaflight — critical on micro platforms where motor vibration frequencies directly overlap with gyro measurement bandwidth. Without it, gyro noise degrades PID control quality.",
+    },
+    {
+      question: "What are the most likely failure points?",
+      answer: "Battery sag under aggressive throttle (causes O3 brownout), unbalanced props or worn bearings (vibration into gyro and camera), antenna obstruction by carbon fiber frame (RF dead zones), and BEC thermal stress in enclosed canopy (regulator instability). Each failure propagates across subsystem boundaries.",
+    },
+  ],
 };
 
 export const resumeHighlights: Record<string, ResumeHighlight[]> = {
@@ -182,5 +217,10 @@ export const resumeHighlights: Record<string, ResumeHighlight[]> = {
   ],
   "funck": [
     { resumeBullet: "Built and deployed full-stack event platform with Stripe payments at funck.live", projectEvidence: "Live production system with auth, payments, email, and role-based access" },
+  ],
+  "fpv-drone": [
+    { resumeBullet: "Analyzed and documented tightly integrated FPV flight system across 6 subsystems", projectEvidence: "Propulsion, flight control, power, RF, video, and structure analyzed as coupled system" },
+    { resumeBullet: "Identified control-link architecture mismatch and evaluated integration paths", projectEvidence: "ELRS vs Tracer protocol incompatibility — serial/RF architecture analysis, not just binding" },
+    { resumeBullet: "Mapped multi-rail power distribution with failure propagation analysis", projectEvidence: "2S → ESC (unregulated) + 10V BEC (O3) + 5V BEC (logic) with 5 documented failure hotspots" },
   ],
 };
