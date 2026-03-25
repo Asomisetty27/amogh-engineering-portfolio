@@ -108,7 +108,7 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
   return (
     <section className="max-w-7xl mx-auto">
       {/* Domain Selector */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-2 mb-6">
         {systemDomains.map((domain) => {
           const Icon = domainIcons[domain.icon] || Zap;
           const isActive = activeDomain === domain.id;
