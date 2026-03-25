@@ -88,7 +88,8 @@ export type SystemDomain =
   | "electromechanical"
   | "digital-systems"
   | "manufacturing"
-  | "materials";
+  | "materials"
+  | "fpv-systems";
 
 export type ProjectStatus = "COMPLETE" | "IN_PROGRESS" | "EVIDENCE_PENDING" | "ACTIVE";
 
