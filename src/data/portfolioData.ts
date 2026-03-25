@@ -156,6 +156,13 @@ export const systemDomains: SystemDomainInfo[] = [
     icon: "flask",
     color: "neon-magenta",
   },
+  {
+    id: "fpv-systems",
+    name: "FPV Flight Systems Integration",
+    subtitle: "Propulsion, flight control, RF architecture, power regulation, digital video",
+    icon: "drone",
+    color: "neon-cyan",
+  },
 ];
 
 // ========== RGM STAGES (from Lab_Final_Report_Amogh_Somisetty.pdf) ==========
