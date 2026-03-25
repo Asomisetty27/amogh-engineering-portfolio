@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/mission-ui";
 import {
   ChevronRight, ChevronDown, FileText, Image as ImageIcon,
-  ExternalLink, Box, Zap, Cpu, Wrench, Radio,
+  ExternalLink, Box, Zap, Cpu, Wrench, Radio, Plane,
   Globe, AlertTriangle, CheckCircle2, Play, FlaskConical,
 } from "lucide-react";
 import RGMSystemPage from "@/components/RGMSystemPage";
@@ -24,6 +24,7 @@ const PhaseDiagramInteractive = lazy(() => import("@/components/materials/PhaseD
 const CorrosionInteractive = lazy(() => import("@/components/materials/CorrosionInteractive"));
 const PolymerStressStrain = lazy(() => import("@/components/materials/PolymerStressStrain"));
 const CFRPComparison = lazy(() => import("@/components/materials/CFRPComparison"));
+const DroneSystemHologram = lazy(() => import("@/components/holograms/DroneSystemHologram"));
 
 import RecruiterProjectView from "@/components/sections/RecruiterProjectView";
 
@@ -35,6 +36,7 @@ const domainIcons: Record<string, React.ElementType> = {
   cpu: Cpu,
   wrench: Wrench,
   flask: FlaskConical,
+  drone: Plane,
 };
 
 function HologramLoader() {
@@ -62,6 +64,7 @@ function ProjectHologram({ project }: { project: Project }) {
           <CFRPComparison />
         </div>
       )}
+      {project.id === "fpv-drone" && <DroneSystemHologram />}
     </Suspense>
   );
 }
@@ -105,7 +108,7 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
   return (
     <section className="max-w-7xl mx-auto">
       {/* Domain Selector */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-2 mb-6">
         {systemDomains.map((domain) => {
           const Icon = domainIcons[domain.icon] || Zap;
           const isActive = activeDomain === domain.id;
