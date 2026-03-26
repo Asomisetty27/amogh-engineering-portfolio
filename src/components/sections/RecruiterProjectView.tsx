@@ -1,21 +1,14 @@
 import { motion } from "framer-motion";
 import { type Project } from "@/data/portfolioData";
-import { recruiterSummaries, interviewQuestions, resumeHighlights } from "@/data/interviewData";
-import { useViewMode } from "@/contexts/ViewModeContext";
-import { CheckCircle2, MessageSquare, FileText, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { recruiterSummaries } from "@/data/interviewData";
+import { CheckCircle2 } from "lucide-react";
 
 interface RecruiterProjectViewProps {
   project: Project;
 }
 
 export default function RecruiterProjectView({ project }: RecruiterProjectViewProps) {
-  const { demoMode } = useViewMode();
   const summary = recruiterSummaries[project.id];
-  const questions = interviewQuestions[project.id];
-  const highlights = resumeHighlights[project.id];
-  const [showInterview, setShowInterview] = useState(false);
-  const [showResume, setShowResume] = useState(false);
 
   if (!summary) return null;
 
@@ -68,72 +61,6 @@ export default function RecruiterProjectView({ project }: RecruiterProjectViewPr
           ))}
         </div>
       </div>
-
-      {/* Interview Mode */}
-      {questions && questions.length > 0 && (
-        <div className="panel-glass rounded-lg overflow-hidden">
-          <button
-            onClick={() => setShowInterview(!showInterview)}
-            className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-panel-highlight transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <MessageSquare size={14} className="text-neon-cyan" />
-              <span className="text-xs font-mono font-semibold tracking-wider text-neon-cyan uppercase">
-                Interview Prep — {questions.length} Questions
-              </span>
-            </div>
-            <ChevronDown size={14} className={`text-muted-foreground transition-transform ${showInterview ? "rotate-180" : ""}`} />
-          </button>
-          {showInterview && (
-            <div className="px-5 pb-5 border-t border-panel-border pt-4 space-y-4">
-              {questions.map((qa, i) => (
-                <div key={i} className="space-y-1.5">
-                  <p className="text-sm font-medium text-foreground">
-                    <span className="text-neon-cyan font-mono">Q{i + 1}:</span> {qa.question}
-                  </p>
-                  <p className="text-sm text-secondary-foreground leading-relaxed pl-6 border-l-2 border-neon-cyan/20">
-                    {qa.answer}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Resume Highlights */}
-      {highlights && highlights.length > 0 && (
-        <div className="panel-glass rounded-lg overflow-hidden">
-          <button
-            onClick={() => setShowResume(!showResume)}
-            className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-panel-highlight transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <FileText size={14} className="text-neon-amber" />
-              <span className="text-xs font-mono font-semibold tracking-wider text-neon-amber uppercase">
-                Resume-Aligned Highlights
-              </span>
-            </div>
-            <ChevronDown size={14} className={`text-muted-foreground transition-transform ${showResume ? "rotate-180" : ""}`} />
-          </button>
-          {showResume && (
-            <div className="px-5 pb-5 border-t border-panel-border pt-4 space-y-3">
-              {highlights.map((h, i) => (
-                <div key={i} className="border border-panel-border rounded p-3">
-                  <p className="text-sm text-foreground font-medium mb-1">
-                    <span className="text-neon-amber font-mono text-[10px] mr-1.5">RESUME</span>
-                    {h.resumeBullet}
-                  </p>
-                  <p className="text-xs text-muted-foreground pl-4 border-l border-neon-amber/20">
-                    <span className="text-neon-green font-mono text-[10px] mr-1">EVIDENCE</span>
-                    {h.projectEvidence}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
     </motion.div>
   );
 }
