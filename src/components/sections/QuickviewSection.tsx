@@ -4,9 +4,10 @@ export default function QuickviewSection() {
   const handlePrint = () => window.print();
 
   const topProjects = [
+    projects.find((p) => p.id === "ee143-signal-system")!,
     projects.find((p) => p.id === "rgm-machine")!,
     projects.find((p) => p.id === "digital-systems")!,
-    projects.find((p) => p.id === "ee143-signal-system")!,
+    projects.find((p) => p.id === "fpv-drone")!,
   ].filter(Boolean);
 
   return (
@@ -38,9 +39,9 @@ export default function QuickviewSection() {
           </p>
         </div>
 
-        {/* Top Projects */}
+        {/* Flagship Systems */}
         <h3 className="text-xs font-mono font-semibold tracking-wider text-primary print:text-black uppercase mb-3">
-          Core Systems
+          Flagship Systems
         </h3>
         <div className="space-y-4 mb-6">
           {topProjects.map((p) => (
@@ -92,7 +93,7 @@ export default function QuickviewSection() {
           ))}
         </div>
 
-        {/* Extras */}
+        {/* Additional */}
         <h3 className="text-xs font-mono font-semibold tracking-wider text-primary print:text-black uppercase mb-2">
           Additional
         </h3>

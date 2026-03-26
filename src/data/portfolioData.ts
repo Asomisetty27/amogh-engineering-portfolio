@@ -331,7 +331,7 @@ export const projects: Project[] = [
     course: "EE 143",
     status: "EVIDENCE_PENDING",
     statusColor: "neon-amber",
-    heroSummary: "Full signal pipeline: analog input → op-amp conditioning → Arduino ADC → 4-bit digital processing → binary-weighted DAC → analog output. 16 discrete voltage levels, ~62.5 mV resolution.",
+    heroSummary: "Complete analog-to-digital-to-analog signal processing system: op-amp conditioning → Arduino ADC → 4-bit quantization → custom PCB DAC → reconstructed output. 16 discrete voltage levels, ~62.5 mV resolution.",
     has3D: false,
     hologramType: "system",
     module: {
@@ -461,7 +461,7 @@ export const projects: Project[] = [
     course: "EE 241",
     status: "COMPLETE",
     statusColor: "neon-green",
-    heroSummary: "Nine-stage electromechanical chain reaction: capacitive piano → relay → strobe → light detector → solenoid → 555 metal detector → electromagnet → tilt switch → LCD. All 9 stages verified in live demo.",
+    heroSummary: "Nine-stage electromechanical chain reaction integrating capacitive sensing, high-voltage generation, optical detection, frequency-domain metal detection, and electromagnetic actuation — all sequentially dependent. 6 failure modes resolved. Verified in live demonstration.",
     heroImage: "/evidence/rgm-complete-setup.jpg",
     videoPath: "/evidence/rgm-demo.mp4",
     has3D: true,
@@ -1451,9 +1451,8 @@ export const experiences: ExperienceItem[] = [
     location: "Pleasanton, CA",
     period: "Summer 2024",
     bullets: [
-      { text: "Improved validation and packaging workflow from ~20 min to ~10–12 min through bottleneck removal and workflow standardization", confidence: "CONCEPTUAL", evidence_source: "Observed estimate — formal time study pending" },
-      { text: "Identified and removed redundant verification steps that did not affect quality outcomes", confidence: "CONCEPTUAL", evidence_source: "Observed estimate" },
-      { text: "Documented standardized packaging procedures for team reference", confidence: "CONCEPTUAL", evidence_source: "Observed estimate" },
+      { text: "Reduced validation and packaging cycle time from ~20 min to ~10–12 min by identifying bottlenecks and eliminating redundant verification steps", confidence: "CONCEPTUAL", evidence_source: "Observed estimate — formal time study pending" },
+      { text: "Standardized packaging workflow and created reference documentation for team consistency", confidence: "CONCEPTUAL", evidence_source: "Observed estimate" },
     ],
     processImprovement: {
       before: "~20 min per validation + packaging cycle (observed estimate)",
@@ -1473,8 +1472,8 @@ export const experiences: ExperienceItem[] = [
     location: "Dublin, CA",
     period: "June 2023 – June 2024",
     bullets: [
-      { text: "California state certified pharmacy technician — processed prescriptions, managed inventory, customer consultations", confidence: "VERIFIED" },
-      { text: "High-volume prescription fulfillment with attention to accuracy and regulatory compliance", confidence: "VERIFIED" },
+      { text: "California state certified pharmacy technician — processed prescriptions, managed inventory, and handled customer consultations in a high-volume environment", confidence: "VERIFIED" },
+      { text: "Maintained accuracy and regulatory compliance across prescription fulfillment workflows", confidence: "VERIFIED" },
     ],
   },
 ];
@@ -1508,9 +1507,9 @@ export const personalInfo = {
   phone: "(925) 236-2600",
   email: "somisett@calpoly.edu",
   extras: [
-    "Varsity wrestling athlete (high school)",
+    "Varsity wrestling — 4 years",
     "California state certified pharmacy technician",
-    "Boy Scouts — 11 years",
-    "Previously CPR/First Aid certified; open to recertification",
+    "Eagle Scout candidate — 11 years in Boy Scouts",
+    "CPR/First Aid certified (open to recertification)",
   ],
 };

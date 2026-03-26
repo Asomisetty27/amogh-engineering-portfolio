@@ -74,7 +74,7 @@ interface ProjectsSectionProps {
 }
 
 export default function ProjectsSection({ initialProjectId }: ProjectsSectionProps) {
-  const { mode, demoMode, interviewMode } = useViewMode();
+  const { mode } = useViewMode();
   const [rgmFullView, setRgmFullView] = useState(false);
 
   const initialProject = initialProjectId 
