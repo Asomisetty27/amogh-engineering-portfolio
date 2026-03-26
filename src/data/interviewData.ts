@@ -20,32 +20,32 @@ export interface ResumeHighlight {
 
 export const recruiterSummaries: Record<string, RecruiterSummary> = {
   "ee143-signal-system": {
-    whatIsIt: "A complete analog-to-digital-to-analog signal processing pipeline built from individual circuits.",
-    whyItMatters: "Demonstrates end-to-end systems thinking — designing, integrating, and debugging across analog and digital domains.",
-    whatYouBuilt: "Full signal chain: op-amp conditioning → Arduino ADC → 4-bit digital processing → custom PCB DAC → reconstructed output.",
+    whatIsIt: "A complete analog-to-digital-to-analog signal processing system — from raw input through conditioning, conversion, and reconstruction.",
+    whyItMatters: "Demonstrates end-to-end systems thinking: designing, integrating, and debugging across analog and digital boundaries.",
+    whatYouBuilt: "Full signal chain: op-amp conditioning → Arduino ADC → 4-bit digital processing → custom PCB DAC → reconstructed analog output.",
     keyOutcomes: [
-      "Built a 4-bit DAC producing 16 discrete voltage levels (~62.5 mV resolution)",
-      "Designed and fabricated PCB using Fusion 360 and reflow soldering",
-      "Integrated full signal chain from analog input to reconstructed audio output",
+      "Designed and fabricated a 4-bit binary-weighted DAC producing 16 discrete voltage levels (~62.5 mV resolution)",
+      "Fabricated PCB using Fusion 360 layout and reflow soldering",
+      "Integrated complete signal chain from analog input to reconstructed audio output",
       "Identified and resolved loading effects using voltage follower buffering",
     ],
-    skillsDemonstrated: ["Circuit Design", "PCB Design & Fabrication", "Signal Conditioning", "System Integration", "Debugging", "LTSpice Simulation"],
+    skillsDemonstrated: ["Circuit Design", "PCB Fabrication", "Signal Conditioning", "System Integration", "Debugging", "LTSpice Simulation"],
   },
   "rgm-machine": {
-    whatIsIt: "A 9-stage electromechanical chain reaction where each stage must reliably trigger the next.",
-    whyItMatters: "Proves ability to debug complex multi-domain systems with sequential dependencies — one failure breaks everything.",
+    whatIsIt: "A 9-stage electromechanical chain reaction where each stage must reliably trigger the next — one failure breaks the entire system.",
+    whyItMatters: "Proves ability to debug complex multi-domain systems with sequential dependencies across electrical, mechanical, and software boundaries.",
     whatYouBuilt: "Capacitive piano → relay → 580V strobe → light detector → solenoid → 555 metal detector → electromagnet → tilt switch → LCD display.",
     keyOutcomes: [
-      "All 9 stages operated in sequence during live class demonstration",
+      "All 9 stages operated in sequence during live demonstration",
       "Resolved 6 distinct failure modes across electrical, mechanical, and software domains",
-      "Implemented robust metal detection: 5.1% frequency shift with streak-based filtering",
+      "Implemented frequency-domain metal detection: 5.1% frequency shift with streak-based filtering",
       "Designed custom mechanical track and sensor housings in Fusion 360",
     ],
-    skillsDemonstrated: ["Analog Circuit Design", "Embedded Programming", "Sensor Integration", "Debugging & Root Cause Analysis", "System Integration", "CAD"],
+    skillsDemonstrated: ["Analog Circuit Design", "Embedded Programming", "Sensor Integration", "Root Cause Analysis", "System Integration", "CAD"],
   },
   "detect-7": {
-    whatIsIt: "A 555-timer-based metal detection system with automated electromagnet release.",
-    whyItMatters: "Shows precision in frequency-domain sensing and robust threshold logic under noise.",
+    whatIsIt: "A 555-timer-based metal detection system with automated electromagnet release — frequency-domain sensing under noise.",
+    whyItMatters: "Shows precision in frequency-domain sensing and robust threshold logic under real-world noise conditions.",
     whatYouBuilt: "LC oscillator metal detector with Arduino-based frequency monitoring and MOSFET-controlled electromagnet.",
     keyOutcomes: [
       "Achieved 5.1% frequency drop detection (8,760 Hz → 8,310 Hz)",
@@ -55,21 +55,21 @@ export const recruiterSummaries: Record<string, RecruiterSummary> = {
     skillsDemonstrated: ["555 Timer Design", "Frequency Analysis", "MOSFET Switching", "Arduino Programming", "Debugging"],
   },
   "digital-systems": {
-    whatIsIt: "A multi-cycle RISC-V CPU designed from gates up, synthesized onto an FPGA.",
-    whyItMatters: "Demonstrates deep understanding of computer architecture — instruction fetch, decode, execute, and memory access.",
-    whatYouBuilt: "Complete OTTER MCU with RV32I ISA support, 10 ALU operations, FSM control unit, and 32×32 register file.",
+    whatIsIt: "A multi-cycle RISC-V CPU designed from gates up and synthesized onto an FPGA.",
+    whyItMatters: "Demonstrates deep understanding of computer architecture — instruction fetch, decode, execute, and memory access at the hardware level.",
+    whatYouBuilt: "Complete OTTER MCU with RV32I ISA support, 10 ALU operations, FSM control unit, and 32×32 register file — synthesized and verified on FPGA via Vivado.",
     keyOutcomes: [
       "Implemented full RV32I instruction set in SystemVerilog",
       "10 ALU operations with branch condition generation",
       "2-state FSM (FETCH/EXEC) with correct timing control",
-      "Synthesized and verified on FPGA via Vivado",
+      "Synthesized and verified on Basys-3 FPGA",
     ],
     skillsDemonstrated: ["SystemVerilog / HDL", "RISC-V Architecture", "FPGA Synthesis", "FSM Design", "Digital Logic", "Timing Analysis"],
   },
   "manufacturing-systems": {
-    whatIsIt: "A precision air motor built through the complete CAD-to-fabrication pipeline.",
-    whyItMatters: "Demonstrates hands-on manufacturing skills — from digital design to physical parts with measured tolerances.",
-    whatYouBuilt: "6 precision-machined parts using lathe and mill, with engineering drawings per ASME Y14.5 GD&T standards.",
+    whatIsIt: "A precision pneumatic air motor built through the complete CAD-to-fabrication pipeline — 6 machined parts, all per GD&T.",
+    whyItMatters: "Demonstrates hands-on manufacturing: digital design to physical parts with measured tolerances and assembly.",
+    whatYouBuilt: "6 precision-machined components using manual lathe and mill, with engineering drawings per ASME Y14.5 GD&T standards.",
     keyOutcomes: [
       "Machined 6 parts: crank disk, cylinder, flywheel, frame, mainshaft, piston",
       "Applied GD&T per ASME Y14.5 for all engineering drawings",
@@ -79,27 +79,27 @@ export const recruiterSummaries: Record<string, RecruiterSummary> = {
     skillsDemonstrated: ["Manual Machining (Lathe & Mill)", "CAD (SolidWorks)", "GD&T / Engineering Drawings", "Metrology", "Production Planning"],
   },
   "funck": {
-    whatIsIt: "A full-stack event ticketing platform handling real payments and user management.",
-    whyItMatters: "Shows ability to build production-grade software with authentication, payments, and database management.",
-    whatYouBuilt: "React/TypeScript platform with Supabase backend, Stripe payments, automated email via Resend, deployed at funck.live.",
+    whatIsIt: "A production event ticketing platform handling real payments, authentication, and automated email — deployed and live.",
+    whyItMatters: "Shows ability to build and ship production-grade software with authentication, payments, and database management.",
+    whatYouBuilt: "React/TypeScript platform with Supabase backend, Stripe payments, automated email via Resend — live at funck.live.",
     keyOutcomes: [
-      "Live production system at funck.live with real users",
-      "Integrated Stripe payment processing with webhook handling",
-      "Built role-based access control and event management",
+      "Live production system at funck.live serving real users",
+      "Integrated Stripe payment processing with server-side webhook verification",
+      "Built role-based access control and event management dashboard",
       "Automated transactional emails via Resend API",
     ],
     skillsDemonstrated: ["React / TypeScript", "Supabase / PostgreSQL", "Stripe Integration", "API Design", "Full-Stack Development"],
   },
   "fpv-drone": {
-    whatIsIt: "A 75 mm HD brushless FPV drone analyzed as a densely integrated electromechanical system — not a hobby toy.",
-    whyItMatters: "Demonstrates ability to reason about a tightly constrained system where power, control, RF, packaging, vibration, and performance all interact.",
+    whatIsIt: "A 75 mm HD brushless FPV drone analyzed as a densely integrated electromechanical and RF system — six tightly coupled subsystems at 70 g.",
+    whyItMatters: "Demonstrates ability to reason about a highly constrained system where power, control, RF, packaging, vibration, and performance all interact.",
     whatYouBuilt: "Comprehensive systems-level analysis: six interconnected subsystems, power architecture mapping, control-link integration analysis, and failure mode identification.",
     keyOutcomes: [
       "Analyzed embedded flight control + ESC + sensor architecture on STM32G474 AIO platform",
       "Mapped multi-rail power architecture: 2S → ESC (unregulated), 10V BEC (O3), 5V BEC (logic)",
       "Identified control-link ecosystem mismatch (ELRS vs Tracer) as a system integration challenge",
-      "Documented 5 failure hotspots with propagation analysis across subsystem boundaries",
-      "Characterized tight mechanical/thermal/RF packaging constraints at 70 g dry weight",
+      "Documented 5 failure hotspots with cross-subsystem propagation analysis",
+      "Characterized mechanical/thermal/RF packaging constraints at 70 g dry weight",
     ],
     skillsDemonstrated: ["Embedded Hardware Systems", "RF / Control-Link Architecture", "Electromechanical Integration", "Power Distribution", "Systems Analysis", "Failure Mode Analysis"],
   },
@@ -202,25 +202,25 @@ export const interviewQuestions: Record<string, InterviewQA[]> = {
 
 export const resumeHighlights: Record<string, ResumeHighlight[]> = {
   "ee143-signal-system": [
-    { resumeBullet: "Designed and built complete analog-to-digital signal processing pipeline", projectEvidence: "Full signal chain: op-amp → ADC → 4-bit processing → DAC → output" },
-    { resumeBullet: "Designed PCB for 4-bit binary-weighted DAC using Fusion 360", projectEvidence: "LTSpice simulation → PCB layout → reflow soldering → hardware validation" },
+    { resumeBullet: "Designed and validated a complete analog-to-digital signal processing pipeline", projectEvidence: "Full signal chain: op-amp → ADC → 4-bit processing → DAC → output" },
+    { resumeBullet: "Designed and fabricated PCB for 4-bit binary-weighted DAC using Fusion 360", projectEvidence: "LTSpice simulation → PCB layout → reflow soldering → hardware validation" },
   ],
   "rgm-machine": [
-    { resumeBullet: "Debugged and integrated 9-stage electromechanical system with 6 resolved failure modes", projectEvidence: "6 documented failure modes with root cause analysis and fixes" },
+    { resumeBullet: "Debugged and integrated 9-stage electromechanical system, resolving 6 failure modes across electrical, mechanical, and software domains", projectEvidence: "6 documented failure modes with root cause analysis and fixes" },
     { resumeBullet: "Implemented frequency-domain metal detection with 5.1% shift threshold and streak filtering", projectEvidence: "555 timer LC oscillator: 8,760 Hz baseline → 8,310 Hz detection" },
   ],
   "digital-systems": [
-    { resumeBullet: "Designed multi-cycle RISC-V CPU (RV32I) in SystemVerilog with 10 ALU operations", projectEvidence: "OTTER MCU: full datapath + FSM control synthesized on FPGA" },
+    { resumeBullet: "Designed multi-cycle RISC-V CPU (RV32I) in SystemVerilog with 10 ALU operations, synthesized on FPGA", projectEvidence: "OTTER MCU: full datapath + FSM control synthesized on Basys-3 FPGA" },
   ],
   "manufacturing-systems": [
-    { resumeBullet: "Machined 6 precision parts for pneumatic air motor on manual lathe and mill", projectEvidence: "Crank disk, cylinder, flywheel, frame, mainshaft, piston — all per GD&T specs" },
+    { resumeBullet: "Machined 6 precision parts for pneumatic air motor on manual lathe and mill per ASME Y14.5 GD&T", projectEvidence: "Crank disk, cylinder, flywheel, frame, mainshaft, piston — all per GD&T specs" },
   ],
   "funck": [
-    { resumeBullet: "Built and deployed full-stack event platform with Stripe payments at funck.live", projectEvidence: "Live production system with auth, payments, email, and role-based access" },
+    { resumeBullet: "Built and deployed full-stack event platform with Stripe payment processing at funck.live", projectEvidence: "Live production system with auth, payments, email, and role-based access" },
   ],
   "fpv-drone": [
-    { resumeBullet: "Analyzed and documented tightly integrated FPV flight system across 6 subsystems", projectEvidence: "Propulsion, flight control, power, RF, video, and structure analyzed as coupled system" },
-    { resumeBullet: "Identified control-link architecture mismatch and evaluated integration paths", projectEvidence: "ELRS vs Tracer protocol incompatibility — serial/RF architecture analysis, not just binding" },
+    { resumeBullet: "Analyzed and documented tightly integrated FPV flight system across 6 coupled subsystems", projectEvidence: "Propulsion, flight control, power, RF, video, and structure analyzed as coupled system" },
+    { resumeBullet: "Identified control-link architecture mismatch and evaluated integration paths", projectEvidence: "ELRS vs Tracer protocol incompatibility — serial/RF architecture analysis" },
     { resumeBullet: "Mapped multi-rail power distribution with failure propagation analysis", projectEvidence: "2S → ESC (unregulated) + 10V BEC (O3) + 5V BEC (logic) with 5 documented failure hotspots" },
   ],
 };

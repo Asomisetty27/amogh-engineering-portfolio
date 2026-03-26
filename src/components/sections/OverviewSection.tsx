@@ -2,33 +2,30 @@ import { motion } from "framer-motion";
 import { personalInfo, projects } from "@/data/portfolioData";
 import { recruiterSummaries } from "@/data/interviewData";
 import { useViewMode } from "@/contexts/ViewModeContext";
-import { MapPin, GraduationCap, Cpu, Radio, Zap, Wrench, ChevronRight, ArrowRight } from "lucide-react";
+import { MapPin, GraduationCap, Cpu, Radio, Zap, ArrowRight } from "lucide-react";
 
 const strengths = [
   {
     title: "Systems Integration",
-    description: "End-to-end signal pipelines, multi-stage electromechanical chains, full analog↔digital systems",
+    description: "End-to-end signal pipelines, multi-stage electromechanical chains, full analog↔digital validation",
     icon: Radio,
     color: "neon-cyan",
-    projects: ["ee143-signal-system", "rgm-machine"],
   },
   {
     title: "Hardware & Test Engineering",
-    description: "PCB design, debugging, sensor integration, root cause analysis across 6+ failure modes",
+    description: "PCB design, sensor integration, root cause analysis, 6+ documented failure modes resolved",
     icon: Zap,
     color: "neon-green",
-    projects: ["rgm-machine", "manufacturing-systems"],
   },
   {
     title: "Digital & Embedded Systems",
-    description: "RISC-V CPU architecture, FPGA synthesis, FSM design, embedded C++ programming",
+    description: "RISC-V CPU architecture, FPGA synthesis, FSM control, embedded C++ for real-time sensing",
     icon: Cpu,
     color: "neon-magenta",
-    projects: ["digital-systems"],
   },
 ];
 
-const topProjectIds = ["ee143-signal-system", "rgm-machine", "digital-systems"];
+const topProjectIds = ["ee143-signal-system", "rgm-machine", "digital-systems", "fpv-drone"];
 
 interface OverviewSectionProps {
   onNavigateToProject?: (projectId: string) => void;
@@ -44,30 +41,29 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
   return (
     <section className="max-w-4xl mx-auto">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        {/* Hero — optimized for 20-second scan */}
-        <div className="mb-8">
-          <h1 className="font-display text-3xl md:text-4xl tracking-wider text-primary neon-text-cyan mb-2">
+        {/* Hero */}
+        <div className="mb-10">
+          <h1 className="font-display text-3xl md:text-4xl tracking-wider text-primary neon-text-cyan mb-3">
             {personalInfo.name}
           </h1>
-          <p className="font-mono text-base md:text-lg text-foreground flex items-center gap-2">
-            <GraduationCap size={18} className="text-primary/60" />
+          <p className="font-mono text-base md:text-lg text-foreground leading-snug max-w-2xl">
             Electrical Engineering · Systems, Hardware & Test Engineering
           </p>
-          <p className="font-mono text-sm text-muted-foreground flex items-center gap-2 mt-1">
-            <MapPin size={14} className="text-primary/40" />
+          <p className="font-mono text-sm text-muted-foreground flex items-center gap-2 mt-2">
+            <GraduationCap size={14} className="text-primary/50" />
             {personalInfo.university}
           </p>
         </div>
 
         {/* Value Proposition */}
-        <div className="panel-glass rounded-lg p-5 mb-6 border-l-2 border-l-primary">
+        <div className="panel-glass rounded-lg p-5 mb-8 border-l-2 border-l-primary">
           <p className="text-sm leading-relaxed text-secondary-foreground">
-            I design and validate complete systems from signal acquisition to hardware implementation, with hands-on experience in debugging, PCB design, and system integration. Every project here shows what was built, how it was tested, and what failed.
+            I design, build, and validate integrated systems across analog, digital, embedded, and electromechanical domains. Every project here shows what was built, how it was tested, what failed, and how it was fixed.
           </p>
         </div>
 
         {/* 3 Core Strengths */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
           {strengths.map((s, i) => {
             const Icon = s.icon;
             return (
@@ -89,11 +85,11 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
           })}
         </div>
 
-        {/* Top 3 Projects — above the fold */}
+        {/* Top Projects */}
         <h3 className="text-xs font-mono font-semibold tracking-wider text-primary uppercase mb-3">
-          Core Projects
+          Flagship Systems
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
           {topProjects.map((p, i) => {
             const summary = recruiterSummaries[p.id];
             return (
@@ -106,7 +102,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
                 onClick={() => onNavigateToProject?.(p.id)}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-mono text-muted-foreground">{p.course}</span>
+                  <span className="text-[10px] font-mono text-muted-foreground">{p.course || p.domain.toUpperCase()}</span>
                   <ArrowRight size={12} className="text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
                 <h4 className="text-sm font-semibold text-foreground mb-1 leading-tight">{p.name}</h4>
@@ -123,20 +119,20 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
           })}
         </div>
 
-        {/* Engineer mode: deep competencies */}
+        {/* Engineer mode: evidence-backed competencies */}
         {mode === "engineer" && (
-          <div className="panel-glass rounded-lg p-6 mb-6">
+          <div className="panel-glass rounded-lg p-6 mb-8">
             <h3 className="font-mono text-xs font-semibold tracking-wider text-muted-foreground uppercase mb-3">
               Evidence-Backed Competencies
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               {[
-                "Analog↔Digital Signal Pipeline → EE 143 ADC/DAC System",
-                "Multi-Stage Electromechanical → 9-Stage RGM (EE 241)",
+                "End-to-End Signal Pipeline → EE 143 ADC/DAC System",
+                "9-Stage Electromechanical Chain → RGM (EE 241)",
                 "RISC-V CPU Architecture → OTTER MCU (CPE 233)",
                 "CAD → Fabrication → Assembly → IME 144 Air Motor",
-                "Full-Stack Web Systems → Funck (funck.live)",
-                "Debugging & Root Cause Analysis → 6 RGM failure modes resolved",
+                "Production Web Platform → Funck (funck.live)",
+                "Root Cause Analysis → 6 RGM failure modes resolved",
               ].map((item) => (
                 <div key={item} className="flex items-start gap-1.5 text-secondary-foreground">
                   <span className="text-primary mt-0.5">▸</span>

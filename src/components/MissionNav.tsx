@@ -3,12 +3,12 @@ import { motion } from "framer-motion";
 import { useViewMode } from "@/contexts/ViewModeContext";
 import {
   Compass, Rocket, Briefcase, Cpu, Mail, FileText,
-  Eye, Wrench, Menu, X, Link2, Check, Monitor, MessageSquare,
+  Eye, Wrench, Menu, X, Link2, Check,
 } from "lucide-react";
 
 const navItems = [
   { id: "overview", label: "Overview", icon: Compass },
-  { id: "projects", label: "Projects", icon: Rocket },
+  { id: "projects", label: "Systems", icon: Rocket },
   { id: "experience", label: "Experience", icon: Briefcase },
   { id: "skills", label: "Skills", icon: Cpu },
   { id: "contact", label: "Contact", icon: Mail },
@@ -21,7 +21,7 @@ interface MissionNavProps {
 }
 
 export default function MissionNav({ activeSection, onNavigate }: MissionNavProps) {
-  const { mode, toggle, demoMode, toggleDemo, interviewMode, toggleInterview } = useViewMode();
+  const { mode, toggle } = useViewMode();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
 
@@ -35,14 +35,9 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
     <>
       <nav className="no-print fixed top-0 left-0 right-0 z-40 panel-glass border-b border-panel-border">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="font-display text-sm tracking-[0.2em] text-primary neon-text-cyan">
-              A.SOMISETTY
-            </span>
-            <span className="hidden sm:inline text-xs font-mono text-muted-foreground">
-              // MISSION CONSOLE
-            </span>
-          </div>
+          <span className="font-display text-sm tracking-[0.2em] text-primary neon-text-cyan">
+            A.SOMISETTY
+          </span>
 
           {/* Desktop links */}
           <div className="hidden md:flex items-center gap-1">
@@ -76,34 +71,6 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
           </div>
 
           <div className="flex items-center gap-1.5">
-            {/* Interview Mode toggle */}
-            <button
-              onClick={toggleInterview}
-              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono rounded border transition-colors ${
-                interviewMode
-                  ? "border-neon-cyan/40 bg-neon-cyan/10 text-neon-cyan"
-                  : "border-panel-border text-muted-foreground hover:text-foreground"
-              }`}
-              title="Interview Mode: shows Q&A and resume highlights"
-            >
-              <MessageSquare size={12} />
-              <span className="hidden lg:inline">INTERVIEW</span>
-            </button>
-
-            {/* Demo Mode toggle */}
-            <button
-              onClick={toggleDemo}
-              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono rounded border transition-colors ${
-                demoMode
-                  ? "border-neon-green/40 bg-neon-green/10 text-neon-green"
-                  : "border-panel-border text-muted-foreground hover:text-foreground"
-              }`}
-              title="Demo Mode: shows only strongest projects"
-            >
-              <Monitor size={12} />
-              <span className="hidden lg:inline">DEMO</span>
-            </button>
-
             {/* Copy link */}
             <button
               onClick={copyLink}
@@ -117,6 +84,7 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
             <button
               onClick={toggle}
               className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono rounded border border-panel-border bg-panel hover:bg-panel-highlight transition-colors"
+              title={mode === "recruiter" ? "Switch to Engineer mode for full technical depth" : "Switch to Recruiter mode for quick overview"}
             >
               {mode === "recruiter" ? (
                 <>
@@ -168,26 +136,6 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
                 </button>
               );
             })}
-            <div className="pt-2 border-t border-panel-border space-y-1">
-              <button
-                onClick={toggleInterview}
-                className={`w-full flex items-center gap-2 px-3 py-2 text-sm font-mono rounded ${
-                  interviewMode ? "text-neon-cyan bg-neon-cyan/10" : "text-muted-foreground"
-                }`}
-              >
-                <MessageSquare size={14} />
-                Interview Mode {interviewMode ? "ON" : "OFF"}
-              </button>
-              <button
-                onClick={toggleDemo}
-                className={`w-full flex items-center gap-2 px-3 py-2 text-sm font-mono rounded ${
-                  demoMode ? "text-neon-green bg-neon-green/10" : "text-muted-foreground"
-                }`}
-              >
-                <Monitor size={14} />
-                Demo Mode {demoMode ? "ON" : "OFF"}
-              </button>
-            </div>
           </motion.div>
         )}
       </nav>
