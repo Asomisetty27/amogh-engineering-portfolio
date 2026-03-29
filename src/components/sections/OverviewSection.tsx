@@ -2,24 +2,24 @@ import { motion } from "framer-motion";
 import { personalInfo, projects } from "@/data/portfolioData";
 import { recruiterSummaries } from "@/data/interviewData";
 import { useViewMode } from "@/contexts/ViewModeContext";
-import { MapPin, GraduationCap, Cpu, Radio, Zap, ArrowRight } from "lucide-react";
+import { GraduationCap, Cpu, Radio, Zap, ArrowRight, Shield } from "lucide-react";
 
 const strengths = [
   {
     title: "Systems Integration",
-    description: "End-to-end signal pipelines, multi-stage electromechanical chains, full analog↔digital validation",
+    description: "End-to-end signal pipelines, multi-stage electromechanical chains, full analog↔digital validation across subsystem boundaries",
     icon: Radio,
     color: "neon-cyan",
   },
   {
-    title: "Hardware & Test Engineering",
-    description: "PCB design, sensor integration, root cause analysis, 6+ documented failure modes resolved",
+    title: "Hardware Validation & Debugging",
+    description: "PCB design, sensor integration, 6+ documented failure modes resolved with root cause analysis and systematic fix verification",
     icon: Zap,
     color: "neon-green",
   },
   {
-    title: "Digital & Embedded Systems",
-    description: "RISC-V CPU architecture, FPGA synthesis, FSM control, embedded C++ for real-time sensing",
+    title: "Signal, Embedded & Digital Systems",
+    description: "RISC-V CPU architecture, FPGA synthesis, FSM control, embedded C++ for real-time sensing, DShot motor telemetry",
     icon: Cpu,
     color: "neon-magenta",
   },
@@ -42,14 +42,14 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
     <section className="max-w-4xl mx-auto">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         {/* Hero */}
-        <div className="mb-10">
-          <h1 className="font-display text-3xl md:text-4xl tracking-wider text-primary neon-text-cyan mb-3">
+        <div className="mb-8">
+          <h1 className="font-display text-3xl md:text-4xl tracking-wider text-primary neon-text-cyan mb-2">
             {personalInfo.name}
           </h1>
           <p className="font-mono text-base md:text-lg text-foreground leading-snug max-w-2xl">
-            Electrical Engineering · Systems, Hardware & Test Engineering
+            Systems-Oriented Electrical Engineer
           </p>
-          <p className="font-mono text-sm text-muted-foreground flex items-center gap-2 mt-2">
+          <p className="font-mono text-sm text-muted-foreground flex items-center gap-2 mt-1.5">
             <GraduationCap size={14} className="text-primary/50" />
             {personalInfo.university}
           </p>
@@ -58,7 +58,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
         {/* Value Proposition */}
         <div className="panel-glass rounded-lg p-5 mb-8 border-l-2 border-l-primary">
           <p className="text-sm leading-relaxed text-secondary-foreground">
-            I design, build, and validate integrated systems across analog, digital, embedded, and electromechanical domains. Every project here shows what was built, how it was tested, what failed, and how it was fixed.
+            I design, build, and validate integrated hardware systems — from analog signal chains and embedded control to electromechanical actuation and RF architecture. Every system on this site was debugged, tested, and documented with real evidence.
           </p>
         </div>
 
@@ -85,7 +85,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
           })}
         </div>
 
-        {/* Top Projects */}
+        {/* Flagship Systems */}
         <h3 className="text-xs font-mono font-semibold tracking-wider text-primary uppercase mb-3">
           Flagship Systems
         </h3>
@@ -122,8 +122,8 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
         {/* Engineer mode: evidence-backed competencies */}
         {mode === "engineer" && (
           <div className="panel-glass rounded-lg p-6 mb-8">
-            <h3 className="font-mono text-xs font-semibold tracking-wider text-muted-foreground uppercase mb-3">
-              Evidence-Backed Competencies
+            <h3 className="font-mono text-xs font-semibold tracking-wider text-muted-foreground uppercase mb-3 flex items-center gap-1.5">
+              <Shield size={12} className="text-primary" /> Evidence-Backed Competencies
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               {[
@@ -131,8 +131,8 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
                 "9-Stage Electromechanical Chain → RGM (EE 241)",
                 "RISC-V CPU Architecture → OTTER MCU (CPE 233)",
                 "CAD → Fabrication → Assembly → IME 144 Air Motor",
-                "Production Web Platform → Funck (funck.live)",
-                "Root Cause Analysis → 6 RGM failure modes resolved",
+                "6 Failure Modes Resolved → RGM Root Cause Analysis",
+                "Micro FPV Systems Analysis → 6-Subsystem Integration",
               ].map((item) => (
                 <div key={item} className="flex items-start gap-1.5 text-secondary-foreground">
                   <span className="text-primary mt-0.5">▸</span>

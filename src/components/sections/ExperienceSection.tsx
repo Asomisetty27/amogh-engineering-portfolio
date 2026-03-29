@@ -10,6 +10,7 @@ export default function ExperienceSection() {
   return (
     <section className="max-w-3xl mx-auto">
       <SectionTitle>Experience</SectionTitle>
+      <p className="text-xs text-muted-foreground mb-6 -mt-2">Roles emphasizing process improvement, operational rigor, and regulated environments.</p>
 
       <div className="space-y-6">
         {experiences.map((exp, i) => (
