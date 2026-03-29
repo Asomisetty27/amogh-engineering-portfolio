@@ -134,15 +134,15 @@
 
 /* Neon glow effects */
 .neon-text-cyan {
-  text-shadow: 0 0 10px hsl(var(--neon-cyan) / 0.5), 0 0 30px hsl(var(--neon-cyan) / 0.2);
+  text-shadow: 0 0 6px hsl(var(--neon-cyan) / 0.35), 0 0 18px hsl(var(--neon-cyan) / 0.12);
 }
 
 .neon-text-magenta {
-  text-shadow: 0 0 10px hsl(var(--neon-magenta) / 0.5), 0 0 30px hsl(var(--neon-magenta) / 0.2);
+  text-shadow: 0 0 6px hsl(var(--neon-magenta) / 0.35), 0 0 18px hsl(var(--neon-magenta) / 0.12);
 }
 
 .neon-border {
-  box-shadow: inset 0 0 20px hsl(var(--neon-cyan) / 0.05), 0 0 15px hsl(var(--neon-cyan) / 0.1);
+  box-shadow: inset 0 0 12px hsl(var(--neon-cyan) / 0.03), 0 0 8px hsl(var(--neon-cyan) / 0.06);
 }
 
 .panel-glass {

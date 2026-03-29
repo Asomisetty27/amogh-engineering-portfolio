@@ -331,7 +331,7 @@ export const projects: Project[] = [
     course: "EE 143",
     status: "EVIDENCE_PENDING",
     statusColor: "neon-amber",
-    heroSummary: "Complete analog-to-digital-to-analog signal processing system: op-amp conditioning → Arduino ADC → 4-bit quantization → custom PCB DAC → reconstructed output. 16 discrete voltage levels, ~62.5 mV resolution.",
+    heroSummary: "Designed and validated a complete analog-to-digital-to-analog signal system: op-amp conditioning → Arduino ADC → 4-bit quantization → custom PCB DAC → reconstructed output. Resolved loading effects through systematic buffering and verified 16 discrete voltage levels.",
     has3D: false,
     hologramType: "system",
     module: {
@@ -461,7 +461,7 @@ export const projects: Project[] = [
     course: "EE 241",
     status: "COMPLETE",
     statusColor: "neon-green",
-    heroSummary: "Nine-stage electromechanical chain reaction integrating capacitive sensing, high-voltage generation, optical detection, frequency-domain metal detection, and electromagnetic actuation — all sequentially dependent. 6 failure modes resolved. Verified in live demonstration.",
+    heroSummary: "Built and debugged a 9-stage electromechanical chain integrating capacitive sensing, high-voltage strobe generation, optical detection, frequency-domain metal detection, and electromagnetic actuation. Resolved 6 failure modes across electrical, mechanical, and software boundaries. All stages verified in live demonstration.",
     heroImage: "/evidence/rgm-complete-setup.jpg",
     videoPath: "/evidence/rgm-demo.mp4",
     has3D: true,
@@ -678,7 +678,7 @@ export const projects: Project[] = [
     course: "CPE 233 / CPE 133",
     status: "COMPLETE",
     statusColor: "neon-green",
-    heroSummary: "Multi-cycle RISC-V CPU (OTTER MCU) with full RV32I support, 10 ALU operations, FSM control, and FPGA-based digital systems including state machines and sequential logic.",
+    heroSummary: "Designed a multi-cycle RISC-V CPU (OTTER MCU) from gates up in SystemVerilog — full RV32I ISA, 10 ALU operations, 2-state FSM control unit, 32×32 register file. Synthesized and verified on Basys-3 FPGA via Vivado.",
     has3D: true,
     hologramType: "interactive",
     module: {
@@ -790,7 +790,7 @@ export const projects: Project[] = [
     course: "IME 144",
     status: "COMPLETE",
     statusColor: "neon-green",
-    heroSummary: "Design-to-manufacturing pipeline: parametric CAD → engineering drawings with GD&T → manual machining (lathe, mill) → assembly. 6 precision-machined parts for pneumatic air motor.",
+    heroSummary: "Executed the full design-to-manufacturing pipeline: parametric CAD → engineering drawings per ASME Y14.5 GD&T → manual machining on lathe and mill → dimensional inspection → assembly. Produced 6 precision parts for a working pneumatic air motor.",
     has3D: true,
     hologramType: "physical",
     module: {
@@ -882,7 +882,7 @@ export const projects: Project[] = [
     course: undefined,
     status: "ACTIVE",
     statusColor: "neon-cyan",
-    heroSummary: "Live event ticketing platform with QR tickets, Stripe payments, fraud prevention, and demand-based pricing. Shipped and operating at funck.live.",
+    heroSummary: "Built and shipped a production event ticketing platform handling Stripe payments, QR ticket issuance, fraud prevention, and demand-based pricing. Live and serving real users at funck.live.",
     has3D: true,
     hologramType: "network",
     module: {
@@ -1227,7 +1227,7 @@ export const projects: Project[] = [
     domain: "fpv-systems",
     status: "ACTIVE",
     statusColor: "neon-cyan",
-    heroSummary: "Analysis and documentation of a 75 mm HD brushless FPV drone as a densely integrated electromechanical system combining propulsion, flight control, power regulation, RF control architecture, and digital video transmission in a highly constrained micro platform.",
+    heroSummary: "Analyzed a 75 mm HD FPV drone as a densely integrated electromechanical system — six coupled subsystems (propulsion, flight control, power regulation, RF control, digital video, structure) with documented failure modes and cross-subsystem constraint propagation at 70 g dry weight.",
     has3D: true,
     hologramType: "system",
     module: {
@@ -1451,8 +1451,8 @@ export const experiences: ExperienceItem[] = [
     location: "Pleasanton, CA",
     period: "Summer 2024",
     bullets: [
-      { text: "Reduced validation and packaging cycle time from ~20 min to ~10–12 min by identifying bottlenecks and eliminating redundant verification steps", confidence: "CONCEPTUAL", evidence_source: "Observed estimate — formal time study pending" },
-      { text: "Standardized packaging workflow and created reference documentation for team consistency", confidence: "CONCEPTUAL", evidence_source: "Observed estimate" },
+      { text: "Reduced validation and packaging cycle time from ~20 min to ~10–12 min by mapping the workflow, identifying bottlenecks, and eliminating redundant verification steps", confidence: "CONCEPTUAL", evidence_source: "Observed estimate — formal time study pending" },
+      { text: "Standardized packaging workflow and authored reference documentation adopted by the team for consistency", confidence: "CONCEPTUAL", evidence_source: "Observed estimate" },
     ],
     processImprovement: {
       before: "~20 min per validation + packaging cycle (observed estimate)",
@@ -1472,8 +1472,8 @@ export const experiences: ExperienceItem[] = [
     location: "Dublin, CA",
     period: "June 2023 – June 2024",
     bullets: [
-      { text: "California state certified pharmacy technician — processed prescriptions, managed inventory, and handled customer consultations in a high-volume environment", confidence: "VERIFIED" },
-      { text: "Maintained accuracy and regulatory compliance across prescription fulfillment workflows", confidence: "VERIFIED" },
+      { text: "California state certified pharmacy technician — processed prescriptions, managed controlled substance inventory, and handled patient consultations in a high-volume retail pharmacy", confidence: "VERIFIED" },
+      { text: "Maintained accuracy under time pressure while ensuring regulatory compliance across all fulfillment workflows", confidence: "VERIFIED" },
     ],
   },
 ];
