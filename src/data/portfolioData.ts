@@ -171,8 +171,10 @@ const rgmStages: RGMStage[] = [
     number: 1,
     name: "Capacitive Touch Arduino Piano",
     labSource: "Lab 4",
-    whatItDoes: "Input trigger for the entire RGM. User inputs correct 5-note sequence (keys 1, 3, 2, 4, 1) using four copper foil touch pads connected to Arduino Mega.",
-    howItWorks: "Each pad uses RC circuit with 2.2 MΩ resistor. Touch increases capacitance beyond 1000 counts (CapacitiveSensor library). Unique tones (C4, D4, E4, F4) play via buzzer. After correct 5-note sequence, relay on pin 8 activates.",
+    whatItDoes:
+      "Input trigger for the entire RGM. User inputs correct 5-note sequence (keys 1, 3, 2, 4, 1) using four copper foil touch pads connected to Arduino Mega.",
+    howItWorks:
+      "Each pad uses RC circuit with 2.2 MΩ resistor. Touch increases capacitance beyond 1000 counts (CapacitiveSensor library). Unique tones (C4, D4, E4, F4) play via buzzer. After correct 5-note sequence, relay on pin 8 activates.",
     input: "Human touch — correct 5-note sequence",
     output: "Relay activation (pin 8 HIGH)",
     evidenceSource: "Lab_Final_Report, p3",
@@ -183,7 +185,8 @@ const rgmStages: RGMStage[] = [
     name: "Relay — Piano to Strobe Light",
     labSource: "Labs 2 & 4",
     whatItDoes: "Provides electrical isolation between the 5V Arduino and the 9V strobe light circuit.",
-    howItWorks: "Arduino switches relay via BC548 NPN transistor. Relay closes normally-open contacts to connect 9V supply to strobe circuit. Flyback diode protects transistor from relay coil voltage spikes.",
+    howItWorks:
+      "Arduino switches relay via BC548 NPN transistor. Relay closes normally-open contacts to connect 9V supply to strobe circuit. Flyback diode protects transistor from relay coil voltage spikes.",
     input: "Relay activation signal from piano Arduino",
     output: "9V power connected to strobe light circuit",
     evidenceSource: "Lab_Final_Report, p3",
@@ -194,7 +197,8 @@ const rgmStages: RGMStage[] = [
     name: "Strobe Light",
     labSource: "Lab 5",
     whatItDoes: "Produces bright flash to trigger light detector circuit.",
-    howItWorks: "Three parts: (1) RC oscillator with Q1/Q2 transistors drives step-up transformer generating ~580V, (2) rectifier/capacitor stores high voltage, (3) SCR trigger circuit discharges energy into xenon flash tube. Flash rate = R3 × C3.",
+    howItWorks:
+      "Three parts: (1) RC oscillator with Q1/Q2 transistors drives step-up transformer generating ~580V, (2) rectifier/capacitor stores high voltage, (3) SCR trigger circuit discharges energy into xenon flash tube. Flash rate = R3 × C3.",
     input: "9V from relay",
     output: "Bright xenon flash",
     evidenceSource: "Lab_Final_Report, p3",
@@ -205,7 +209,8 @@ const rgmStages: RGMStage[] = [
     name: "Light Detector with Schmitt Trigger",
     labSource: "Lab 2",
     whatItDoes: "Detects the strobe flash and outputs a clean digital signal to trigger the solenoid.",
-    howItWorks: "Photoresistor and VR1 form voltage divider. Strobe flash causes V2 > V1 at Schmitt trigger input. Hysteresis prevents oscillation from ambient light. Output drives solenoid circuit.",
+    howItWorks:
+      "Photoresistor and VR1 form voltage divider. Strobe flash causes V2 > V1 at Schmitt trigger input. Hysteresis prevents oscillation from ambient light. Output drives solenoid circuit.",
     input: "Strobe light flash",
     output: "Digital trigger signal to solenoid",
     evidenceSource: "Lab_Final_Report, p3–4",
@@ -216,7 +221,8 @@ const rgmStages: RGMStage[] = [
     name: "Solenoid — Launches Steel Marble",
     labSource: "Lab 7",
     whatItDoes: "Physically launches steel marble into metal detector coil when triggered by light detector.",
-    howItWorks: "Current through solenoid coil attracts inner plunger, pushing steel ball down track into inductor coil. Solenoid secured in track piece (6 in × 2 in × 1 in, 0.75 in cylindrical cutout).",
+    howItWorks:
+      "Current through solenoid coil attracts inner plunger, pushing steel ball down track into inductor coil. Solenoid secured in track piece (6 in × 2 in × 1 in, 0.75 in cylindrical cutout).",
     input: "Trigger signal from light detector",
     output: "Steel marble launched into inductor coil",
     evidenceSource: "Lab_Final_Report, p4",
@@ -226,8 +232,10 @@ const rgmStages: RGMStage[] = [
     number: 6,
     name: "555 Timer Metal Detector",
     labSource: "Lab 6",
-    whatItDoes: "Senses steel marble inside inductor coil via frequency drop, signals Arduino to release electromagnet.",
-    howItWorks: "NE555 in astable mode with LC oscillator. Without metal: 8,760 Hz. With marble: 8,310 Hz (5.1% drop, above 4% minimum). Arduino on pin 12 reads frequency with pulseIn() and sets electromagnet LOW when ≥4% drop detected.",
+    whatItDoes:
+      "Senses steel marble inside inductor coil via frequency drop, signals Arduino to release electromagnet.",
+    howItWorks:
+      "NE555 in astable mode with LC oscillator. Without metal: 8,760 Hz. With marble: 8,310 Hz (5.1% drop, above 4% minimum). Arduino on pin 12 reads frequency with pulseIn() and sets electromagnet LOW when ≥4% drop detected.",
     input: "Steel marble enters inductor coil",
     output: "Frequency drop detection → Arduino signal",
     evidenceSource: "Lab_Final_Report, p4",
@@ -238,7 +246,8 @@ const rgmStages: RGMStage[] = [
     name: "Electromagnet Turns OFF — Ball Released",
     labSource: "Lab 7",
     whatItDoes: "Holds steel ball above tilt switch. Releases when metal detection confirmed.",
-    howItWorks: "MOSFET on Arduino pin 11 controls electromagnet current. Initially HIGH (holding ball). Arduino detects ≥4% frequency drop → sets pin 11 LOW → MOSFET switches off → electromagnet releases ball. Shared ground required between Arduino and 9V supply.",
+    howItWorks:
+      "MOSFET on Arduino pin 11 controls electromagnet current. Initially HIGH (holding ball). Arduino detects ≥4% frequency drop → sets pin 11 LOW → MOSFET switches off → electromagnet releases ball. Shared ground required between Arduino and 9V supply.",
     input: "Arduino detection signal (≥4% frequency drop)",
     output: "Steel ball released from electromagnet",
     evidenceSource: "Lab_Final_Report, p4",
@@ -249,7 +258,8 @@ const rgmStages: RGMStage[] = [
     name: "Metal Ball Drops onto Tilt Switch",
     labSource: "N/A",
     whatItDoes: "Steel ball falls under gravity onto tilt switch, physically actuating it.",
-    howItWorks: "Tilt switch is normally open. Steel ball falls and tilts switch beyond threshold, closing circuit and sending signal to Arduino to update LCD.",
+    howItWorks:
+      "Tilt switch is normally open. Steel ball falls and tilts switch beyond threshold, closing circuit and sending signal to Arduino to update LCD.",
     input: "Steel ball released from electromagnet",
     output: "Tilt switch closed → Arduino digital input LOW",
     evidenceSource: "Lab_Final_Report, p5",
@@ -260,7 +270,8 @@ const rgmStages: RGMStage[] = [
     name: "LCD Displays 2 Rows of 16 White Blocks",
     labSource: "Last Step (Team Designed)",
     whatItDoes: "Displays confirmation — 2 rows of 16 white blocks each — completing the RGM sequence.",
-    howItWorks: "Tilt switch connected to Arduino with INPUT_PULLUP. Default HIGH, switch closure pulls LOW. Arduino polls pin state, writes custom 0xFF block character to all 32 positions of I2C LCD (address 0x27). Clear visual confirmation of successful RGM completion.",
+    howItWorks:
+      "Tilt switch connected to Arduino with INPUT_PULLUP. Default HIGH, switch closure pulls LOW. Arduino polls pin state, writes custom 0xFF block character to all 32 positions of I2C LCD (address 0x27). Clear visual confirmation of successful RGM completion.",
     input: "Tilt switch LOW signal",
     output: "LCD shows 2×16 white blocks (RGM complete)",
     evidenceSource: "Lab_Final_Report, p5–6",
@@ -312,7 +323,8 @@ const rgmFailureModes: FailureMode[] = [
   },
   {
     problem: "RC time constant discrepancy (Lab 4)",
-    cause: "38.5% error in charging, 12.8% in discharging — due to oscilloscope cursor positioning, component tolerances, breadboard contact resistance",
+    cause:
+      "38.5% error in charging, 12.8% in discharging — due to oscilloscope cursor positioning, component tolerances, breadboard contact resistance",
     fix: "Changed resistor to 20 kΩ which decreased percent error; documented tolerance effects",
     systemImpact: "Affected timing accuracy of capacitive touch detection",
     evidence_source: "Lab_Final_Report, p12",
@@ -331,18 +343,23 @@ export const projects: Project[] = [
     course: "EE 143",
     status: "EVIDENCE_PENDING",
     statusColor: "neon-amber",
-    heroSummary: "Designed and validated a complete analog-to-digital-to-analog signal system: op-amp conditioning → Arduino ADC → 4-bit quantization → custom PCB DAC → reconstructed output. Resolved loading effects through systematic buffering and verified 16 discrete voltage levels.",
+    heroSummary:
+      "Designed and validated a complete analog-to-digital-to-analog signal system: op-amp conditioning → Arduino ADC → 4-bit quantization → custom PCB DAC → reconstructed output. Resolved loading effects through systematic buffering and verified 16 discrete voltage levels.",
     has3D: false,
     hologramType: "system",
     module: {
-      problemStatement: "How do you convert an analog signal to digital, process it, and reconstruct it — understanding every loss and distortion introduced at each stage?",
-      systemOverview: "Complete analog-to-digital-to-analog pipeline spanning measurement, conditioning, conversion, processing, and reconstruction. Built across EE 143 labs culminating in a working ADC→DAC system.",
-      systemArchitecture: "Signal Source → Op-Amp Conditioning (level shift, buffer) → Arduino ADC (10-bit, mapped to 4-bit) → Digital Processing → 4-bit Binary Weighted DAC → Output Stage → Speaker",
+      problemStatement:
+        "How do you convert an analog signal to digital, process it, and reconstruct it — understanding every loss and distortion introduced at each stage?",
+      systemOverview:
+        "Complete analog-to-digital-to-analog pipeline spanning measurement, conditioning, conversion, processing, and reconstruction. Built across EE 143 labs culminating in a working ADC→DAC system.",
+      systemArchitecture:
+        "Signal Source → Op-Amp Conditioning (level shift, buffer) → Arduino ADC (10-bit, mapped to 4-bit) → Digital Processing → 4-bit Binary Weighted DAC → Output Stage → Speaker",
       subsystems: [
         {
           id: "measurement",
           title: "Measurement & Instrumentation",
-          description: "Oscilloscope triggering, waveform measurement, frequency/time domain analysis, function generator behavior (50Ω vs Hi-Z loading)",
+          description:
+            "Oscilloscope triggering, waveform measurement, frequency/time domain analysis, function generator behavior (50Ω vs Hi-Z loading)",
           details: [
             "Oscilloscope trigger modes: edge, auto, single",
             "Function generator 50Ω output impedance vs Hi-Z termination effects",
@@ -355,7 +372,8 @@ export const projects: Project[] = [
         {
           id: "analog-conditioning",
           title: "Analog Conditioning (Op-Amp Systems)",
-          description: "Summing amplifier for audio level shifting, voltage follower for buffering, practical current source design",
+          description:
+            "Summing amplifier for audio level shifting, voltage follower for buffering, practical current source design",
           details: [
             "Summing amplifier: shifts AC signal into ADC-compatible 0–5V range",
             "Voltage follower: unity gain buffer prevents loading from ADC input impedance",
@@ -368,7 +386,8 @@ export const projects: Project[] = [
         {
           id: "pcb-dac",
           title: "PCB Design & 4-bit DAC",
-          description: "Binary-weighted resistor DAC: LTSpice simulation → Fusion 360 PCB design → physical board via reflow soldering",
+          description:
+            "Binary-weighted resistor DAC: LTSpice simulation → Fusion 360 PCB design → physical board via reflow soldering",
           details: [
             "4-bit binary weighted DAC: R, 2R, 4R, 8R resistor network",
             "16 discrete output levels from 4 digital input bits",
@@ -396,7 +415,8 @@ export const projects: Project[] = [
         {
           id: "system-integration",
           title: "System Integration — ADC→DAC Pipeline",
-          description: "Arduino ADC sampling → 4-bit quantization → DAC reconstruction with staircase output and quantization error analysis",
+          description:
+            "Arduino ADC sampling → 4-bit quantization → DAC reconstruction with staircase output and quantization error analysis",
           details: [
             "Arduino 10-bit ADC (0–1023) mapped to 4-bit (0–15)",
             "Quantization: continuous signal → 16 discrete levels",
@@ -445,11 +465,20 @@ export const projects: Project[] = [
         "Add reconstruction filter (low-pass) after DAC output",
         "Implement higher sampling rate for better audio fidelity",
       ],
-      keyInsight: "Low bit-depth causes audible distortion because the continuous analog signal is approximated by only 16 discrete levels. Each conversion stage (analog→digital→analog) introduces quantization error. Analog systems behave non-ideally due to loading, offset voltages, and component tolerances — understanding these is essential for system-level design.",
+      keyInsight:
+        "Low bit-depth causes audible distortion because the continuous analog signal is approximated by only 16 discrete levels. Each conversion stage (analog→digital→analog) introduces quantization error. Analog systems behave non-ideally due to loading, offset voltages, and component tolerances — understanding these is essential for system-level design.",
     },
     diagrams: [],
     evidence: [],
-    techStack: ["Op-Amps", "Arduino ADC", "Binary-Weighted DAC", "LTSpice", "PCB Design", "Reflow Soldering", "Oscilloscope"],
+    techStack: [
+      "Op-Amps",
+      "Arduino ADC",
+      "Binary-Weighted DAC",
+      "LTSpice",
+      "PCB Design",
+      "Reflow Soldering",
+      "Oscilloscope",
+    ],
   },
 
   // ===== DOMAIN: ELECTROMECHANICAL =====
@@ -461,20 +490,25 @@ export const projects: Project[] = [
     course: "EE 241",
     status: "COMPLETE",
     statusColor: "neon-green",
-    heroSummary: "Built and debugged a 9-stage electromechanical chain integrating capacitive sensing, high-voltage strobe generation, optical detection, frequency-domain metal detection, and electromagnetic actuation. Resolved 6 failure modes across electrical, mechanical, and software boundaries. All stages verified in live demonstration.",
+    heroSummary:
+      "Built and debugged a 9-stage electromechanical chain integrating capacitive sensing, high-voltage strobe generation, optical detection, frequency-domain metal detection, and electromagnetic actuation. Resolved 6 failure modes across electrical, mechanical, and software boundaries. All stages verified in live demonstration.",
     heroImage: "/evidence/rgm-complete-setup.jpg",
     videoPath: "/evidence/rgm-demo.mp4",
     has3D: true,
     hologramType: "physical",
     module: {
-      problemStatement: "Design a nine-stage Rube Goldberg Machine where each stage must reliably trigger the next with no manual intervention. Any single failure breaks the entire chain.",
-      systemOverview: "Nine-stage electromechanical chain reaction integrating circuits from EE 241 Labs 2–7 plus a team-designed final step. The system spans capacitive sensing, power switching, high-voltage generation, optical detection, electromagnetic actuation, frequency-based metal detection, and digital I/O — all sequentially dependent.",
-      systemArchitecture: "Piano (capacitive touch) → Relay (5V→9V isolation) → Strobe (~580V flash) → Light Detector (Schmitt trigger) → Solenoid (marble launch) → 555 Metal Detector (8,760→8,310 Hz) → Electromagnet (MOSFET release) → Tilt Switch → LCD (2×16 white blocks)",
+      problemStatement:
+        "Design a nine-stage Rube Goldberg Machine where each stage must reliably trigger the next with no manual intervention. Any single failure breaks the entire chain.",
+      systemOverview:
+        "Nine-stage electromechanical chain reaction integrating circuits from EE 241 Labs 2–7 plus a team-designed final step. The system spans capacitive sensing, power switching, high-voltage generation, optical detection, electromagnetic actuation, frequency-based metal detection, and digital I/O — all sequentially dependent.",
+      systemArchitecture:
+        "Piano (capacitive touch) → Relay (5V→9V isolation) → Strobe (~580V flash) → Light Detector (Schmitt trigger) → Solenoid (marble launch) → 555 Metal Detector (8,760→8,310 Hz) → Electromagnet (MOSFET release) → Tilt Switch → LCD (2×16 white blocks)",
       subsystems: [
         {
           id: "capacitive-input",
           title: "Capacitive Input Detection",
-          description: "Four copper foil touch pads with RC circuits detect finger touch via capacitance change exceeding 1000 counts",
+          description:
+            "Four copper foil touch pads with RC circuits detect finger touch via capacitance change exceeding 1000 counts",
           details: [
             "2.2 MΩ resistors create RC time constant",
             "CapacitiveSensor library measures charge time",
@@ -487,7 +521,8 @@ export const projects: Project[] = [
         {
           id: "light-sensing",
           title: "Light Sensing + Schmitt Trigger",
-          description: "Photoresistor voltage divider with hysteresis-based Schmitt trigger discriminates strobe flash from ambient light",
+          description:
+            "Photoresistor voltage divider with hysteresis-based Schmitt trigger discriminates strobe flash from ambient light",
           details: [
             "Photoresistor + VR1 voltage divider sets threshold",
             "LM324 op-amp comparator with hysteresis",
@@ -572,16 +607,76 @@ export const projects: Project[] = [
         "LCD displayed 2 rows of 16 white blocks",
       ],
       verificationSummary: [
-        { parameter: "Baseline Frequency", value: "8,760", unit: "Hz", evidence_source: "Lab_Final_Report, p4", confidence: "VERIFIED" },
-        { parameter: "Metal-Present Frequency", value: "8,310", unit: "Hz", evidence_source: "Lab_Final_Report, p4", confidence: "VERIFIED" },
-        { parameter: "Frequency Drop", value: "5.1", unit: "%", evidence_source: "Lab_Final_Report, p4", confidence: "VERIFIED" },
-        { parameter: "Min Required Drop", value: "4", unit: "%", evidence_source: "Lab_Final_Report, p4", confidence: "VERIFIED" },
-        { parameter: "TRIP_DELTA", value: "150", unit: "Hz", evidence_source: "Lab_Final_Report, p7 (code)", confidence: "VERIFIED" },
-        { parameter: "BASE_FREQ", value: "8,600", unit: "Hz", evidence_source: "Lab_Final_Report, p7 (code)", confidence: "VERIFIED" },
-        { parameter: "STREAK_N", value: "5", unit: "readings", evidence_source: "Lab_Final_Report, p7 (code)", confidence: "VERIFIED" },
-        { parameter: "RELEASE_DELAY", value: "600", unit: "ms", evidence_source: "Lab_Final_Report, p7 (code)", confidence: "VERIFIED" },
-        { parameter: "Strobe HV", value: "~580", unit: "V", evidence_source: "Lab_Final_Report, p3", confidence: "VERIFIED" },
-        { parameter: "Total Stages", value: "9", unit: "stages", evidence_source: "Lab_Final_Report, p2", confidence: "VERIFIED" },
+        {
+          parameter: "Baseline Frequency",
+          value: "8,760",
+          unit: "Hz",
+          evidence_source: "Lab_Final_Report, p4",
+          confidence: "VERIFIED",
+        },
+        {
+          parameter: "Metal-Present Frequency",
+          value: "8,310",
+          unit: "Hz",
+          evidence_source: "Lab_Final_Report, p4",
+          confidence: "VERIFIED",
+        },
+        {
+          parameter: "Frequency Drop",
+          value: "5.1",
+          unit: "%",
+          evidence_source: "Lab_Final_Report, p4",
+          confidence: "VERIFIED",
+        },
+        {
+          parameter: "Min Required Drop",
+          value: "4",
+          unit: "%",
+          evidence_source: "Lab_Final_Report, p4",
+          confidence: "VERIFIED",
+        },
+        {
+          parameter: "TRIP_DELTA",
+          value: "150",
+          unit: "Hz",
+          evidence_source: "Lab_Final_Report, p7 (code)",
+          confidence: "VERIFIED",
+        },
+        {
+          parameter: "BASE_FREQ",
+          value: "8,600",
+          unit: "Hz",
+          evidence_source: "Lab_Final_Report, p7 (code)",
+          confidence: "VERIFIED",
+        },
+        {
+          parameter: "STREAK_N",
+          value: "5",
+          unit: "readings",
+          evidence_source: "Lab_Final_Report, p7 (code)",
+          confidence: "VERIFIED",
+        },
+        {
+          parameter: "RELEASE_DELAY",
+          value: "600",
+          unit: "ms",
+          evidence_source: "Lab_Final_Report, p7 (code)",
+          confidence: "VERIFIED",
+        },
+        {
+          parameter: "Strobe HV",
+          value: "~580",
+          unit: "V",
+          evidence_source: "Lab_Final_Report, p3",
+          confidence: "VERIFIED",
+        },
+        {
+          parameter: "Total Stages",
+          value: "9",
+          unit: "stages",
+          evidence_source: "Lab_Final_Report, p2",
+          confidence: "VERIFIED",
+        },
       ],
       rgmStages,
       achievements: [
@@ -595,7 +690,8 @@ export const projects: Project[] = [
         "Tilt switch triggered correctly (LOW with INPUT_PULLUP)",
         "LCD displayed 2 rows of 16 white blocks",
       ],
-      keyInsight: "Each stage must correctly produce an output that triggers the next. A single failure anywhere in the chain halts the entire system. Debugging required understanding signal propagation across domain boundaries — capacitive, optical, mechanical, electromagnetic, and digital.",
+      keyInsight:
+        "Each stage must correctly produce an output that triggers the next. A single failure anywhere in the chain halts the entire system. Debugging required understanding signal propagation across domain boundaries — capacitive, optical, mechanical, electromagnetic, and digital.",
     },
     diagrams: [
       {
@@ -611,7 +707,8 @@ export const projects: Project[] = [
         title: "RGM Step-by-Step Block Diagram",
         confidence: "VERIFIED",
         derivedFrom: ["Lab_Final_Report_Amogh_Somisetty.pdf, p2"],
-        description: "Nine-stage block diagram from Piano Key → LCD Display showing decision logic at frequency detection step.",
+        description:
+          "Nine-stage block diagram from Piano Key → LCD Display showing decision logic at frequency detection step.",
         imagePath: "/evidence/rgm-block-diagram.png",
       },
       {
@@ -619,7 +716,8 @@ export const projects: Project[] = [
         title: "Last Step Schematic — Tilt Switch + I2C LCD",
         confidence: "VERIFIED",
         derivedFrom: ["Lab_Final_Report_Amogh_Somisetty.pdf, p6"],
-        description: "Arduino digital input with INPUT_PULLUP, tilt switch SPST connection, Inland 16×2 LCD I2C backpack (PCF8574, address 0x27).",
+        description:
+          "Arduino digital input with INPUT_PULLUP, tilt switch SPST connection, Inland 16×2 LCD I2C backpack (PCF8574, address 0x27).",
         imagePath: "/evidence/rgm-last-step-schematic.png",
       },
       {
@@ -627,7 +725,8 @@ export const projects: Project[] = [
         title: "555 Timer Metal Detector Schematic",
         confidence: "VERIFIED",
         derivedFrom: ["EE_241_Lab_6_Electric_Circuit_Analysis_1.pdf"],
-        description: "TLC555 timer circuit with L1=0.5mH, C2/C3=2.2µF, R1=10K, R2=12K, R3=10K, R4=47K, C1=0.1µF, 9VDC supply.",
+        description:
+          "TLC555 timer circuit with L1=0.5mH, C2/C3=2.2µF, R1=10K, R2=12K, R3=10K, R4=47K, C1=0.1µF, 9VDC supply.",
         imagePath: "/evidence/ee241-lab6-555timer.jpg",
       },
       {
@@ -635,7 +734,8 @@ export const projects: Project[] = [
         title: "Solenoid Drive Circuit (BJT)",
         confidence: "VERIFIED",
         derivedFrom: ["EE_241_Lab_7_Electric_Circuit_Analysis.pdf"],
-        description: "BJT (TIP1E) drive circuit: base resistor (1K/2.2K), flyback diode (1N4004/MUR348), collector to solenoid, emitter to GND.",
+        description:
+          "BJT (TIP1E) drive circuit: base resistor (1K/2.2K), flyback diode (1N4004/MUR348), collector to solenoid, emitter to GND.",
         imagePath: "/evidence/ee241-lab7-drive-circuit.png",
       },
     ],
@@ -644,13 +744,15 @@ export const projects: Project[] = [
         id: "rgm-report",
         fileName: "Lab_Final_Report_Amogh_Somisetty.pdf",
         type: "pdf",
-        description: "EE 241-01 Final RGM Project Report (15 pages). All 9 stages, schematics, code, failure modes, and discussion.",
+        description:
+          "EE 241-01 Final RGM Project Report (15 pages). All 9 stages, schematics, code, failure modes, and discussion.",
       },
       {
         id: "rgm-demo-video",
         fileName: "EE_241_Final_Demonstration.mp4",
         type: "video",
-        description: "Video demonstration of all nine RGM stages operating in sequence during class demo on March 10, 2026.",
+        description:
+          "Video demonstration of all nine RGM stages operating in sequence during class demo on March 10, 2026.",
         path: "/evidence/rgm-demo.mp4",
       },
       {
@@ -666,7 +768,17 @@ export const projects: Project[] = [
         description: "Fusion 360 CAD file for light detector housing.",
       },
     ],
-    techStack: ["Arduino Mega", "555 Timer", "MOSFET", "Solenoid", "Electromagnet", "Schmitt Trigger", "I2C LCD", "Capacitive Touch", "Op-Amps"],
+    techStack: [
+      "Arduino Mega",
+      "555 Timer",
+      "MOSFET",
+      "Solenoid",
+      "Electromagnet",
+      "Schmitt Trigger",
+      "I2C LCD",
+      "Capacitive Touch",
+      "Op-Amps",
+    ],
   },
 
   // ===== DOMAIN: DIGITAL SYSTEMS =====
@@ -678,13 +790,17 @@ export const projects: Project[] = [
     course: "CPE 233 / CPE 133",
     status: "COMPLETE",
     statusColor: "neon-green",
-    heroSummary: "Designed a multi-cycle RISC-V CPU (OTTER MCU) from gates up in SystemVerilog — full RV32I ISA, 10 ALU operations, 2-state FSM control unit, 32×32 register file. Synthesized and verified on Basys-3 FPGA via Vivado.",
+    heroSummary:
+      "Designed a multi-cycle RISC-V CPU (OTTER MCU) from gates up in SystemVerilog — full RV32I ISA, 10 ALU operations, 2-state FSM control unit, 32×32 register file. Synthesized and verified on Basys-3 FPGA via Vivado.",
     has3D: true,
     hologramType: "interactive",
     module: {
-      problemStatement: "How do you design a complete CPU from gates up — implementing instruction fetch, decode, execute, and memory access cycles with correct timing and control?",
-      systemOverview: "Comprehensive digital systems work spanning CPU architecture (OTTER MCU in SystemVerilog), finite state machines, and FPGA implementation of combinational and sequential logic.",
-      systemArchitecture: "OTTER MCU: PC → IMEM → Decode → RF(32×32) → ALU(10 ops) → Memory → Writeback. CU_FSM: FETCH→EXEC. Branch logic: br_eq, br_lt, br_ltu. Immediate Gen: I/S/B/U/J types.",
+      problemStatement:
+        "How do you design a complete CPU from gates up — implementing instruction fetch, decode, execute, and memory access cycles with correct timing and control?",
+      systemOverview:
+        "Comprehensive digital systems work spanning CPU architecture (OTTER MCU in SystemVerilog), finite state machines, and FPGA implementation of combinational and sequential logic.",
+      systemArchitecture:
+        "OTTER MCU: PC → IMEM → Decode → RF(32×32) → ALU(10 ops) → Memory → Writeback. CU_FSM: FETCH→EXEC. Branch logic: br_eq, br_lt, br_ltu. Immediate Gen: I/S/B/U/J types.",
       subsystems: [
         {
           id: "otter-cpu",
@@ -719,7 +835,8 @@ export const projects: Project[] = [
         {
           id: "fpga-implementation",
           title: "FPGA Implementation",
-          description: "Digital logic building blocks implemented on FPGA: multiplexers, flip-flops, shift registers, clock dividers",
+          description:
+            "Digital logic building blocks implemented on FPGA: multiplexers, flip-flops, shift registers, clock dividers",
           details: [
             "Combinational: MUX, decoder, encoder",
             "Sequential: D-FF, shift registers, counters",
@@ -755,13 +872,44 @@ export const projects: Project[] = [
         "Hazard detection and forwarding logic",
         "Expand to RV32IM (multiply/divide)",
       ],
-      keyInsight: "Timing is everything in digital systems. The difference between combinational and sequential logic determines when data is valid. State machines control the system — every instruction's execution is a sequence of precisely-timed control signals that must be generated in the correct order.",
+      keyInsight:
+        "Timing is everything in digital systems. The difference between combinational and sequential logic determines when data is valid. State machines control the system — every instruction's execution is a sequence of precisely-timed control signals that must be generated in the correct order.",
       verificationSummary: [
-        { parameter: "ISA", value: "RV32I", unit: "", evidence_source: "OTTER_Architecture, p1", confidence: "VERIFIED" },
-        { parameter: "ALU Operations", value: "10", unit: "functions", evidence_source: "OTTER_Architecture, p1", confidence: "VERIFIED" },
-        { parameter: "Register File", value: "32×32", unit: "bit", evidence_source: "OTTER_Architecture, p1", confidence: "VERIFIED" },
-        { parameter: "FSM States", value: "2", unit: "(FETCH, EXEC)", evidence_source: "OTTER_Architecture, p1", confidence: "VERIFIED" },
-        { parameter: "PC Sources", value: "4", unit: "MUX inputs", evidence_source: "OTTER_Architecture, p1", confidence: "VERIFIED" },
+        {
+          parameter: "ISA",
+          value: "RV32I",
+          unit: "",
+          evidence_source: "OTTER_Architecture, p1",
+          confidence: "VERIFIED",
+        },
+        {
+          parameter: "ALU Operations",
+          value: "10",
+          unit: "functions",
+          evidence_source: "OTTER_Architecture, p1",
+          confidence: "VERIFIED",
+        },
+        {
+          parameter: "Register File",
+          value: "32×32",
+          unit: "bit",
+          evidence_source: "OTTER_Architecture, p1",
+          confidence: "VERIFIED",
+        },
+        {
+          parameter: "FSM States",
+          value: "2",
+          unit: "(FETCH, EXEC)",
+          evidence_source: "OTTER_Architecture, p1",
+          confidence: "VERIFIED",
+        },
+        {
+          parameter: "PC Sources",
+          value: "4",
+          unit: "MUX inputs",
+          evidence_source: "OTTER_Architecture, p1",
+          confidence: "VERIFIED",
+        },
       ],
     },
     diagrams: [
@@ -775,8 +923,19 @@ export const projects: Project[] = [
       },
     ],
     evidence: [
-      { id: "otter-arch-pdf", fileName: "OTTER_Architecture_No_Interrupts_1.pdf", type: "pdf", description: "Full OTTER MCU architecture diagram with datapath, control unit, and ALU table", path: "/evidence/otter-datapath.jpg" },
-      { id: "riscv-asm-manual", fileName: "RISC-V_Assembler_Manual.pdf", type: "pdf", description: "RISC-V OTTER Assembly Manual v4.04 — ISA formats, opcodes, instructions" },
+      {
+        id: "otter-arch-pdf",
+        fileName: "OTTER_Architecture_No_Interrupts_1.pdf",
+        type: "pdf",
+        description: "Full OTTER MCU architecture diagram with datapath, control unit, and ALU table",
+        path: "/evidence/otter-datapath.jpg",
+      },
+      {
+        id: "riscv-asm-manual",
+        fileName: "RISC-V_Assembler_Manual.pdf",
+        type: "pdf",
+        description: "RISC-V OTTER Assembly Manual v4.04 — ISA formats, opcodes, instructions",
+      },
     ],
     techStack: ["SystemVerilog", "Vivado", "RISC-V ISA", "FPGA", "FSM Design"],
   },
@@ -790,13 +949,17 @@ export const projects: Project[] = [
     course: "IME 144",
     status: "COMPLETE",
     statusColor: "neon-green",
-    heroSummary: "Executed the full design-to-manufacturing pipeline: parametric CAD → engineering drawings per ASME Y14.5 GD&T → manual machining on lathe and mill → dimensional inspection → assembly. Produced 6 precision parts for a working pneumatic air motor.",
+    heroSummary:
+      "Executed the full design-to-manufacturing pipeline: parametric CAD → engineering drawings per ASME Y14.5 GD&T → manual machining on lathe and mill → dimensional inspection → assembly. Produced 6 precision parts for a working pneumatic air motor.",
     has3D: true,
     hologramType: "physical",
     module: {
-      problemStatement: "How do you take a design from CAD model to physical part — accounting for tolerances, material properties, and manufacturing constraints at every step?",
-      systemOverview: "Complete design-to-manufacturing pipeline for a pneumatic air motor. Covers parametric CAD modeling, engineering drawings with GD&T per ASME Y14.5, manual machining on lathe and mill, metrology, and final assembly.",
-      systemArchitecture: "CAD Model (SolidWorks) → Engineering Drawing (GD&T) → Production Plan → Material Selection → Machining (Lathe/Mill) → Inspection (Metrology) → Assembly",
+      problemStatement:
+        "How do you take a design from CAD model to physical part — accounting for tolerances, material properties, and manufacturing constraints at every step?",
+      systemOverview:
+        "Complete design-to-manufacturing pipeline for a pneumatic air motor. Covers parametric CAD modeling, engineering drawings with GD&T per ASME Y14.5, manual machining on lathe and mill, metrology, and final assembly.",
+      systemArchitecture:
+        "CAD Model (SolidWorks) → Engineering Drawing (GD&T) → Production Plan → Material Selection → Machining (Lathe/Mill) → Inspection (Metrology) → Assembly",
       subsystems: [
         {
           id: "cad-modeling",
@@ -851,7 +1014,8 @@ export const projects: Project[] = [
         "CNC machining for higher precision repeatability",
         "Alternative materials (aluminum alloys) for weight reduction",
       ],
-      keyInsight: "The gap between a CAD model and a physical part is defined by tolerances. Real-world manufacturing introduces variation from tool wear, thermal expansion, fixturing, and operator technique. GD&T communicates design intent so manufacturing and inspection can verify parts independently.",
+      keyInsight:
+        "The gap between a CAD model and a physical part is defined by tolerances. Real-world manufacturing introduces variation from tool wear, thermal expansion, fixturing, and operator technique. GD&T communicates design intent so manufacturing and inspection can verify parts independently.",
     },
     diagrams: [
       {
@@ -864,11 +1028,38 @@ export const projects: Project[] = [
       },
     ],
     evidence: [
-      { id: "ime144-manual", fileName: "IME_144_MANUAL.pdf", type: "pdf", description: "Full IME 144 Manual: engineering drawings, GD&T, machining processes, air motor project (pp.224-285).", path: "/evidence/ime144-cover.jpg" },
-      { id: "ime144-crank", fileName: "Crank_Disk-2.SLDPRT", type: "image", description: "SolidWorks part file for Crank Disk" },
-      { id: "ime144-cylinder", fileName: "Cylinder.SLDPRT", type: "image", description: "SolidWorks part file for Cylinder" },
-      { id: "ime144-mill", fileName: "IME_144_Mill_Part_1_Somisetty.SLDPRT", type: "image", description: "SolidWorks part file for milled component" },
-      { id: "ime144-screwdriver", fileName: "IME_Screwdriver_Project_Somisetty.SLDPRT", type: "image", description: "SolidWorks screwdriver project file" },
+      {
+        id: "ime144-manual",
+        fileName: "IME_144_MANUAL.pdf",
+        type: "pdf",
+        description:
+          "Full IME 144 Manual: engineering drawings, GD&T, machining processes, air motor project (pp.224-285).",
+        path: "/evidence/ime144-cover.jpg",
+      },
+      {
+        id: "ime144-crank",
+        fileName: "Crank_Disk-2.SLDPRT",
+        type: "image",
+        description: "SolidWorks part file for Crank Disk",
+      },
+      {
+        id: "ime144-cylinder",
+        fileName: "Cylinder.SLDPRT",
+        type: "image",
+        description: "SolidWorks part file for Cylinder",
+      },
+      {
+        id: "ime144-mill",
+        fileName: "IME_144_Mill_Part_1_Somisetty.SLDPRT",
+        type: "image",
+        description: "SolidWorks part file for milled component",
+      },
+      {
+        id: "ime144-screwdriver",
+        fileName: "IME_Screwdriver_Project_Somisetty.SLDPRT",
+        type: "image",
+        description: "SolidWorks screwdriver project file",
+      },
     ],
     techStack: ["Manual Lathe", "Manual Mill", "GD&T", "SolidWorks", "Metrology", "Production Planning"],
   },
@@ -882,13 +1073,17 @@ export const projects: Project[] = [
     course: undefined,
     status: "ACTIVE",
     statusColor: "neon-cyan",
-    heroSummary: "Built and shipped a production event ticketing platform handling Stripe payments, QR ticket issuance, fraud prevention, and demand-based pricing. Live and serving real users at funck.live.",
+    heroSummary:
+      "Built and shipped a production event ticketing platform handling Stripe payments, QR ticket issuance, fraud prevention, and demand-based pricing. Live and serving real users at funck.live.",
     has3D: true,
     hologramType: "network",
     module: {
-      problemStatement: "How do you build a production ticketing system that handles payments, fraud prevention, and real-time event management?",
-      systemOverview: "Full-stack event ticketing platform with presale tickets, QR code issuance, fraud prevention, demand-based pricing, Stripe Connect payouts, group split-pay, and analytics.",
-      systemArchitecture: "Client (React) → Lovable App → Supabase (PostgreSQL + Auth + Edge Functions) → Stripe (payments + Connect payouts) → Resend (email delivery)",
+      problemStatement:
+        "How do you build a production ticketing system that handles payments, fraud prevention, and real-time event management?",
+      systemOverview:
+        "Full-stack event ticketing platform with presale tickets, QR code issuance, fraud prevention, demand-based pricing, Stripe Connect payouts, group split-pay, and analytics.",
+      systemArchitecture:
+        "Client (React) → Lovable App → Supabase (PostgreSQL + Auth + Edge Functions) → Stripe (payments + Connect payouts) → Resend (email delivery)",
       implementationNotes: [
         "Built using Lovable, Supabase, Stripe, Resend",
         "Live at www.funck.live",
@@ -914,9 +1109,7 @@ export const projects: Project[] = [
           "Deployment and production operations",
           "Validation and user feedback iteration",
         ],
-        aiAssisted: [
-          "Code generation via Lovable AI — used for implementation acceleration",
-        ],
+        aiAssisted: ["Code generation via Lovable AI — used for implementation acceleration"],
       },
     },
     diagrams: [
@@ -925,12 +1118,19 @@ export const projects: Project[] = [
         title: "Platform Architecture",
         confidence: "CONCEPTUAL",
         derivedFrom: [],
-        description: "Client (React/Lovable) → Supabase (DB + Auth + Edge Functions) → Stripe (Payments + Connect) → Resend (Emails)",
+        description:
+          "Client (React/Lovable) → Supabase (DB + Auth + Edge Functions) → Stripe (Payments + Connect) → Resend (Emails)",
         conceptualNote: "Architecture reflects actual production system at funck.live.",
       },
     ],
     evidence: [
-      { id: "funck-live", fileName: "www.funck.live", type: "link", description: "Live production URL", url: "https://www.funck.live" },
+      {
+        id: "funck-live",
+        fileName: "www.funck.live",
+        type: "link",
+        description: "Live production URL",
+        url: "https://www.funck.live",
+      },
     ],
     techStack: ["React", "Lovable", "Supabase", "Stripe", "Resend", "TypeScript"],
   },
@@ -945,18 +1145,23 @@ export const projects: Project[] = [
     course: "MATE 210 / MATE 215",
     status: "COMPLETE",
     statusColor: "neon-amber",
-    heroSummary: "Phase diagram reasoning, cold work/recrystallization mechanics, and heat treatment of steels. Structure–property–processing control from eutectic solidification through eutectoid transformation.",
+    heroSummary:
+      "Phase diagram reasoning, cold work/recrystallization mechanics, and heat treatment of steels. Structure–property–processing control from eutectic solidification through eutectoid transformation.",
     has3D: true,
     hologramType: "scientific",
     module: {
-      problemStatement: "How do phase diagrams, deformation history, and thermal processing combine to control the microstructure and mechanical properties of engineering alloys?",
-      systemOverview: "Integrates three interconnected materials concepts: (1) binary phase diagram interpretation and cooling behavior, (2) cold work → recovery → recrystallization → grain growth progression, and (3) Fe-C phase transformations and heat treatment logic for steels.",
-      systemArchitecture: "Composition + Temperature → Phase Diagram → Phase Fields → Microstructure Prediction → Property Control | Deformation → Dislocation Density → Annealing → Recrystallization → Grain Size → Properties | Austenitize → Cooling Rate → Pearlite/Bainite/Martensite → Hardness/Ductility",
+      problemStatement:
+        "How do phase diagrams, deformation history, and thermal processing combine to control the microstructure and mechanical properties of engineering alloys?",
+      systemOverview:
+        "Integrates three interconnected materials concepts: (1) binary phase diagram interpretation and cooling behavior, (2) cold work → recovery → recrystallization → grain growth progression, and (3) Fe-C phase transformations and heat treatment logic for steels.",
+      systemArchitecture:
+        "Composition + Temperature → Phase Diagram → Phase Fields → Microstructure Prediction → Property Control | Deformation → Dislocation Density → Annealing → Recrystallization → Grain Size → Properties | Austenitize → Cooling Rate → Pearlite/Bainite/Martensite → Hardness/Ductility",
       subsystems: [
         {
           id: "phase-diagrams",
           title: "Phase Diagram Reasoning (Pb-Sn Eutectic)",
-          description: "Binary eutectic phase diagram interpretation: phase fields, eutectic composition/temperature, cooling paths, and primary/proeutectic phase formation. Pb-Sn system used as the model eutectic.",
+          description:
+            "Binary eutectic phase diagram interpretation: phase fields, eutectic composition/temperature, cooling paths, and primary/proeutectic phase formation. Pb-Sn system used as the model eutectic.",
           details: [
             "Pb-Sn eutectic system: eutectic at 61.9 wt% Sn, 183°C (Lab 4, p3–4)",
             "α solvus: max solubility 18.3 wt% Sn at 183°C; β solvus: 97.8 wt% Sn at 183°C (Lab 4, p3)",
@@ -972,7 +1177,8 @@ export const projects: Project[] = [
         {
           id: "cold-work-recrystallization",
           title: "Cold Work and Recrystallization",
-          description: "Dislocation mechanics linking strain hardening, recovery, recrystallization, and grain growth to mechanical property changes. Demonstrated on α-brass (70Cu-30Zn).",
+          description:
+            "Dislocation mechanics linking strain hardening, recovery, recrystallization, and grain growth to mechanical property changes. Demonstrated on α-brass (70Cu-30Zn).",
           details: [
             "Cold work creates and multiplies dislocations → 'dislocation traffic jam' resists further deformation (Lab 7, p1–2)",
             "Strain hardening: each successive bend requires more force as dislocation density increases (Lab 7, p2)",
@@ -989,7 +1195,8 @@ export const projects: Project[] = [
         {
           id: "heat-treatment-steels",
           title: "Heat Treatment of Steels",
-          description: "Fe-C eutectoid transformation: austenite → pearlite/ferrite/cementite. Steels used: 1018, 1050, 1095 (plain carbon). TTT diagram interpretation for non-equilibrium structures.",
+          description:
+            "Fe-C eutectoid transformation: austenite → pearlite/ferrite/cementite. Steels used: 1018, 1050, 1095 (plain carbon). TTT diagram interpretation for non-equilibrium structures.",
           details: [
             "Eutectoid composition: 0.77 wt% C at 727°C (Lab 8, Fig.1, p2)",
             "Austenite (γ-FCC) is the high-temperature starting phase — all C dissolved interstitially (Lab 8, p2)",
@@ -1033,13 +1240,29 @@ export const projects: Project[] = [
         "Include real micrograph annotations when evidence uploaded",
         "Add Jominy hardenability exploration",
       ],
-      keyInsight: "Structure controls properties. Processing controls structure. Therefore, processing controls properties. Every decision about composition, temperature, time, and cooling rate determines what phases form, what microstructure develops, and what mechanical behavior results.",
+      keyInsight:
+        "Structure controls properties. Processing controls structure. Therefore, processing controls properties. Every decision about composition, temperature, time, and cooling rate determines what phases form, what microstructure develops, and what mechanical behavior results.",
     },
     diagrams: [],
     evidence: [
-      { id: "lab4-pdf", fileName: "Lab_4_Phase_Diagrams_Spring_2017_1.pdf", type: "pdf", description: "Pb-Sn eutectic phase diagram lab — cooling curves, phase fields, lever rule, microstructure" },
-      { id: "lab7-pdf", fileName: "Lab_7_Cold_Work_and_Annealing_SPR_2017.pdf", type: "pdf", description: "α-brass cold work and annealing — dislocation mechanics, recrystallization, micrographs" },
-      { id: "lab8-pdf", fileName: "Lab_8_Steel_Heat_Treatment_SPR_2017.pdf", type: "pdf", description: "Fe-C heat treatment — austenite transformation, pearlite, martensite, TTT diagrams" },
+      {
+        id: "lab4-pdf",
+        fileName: "Lab_4_Phase_Diagrams_Spring_2017_1.pdf",
+        type: "pdf",
+        description: "Pb-Sn eutectic phase diagram lab — cooling curves, phase fields, lever rule, microstructure",
+      },
+      {
+        id: "lab7-pdf",
+        fileName: "Lab_7_Cold_Work_and_Annealing_SPR_2017.pdf",
+        type: "pdf",
+        description: "α-brass cold work and annealing — dislocation mechanics, recrystallization, micrographs",
+      },
+      {
+        id: "lab8-pdf",
+        fileName: "Lab_8_Steel_Heat_Treatment_SPR_2017.pdf",
+        type: "pdf",
+        description: "Fe-C heat treatment — austenite transformation, pearlite, martensite, TTT diagrams",
+      },
     ],
     techStack: ["Phase Diagrams", "Metallography", "Heat Treatment", "Mechanical Testing", "Microstructure Analysis"],
   },
@@ -1053,18 +1276,23 @@ export const projects: Project[] = [
     course: "MATE 210",
     status: "COMPLETE",
     statusColor: "neon-amber",
-    heroSummary: "Electrochemical corrosion fundamentals: anode/cathode/electrolyte/path model, galvanic series reasoning, and design strategies for corrosion prevention in engineering systems.",
+    heroSummary:
+      "Electrochemical corrosion fundamentals: anode/cathode/electrolyte/path model, galvanic series reasoning, and design strategies for corrosion prevention in engineering systems.",
     has3D: true,
     hologramType: "scientific",
     module: {
-      problemStatement: "How does electrochemical corrosion degrade materials, and how can engineers interrupt the corrosion mechanism through design?",
-      systemOverview: "Corrosion as a systems-level failure mode: four required elements (anode, cathode, electrolyte, electrical path), galvanic series for material selection, and engineering strategies to prevent or mitigate material degradation.",
-      systemArchitecture: "Anode (oxidation: M → M²⁺ + 2e⁻) → Electrical Path (e⁻ flow) → Cathode (reduction: O₂ + 2H₂O + 4e⁻ → 4OH⁻) → Electrolyte (ion transport) → Anode (cycle)",
+      problemStatement:
+        "How does electrochemical corrosion degrade materials, and how can engineers interrupt the corrosion mechanism through design?",
+      systemOverview:
+        "Corrosion as a systems-level failure mode: four required elements (anode, cathode, electrolyte, electrical path), galvanic series for material selection, and engineering strategies to prevent or mitigate material degradation.",
+      systemArchitecture:
+        "Anode (oxidation: M → M²⁺ + 2e⁻) → Electrical Path (e⁻ flow) → Cathode (reduction: O₂ + 2H₂O + 4e⁻ → 4OH⁻) → Electrolyte (ion transport) → Anode (cycle)",
       subsystems: [
         {
           id: "corrosion-fundamentals",
           title: "Corrosion Fundamentals",
-          description: "Four required elements for corrosion: anode, cathode, electrolyte, and electrical path. Remove any one to stop corrosion.",
+          description:
+            "Four required elements for corrosion: anode, cathode, electrolyte, and electrical path. Remove any one to stop corrosion.",
           details: [
             "Anode: metal that undergoes oxidation — Fe⁰ → Fe²⁺ + 2e⁻ (Lab 5, p2, Eq.1)",
             "Cathode: site where reduction occurs — ½O₂ + H₂O + 2e⁻ → 2(OH)⁻ (Lab 5, p2, Eq.2)",
@@ -1079,7 +1307,8 @@ export const projects: Project[] = [
         {
           id: "galvanic-series",
           title: "Corrosion Potential & Galvanic Series",
-          description: "Why some metals corrode preferentially when coupled — electrode potential determines anodic/cathodic behavior",
+          description:
+            "Why some metals corrode preferentially when coupled — electrode potential determines anodic/cathodic behavior",
           details: [
             "Corrosion potential measured by interrupting external circuit with voltmeter (Lab 5, p5, Fig.3)",
             "More negative potential → more anodic → preferentially corrodes (Lab 5, p5)",
@@ -1093,7 +1322,8 @@ export const projects: Project[] = [
         {
           id: "corrosion-prevention",
           title: "Design Implications & Prevention",
-          description: "Engineering strategies to interrupt the corrosion cell by removing one of the four required elements",
+          description:
+            "Engineering strategies to interrupt the corrosion cell by removing one of the four required elements",
           details: [
             "Coatings/barriers: remove electrolyte contact (paint, anodizing, sealants) (Lab 5, p4)",
             "Cathodic protection: sacrificial anode shifts corrosion to expendable metal (Lab 5, p4)",
@@ -1124,13 +1354,26 @@ export const projects: Project[] = [
         "Add interactive galvanic series explorer",
         "Include real corrosion sample images when evidence uploaded",
       ],
-      keyInsight: "Corrosion is not random — it is a predictable electrochemical process. Every corrosion failure can be traced to the presence of all four elements: anode, cathode, electrolyte, and electrical path. Engineering prevention means deliberately eliminating at least one.",
+      keyInsight:
+        "Corrosion is not random — it is a predictable electrochemical process. Every corrosion failure can be traced to the presence of all four elements: anode, cathode, electrolyte, and electrical path. Engineering prevention means deliberately eliminating at least one.",
     },
     diagrams: [],
     evidence: [
-      { id: "lab5-pdf", fileName: "Lab_5_Corrosion_SPR_2017_Materials_Lab.pdf", type: "pdf", description: "Metal corrosion lab — electrochemical fundamentals, galvanic series, 4-component model, prevention" },
+      {
+        id: "lab5-pdf",
+        fileName: "Lab_5_Corrosion_SPR_2017_Materials_Lab.pdf",
+        type: "pdf",
+        description:
+          "Metal corrosion lab — electrochemical fundamentals, galvanic series, 4-component model, prevention",
+      },
     ],
-    techStack: ["Electrochemistry", "Galvanic Series", "Failure Analysis", "Material Selection", "Corrosion Prevention"],
+    techStack: [
+      "Electrochemistry",
+      "Galvanic Series",
+      "Failure Analysis",
+      "Material Selection",
+      "Corrosion Prevention",
+    ],
   },
 
   // PROJECT GROUP C: Polymers & Lightweight Materials
@@ -1142,18 +1385,23 @@ export const projects: Project[] = [
     course: "MATE 210 / MATE 215",
     status: "COMPLETE",
     statusColor: "neon-amber",
-    heroSummary: "Thermoplastic structure–property relationships and CFRP vs 6061-T6 aluminum analysis for transit vehicle design. Structure–properties–processing–performance framework applied to real transport engineering decisions.",
+    heroSummary:
+      "Thermoplastic structure–property relationships and CFRP vs 6061-T6 aluminum analysis for transit vehicle design. Structure–properties–processing–performance framework applied to real transport engineering decisions.",
     has3D: true,
     hologramType: "scientific",
     module: {
-      problemStatement: "How do molecular structure and processing control the mechanical behavior of polymers, and how do composite materials compare to metals for lightweight transport applications?",
-      systemOverview: "Two interconnected modules: (1) thermoplastic polymer mechanical behavior driven by molecular structure and secondary bonding, and (2) CFRP vs 6061-T6 aluminum material selection analysis for bus rapid transit and rail applications.",
-      systemArchitecture: "Molecular Structure (chain architecture, bonding) → Processing (temperature, forming) → Microstructure (crystallinity, orientation) → Properties (E, σy, εf) → Performance (specific strength, cost, lifecycle)",
+      problemStatement:
+        "How do molecular structure and processing control the mechanical behavior of polymers, and how do composite materials compare to metals for lightweight transport applications?",
+      systemOverview:
+        "Two interconnected modules: (1) thermoplastic polymer mechanical behavior driven by molecular structure and secondary bonding, and (2) CFRP vs 6061-T6 aluminum material selection analysis for bus rapid transit and rail applications.",
+      systemArchitecture:
+        "Molecular Structure (chain architecture, bonding) → Processing (temperature, forming) → Microstructure (crystallinity, orientation) → Properties (E, σy, εf) → Performance (specific strength, cost, lifecycle)",
       subsystems: [
         {
           id: "thermoplastics",
           title: "Thermoplastic Mechanical Behavior",
-          description: "How molecular structure, secondary bonding, and chain motion control stiffness, strength, and ductility in engineering polymers",
+          description:
+            "How molecular structure, secondary bonding, and chain motion control stiffness, strength, and ductility in engineering polymers",
           details: [
             "PE: simple –(CH₂–CH₂)– backbone, no side groups → chains slide easily → weak, ductile (Lab 6, p1–2)",
             "PVC: Cl substitution creates dipole-dipole forces → strength up to 3× PE (Lab 6, p2, Fig.2)",
@@ -1170,7 +1418,8 @@ export const projects: Project[] = [
         {
           id: "cfrp-vs-aluminum",
           title: "CFRP vs 6061-T6 Aluminum for Transit",
-          description: "Structure–properties–processing–performance comparison for short-haul BRT and longer-range rail applications",
+          description:
+            "Structure–properties–processing–performance comparison for short-haul BRT and longer-range rail applications",
           details: [
             "CFRP: high specific strength (σ/ρ), excellent fatigue, but high cost and complex repair",
             "6061-T6: moderate specific strength, well-understood processing, lower cost, easier repair",
@@ -1211,13 +1460,26 @@ export const projects: Project[] = [
         "Include stress-strain data from actual tensile tests when evidence uploaded",
         "Add Ashby chart exploration module",
       ],
-      keyInsight: "Material selection is never about finding the 'strongest' material — it's about matching the structure–properties–processing–performance chain to application requirements. CFRP wins on specific strength; aluminum wins on cost and repairability. The right choice depends on the system context.",
+      keyInsight:
+        "Material selection is never about finding the 'strongest' material — it's about matching the structure–properties–processing–performance chain to application requirements. CFRP wins on specific strength; aluminum wins on cost and repairability. The right choice depends on the system context.",
     },
     diagrams: [],
     evidence: [
-      { id: "lab6-pdf", fileName: "Lab_6_Polymer_Mechanical_Properties_SPR_2017.pdf", type: "pdf", description: "Thermoplastic polymer mechanical properties — tensile testing, structure-property relationships, PE/PVC/PS/PC/PMMA" },
+      {
+        id: "lab6-pdf",
+        fileName: "Lab_6_Polymer_Mechanical_Properties_SPR_2017.pdf",
+        type: "pdf",
+        description:
+          "Thermoplastic polymer mechanical properties — tensile testing, structure-property relationships, PE/PVC/PS/PC/PMMA",
+      },
     ],
-    techStack: ["Polymer Science", "Composite Materials", "Material Selection", "Mechanical Testing", "Transport Engineering"],
+    techStack: [
+      "Polymer Science",
+      "Composite Materials",
+      "Material Selection",
+      "Mechanical Testing",
+      "Transport Engineering",
+    ],
   },
   // ===== DOMAIN: FPV FLIGHT SYSTEMS =====
   {
@@ -1227,18 +1489,23 @@ export const projects: Project[] = [
     domain: "fpv-systems",
     status: "ACTIVE",
     statusColor: "neon-cyan",
-    heroSummary: "Analyzed a 75 mm HD FPV drone as a densely integrated electromechanical system — six coupled subsystems (propulsion, flight control, power regulation, RF control, digital video, structure) with documented failure modes and cross-subsystem constraint propagation at 70 g dry weight.",
+    heroSummary:
+      "Analyzed a 75 mm HD FPV drone as a densely integrated electromechanical system — six coupled subsystems (propulsion, flight control, power regulation, RF control, digital video, structure) with documented failure modes and cross-subsystem constraint propagation at 70 g dry weight.",
     has3D: true,
     hologramType: "system",
     module: {
-      problemStatement: "How do you integrate propulsion, flight control, power regulation, RF control, and HD digital video into a 75 mm airframe weighing ~70 g while managing thermal, vibration, packaging, and performance constraints?",
-      systemOverview: "NewBeeDrone AcroBee75 G4 BNF HD with DJI O3 — a tightly constrained micro FPV platform where every subsystem (structure, propulsion, flight control, radio control, digital video, power) interacts and imposes constraints on every other subsystem. This project analyzes the platform at the systems integration level.",
-      systemArchitecture: "Battery (2S LiPo) → XT30 → BeeBrain HD G4 AIO [STM32G474 FC + 4×20A ESC + ELRS 3.0 Rx] → 4× 0804 12000KV Motors → 40mm Tri-blade Props\n                         → 10V 2A BEC → DJI O3 Air Unit (HD Video + OSD)\n                         → 5V 2A BEC → Logic/Peripherals\nCockroach75 Frame + AcroBee75 HD O3 Canopy → Packaging / Antenna / Crash Geometry",
+      problemStatement:
+        "How do you integrate propulsion, flight control, power regulation, RF control, and HD digital video into a 75 mm airframe weighing ~70 g while managing thermal, vibration, packaging, and performance constraints?",
+      systemOverview:
+        "NewBeeDrone AcroBee75 G4 BNF HD with DJI O3 — a tightly constrained micro FPV platform where every subsystem (structure, propulsion, flight control, radio control, digital video, power) interacts and imposes constraints on every other subsystem. This project analyzes the platform at the systems integration level.",
+      systemArchitecture:
+        "Battery (2S LiPo) → XT30 → BeeBrain HD G4 AIO [STM32G474 FC + 4×20A ESC + ELRS 3.0 Rx] → 4× 0804 12000KV Motors → 40mm Tri-blade Props\n                         → 10V 2A BEC → DJI O3 Air Unit (HD Video + OSD)\n                         → 5V 2A BEC → Logic/Peripherals\nCockroach75 Frame + AcroBee75 HD O3 Canopy → Packaging / Antenna / Crash Geometry",
       subsystems: [
         {
           id: "structure",
           title: "Structure & Mechanical Packaging",
-          description: "Cockroach75 frame provides structural skeleton with ducted motor mounts. AcroBee75 HD O3 canopy protects camera/VTX assembly and routes antennas.",
+          description:
+            "Cockroach75 frame provides structural skeleton with ducted motor mounts. AcroBee75 HD O3 canopy protects camera/VTX assembly and routes antennas.",
           details: [
             "Cockroach75 frame: 75 mm motor-to-motor, ducted propeller protection",
             "Ducts serve as structural guards, indoor crash protection, and prop noise shielding",
@@ -1254,7 +1521,8 @@ export const projects: Project[] = [
         {
           id: "propulsion",
           title: "Propulsion System",
-          description: "Four 0804 12000KV brushless motors with 40 mm tri-blade propellers driven by 4×20A ESC channels with Bluejay 48 kHz firmware.",
+          description:
+            "Four 0804 12000KV brushless motors with 40 mm tri-blade propellers driven by 4×20A ESC channels with Bluejay 48 kHz firmware.",
           details: [
             "0804 motors: 8 mm stator diameter, 4 mm stator height — micro-class brushless",
             "12000KV: high RPM-per-volt rating suited for 2S (7.4–8.4V) low-voltage operation",
@@ -1271,7 +1539,8 @@ export const projects: Project[] = [
         {
           id: "flight-control",
           title: "Flight Control & Processing",
-          description: "BeeBrain HD G4 AIO board with STM32G474 MCU running Betaflight — the coordination core for all motor control, sensor fusion, and peripheral management.",
+          description:
+            "BeeBrain HD G4 AIO board with STM32G474 MCU running Betaflight — the coordination core for all motor control, sensor fusion, and peripheral management.",
           details: [
             "STM32G474: ARM Cortex-M4F, 170 MHz, FPU — substantial processing for a micro FC",
             "PID control loop: gyroscope → error calculation → motor speed adjustment at kHz rates",
@@ -1287,7 +1556,8 @@ export const projects: Project[] = [
         {
           id: "radio-control",
           title: "Radio / Control-Link Architecture",
-          description: "Stock platform includes integrated ELRS 3.0 diversity receiver on UART2. Alternative control-link integration (TBS Tracer) analyzed as a system architecture challenge.",
+          description:
+            "Stock platform includes integrated ELRS 3.0 diversity receiver on UART2. Alternative control-link integration (TBS Tracer) analyzed as a system architecture challenge.",
           details: [
             "Built-in ExpressLRS 3.0 diversity receiver: two antenna paths for link robustness",
             "ELRS on UART2: serial protocol to FC for control commands",
@@ -1299,12 +1569,14 @@ export const projects: Project[] = [
             "External receiver integration would require: UART reassignment, physical mounting, antenna routing within canopy constraints",
           ],
           confidence: "VERIFIED",
-          evidenceSource: "Platform specification / known hardware stack — Tracer integration is analysis only, not completed",
+          evidenceSource:
+            "Platform specification / known hardware stack — Tracer integration is analysis only, not completed",
         },
         {
           id: "digital-video",
           title: "Digital Video — DJI O3 Air Unit",
-          description: "DJI O3 as premium HD video payload — transforms platform design constraints due to its weight, power draw, and thermal output.",
+          description:
+            "DJI O3 as premium HD video payload — transforms platform design constraints due to its weight, power draw, and thermal output.",
           details: [
             "DJI O3: HD digital video transmission with low-latency FPV feed",
             "O3 is the heaviest single component on the platform — dominant mass contributor",
@@ -1320,7 +1592,8 @@ export const projects: Project[] = [
         {
           id: "power-architecture",
           title: "Power Architecture",
-          description: "Multi-rail regulated power distribution from 2S LiPo through XT30 connector, with dedicated BECs for O3 and logic systems.",
+          description:
+            "Multi-rail regulated power distribution from 2S LiPo through XT30 connector, with dedicated BECs for O3 and logic systems.",
           details: [
             "Battery input: 1–2S LiPo (typically 2S 450–550 mAh for HD builds)",
             "XT30 connector: rated for continuous current demands of 4×20A ESC channels",
@@ -1384,7 +1657,8 @@ export const projects: Project[] = [
         "Document Betaflight PID tuning process and RPM filter configuration",
         "Photograph actual assembly stack and wiring for VERIFIED visual evidence",
       ],
-      keyInsight: "This platform demonstrates that even a 70-gram drone is a complex integrated system where power, control, RF, thermal, vibration, and packaging all interact. Engineering reasoning — not just component selection — determines whether the system works reliably.",
+      keyInsight:
+        "This platform demonstrates that even a 70-gram drone is a complex integrated system where power, control, RF, thermal, vibration, and packaging all interact. Engineering reasoning — not just component selection — determines whether the system works reliably.",
       ownershipDisclosure: {
         owned: [
           "Platform analysis and systems-level documentation",
@@ -1404,28 +1678,43 @@ export const projects: Project[] = [
         title: "Reconstructed System Block Diagram",
         confidence: "CONCEPTUAL",
         derivedFrom: ["Known platform components", "Standard UAV integration practice"],
-        description: "Likely relationships between battery, AIO flight controller, ESC channels, motors, receiver, DJI O3, BEC rails, and frame/canopy assembly. Derived from known components and standard engineering integration logic — not an original manufacturer schematic.",
-        conceptualNote: "RECONSTRUCTED FROM KNOWN COMPONENTS — derived from platform specs and standard engineering practice",
+        description:
+          "Likely relationships between battery, AIO flight controller, ESC channels, motors, receiver, DJI O3, BEC rails, and frame/canopy assembly. Derived from known components and standard engineering integration logic — not an original manufacturer schematic.",
+        conceptualNote:
+          "RECONSTRUCTED FROM KNOWN COMPONENTS — derived from platform specs and standard engineering practice",
       },
       {
         id: "fpv-power-map",
         title: "Likely Power Architecture",
         confidence: "CONCEPTUAL",
         derivedFrom: ["Known BEC specs", "Standard multi-rail UAV power design"],
-        description: "Power distribution: battery → high-current ESC stage (unregulated), 10V BEC → O3, 5V BEC → logic. Architecture diagram, not exact manufacturer schematic.",
-        conceptualNote: "RECONSTRUCTED — likely power distribution based on known BEC specifications and standard practice",
+        description:
+          "Power distribution: battery → high-current ESC stage (unregulated), 10V BEC → O3, 5V BEC → logic. Architecture diagram, not exact manufacturer schematic.",
+        conceptualNote:
+          "RECONSTRUCTED — likely power distribution based on known BEC specifications and standard practice",
       },
       {
         id: "fpv-assembly-stack",
         title: "Likely Assembly Stack",
         confidence: "CONCEPTUAL",
         derivedFrom: ["Known form factors", "Packaging constraints"],
-        description: "Physical layering: frame base → motor mounts → AIO board (centered) → O3 (upper/front) → canopy → battery (external). Most plausible layout given known component dimensions.",
-        conceptualNote: "LIKELY ASSEMBLY ARCHITECTURE — based on known form factors, not verified from disassembly photos",
+        description:
+          "Physical layering: frame base → motor mounts → AIO board (centered) → O3 (upper/front) → canopy → battery (external). Most plausible layout given known component dimensions.",
+        conceptualNote:
+          "LIKELY ASSEMBLY ARCHITECTURE — based on known form factors, not verified from disassembly photos",
       },
     ],
     evidence: [],
-    techStack: ["Embedded Systems", "Brushless Motor Control", "RF Architecture", "Power Regulation", "DShot Protocol", "Betaflight", "System Integration", "Mechanical Packaging"],
+    techStack: [
+      "Embedded Systems",
+      "Brushless Motor Control",
+      "RF Architecture",
+      "Power Regulation",
+      "DShot Protocol",
+      "Betaflight",
+      "System Integration",
+      "Mechanical Packaging",
+    ],
   },
 ];
 
@@ -1449,10 +1738,18 @@ export const experiences: ExperienceItem[] = [
     company: "Natera",
     role: "Intern",
     location: "Pleasanton, CA",
-    period: "Summer 2024",
+    period: "Summer 2025",
     bullets: [
-      { text: "Reduced validation and packaging cycle time from ~20 min to ~10–12 min by mapping the workflow, identifying bottlenecks, and eliminating redundant verification steps", confidence: "CONCEPTUAL", evidence_source: "Observed estimate — formal time study pending" },
-      { text: "Standardized packaging workflow and authored reference documentation adopted by the team for consistency", confidence: "CONCEPTUAL", evidence_source: "Observed estimate" },
+      {
+        text: "Reduced validation and packaging cycle time from ~20 min to ~10–12 min by mapping the workflow, identifying bottlenecks, and eliminating redundant verification steps",
+        confidence: "CONCEPTUAL",
+        evidence_source: "Observed estimate — formal time study pending",
+      },
+      {
+        text: "Standardized packaging workflow and authored reference documentation adopted by the team for consistency",
+        confidence: "CONCEPTUAL",
+        evidence_source: "Observed estimate",
+      },
     ],
     processImprovement: {
       before: "~20 min per validation + packaging cycle (observed estimate)",
@@ -1463,7 +1760,8 @@ export const experiences: ExperienceItem[] = [
         "Standardized packaging workflow sequence",
         "Created reference documentation for consistency",
       ],
-      measurementMethod: "Observed estimate based on timed walkthroughs. Formal time study with statistical sampling not conducted.",
+      measurementMethod:
+        "Observed estimate based on timed walkthroughs. Formal time study with statistical sampling not conducted.",
     },
   },
   {
@@ -1472,8 +1770,14 @@ export const experiences: ExperienceItem[] = [
     location: "Dublin, CA",
     period: "June 2023 – June 2024",
     bullets: [
-      { text: "California state certified pharmacy technician — processed prescriptions, managed controlled substance inventory, and handled patient consultations in a high-volume retail pharmacy", confidence: "VERIFIED" },
-      { text: "Maintained accuracy under time pressure while ensuring regulatory compliance across all fulfillment workflows", confidence: "VERIFIED" },
+      {
+        text: "California state certified pharmacy technician — processed prescriptions, managed controlled substance inventory, and handled patient consultations in a high-volume retail pharmacy",
+        confidence: "VERIFIED",
+      },
+      {
+        text: "Maintained accuracy under time pressure while ensuring regulatory compliance across all fulfillment workflows",
+        confidence: "VERIFIED",
+      },
     ],
   },
 ];
@@ -1484,15 +1788,35 @@ export const skills = {
   technical: [
     { name: "SystemVerilog / HDL", evidence: "OTTER CPU project (CPE 233)", confidence: "VERIFIED" as ConfidenceBadge },
     { name: "Analog Circuit Design", evidence: "EE 241 Labs 1-7 + RGM", confidence: "VERIFIED" as ConfidenceBadge },
-    { name: "Manual Machining (Lathe & Mill)", evidence: "IME 144 Air Motor", confidence: "VERIFIED" as ConfidenceBadge },
+    {
+      name: "Manual Machining (Lathe & Mill)",
+      evidence: "IME 144 Air Motor",
+      confidence: "VERIFIED" as ConfidenceBadge,
+    },
     { name: "GD&T / Engineering Drawings", evidence: "IME 144 Manual", confidence: "VERIFIED" as ConfidenceBadge },
-    { name: "CAD (SolidWorks, Fusion 360)", evidence: "IME 144 + RGM CAD files", confidence: "VERIFIED" as ConfidenceBadge },
+    {
+      name: "CAD (SolidWorks, Fusion 360)",
+      evidence: "IME 144 + RGM CAD files",
+      confidence: "VERIFIED" as ConfidenceBadge,
+    },
     { name: "RISC-V Assembly", evidence: "RISC-V_Assembler_Manual.pdf", confidence: "VERIFIED" as ConfidenceBadge },
-    { name: "Arduino / Embedded C++", evidence: "RGM Final Report (Arduino Mega)", confidence: "VERIFIED" as ConfidenceBadge },
+    {
+      name: "Arduino / Embedded C++",
+      evidence: "RGM Final Report (Arduino Mega)",
+      confidence: "VERIFIED" as ConfidenceBadge,
+    },
     { name: "LTSpice Simulation", evidence: "EE 241 Lab 6", confidence: "VERIFIED" as ConfidenceBadge },
-    { name: "Web Development (React/TS)", evidence: "Funck platform (funck.live)", confidence: "VERIFIED" as ConfidenceBadge },
+    {
+      name: "Web Development (React/TS)",
+      evidence: "Funck platform (funck.live)",
+      confidence: "VERIFIED" as ConfidenceBadge,
+    },
     { name: "Soldering & Prototyping", evidence: "EE 241 lab work + RGM", confidence: "VERIFIED" as ConfidenceBadge },
-    { name: "Test Equipment (Scope/FGen)", evidence: "EE 241 lab equipment", confidence: "VERIFIED" as ConfidenceBadge },
+    {
+      name: "Test Equipment (Scope/FGen)",
+      evidence: "EE 241 lab equipment",
+      confidence: "VERIFIED" as ConfidenceBadge,
+    },
     { name: "PCB Design & Reflow", evidence: "EE 143 DAC PCB", confidence: "CONCEPTUAL" as ConfidenceBadge },
     { name: "Materials Engineering", evidence: "MATE 210/215 coursework", confidence: "CONCEPTUAL" as ConfidenceBadge },
     { name: "Phase Diagram Analysis", evidence: "MATE 210 labs", confidence: "CONCEPTUAL" as ConfidenceBadge },
