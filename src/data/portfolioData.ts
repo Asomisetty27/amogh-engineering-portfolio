@@ -1067,47 +1067,64 @@ export const projects: Project[] = [
   // ===== FUNCK (cross-domain: web/systems) =====
   {
     id: "funck",
-    name: "Funck — Event Ticketing Platform",
+    name: "FUNCK — Mobile-First Event Operating System",
     codename: "FUNCK",
     domain: "signal-systems",
     course: undefined,
     status: "ACTIVE",
     statusColor: "neon-cyan",
     heroSummary:
-      "Built and shipped a production event ticketing platform handling Stripe payments, QR ticket issuance, fraud prevention, and demand-based pricing. Live and serving real users at funck.live.",
+      "Production-ready, mobile-first event platform for creating, filling, and operating events end-to-end. Refined into a conversion-optimized OS with hardened mobile Safari behavior, repaired verification email infrastructure, and edge-function OG preview rendering. Live at funck.live.",
     has3D: true,
     hologramType: "network",
     module: {
       problemStatement:
-        "How do you build a production ticketing system that handles payments, fraud prevention, and real-time event management?",
+        "How do you turn a feature-focused event app into a conversion-optimized operating system that hosts can trust to create, fill, and run real events on mobile?",
       systemOverview:
-        "Full-stack event ticketing platform with presale tickets, QR code issuance, fraud prevention, demand-based pricing, Stripe Connect payouts, group split-pay, and analytics.",
+        "Mobile-first event OS spanning host onboarding, event creation, share-oriented RSVP funnel, lifecycle operations (before/during/after), Stripe-backed ticketing, QR issuance, and admin tooling — engineered for real-device reliability.",
       systemArchitecture:
-        "Client (React) → Lovable App → Supabase (PostgreSQL + Auth + Edge Functions) → Stripe (payments + Connect payouts) → Resend (email delivery)",
+        "Client (React, mobile-first) → Lovable App → Supabase (PostgreSQL + Auth + Edge Functions) → Stripe (payments + Connect payouts) → Resend (verification + transactional email) → Edge functions (OG preview rendering, keep-alive)",
       implementationNotes: [
-        "Built using Lovable, Supabase, Stripe, Resend",
-        "Live at www.funck.live",
-        "Presale tickets, QR ticket issuance, fraud prevention at door scan",
-        "Demand-based pricing logic",
-        "Stripe Connect for organizer payouts",
-        "Group split-pay functionality",
-        "Analytics and logging dashboard",
+        "Mobile-first event creation, management, and RSVP flows",
+        "Guest conversion and share-oriented RSVP funnel",
+        "Host onboarding, readiness, and retention improvements",
+        "Full event lifecycle support: pre-event, live, and post-event",
+        "Safari hardening: safe-area, viewport, and real-device UX fixes",
+        "Diagnosed and repaired broken verification email delivery (missing queue infrastructure)",
+        "Admin system consolidated and locked to a single email",
+        "Keep-alive workaround for Supabase inactivity pausing",
+        "Edge-function based OG preview infrastructure for invite sharing",
       ],
-      failureModes: [],
+      failureModes: [
+        {
+          problem: "Verification emails not being delivered",
+          cause: "Missing queue infrastructure between auth events and email provider",
+          fix: "Rebuilt verification pipeline through edge function + Resend with proper retry/queue handling",
+          systemImpact: "Blocked new user signups and host onboarding entirely",
+          confidence: "VERIFIED",
+        },
+        {
+          problem: "Production UI mismatch on iOS Safari only",
+          cause: "Safe-area insets and viewport height behavior differing from desktop/Chrome",
+          fix: "Hardened layout with safe-area env() padding and dynamic viewport units; validated on real devices",
+          systemImpact: "Broken layouts on the primary target platform (mobile Safari)",
+          confidence: "VERIFIED",
+        },
+      ],
       improvements: [
+        "Open Graph preview headers for invite link rendering (current critical blocker)",
         "Concurrency controls for ticket purchase race conditions",
         "Idempotency keys for Stripe payment intents",
-        "Rate limiting on ticket scan endpoint",
         "Load testing for high-demand events",
       ],
       ownershipDisclosure: {
         owned: [
-          "Product requirements and feature scoping",
-          "User flow and product decisions",
-          "Integration architecture (Stripe Connect, Supabase, Resend)",
-          "Testing and QA across payment flows",
+          "Product strategy, conversion optimization, and UX direction",
+          "Host onboarding and event lifecycle design",
+          "Mobile Safari debugging and real-device validation",
+          "Infrastructure debugging (email queue, OG preview, keep-alive)",
+          "Integration architecture (Stripe, Supabase, Resend, edge functions)",
           "Deployment and production operations",
-          "Validation and user feedback iteration",
         ],
         aiAssisted: ["Code generation via Lovable AI — used for implementation acceleration"],
       },
@@ -1119,7 +1136,7 @@ export const projects: Project[] = [
         confidence: "CONCEPTUAL",
         derivedFrom: [],
         description:
-          "Client (React/Lovable) → Supabase (DB + Auth + Edge Functions) → Stripe (Payments + Connect) → Resend (Emails)",
+          "Client (React/Lovable, mobile-first) → Supabase (DB + Auth + Edge Functions) → Stripe (Payments + Connect) → Resend (Verification + Email) → Edge functions (OG preview, keep-alive)",
         conceptualNote: "Architecture reflects actual production system at funck.live.",
       },
     ],
@@ -1132,7 +1149,69 @@ export const projects: Project[] = [
         url: "https://www.funck.live",
       },
     ],
-    techStack: ["React", "Lovable", "Supabase", "Stripe", "Resend", "TypeScript"],
+    techStack: ["React", "Lovable", "Supabase", "Edge Functions", "Stripe", "Resend", "TypeScript"],
+  },
+
+  // ===== PEC NEXUS (cross-domain: internal tools / systems) =====
+  {
+    id: "pec-nexus",
+    name: "PEC Nexus — Role-Aware Internal Operating System",
+    codename: "PEC-NEXUS",
+    domain: "signal-systems",
+    course: undefined,
+    status: "ACTIVE",
+    statusColor: "neon-cyan",
+    heroSummary:
+      "Role-aware internal operating system for Poly-Engineering Consulting unifying project execution, training, scheduling, messaging, and permissions. Designed around three operating modes — Purpose, Competition, and Contract — to reduce redundancy, clarify roles, and scale internal coordination.",
+    has3D: false,
+    hologramType: "network",
+    module: {
+      problemStatement:
+        "How do you replace a fragmented set of club tools with a single role-aware operating system that mirrors how the organization actually executes work across projects, training, and operations?",
+      systemOverview:
+        "Internal OS structured around three operating modes — Purpose, Competition, and Contract — with role-aware workflows for PMs, Tech Leads, and members. Unifies project execution, training, scheduling, messaging, and permissions into one scalable platform.",
+      systemArchitecture:
+        "Client (React, role-aware UI) → Lovable App (workflow + permissions layer) → Supabase (PostgreSQL + Auth + RLS) → Mission Control surface → Training (Learn + Grind) + Scheduling + Stage-based Project Execution",
+      implementationNotes: [
+        "Three-mode architecture: Purpose, Competition, Contract",
+        "Role-aware workflows for PMs, Tech Leads, and members",
+        "Mission Control command surface for action prioritization",
+        "Unified Training system combining Learn + Grind",
+        "Active and passive scheduling with intelligent planning concepts",
+        "Stage-based project execution and deliverable workflows",
+        "Identity mapping, permissions, and self-healing admin logic",
+        "Navigation compression to reduce surface complexity",
+        "Group workflows and structured internal operations",
+      ],
+      failureModes: [],
+      improvements: [
+        "Telemetry on workflow adoption and bottleneck stages",
+        "Automated permission audits across roles and modes",
+        "Deeper integration between Training progression and project staffing",
+      ],
+      ownershipDisclosure: {
+        owned: [
+          "Product architecture and three-mode system design",
+          "Role-based UX strategy and permissions model",
+          "Workflow architecture across projects, training, and scheduling",
+          "End-to-end build, iteration, and rollout to the organization",
+        ],
+        aiAssisted: ["Code generation via Lovable AI — used for implementation acceleration"],
+      },
+    },
+    diagrams: [
+      {
+        id: "pec-nexus-arch",
+        title: "PEC Nexus — System Architecture",
+        confidence: "CONCEPTUAL",
+        derivedFrom: [],
+        description:
+          "Role-aware client → Workflow + permissions layer → Supabase (DB + Auth + RLS) → Mission Control + Training + Scheduling + Stage-based Execution",
+        conceptualNote: "Architecture reflects the deployed internal operating system for Poly-Engineering Consulting.",
+      },
+    ],
+    evidence: [],
+    techStack: ["React", "Lovable", "Supabase", "Workflow Architecture", "Role-Based UX", "TypeScript"],
   },
 
   // ===== DOMAIN: MATERIALS ENGINEERING =====
