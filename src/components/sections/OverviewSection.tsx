@@ -3,6 +3,7 @@ import { personalInfo, projects } from "@/data/portfolioData";
 import { recruiterSummaries } from "@/data/interviewData";
 import { useViewMode } from "@/contexts/ViewModeContext";
 import { GraduationCap, Cpu, Radio, Zap, ArrowRight, Shield } from "lucide-react";
+import ThermalOSBanner from "@/components/ThermalOSBanner";
 
 const strengths = [
   {
@@ -84,6 +85,12 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
             );
           })}
         </div>
+
+        {/* Active Project — ThermalOS */}
+        <h3 className="text-xs font-mono font-semibold tracking-wider text-[#35C792] uppercase mb-3">
+          Active Project
+        </h3>
+        <ThermalOSBanner />
 
         {/* Flagship Systems */}
         <h3 className="text-xs font-mono font-semibold tracking-wider text-primary uppercase mb-3">
