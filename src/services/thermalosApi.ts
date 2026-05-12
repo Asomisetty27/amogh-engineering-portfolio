@@ -147,3 +147,96 @@ export function generateDemoTimeline(): TimelineRow[] {
 export function isDemoModeError(err: unknown): boolean {
   return err instanceof Error && err.message === "DEMO_MODE";
 }
+
+// ---------- OUTREACH ----------
+// Outreach sheet: headers at row 3, data from row 4 (A–I, 9 cols)
+// A:Name  B:Organization  C:Role  D:Email  E:Type  F:Status  G:Date  H:Priority  I:Notes/Quote
+export interface OutreachRow {
+  name: string; org: string; role: string; email: string;
+  type: string; status: string; date: string; priority: string; notes: string;
+}
+
+export async function fetchOutreach(): Promise<OutreachRow[]> {
+  const rows = await readRange("'📬 Outreach'!A4:I200");
+  return rows.filter((r) => r[0]).map((r) => ({
+    name: r[0] ?? "", org: r[1] ?? "", role: r[2] ?? "", email: r[3] ?? "",
+    type: r[4] ?? "", status: r[5] ?? "Not Contacted",
+    date: r[6] ?? "", priority: r[7] ?? "P2 — Normal", notes: r[8] ?? "",
+  }));
+}
+
+export function generateDemoOutreach(): OutreachRow[] {
+  return [
+    { name: "Dr. Sarah Kim", org: "Cal Poly SLO", role: "Professor, EE", email: "skim@calpoly.edu", type: "Professor", status: "Not Contacted", date: "", priority: "P0 — Critical", notes: "ENGR 400 supervisor candidate" },
+    { name: "Marcus Webb", org: "Lambda Labs", role: "Head of Infra", email: "mwebb@lambdalabs.com", type: "GPU Cloud", status: "Contacted", date: "5/10/2026", priority: "P0 — Critical", notes: "Manages 800-GPU H100 cluster" },
+    { name: "Priya Nair", org: "CoreWeave", role: "Sr. SRE", email: "pnair@coreweave.com", type: "GPU Cloud", status: "Replied", date: "5/8/2026", priority: "P0 — Critical", notes: "Follow up by 5/17" },
+    { name: "Dr. James Thorncroft", org: "Cal Poly SLO", role: "Professor, ME", email: "jthorncroft@calpoly.edu", type: "Professor", status: "Not Contacted", date: "", priority: "P1 — High", notes: "" },
+    { name: "Tom Okafor", org: "Voltage Park", role: "Ops Lead", email: "tokafor@voltagepark.com", type: "AI Inference", status: "Meeting Set", date: "5/9/2026", priority: "P0 — Critical", notes: "Call Thursday 2pm PT" },
+    { name: "Lin Chen", org: "Together AI", role: "Platform Eng", email: "lchen@together.ai", type: "AI Inference", status: "Not Contacted", date: "", priority: "P1 — High", notes: "" },
+    { name: "Alex Rivera", org: "Vast.ai", role: "CEO", email: "arivera@vast.ai", type: "GPU Cloud", status: "No Response", date: "5/5/2026", priority: "P1 — High", notes: "Re-try after demo video" },
+    { name: "Dr. Won Park", org: "UCI", role: "Professor, MAE", email: "won@uci.edu", type: "Professor", status: "Contacted", date: "5/11/2026", priority: "P1 — High", notes: "Sam's supervisor candidate" },
+    { name: "Raj Mehta", org: "Crusoe Energy", role: "HPC Eng", email: "rmehta@crusoe.ai", type: "HPC Lab", status: "Positive Quote", date: "5/7/2026", priority: "P0 — Critical", notes: '"We have no idea if our GPUs are throttling silently"' },
+    { name: "Dana Lee", org: "SambaNova", role: "Infra Mgr", email: "dlee@sambanova.ai", type: "HPC Lab", status: "Not Contacted", date: "", priority: "P2 — Normal", notes: "" },
+  ];
+}
+
+// ---------- EVIDENCE BOARD ----------
+// Evidence sheet: headers at row 3, data from row 4 (A–D, 4 cols)
+// A:Claim  B:Required Proof  C:Where to find it  D:Status
+export interface EvidenceRow {
+  claim: string; proof: string; location: string; status: string;
+}
+
+export async function fetchEvidence(): Promise<EvidenceRow[]> {
+  const rows = await readRange("'🏆 Evidence Board'!A4:D50");
+  return rows.filter((r) => r[0]).map((r) => ({
+    claim: r[0] ?? "", proof: r[1] ?? "", location: r[2] ?? "",
+    status: r[3] ?? "No proof yet",
+  }));
+}
+
+export function generateDemoEvidence(): EvidenceRow[] {
+  return [
+    { claim: "GPU telemetry collector logging [N] fields per second", proof: "collector_v2.py + sample CSV with all fields", location: "GitHub — /src/collector.py + /data/sample_run.csv", status: "No proof yet" },
+    { claim: "Power-cap sweep: [X]% compute/watt improvement at [Y]% below TDP", proof: "power_cap_results.csv with throughput+watts+temp at 6+ power levels", location: "GitHub — /experiments/power_cap/ + chart", status: "No proof yet" },
+    { claim: "Optimal power cap: [Y]% below TDP with <3% throughput loss", proof: "Specific data row with power, throughput, efficiency values", location: "power_cap_results.csv — optimal row highlighted", status: "No proof yet" },
+    { claim: "Physical rig with [M] cooling fault signatures characterized", proof: "fault_library.json: each fault × Rθ deviation × threshold", location: "GitHub — /hardware/fault_library.json", status: "No proof yet" },
+    { claim: "Rθ varies [B]% with mounting pressure alone at same heat load", proof: "pressure_sweep.csv: Rθ at 8N/16N/24N/32N/50N for Arctic MX-4", location: "GitHub — /hardware/pressure_sweep.csv + chart", status: "No proof yet" },
+    { claim: "Anomaly detector flags cooling path degradation from GPU telemetry", proof: "validation_results.csv: each fault × detected(y/n) × accuracy × latency", location: "GitHub — /model/validation_results.csv", status: "No proof yet" },
+    { claim: "Throttle prediction [T] seconds before thermal event", proof: "Timestamped log showing prediction then actual throttle", location: "GitHub — /model/throttle_prediction_demo.csv", status: "No proof yet" },
+    { claim: "[N] GPU cluster operators interviewed, [X] confirmed the problem", proof: "Discovery call notes with org, role, exact quotes", location: "Private notes doc — share with Sam", status: "In progress" },
+    { claim: "1 design partner running pilot audit", proof: "Email/Slack confirmation from partner", location: "Email thread — keep it", status: "No proof yet" },
+    { claim: "Both founders have GitHub commits", proof: "Amogh: collector+model+experiments. Sam: CAD+fault CSVs+docs.", location: "GitHub commit history — both usernames visible", status: "No proof yet" },
+    { claim: "Co-founder agreement signed 50/50", proof: "Signed document", location: "Private doc — reference in application", status: "No proof yet" },
+    { claim: "ENGR 400 supervisor confirmed (Amogh)", proof: "Email reply from professor", location: "Email thread", status: "No proof yet" },
+    { claim: "UCI professor engagement (Sam)", proof: "Email reply from Prof. Won or Prof. Lee", location: "Email thread", status: "No proof yet" },
+    { claim: "'[exact operator quote confirming problem is real]'", proof: "Written/recorded quote from real person at real organization", location: "Email/message screenshot", status: "In progress" },
+  ];
+}
+
+// ---------- TODAY PLAN ----------
+// Today Plan sheet: headers at row 3, data from row 4 (A–F, 6 cols)
+// A:Priority  B:Phase  C:Milestone  D:Owner  E:Track  F:Notes
+export interface TodayRow {
+  priority: string; phase: string; milestone: string;
+  owner: string; track: string; notes: string;
+}
+
+export async function fetchTodayPlan(): Promise<TodayRow[]> {
+  const rows = await readRange("'📋 Today Plan'!A4:F100");
+  return rows.filter((r) => r[2]).map((r) => ({
+    priority: r[0] ?? "", phase: r[1] ?? "", milestone: r[2] ?? "",
+    owner: r[3] ?? "", track: r[4] ?? "", notes: r[5] ?? "",
+  }));
+}
+
+export function generateDemoTodayPlan(): TodayRow[] {
+  return [
+    { priority: "P0 — Critical", phase: "Phase 0 — Foundation", milestone: "Send 5 professor emails with one-page proposal", owner: "Amogh", track: "Comms", notes: "Dr. Kim, Thorncroft, Shollenberger, Chen, Johnson-Glauch" },
+    { priority: "P0 — Critical", phase: "Phase 0 — Foundation", milestone: "Full co-founder conversation with Sam: YC, 50/50 equity, commitment", owner: "Both", track: "Both", notes: "Do this before touching any hardware" },
+    { priority: "P0 — Critical", phase: "Phase 0 — Foundation", milestone: "Draft one-page research proposal PDF", owner: "Amogh", track: "Comms", notes: "Use ThermalOS dashboard as evidence" },
+    { priority: "P1 — High", phase: "Phase 0 — Foundation", milestone: "Finalize BOM v1 — heater block, TIM samples, thermistors, ESP32", owner: "Sam", track: "Hardware", notes: "" },
+    { priority: "P1 — High", phase: "Phase 0 — Foundation", milestone: "Lock GitHub repo structure: /src /hardware /experiments /model", owner: "Amogh", track: "Software", notes: "" },
+    { priority: "P1 — High", phase: "Phase 0 — Foundation", milestone: "Reach out to 3 GPU cloud operators from outreach list", owner: "Amogh", track: "Comms", notes: "Lambda Labs, Voltage Park, Crusoe" },
+  ];
+}
