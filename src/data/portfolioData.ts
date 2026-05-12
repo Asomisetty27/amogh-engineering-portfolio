@@ -484,14 +484,14 @@ export const projects: Project[] = [
     diagrams: [],
     evidence: [
       {
-        type: "report",
+        type: "pdf",
         title: "Final Project Report — Design of a 4-bit Digital to Analog Converter",
         description:
           "IEEE-format paper co-authored with Joyce Han covering schematic, LTspice simulation, Fusion PCB design, OshPark fabrication, assembly, and Exp 9 system-level integration test.",
         confidence: "VERIFIED",
       },
       {
-        type: "lab-sequence",
+        type: "link",
         title: "EE 143 lab sequence (Exp 1–9)",
         description:
           "Nine completed labs forming the build chain: Chassis CAD → Soldering → Instrumentation → Op-Amps → PCB DAC → Reflow → System Integration.",
