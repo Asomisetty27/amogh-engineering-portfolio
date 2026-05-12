@@ -341,19 +341,19 @@ export const projects: Project[] = [
     codename: "EE143-SYS",
     domain: "signal-systems",
     course: "EE 143",
-    status: "EVIDENCE_PENDING",
-    statusColor: "neon-amber",
+    status: "COMPLETE",
+    statusColor: "neon-green",
     heroSummary:
-      "Designed and validated a complete analog-to-digital-to-analog signal system: op-amp conditioning → Arduino ADC → 4-bit quantization → custom PCB DAC → reconstructed output. Resolved loading effects through systematic buffering and verified 16 discrete voltage levels.",
+      "Designed, simulated, fabricated, and integrated a 4-bit binary-weighted DAC (LM1458 + 1206 resistors) on a 1×1\" 2-layer OshPark PCB, then validated it inside the full audio→Arduino ADC→DAC→speaker pipeline. Achieved 62.5 mV/step resolution with measured-vs-theoretical error within ±1 LSB across all 16 codes. Co-authored with Joyce Han.",
     has3D: false,
     hologramType: "system",
     module: {
       problemStatement:
-        "How do you convert an analog signal to digital, process it, and reconstruct it — understanding every loss and distortion introduced at each stage?",
+        "How do you convert an analog audio signal to digital, process it, and reconstruct it through a hand-fabricated 4-bit DAC — accounting for loading, level-shifting, quantization, and sampling distortion at every stage?",
       systemOverview:
-        "Complete analog-to-digital-to-analog pipeline spanning measurement, conditioning, conversion, processing, and reconstruction. Built across EE 143 labs culminating in a working ADC→DAC system.",
+        "End-to-end analog→digital→analog pipeline built across nine EE 143 labs (chassis CAD, soldering, instrumentation, op-amps, PCB design, reflow, integration). Capstone delivered a fabricated 4-bit binary-weighted DAC validated in standalone (binary counter) and system-level (Arduino ADC + audio source + speaker) tests.",
       systemArchitecture:
-        "Signal Source → Op-Amp Conditioning (level shift, buffer) → Arduino ADC (10-bit, mapped to 4-bit) → Digital Processing → 4-bit Binary Weighted DAC → Output Stage → Speaker",
+        "Audio Source → Level-Shifting Op-Amp (LM1458, AC→0–1 V) → Arduino ADC (10-bit, mapped to 4-bit via ×0.014663) → PORTB digital lines → Custom 4-bit Binary-Weighted DAC PCB (LM1458, 80k/40k/20k/10k + 10k feedback, second stage ×–0.1) → Speaker / Oscilloscope",
       subsystems: [
         {
           id: "measurement",
