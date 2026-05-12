@@ -22,7 +22,7 @@ const ALERT_META = {
 export default function Alerts() {
   useEffect(() => { document.title = "ThermalOS — Alerts | amogh.site"; }, []);
 
-  const [filter, setFilter] = useState<"All" | "HOT" | "HIGH_RTHETA" | "LOW_HEADROOM">("All");
+  const [filter, setFilter] = useState<"All" | "HOT" | "HIGH_RTHETA" | "LOW_HEADROOM" | "OK">("All");
 
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["measurements"],
