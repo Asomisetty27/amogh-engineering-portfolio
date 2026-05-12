@@ -79,9 +79,14 @@ export default function LiveTelemetry() {
 
   return (
     <div>
-      {(demo || (data && data.length === 0)) && (
+      {demo && (
         <div className="mb-4 px-3 py-2 rounded-lg bg-[#EF9F27]/10 border border-[#EF9F27]/30 text-[12px] font-mono text-[#EF9F27]">
           Demo Mode — connect the Google Sheet (`GOOGLE_SHEETS_API_KEY` + `SPREADSHEET_ID` backend secrets) to stream live data.
+        </div>
+      )}
+      {!demo && data && data.length === 0 && (
+        <div className="mb-4 px-3 py-2 rounded-lg bg-[#1D9E75]/10 border border-[#1D9E75]/30 text-[12px] font-mono text-[#1D9E75]">
+          Sheet connected — no measurement rows yet. Add data to the <span className="opacity-70">📡 Measurements</span> tab starting at row 4.
         </div>
       )}
 
@@ -138,7 +143,7 @@ export default function LiveTelemetry() {
               <Row dot="#9FE1CB" label="T Coolant" value={latest ? `${latest.tCoolant.toFixed(1)} °C` : "—"} />
               <Row dot="#EF9F27" label="Voltage V" value={latest ? `${latest.v.toFixed(2)} V` : "—"} />
               <Row dot="#EF9F27" label="Current I" value={latest ? `${latest.i.toFixed(2)} A` : "—"} />
-              <Row dot="#1D9E75" label="Fan/Pump" value={latest ? `${latest.fanPump.toFixed(0)} %` : "—"} />
+              <Row dot="#5a5a55" label="Pressure" value={latest ? `${latest.pressureN} N` : "—"} />
               <Row dot="#888780" label="Run ID" value={latest?.runId ?? "—"} last />
             </div>
           </div>

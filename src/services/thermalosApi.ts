@@ -3,11 +3,22 @@ import { supabase } from "@/integrations/supabase/client";
 const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
 const FN_URL = `https://${PROJECT_ID}.supabase.co/functions/v1/sheets-read`;
 
+// Column layout matches Apps Script logMeasurement / logGPUSnapshot (A–T, 20 cols)
+// A:runId  B:timestamp  C:type  D:material  E:pressureN  F:faultCondition
+// G:v  H:i  I:pW  J:tHot  K:tCold  L:tAmb  M:tCoolant  N:throttleReason
+// O:deltaT  P:rtheta  Q:vsBaseline  R:headroom  S:alert  T:notes
 export interface MeasurementRow {
-  runId: string; timestamp: string; material: string; pressureN: number;
-  powerTarget: number; v: number; i: number; pW: number; tHot: number;
-  tCold: number; tAmb: number; tCoolant: number; deltaT: number;
-  rtheta: number; headroom: number; alert: string; fanPump: number; notes: string;
+  runId: string; timestamp: string;
+  type: string;          // "PHYSICAL_RIG" | "GPU_TELEMETRY"
+  material: string;      // TIM material or GPU model
+  pressureN: number;     // mounting pressure (N) or power limit (W) for GPU rows
+  faultCondition: string;
+  v: number; i: number; pW: number;
+  tHot: number; tCold: number; tAmb: number; tCoolant: number;
+  throttleReason: string;
+  deltaT: number; rtheta: number;
+  vsBaseline: string;
+  headroom: number; alert: string; notes: string;
 }
 
 export interface TimelineRow {
@@ -29,15 +40,23 @@ async function readRange(range: string): Promise<string[][]> {
 }
 
 export async function fetchMeasurements(): Promise<MeasurementRow[]> {
-  const rows = await readRange("'📡 Measurements'!A4:R200");
+  const rows = await readRange("'📡 Measurements'!A4:T200");
   return rows.filter((r) => r[0]).map((r) => ({
-    runId: r[0] ?? "", timestamp: r[1] ?? "", material: r[2] ?? "",
-    pressureN: parseFloat(r[3]) || 0, powerTarget: parseFloat(r[4]) || 0,
-    v: parseFloat(r[5]) || 0, i: parseFloat(r[6]) || 0, pW: parseFloat(r[7]) || 0,
-    tHot: parseFloat(r[8]) || 0, tCold: parseFloat(r[9]) || 0, tAmb: parseFloat(r[10]) || 0,
-    tCoolant: parseFloat(r[11]) || 0, deltaT: parseFloat(r[12]) || 0,
-    rtheta: parseFloat(r[13]) || 0, headroom: parseFloat(r[14]) || 0,
-    alert: r[15] ?? "OK", fanPump: parseFloat(r[16]) || 0, notes: r[17] ?? "",
+    runId: r[0] ?? "", timestamp: r[1] ?? "",
+    type: r[2] ?? "",
+    material: r[3] ?? "",
+    pressureN: parseFloat(r[4]) || 0,
+    faultCondition: r[5] ?? "",
+    v: parseFloat(r[6]) || 0, i: parseFloat(r[7]) || 0, pW: parseFloat(r[8]) || 0,
+    tHot: parseFloat(r[9]) || 0, tCold: parseFloat(r[10]) || 0,
+    tAmb: parseFloat(r[11]) || 0, tCoolant: parseFloat(r[12]) || 0,
+    throttleReason: r[13] ?? "",
+    deltaT: parseFloat(r[14]) || 0,
+    rtheta: parseFloat(r[15]) || 0,
+    vsBaseline: r[16] ?? "",
+    headroom: parseFloat(r[17]) || 0,
+    alert: r[18] ?? "OK",
+    notes: r[19] ?? "",
   }));
 }
 
@@ -80,11 +99,17 @@ export function generateDemoMeasurements(count = 30): MeasurementRow[] {
     const ts = new Date(now - (count - i) * 10_000).toLocaleString();
     return {
       runId: `R${String(i + 1).padStart(3, "0")}`,
-      timestamp: ts, material, pressureN: 40 + (i % 4) * 10,
-      powerTarget: power, v, i: I, pW: power,
-      tHot, tCold, tAmb, tCoolant: tCold - 2,
-      deltaT, rtheta, headroom, alert,
-      fanPump: 60 + (i % 4) * 10, notes: "",
+      timestamp: ts,
+      type: "PHYSICAL_RIG",
+      material,
+      pressureN: 40 + (i % 4) * 10,
+      faultCondition: "BASELINE",
+      v, i: I, pW: power,
+      tHot, tCold, tAmb, tCoolant: +(tCold - 2).toFixed(1),
+      throttleReason: "",
+      deltaT, rtheta,
+      vsBaseline: "",
+      headroom, alert, notes: "",
     };
   });
 }
