@@ -484,18 +484,18 @@ export const projects: Project[] = [
     diagrams: [],
     evidence: [
       {
+        id: "ee143-final-report",
+        fileName: "Final_Project_EE143_Post-lab_9.pdf",
         type: "pdf",
-        title: "Final Project Report — Design of a 4-bit Digital to Analog Converter",
         description:
-          "IEEE-format paper co-authored with Joyce Han covering schematic, LTspice simulation, Fusion PCB design, OshPark fabrication, assembly, and Exp 9 system-level integration test.",
-        confidence: "VERIFIED",
+          "IEEE-format final report (Han & Somisetty) — schematic, LTspice simulation, Fusion PCB design, OshPark fabrication, assembly, and Exp 9 system-level integration test of the 4-bit binary-weighted DAC.",
       },
       {
-        type: "link",
-        title: "EE 143 lab sequence (Exp 1–9)",
+        id: "ee143-lab-sequence",
+        fileName: "EE143_Exp1-9_LabManuals.pdf",
+        type: "pdf",
         description:
-          "Nine completed labs forming the build chain: Chassis CAD → Soldering → Instrumentation → Op-Amps → PCB DAC → Reflow → System Integration.",
-        confidence: "VERIFIED",
+          "Nine EE 143 lab manuals forming the build chain: Chassis CAD (Exp 1) → Soldering (Exp 2) → Instrumentation (Exp 3,4) → Op-Amps (Exp 5,7) → PCB DAC (Exp 6) → Reflow (Exp 8) → System Integration (Exp 9).",
       },
     ],
     techStack: [
