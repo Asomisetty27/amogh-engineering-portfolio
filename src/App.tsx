@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ThermalOSLayout from "./pages/thermalos/ThermalOSLayout.tsx";
+import Dashboard from "./pages/thermalos/Dashboard.tsx";
 import LiveTelemetry from "./pages/thermalos/LiveTelemetry.tsx";
 import Timeline from "./pages/thermalos/Timeline.tsx";
 import Experiments from "./pages/thermalos/Experiments.tsx";
@@ -29,7 +30,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/thermalos" element={<ThermalOSLayout />}>
-            <Route index element={<Navigate to="/thermalos/live" replace />} />
+            <Route index element={<Dashboard />} />
+            <Route path="dashboard" element={<Navigate to="/thermalos" replace />} />
             <Route path="live" element={<LiveTelemetry />} />
             <Route path="experiments" element={<Experiments />} />
             <Route path="tim" element={<TIMAnalysis />} />

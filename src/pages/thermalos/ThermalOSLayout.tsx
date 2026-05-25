@@ -3,10 +3,17 @@ import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   Activity, FlaskConical, Thermometer, Layers, Brain, AlertTriangle,
   TrendingUp, Calendar, Award, Users, ListChecks, Menu, X, Loader2,
+  LayoutDashboard,
 } from "lucide-react";
 import { useIsFetching } from "@tanstack/react-query";
 
 const navSections = [
+  {
+    label: "Overview",
+    items: [
+      { to: "/thermalos", label: "Dashboard", icon: LayoutDashboard, end: true },
+    ],
+  },
   {
     label: "Monitoring",
     items: [
@@ -134,6 +141,7 @@ export default function ThermalOSLayout() {
                       <NavLink
                         key={it.to}
                         to={it.to}
+                        end={"end" in it ? (it as { end?: boolean }).end : false}
                         className={({ isActive }) =>
                           `flex items-center gap-2 px-2 py-1.5 rounded text-[12px] border-l-2 transition-colors ${
                             isActive
