@@ -6,17 +6,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ThermalOSLayout from "./pages/thermalos/ThermalOSLayout.tsx";
-import LiveTelemetry from "./pages/thermalos/LiveTelemetry.tsx";
-import Timeline from "./pages/thermalos/Timeline.tsx";
-import Experiments from "./pages/thermalos/Experiments.tsx";
-import TIMAnalysis from "./pages/thermalos/TIMAnalysis.tsx";
-import ThermalCycling from "./pages/thermalos/ThermalCycling.tsx";
-import RthetaModel from "./pages/thermalos/RthetaModel.tsx";
-import Alerts from "./pages/thermalos/Alerts.tsx";
-import Predictions from "./pages/thermalos/Predictions.tsx";
-import EvidenceBoard from "./pages/thermalos/EvidenceBoard.tsx";
-import Outreach from "./pages/thermalos/Outreach.tsx";
-import TodayPlan from "./pages/thermalos/TodayPlan.tsx";
+
+// New top-level pages
+import Overview from "./pages/thermalos/Overview.tsx";
+import Lab from "./pages/thermalos/Lab.tsx";
+import Research from "./pages/thermalos/Research.tsx";
+import YC from "./pages/thermalos/YC.tsx";
+import Plan from "./pages/thermalos/Plan.tsx";
 
 const queryClient = new QueryClient();
 
@@ -29,18 +25,27 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/thermalos" element={<ThermalOSLayout />}>
-            <Route index element={<Navigate to="/thermalos/live" replace />} />
-            <Route path="live" element={<LiveTelemetry />} />
-            <Route path="experiments" element={<Experiments />} />
-            <Route path="tim" element={<TIMAnalysis />} />
-            <Route path="cycling" element={<ThermalCycling />} />
-            <Route path="model" element={<RthetaModel />} />
-            <Route path="alerts" element={<Alerts />} />
-            <Route path="predictions" element={<Predictions />} />
-            <Route path="timeline" element={<Timeline />} />
-            <Route path="evidence" element={<EvidenceBoard />} />
-            <Route path="outreach" element={<Outreach />} />
-            <Route path="today" element={<TodayPlan />} />
+            <Route index element={<Overview />} />
+
+            {/* 5-pillar IA */}
+            <Route path="lab" element={<Lab />} />
+            <Route path="research" element={<Research />} />
+            <Route path="yc" element={<YC />} />
+            <Route path="plan" element={<Plan />} />
+
+            {/* Legacy URLs — keep working, redirect into new tabbed pages */}
+            <Route path="dashboard"    element={<Navigate to="/thermalos" replace />} />
+            <Route path="live"         element={<Navigate to="/thermalos/lab" replace />} />
+            <Route path="experiments"  element={<Navigate to="/thermalos/lab?tab=experiments" replace />} />
+            <Route path="cycling"      element={<Navigate to="/thermalos/lab?tab=cycling" replace />} />
+            <Route path="alerts"       element={<Navigate to="/thermalos/lab?tab=alerts" replace />} />
+            <Route path="model"        element={<Navigate to="/thermalos/research?tab=rtheta" replace />} />
+            <Route path="tim"          element={<Navigate to="/thermalos/research?tab=tim" replace />} />
+            <Route path="evidence"     element={<Navigate to="/thermalos/yc" replace />} />
+            <Route path="predictions"  element={<Navigate to="/thermalos/yc?tab=milestones" replace />} />
+            <Route path="outreach"     element={<Navigate to="/thermalos/yc?tab=outreach" replace />} />
+            <Route path="today"        element={<Navigate to="/thermalos/plan" replace />} />
+            <Route path="timeline"     element={<Navigate to="/thermalos/plan?tab=timeline" replace />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

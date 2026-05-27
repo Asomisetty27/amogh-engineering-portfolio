@@ -1,38 +1,24 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import {
-  Activity, FlaskConical, Thermometer, Layers, Brain, AlertTriangle,
-  TrendingUp, Calendar, Award, Users, ListChecks, Menu, X, Loader2,
+  LayoutDashboard, Activity, FlaskConical, Award,
+  Menu, X, Loader2,
 } from "lucide-react";
 import { useIsFetching } from "@tanstack/react-query";
 
-const navSections = [
-  {
-    label: "Monitoring",
-    items: [
-      { to: "/thermalos/live", label: "Live Telemetry", icon: Activity },
-      { to: "/thermalos/experiments", label: "Experiments", icon: FlaskConical },
-      { to: "/thermalos/tim", label: "TIM Analysis", icon: Layers },
-      { to: "/thermalos/cycling", label: "Thermal Cycling", icon: Thermometer },
-    ],
-  },
-  {
-    label: "Intelligence",
-    items: [
-      { to: "/thermalos/model", label: "Rθ Model", icon: Brain },
-      { to: "/thermalos/alerts", label: "Alerts", icon: AlertTriangle },
-      { to: "/thermalos/predictions", label: "Predictions", icon: TrendingUp },
-    ],
-  },
-  {
-    label: "Platform",
-    items: [
-      { to: "/thermalos/timeline", label: "Timeline", icon: Calendar },
-      { to: "/thermalos/evidence", label: "Evidence Board", icon: Award },
-      { to: "/thermalos/outreach", label: "Outreach", icon: Users },
-      { to: "/thermalos/today", label: "Today Plan", icon: ListChecks },
-    ],
-  },
+interface NavItem {
+  to: string;
+  label: string;
+  sub: string;
+  icon: typeof LayoutDashboard;
+  end?: boolean;
+}
+
+const navItems: NavItem[] = [
+  { to: "/thermalos",          label: "Overview", sub: "Thesis & live data",      icon: LayoutDashboard, end: true },
+  { to: "/thermalos/lab",      label: "Lab",      sub: "Telemetry & runs",        icon: Activity },
+  { to: "/thermalos/research", label: "Research", sub: "Methodology & findings",  icon: FlaskConical },
+  { to: "/thermalos/yc",       label: "YC",       sub: "Evidence & milestones",   icon: Award },
 ];
 
 function UTCClock() {
@@ -121,40 +107,35 @@ export default function ThermalOSLayout() {
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           } md:translate-x-0 fixed md:sticky top-14 left-0 z-20 w-52 h-[calc(100vh-3.5rem)] bg-[#0D0D0B] border-r border-white/[0.07] transition-transform overflow-y-auto`}
         >
-          <nav className="p-3 space-y-5">
-            {navSections.map((sec) => (
-              <div key={sec.label}>
-                <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-[#5a5a55] px-2 mb-1.5">
-                  {sec.label}
-                </div>
-                <div className="space-y-0.5">
-                  {sec.items.map((it) => {
-                    const Icon = it.icon;
-                    return (
-                      <NavLink
-                        key={it.to}
-                        to={it.to}
-                        className={({ isActive }) =>
-                          `flex items-center gap-2 px-2 py-1.5 rounded text-[12px] border-l-2 transition-colors ${
-                            isActive
-                              ? "border-[#1D9E75] bg-[#0F6E56]/15 text-[#35C792]"
-                              : "border-transparent text-[#a8a89f] hover:bg-white/[0.03] hover:text-[#E6F7F1]"
-                          }`
-                        }
-                      >
-                        <Icon size={13} />
-                        <span>{it.label}</span>
-                      </NavLink>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+          <nav className="p-3 space-y-1">
+            {navItems.map((it) => {
+              const Icon = it.icon;
+              return (
+                <NavLink
+                  key={it.to}
+                  to={it.to}
+                  end={it.end}
+                  className={({ isActive }) =>
+                    `flex items-start gap-2.5 px-2.5 py-2 rounded border-l-2 transition-colors ${
+                      isActive
+                        ? "border-[#1D9E75] bg-[#0F6E56]/15 text-[#35C792]"
+                        : "border-transparent text-[#a8a89f] hover:bg-white/[0.03] hover:text-[#E6F7F1]"
+                    }`
+                  }
+                >
+                  <Icon size={14} className="mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-[13px] font-semibold leading-tight">{it.label}</div>
+                    <div className="text-[10px] font-mono text-[#5a5a55] leading-tight mt-0.5">{it.sub}</div>
+                  </div>
+                </NavLink>
+              );
+            })}
           </nav>
           <div className="p-3 mt-2 border-t border-white/[0.05] text-[9px] font-mono text-[#5a5a55] leading-relaxed">
-            Amogh (EE) · Sam (ME)
+            Amogh (EE · Cal Poly) · Sam (ME · Cal Poly)
             <br />
-            Cal Poly SLO · YC W27
+            YC W27 · GPU thermal forensics
           </div>
         </aside>
 
@@ -169,7 +150,7 @@ export default function ThermalOSLayout() {
         <main className="flex-1 min-w-0 p-4 md:p-6">
           <Outlet />
           <footer className="mt-10 pt-4 border-t border-white/[0.05] text-[10px] font-mono text-[#5a5a55] text-center">
-            ThermalOS · amogh.site/thermalos · Amogh (EE) + Sam (ME) · Cal Poly SLO · YC W27
+            ThermalOS · amogh.site/thermalos · Amogh (EE · Cal Poly) + Sam (ME · UCI) · YC W27
           </footer>
         </main>
       </div>
