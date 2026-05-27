@@ -3,22 +3,21 @@ import { supabase } from "@/integrations/supabase/client";
 const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
 const FN_URL = `https://${PROJECT_ID}.supabase.co/functions/v1/sheets-read`;
 
-// Column layout matches Apps Script logMeasurement / logGPUSnapshot (A–T, 20 cols)
-// A:runId  B:timestamp  C:type  D:material  E:pressureN  F:faultCondition
-// G:v  H:i  I:pW  J:tHot  K:tCold  L:tAmb  M:tCoolant  N:throttleReason
-// O:deltaT  P:rtheta  Q:vsBaseline  R:headroom  S:alert  T:notes
+// GPU Telemetry columns (A–I, 9 cols) — written by Colab collector
+// A:timestamp  B:temp_c  C:power_w  D:power_cap_w  E:sm_clock_mhz
+// F:mem_clock_mhz  G:util_pct  H:headroom_c  I:rtheta_cwatt
 export interface MeasurementRow {
-  runId: string; timestamp: string;
-  type: string;          // "PHYSICAL_RIG" | "GPU_TELEMETRY"
-  material: string;      // TIM material or GPU model
-  pressureN: number;     // mounting pressure (N) or power limit (W) for GPU rows
-  faultCondition: string;
-  v: number; i: number; pW: number;
-  tHot: number; tCold: number; tAmb: number; tCoolant: number;
-  throttleReason: string;
-  deltaT: number; rtheta: number;
-  vsBaseline: string;
-  headroom: number; alert: string; notes: string;
+  timestamp: string;
+  tempC: number;
+  powerW: number;
+  powerCapW: number;
+  smClockMhz: number;
+  memClockMhz: number;
+  utilPct: number;
+  headroomC: number;
+  rthetaCwatt: number;
+  // Derived
+  alert: string;
 }
 
 export interface TimelineRow {
@@ -39,25 +38,29 @@ async function readRange(range: string): Promise<string[][]> {
   return data.values ?? [];
 }
 
+function deriveAlert(m: Omit<MeasurementRow, "alert">): string {
+  if (m.tempC >= 85) return "HOT";
+  if (m.rthetaCwatt > 1.8) return "HIGH_RTHETA";
+  if (m.headroomC < 15) return "LOW_HEADROOM";
+  return "OK";
+}
+
 export async function fetchMeasurements(): Promise<MeasurementRow[]> {
-  const rows = await readRange("'📡 Measurements'!A4:T200");
-  return rows.filter((r) => r[0]).map((r) => ({
-    runId: r[0] ?? "", timestamp: r[1] ?? "",
-    type: r[2] ?? "",
-    material: r[3] ?? "",
-    pressureN: parseFloat(r[4]) || 0,
-    faultCondition: r[5] ?? "",
-    v: parseFloat(r[6]) || 0, i: parseFloat(r[7]) || 0, pW: parseFloat(r[8]) || 0,
-    tHot: parseFloat(r[9]) || 0, tCold: parseFloat(r[10]) || 0,
-    tAmb: parseFloat(r[11]) || 0, tCoolant: parseFloat(r[12]) || 0,
-    throttleReason: r[13] ?? "",
-    deltaT: parseFloat(r[14]) || 0,
-    rtheta: parseFloat(r[15]) || 0,
-    vsBaseline: r[16] ?? "",
-    headroom: parseFloat(r[17]) || 0,
-    alert: r[18] ?? "OK",
-    notes: r[19] ?? "",
-  }));
+  const rows = await readRange("'📡 Measurements'!A4:I2000");
+  return rows.filter((r) => r[0] && r[1]).map((r) => {
+    const base = {
+      timestamp: r[0] ?? "",
+      tempC: parseFloat(r[1]) || 0,
+      powerW: parseFloat(r[2]) || 0,
+      powerCapW: parseFloat(r[3]) || 0,
+      smClockMhz: parseFloat(r[4]) || 0,
+      memClockMhz: parseFloat(r[5]) || 0,
+      utilPct: parseFloat(r[6]) || 0,
+      headroomC: parseFloat(r[7]) || 0,
+      rthetaCwatt: parseFloat(r[8]) || 0,
+    };
+    return { ...base, alert: deriveAlert(base) };
+  });
 }
 
 export async function fetchTimeline(): Promise<TimelineRow[]> {
@@ -75,54 +78,53 @@ export async function fetchTimeline(): Promise<TimelineRow[]> {
 
 // ---------- DEMO DATA ----------
 
-const MATERIALS = ["No TIM", "Generic paste", "Arctic MX-4", "Fujipoly pad", "Phase-change", "Graphene TIM"];
-
-export function generateDemoMeasurements(count = 30): MeasurementRow[] {
+export function generateDemoMeasurements(count = 60): MeasurementRow[] {
   const now = Date.now();
+  const THROTTLE_TEMP = 93;
+
   return Array.from({ length: count }, (_, i) => {
-    const material = MATERIALS[i % MATERIALS.length];
-    const baseR = 0.25 + (i % 6) * 0.05;
-    const noise = (Math.sin(i * 1.3) + 1) * 0.04;
-    const rtheta = +(baseR + noise).toFixed(3);
-    const power = 30 + (i % 5) * 4;
-    const tAmb = 23;
-    const tCold = +(tAmb + 8 + (i % 3) * 1.2).toFixed(1);
-    const tHot = +(tCold + rtheta * power).toFixed(1);
-    const deltaT = +(tHot - tCold).toFixed(1);
-    const headroom = +(85 - tHot).toFixed(1);
-    let alert = "OK";
-    if (tHot >= 80) alert = "HOT";
-    else if (rtheta > 0.5) alert = "HIGH_RTHETA";
-    else if (headroom < 20) alert = "LOW_HEADROOM";
-    const v = +(12 + (i % 4) * 0.5).toFixed(2);
-    const I = +(power / v).toFixed(2);
-    const ts = new Date(now - (count - i) * 10_000).toLocaleString();
-    return {
-      runId: `R${String(i + 1).padStart(3, "0")}`,
-      timestamp: ts,
-      type: "PHYSICAL_RIG",
-      material,
-      pressureN: 40 + (i % 4) * 10,
-      faultCondition: "BASELINE",
-      v, i: I, pW: power,
-      tHot, tCold, tAmb, tCoolant: +(tCold - 2).toFixed(1),
-      throttleReason: "",
-      deltaT, rtheta,
-      vsBaseline: "",
-      headroom, alert, notes: "",
+    // Simulate: idle for first 10, ramp up, stabilize under load
+    const phase = i < 10 ? "idle" : i < 20 ? "ramp" : "load";
+    const tempC = phase === "idle"
+      ? 40 + Math.sin(i * 0.8) * 0.5
+      : phase === "ramp"
+        ? 40 + (i - 10) * 3.4
+        : 74 + Math.sin(i * 1.2) * 1.5;
+    const powerW = phase === "idle"
+      ? 9.5 + Math.random() * 0.3
+      : phase === "ramp"
+        ? 9.5 + (i - 10) * 6
+        : 68 + Math.sin(i * 0.9) * 2;
+    const powerCapW = 70;
+    const smClockMhz = phase === "idle" ? 300 : phase === "ramp" ? 300 + (i - 10) * 150 : 1590 + Math.random() * 20;
+    const memClockMhz = phase === "idle" ? 405 : 5001;
+    const utilPct = phase === "idle" ? 0 : phase === "ramp" ? (i - 10) * 10 : 95 + Math.random() * 5;
+    const headroomC = +(THROTTLE_TEMP - tempC).toFixed(1);
+    const rthetaCwatt = powerW > 1 ? +((tempC - 25) / powerW).toFixed(4) : 0;
+
+    const base = {
+      timestamp: new Date(now - (count - i) * 1000).toISOString(),
+      tempC: +tempC.toFixed(1),
+      powerW: +powerW.toFixed(2),
+      powerCapW,
+      smClockMhz: Math.round(smClockMhz),
+      memClockMhz,
+      utilPct: Math.round(utilPct),
+      headroomC,
+      rthetaCwatt,
     };
+    return { ...base, alert: deriveAlert(base) };
   });
 }
 
 export function generateDemoTimeline(): TimelineRow[] {
   const phases = [
-    { name: "Phase 0 — Foundations", items: ["Lock thesis & scope", "Draft system architecture", "Finalize BOM v1", "Open evidence board", "Public landing page", "First outreach batch"] },
-    { name: "Phase 1 — Rig Build", items: ["Procure heater + TIM samples", "Wire ESP32 + sensors", "Mount cold plate", "First Rθ measurement", "Calibrate thermistors", "Bench safety review", "Repeatability test", "Document fixture", "Photo + video pass"] },
-    { name: "Phase 2 — TIM Sweep", items: ["Run 6-TIM benchmark", "Statistical fit", "Plot Rθ vs material", "Failure-mode log"] },
-    { name: "Phase 3 — Adaptive Control", items: ["PI loop on pump", "Headroom guard", "Alert thresholds", "Closed-loop demo"] },
-    { name: "Phase 4 — YC Application", items: ["Write app draft", "Founder video", "Submit W27"] },
+    { name: "Phase 0 — Foundation", items: ["GPU access + first telemetry run", "Kundu advisor confirmed", "Yu meeting + 2nd advisor", "Power-cap sweep E005", "Baseline Rθ characterization", "GitHub repo structure locked"] },
+    { name: "Phase 1 — Experiments", items: ["Idle vs load Rθ comparison", "Utilization signal validation", "Process-exit cooldown study", "Power-cap sweep (6 levels)", "Compute/watt curve plotted", "Optimal power cap identified"] },
+    { name: "Phase 2 — Anomaly Detection", items: ["Rolling baseline algorithm", "Anomaly threshold calibration", "False-positive rate testing", "Throttle predictor v1", "Kundu check-in #3", "EE 4400 proposal submitted"] },
+    { name: "Phase 3 — Validation", items: ["Sam rig fault signatures", "Cross-validate rig vs telemetry", "Operator audit dry run", "Design partner outreach"] },
+    { name: "Phase 4 — YC Application", items: ["Write application draft", "Founder video", "Submit W27"] },
   ];
-  const owners = ["Amogh", "Sam", "Both"];
   const out: TimelineRow[] = [];
   let week = 1;
   phases.forEach((p, pi) => {
@@ -132,10 +134,10 @@ export function generateDemoTimeline(): TimelineRow[] {
         week: `W${week}`,
         dates: "—",
         milestone: item,
-        owner: owners[(pi + ii) % 3],
-        status: "Not Started",
+        owner: ["Amogh", "Both", "Sam", "Amogh", "Both", "Amogh"][ii % 6],
+        status: pi === 0 && ii < 3 ? "Done ✓" : "Not Started",
         priority: ii === 0 ? "P0 — Critical" : ii < 2 ? "P1 — High" : "P2 — Normal",
-        layer: ["Hardware", "Software", "Ops", "Comms"][(pi + ii) % 4],
+        layer: ["SW", "EE", "Both", "EE", "Comms", "EE"][ii % 6],
         notes: "",
       });
       if (ii % 2 === 1) week++;
@@ -149,8 +151,6 @@ export function isDemoModeError(err: unknown): boolean {
 }
 
 // ---------- OUTREACH ----------
-// Outreach sheet: headers at row 3, data from row 4 (A–I, 9 cols)
-// A:Name  B:Organization  C:Role  D:Email  E:Type  F:Status  G:Date  H:Priority  I:Notes/Quote
 export interface OutreachRow {
   name: string; org: string; role: string; email: string;
   type: string; status: string; date: string; priority: string; notes: string;
@@ -167,22 +167,18 @@ export async function fetchOutreach(): Promise<OutreachRow[]> {
 
 export function generateDemoOutreach(): OutreachRow[] {
   return [
-    { name: "Dr. Sarah Kim", org: "Cal Poly SLO", role: "Professor, EE", email: "skim@calpoly.edu", type: "Professor", status: "Not Contacted", date: "", priority: "P0 — Critical", notes: "ENGR 400 supervisor candidate" },
+    { name: "Prof. Souvik Kundu", org: "Cal Poly EE", role: "Assistant Professor", email: "sokundu@calpoly.edu", type: "Advisor", status: "Replied", date: "5/13/2026", priority: "P0 — Critical", notes: "Confirmed informal advising. EE 4400 in fall." },
+    { name: "Prof. Helen Yu", org: "Cal Poly EE", role: "Professor", email: "xhyu@calpoly.edu", type: "Advisor", status: "Replied", date: "5/13/2026", priority: "P0 — Critical", notes: "Meeting Tuesday 2:10pm." },
     { name: "Marcus Webb", org: "Lambda Labs", role: "Head of Infra", email: "mwebb@lambdalabs.com", type: "GPU Cloud", status: "Contacted", date: "5/10/2026", priority: "P0 — Critical", notes: "Manages 800-GPU H100 cluster" },
-    { name: "Priya Nair", org: "CoreWeave", role: "Sr. SRE", email: "pnair@coreweave.com", type: "GPU Cloud", status: "Replied", date: "5/8/2026", priority: "P0 — Critical", notes: "Follow up by 5/17" },
-    { name: "Dr. James Thorncroft", org: "Cal Poly SLO", role: "Professor, ME", email: "jthorncroft@calpoly.edu", type: "Professor", status: "Not Contacted", date: "", priority: "P1 — High", notes: "" },
     { name: "Tom Okafor", org: "Voltage Park", role: "Ops Lead", email: "tokafor@voltagepark.com", type: "AI Inference", status: "Meeting Set", date: "5/9/2026", priority: "P0 — Critical", notes: "Call Thursday 2pm PT" },
-    { name: "Lin Chen", org: "Together AI", role: "Platform Eng", email: "lchen@together.ai", type: "AI Inference", status: "Not Contacted", date: "", priority: "P1 — High", notes: "" },
-    { name: "Alex Rivera", org: "Vast.ai", role: "CEO", email: "arivera@vast.ai", type: "GPU Cloud", status: "No Response", date: "5/5/2026", priority: "P1 — High", notes: "Re-try after demo video" },
-    { name: "Dr. Won Park", org: "UCI", role: "Professor, MAE", email: "won@uci.edu", type: "Professor", status: "Contacted", date: "5/11/2026", priority: "P1 — High", notes: "Sam's supervisor candidate" },
     { name: "Raj Mehta", org: "Crusoe Energy", role: "HPC Eng", email: "rmehta@crusoe.ai", type: "HPC Lab", status: "Positive Quote", date: "5/7/2026", priority: "P0 — Critical", notes: '"We have no idea if our GPUs are throttling silently"' },
-    { name: "Dana Lee", org: "SambaNova", role: "Infra Mgr", email: "dlee@sambanova.ai", type: "HPC Lab", status: "Not Contacted", date: "", priority: "P2 — Normal", notes: "" },
+    { name: "Priya Nair", org: "CoreWeave", role: "Sr. SRE", email: "pnair@coreweave.com", type: "GPU Cloud", status: "Replied", date: "5/8/2026", priority: "P0 — Critical", notes: "Follow up by 5/17" },
+    { name: "Alex Rivera", org: "Vast.ai", role: "CEO", email: "arivera@vast.ai", type: "GPU Cloud", status: "No Response", date: "5/5/2026", priority: "P1 — High", notes: "Re-try after demo video" },
+    { name: "Lin Chen", org: "Together AI", role: "Platform Eng", email: "lchen@together.ai", type: "AI Inference", status: "Not Contacted", date: "", priority: "P1 — High", notes: "" },
   ];
 }
 
 // ---------- EVIDENCE BOARD ----------
-// Evidence sheet: headers at row 3, data from row 4 (A–D, 4 cols)
-// A:Claim  B:Required Proof  C:Where to find it  D:Status
 export interface EvidenceRow {
   claim: string; proof: string; location: string; status: string;
 }
@@ -197,26 +193,18 @@ export async function fetchEvidence(): Promise<EvidenceRow[]> {
 
 export function generateDemoEvidence(): EvidenceRow[] {
   return [
-    { claim: "GPU telemetry collector logging [N] fields per second", proof: "collector_v2.py + sample CSV with all fields", location: "GitHub — /src/collector.py + /data/sample_run.csv", status: "No proof yet" },
-    { claim: "Power-cap sweep: [X]% compute/watt improvement at [Y]% below TDP", proof: "power_cap_results.csv with throughput+watts+temp at 6+ power levels", location: "GitHub — /experiments/power_cap/ + chart", status: "No proof yet" },
-    { claim: "Optimal power cap: [Y]% below TDP with <3% throughput loss", proof: "Specific data row with power, throughput, efficiency values", location: "power_cap_results.csv — optimal row highlighted", status: "No proof yet" },
-    { claim: "Physical rig with [M] cooling fault signatures characterized", proof: "fault_library.json: each fault × Rθ deviation × threshold", location: "GitHub — /hardware/fault_library.json", status: "No proof yet" },
-    { claim: "Rθ varies [B]% with mounting pressure alone at same heat load", proof: "pressure_sweep.csv: Rθ at 8N/16N/24N/32N/50N for Arctic MX-4", location: "GitHub — /hardware/pressure_sweep.csv + chart", status: "No proof yet" },
-    { claim: "Anomaly detector flags cooling path degradation from GPU telemetry", proof: "validation_results.csv: each fault × detected(y/n) × accuracy × latency", location: "GitHub — /model/validation_results.csv", status: "No proof yet" },
-    { claim: "Throttle prediction [T] seconds before thermal event", proof: "Timestamped log showing prediction then actual throttle", location: "GitHub — /model/throttle_prediction_demo.csv", status: "No proof yet" },
-    { claim: "[N] GPU cluster operators interviewed, [X] confirmed the problem", proof: "Discovery call notes with org, role, exact quotes", location: "Private notes doc — share with Sam", status: "In progress" },
-    { claim: "1 design partner running pilot audit", proof: "Email/Slack confirmation from partner", location: "Email thread — keep it", status: "No proof yet" },
-    { claim: "Both founders have GitHub commits", proof: "Amogh: collector+model+experiments. Sam: CAD+fault CSVs+docs.", location: "GitHub commit history — both usernames visible", status: "No proof yet" },
-    { claim: "Co-founder agreement signed 50/50", proof: "Signed document", location: "Private doc — reference in application", status: "No proof yet" },
-    { claim: "ENGR 400 supervisor confirmed (Amogh)", proof: "Email reply from professor", location: "Email thread", status: "No proof yet" },
-    { claim: "UCI professor engagement (Sam)", proof: "Email reply from Prof. Won or Prof. Lee", location: "Email thread", status: "No proof yet" },
-    { claim: "'[exact operator quote confirming problem is real]'", proof: "Written/recorded quote from real person at real organization", location: "Email/message screenshot", status: "In progress" },
+    { claim: "Utilization is a broken thermal state signal", proof: "E002: GPU held 74°C / 31W for 10 min at 0% util after workload exit", location: "GitHub — /experiments/E002_same_process_cooldown.csv", status: "Evidence collected" },
+    { claim: "Process-exit cooldown is consistent and measurable", proof: "E003/E004: Mean 202s ± 14.8s across 3 trials (141s, 209s, 212s, 185s)", location: "GitHub — /experiments/E003_E004_cooldown_replication.csv", status: "Evidence collected" },
+    { claim: "Idle Rθ baseline established on T4", proof: "E001: 40.4°C, 9.47W, Rθ = 1.623 °C/W stable over 60s", location: "GitHub — /experiments/E001_idle_baseline.csv", status: "Evidence collected" },
+    { claim: "Power-cap sweep: compute/watt improvement at sub-TDP cap", proof: "E005 pending — 6 power levels, throughput + watts + temp", location: "GitHub — /experiments/E005_power_cap_sweep/ (planned)", status: "No proof yet" },
+    { claim: "Anomaly detector flags Rθ deviation from baseline", proof: "Validation CSV: each condition × detected(y/n) × latency", location: "GitHub — /model/validation_results.csv (planned)", status: "No proof yet" },
+    { claim: "GPU cluster operators confirm the problem exists", proof: "Discovery call notes with org, role, exact quotes", location: "Private notes doc", status: "In progress" },
+    { claim: "ENGR 400 advisor confirmed (fall)", proof: "Email from Prof. Kundu confirming informal summer + EE 4400 fall", location: "Email thread — keep it", status: "Evidence collected" },
+    { claim: "1 design partner running pilot audit", proof: "Email/Slack confirmation from partner", location: "Email thread", status: "No proof yet" },
   ];
 }
 
 // ---------- TODAY PLAN ----------
-// Today Plan sheet: headers at row 3, data from row 4 (A–F, 6 cols)
-// A:Priority  B:Phase  C:Milestone  D:Owner  E:Track  F:Notes
 export interface TodayRow {
   priority: string; phase: string; milestone: string;
   owner: string; track: string; notes: string;
@@ -232,11 +220,11 @@ export async function fetchTodayPlan(): Promise<TodayRow[]> {
 
 export function generateDemoTodayPlan(): TodayRow[] {
   return [
-    { priority: "P0 — Critical", phase: "Phase 0 — Foundation", milestone: "Send 5 professor emails with one-page proposal", owner: "Amogh", track: "Comms", notes: "Dr. Kim, Thorncroft, Shollenberger, Chen, Johnson-Glauch" },
-    { priority: "P0 — Critical", phase: "Phase 0 — Foundation", milestone: "Full co-founder conversation with Sam: YC, 50/50 equity, commitment", owner: "Both", track: "Both", notes: "Do this before touching any hardware" },
-    { priority: "P0 — Critical", phase: "Phase 0 — Foundation", milestone: "Draft one-page research proposal PDF", owner: "Amogh", track: "Comms", notes: "Use ThermalOS dashboard as evidence" },
-    { priority: "P1 — High", phase: "Phase 0 — Foundation", milestone: "Finalize BOM v1 — heater block, TIM samples, thermistors, ESP32", owner: "Sam", track: "Hardware", notes: "" },
-    { priority: "P1 — High", phase: "Phase 0 — Foundation", milestone: "Lock GitHub repo structure: /src /hardware /experiments /model", owner: "Amogh", track: "Software", notes: "" },
-    { priority: "P1 — High", phase: "Phase 0 — Foundation", milestone: "Reach out to 3 GPU cloud operators from outreach list", owner: "Amogh", track: "Comms", notes: "Lambda Labs, Voltage Park, Crusoe" },
+    { priority: "P0 — Critical", phase: "Phase 0 — Foundation", milestone: "Run E005 power-cap sweep (6 levels, PyTorch matmul)", owner: "Amogh", track: "Software", notes: "Use Colab T4, 30min per level, log to sheet" },
+    { priority: "P0 — Critical", phase: "Phase 0 — Foundation", milestone: "Yu meeting Tuesday 2:10pm — bring E001-E004 findings + GitHub", owner: "Amogh", track: "Comms", notes: "Have dashboard live on phone" },
+    { priority: "P0 — Critical", phase: "Phase 0 — Foundation", milestone: "Push E001-E004 notebooks + CSVs to GitHub repo", owner: "Amogh", track: "Software", notes: "Name: E001_idle_baseline, E002_same_process, E003_E004_cooldown" },
+    { priority: "P1 — High", phase: "Phase 0 — Foundation", milestone: "Send Kundu follow-up with first experiment summary", owner: "Amogh", track: "Comms", notes: "Keep it short — specific findings, one question" },
+    { priority: "P1 — High", phase: "Phase 0 — Foundation", milestone: "Sam: review ThermalOS direction, plan fall rig build", owner: "Sam", track: "Hardware", notes: "Rig pushed to fall — focus on internship" },
+    { priority: "P2 — Normal", phase: "Phase 0 — Foundation", milestone: "Reach out to 3 GPU cluster operators from outreach list", owner: "Amogh", track: "Comms", notes: "Lambda Labs, Voltage Park, Crusoe" },
   ];
 }

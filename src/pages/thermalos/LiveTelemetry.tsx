@@ -10,26 +10,26 @@ import {
 } from "@/services/thermalosApi";
 import KPIStrip from "./components/KPIStrip";
 
-const REC: Record<string, { text: (m: MeasurementRow) => string; action: string; actionColor: string }> = {
+const ALERT_CONFIG: Record<string, { text: (m: MeasurementRow) => string; action: string; color: string }> = {
   OK: {
-    text: (m) => `System nominal. Rθ = ${m.rtheta.toFixed(3)} °C/W. ${m.headroom.toFixed(1)}°C headroom. No action required.`,
-    action: "maintain_current_settings",
-    actionColor: "#1D9E75",
+    text: (m) => `System nominal. Rθ = ${m.rthetaCwatt.toFixed(3)} °C/W. ${m.headroomC.toFixed(1)}°C thermal headroom remaining.`,
+    action: "maintain_current_power_cap",
+    color: "#1D9E75",
   },
   HIGH_RTHETA: {
-    text: (m) => `Thermal resistance elevated at ${m.rtheta.toFixed(3)} °C/W. Verify mounting pressure and TIM spread uniformity.`,
-    action: "increase_pump_speed → 75%",
-    actionColor: "#EF9F27",
+    text: (m) => `Thermal resistance elevated at ${m.rthetaCwatt.toFixed(3)} °C/W above expected baseline. Possible cooling path degradation — verify TIM and mounting.`,
+    action: "inspect_cooling_path",
+    color: "#D85A30",
   },
   LOW_HEADROOM: {
-    text: (m) => `Headroom ${m.headroom.toFixed(1)}°C below 20°C threshold. Consider reducing power or increasing pump speed.`,
-    action: "reduce_power → -5W",
-    actionColor: "#EF9F27",
+    text: (m) => `Only ${m.headroomC.toFixed(1)}°C before throttle threshold. Reduce power cap or improve cooling to avoid performance loss.`,
+    action: "reduce_power_cap → -5W",
+    color: "#EF9F27",
   },
   HOT: {
-    text: (m) => `CRITICAL: Junction temperature at ${m.tHot.toFixed(1)}°C. Reduce heater power immediately.`,
-    action: "emergency_power_reduction → 50%",
-    actionColor: "#D85A30",
+    text: (m) => `CRITICAL: ${m.tempC.toFixed(1)}°C. Throttle imminent. Reduce workload or power cap immediately.`,
+    action: "emergency_power_reduction",
+    color: "#ff4d4d",
   },
 };
 
@@ -48,21 +48,20 @@ export default function LiveTelemetry() {
 
   const demo = isError && isDemoModeError(error);
   const rows: MeasurementRow[] = demo || !data || data.length === 0
-    ? generateDemoMeasurements(30)
-    : data.slice(-30);
+    ? generateDemoMeasurements(60)
+    : data.slice(-60);
 
   const latest = rows[rows.length - 1];
+  const rec = ALERT_CONFIG[latest?.alert ?? "OK"] ?? ALERT_CONFIG.OK;
 
   const chartData = rows.map((r) => ({
-    t: r.timestamp.slice(-8),
-    rtheta: r.rtheta,
-    tHot: r.tHot,
-    tCold: r.tCold,
-    tAmb: r.tAmb,
-    tCoolant: r.tCoolant,
+    t: r.timestamp.length > 19 ? r.timestamp.slice(11, 19) : r.timestamp.slice(-8),
+    rtheta: r.rthetaCwatt,
+    temp: r.tempC,
+    power: r.powerW,
+    util: r.utilPct,
+    sm: r.smClockMhz,
   }));
-
-  const rec = latest ? REC[latest.alert] ?? REC.OK : REC.OK;
 
   if (isLoading) {
     return (
@@ -81,12 +80,12 @@ export default function LiveTelemetry() {
     <div>
       {demo && (
         <div className="mb-4 px-3 py-2 rounded-lg bg-[#EF9F27]/10 border border-[#EF9F27]/30 text-[12px] font-mono text-[#EF9F27]">
-          Demo Mode — connect the Google Sheet (`GOOGLE_SHEETS_API_KEY` + `SPREADSHEET_ID` backend secrets) to stream live data.
+          Demo Mode — sheet not connected. Connect Supabase edge function to stream live Colab data.
         </div>
       )}
       {!demo && data && data.length === 0 && (
         <div className="mb-4 px-3 py-2 rounded-lg bg-[#1D9E75]/10 border border-[#1D9E75]/30 text-[12px] font-mono text-[#1D9E75]">
-          Sheet connected — no measurement rows yet. Add data to the <span className="opacity-70">📡 Measurements</span> tab starting at row 4.
+          Sheet connected — no rows yet in <span className="opacity-70">📡 Measurements</span> A4:I. Run the Colab collector to populate.
         </div>
       )}
 
@@ -95,36 +94,50 @@ export default function LiveTelemetry() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         {/* Charts */}
         <div className="lg:col-span-3 space-y-4">
-          <ChartCard title="Rθ over time" subtitle="°C/W · last 30 samples">
-            <ResponsiveContainer width="100%" height={220}>
+          <ChartCard title="Rθ_eff over time" subtitle="°C/W · last 60 samples · 5s refresh">
+            <ResponsiveContainer width="100%" height={200}>
               <ComposedChart data={chartData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
                 <CartesianGrid stroke="rgba(255,255,255,0.04)" />
-                <XAxis dataKey="t" tick={{ fill: "#5a5a55", fontSize: 10 }} stroke="#2a2a26" />
-                <YAxis domain={[0, 0.8]} tick={{ fill: "#5a5a55", fontSize: 10 }} stroke="#2a2a26" />
+                <XAxis dataKey="t" tick={{ fill: "#5a5a55", fontSize: 9 }} stroke="#2a2a26" interval={9} />
+                <YAxis domain={["auto", "auto"]} tick={{ fill: "#5a5a55", fontSize: 10 }} stroke="#2a2a26" />
                 <Tooltip
                   contentStyle={{ background: "#0D0D0B", border: "1px solid rgba(255,255,255,0.1)", fontSize: 11 }}
-                  formatter={(v: number) => [`Rθ = ${v.toFixed(3)} °C/W`, ""]}
+                  formatter={(v: number) => [`Rθ = ${v.toFixed(4)} °C/W`, ""]}
                   labelStyle={{ color: "#9FE1CB" }}
                 />
-                <ReferenceLine y={0.5} stroke="#D85A30" strokeDasharray="4 4" label={{ value: "Threshold", fill: "#D85A30", fontSize: 10, position: "right" }} />
                 <Area type="monotone" dataKey="rtheta" fill="rgba(29,158,117,0.08)" stroke="none" />
                 <Line type="monotone" dataKey="rtheta" stroke="#1D9E75" strokeWidth={2} dot={false} />
               </ComposedChart>
             </ResponsiveContainer>
           </ChartCard>
 
-          <ChartCard title="Temperature history" subtitle="°C · T_hot / T_cold / T_amb / T_coolant">
-            <ResponsiveContainer width="100%" height={220}>
+          <ChartCard title="Temperature + Power" subtitle="°C and W · last 60 samples">
+            <ResponsiveContainer width="100%" height={200}>
               <LineChart data={chartData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
                 <CartesianGrid stroke="rgba(255,255,255,0.04)" />
-                <XAxis dataKey="t" tick={{ fill: "#5a5a55", fontSize: 10 }} stroke="#2a2a26" />
-                <YAxis domain={[10, 100]} tick={{ fill: "#5a5a55", fontSize: 10 }} stroke="#2a2a26" />
+                <XAxis dataKey="t" tick={{ fill: "#5a5a55", fontSize: 9 }} stroke="#2a2a26" interval={9} />
+                <YAxis yAxisId="temp" domain={[20, 100]} tick={{ fill: "#5a5a55", fontSize: 10 }} stroke="#2a2a26" />
+                <YAxis yAxisId="power" orientation="right" domain={[0, 80]} tick={{ fill: "#5a5a55", fontSize: 10 }} stroke="#2a2a26" />
                 <Tooltip contentStyle={{ background: "#0D0D0B", border: "1px solid rgba(255,255,255,0.1)", fontSize: 11 }} />
                 <Legend wrapperStyle={{ fontSize: 10, color: "#888780" }} />
-                <Line type="monotone" dataKey="tHot" stroke="#D85A30" strokeWidth={1.8} dot={false} name="T_hot" />
-                <Line type="monotone" dataKey="tCold" stroke="#1D9E75" strokeWidth={1.8} dot={false} name="T_cold" />
-                <Line type="monotone" dataKey="tAmb" stroke="#888780" strokeWidth={1.5} dot={false} name="T_amb" />
-                <Line type="monotone" dataKey="tCoolant" stroke="#9FE1CB" strokeWidth={1.5} dot={false} name="T_coolant" />
+                <ReferenceLine yAxisId="temp" y={93} stroke="#D85A30" strokeDasharray="4 4" label={{ value: "93°C throttle", fill: "#D85A30", fontSize: 9, position: "right" }} />
+                <Line yAxisId="temp" type="monotone" dataKey="temp" stroke="#D85A30" strokeWidth={2} dot={false} name="Temp °C" />
+                <Line yAxisId="power" type="monotone" dataKey="power" stroke="#EF9F27" strokeWidth={1.5} dot={false} name="Power W" />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          <ChartCard title="Utilization + SM Clock" subtitle="% and MHz · last 60 samples">
+            <ResponsiveContainer width="100%" height={160}>
+              <LineChart data={chartData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+                <CartesianGrid stroke="rgba(255,255,255,0.04)" />
+                <XAxis dataKey="t" tick={{ fill: "#5a5a55", fontSize: 9 }} stroke="#2a2a26" interval={9} />
+                <YAxis yAxisId="util" domain={[0, 100]} tick={{ fill: "#5a5a55", fontSize: 10 }} stroke="#2a2a26" />
+                <YAxis yAxisId="sm" orientation="right" domain={[0, 1700]} tick={{ fill: "#5a5a55", fontSize: 10 }} stroke="#2a2a26" />
+                <Tooltip contentStyle={{ background: "#0D0D0B", border: "1px solid rgba(255,255,255,0.1)", fontSize: 11 }} />
+                <Legend wrapperStyle={{ fontSize: 10, color: "#888780" }} />
+                <Line yAxisId="util" type="monotone" dataKey="util" stroke="#9FE1CB" strokeWidth={1.5} dot={false} name="Util %" />
+                <Line yAxisId="sm" type="monotone" dataKey="sm" stroke="#888780" strokeWidth={1.5} dot={false} name="SM MHz" />
               </LineChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -134,43 +147,54 @@ export default function LiveTelemetry() {
         <div className="lg:col-span-2 space-y-4">
           <div className="bg-[#141412] border border-white/[0.07] rounded-xl p-4">
             <div className="text-[9px] font-mono uppercase tracking-wider text-[#5a5a55] mb-3">
-              Live Sensor Readout
+              Live GPU Readout
             </div>
             <div className="space-y-0">
-              <Row dot="#D85A30" label="T Hot" value={latest ? `${latest.tHot.toFixed(1)} °C` : "—"} />
-              <Row dot="#1D9E75" label="T Cold" value={latest ? `${latest.tCold.toFixed(1)} °C` : "—"} />
-              <Row dot="#888780" label="T Ambient" value={latest ? `${latest.tAmb.toFixed(1)} °C` : "—"} />
-              <Row dot="#9FE1CB" label="T Coolant" value={latest ? `${latest.tCoolant.toFixed(1)} °C` : "—"} />
-              <Row dot="#EF9F27" label="Voltage V" value={latest ? `${latest.v.toFixed(2)} V` : "—"} />
-              <Row dot="#EF9F27" label="Current I" value={latest ? `${latest.i.toFixed(2)} A` : "—"} />
-              <Row dot="#5a5a55" label="Pressure" value={latest ? `${latest.pressureN} N` : "—"} />
-              <Row dot="#888780" label="Run ID" value={latest?.runId ?? "—"} last />
+              <Row dot="#D85A30" label="GPU Temp" value={latest ? `${latest.tempC.toFixed(1)} °C` : "—"} />
+              <Row dot="#EF9F27" label="Power Draw" value={latest ? `${latest.powerW.toFixed(1)} W` : "—"} />
+              <Row dot="#888780" label="Power Cap" value={latest ? `${latest.powerCapW.toFixed(0)} W` : "—"} />
+              <Row dot="#9FE1CB" label="SM Clock" value={latest ? `${latest.smClockMhz.toLocaleString()} MHz` : "—"} />
+              <Row dot="#9FE1CB" label="Mem Clock" value={latest ? `${latest.memClockMhz.toLocaleString()} MHz` : "—"} />
+              <Row dot="#1D9E75" label="Utilization" value={latest ? `${latest.utilPct}%` : "—"} />
+              <Row dot="#1D9E75" label="Headroom" value={latest ? `${latest.headroomC.toFixed(1)} °C` : "—"} />
+              <Row dot="#5a5a55" label="Last sample" value={latest ? latest.timestamp.slice(0, 19).replace("T", " ") : "—"} last />
             </div>
           </div>
 
           <div className="bg-[#141412] border border-white/[0.07] rounded-xl border-l-[3px] border-l-[#1D9E75] p-4">
             <div className="text-[9px] font-mono uppercase tracking-wider text-[#35C792] mb-2">
-              🧠 AI Recommendation Layer
+              ThermalOS Recommendation
             </div>
             <p className="font-mono text-[12px] leading-relaxed text-[#E6F7F1]">
-              {latest ? rec.text(latest) : "Awaiting telemetry…"}
+              {latest ? rec.text(latest) : "Awaiting telemetry..."}
             </p>
             <div className="mt-3">
               <span
                 className="inline-block text-[10px] font-mono px-2 py-1 rounded"
-                style={{ background: `${rec.actionColor}15`, color: rec.actionColor, border: `1px solid ${rec.actionColor}40` }}
+                style={{ background: `${rec.color}15`, color: rec.color, border: `1px solid ${rec.color}40` }}
               >
                 {rec.action}
               </span>
             </div>
             <div className="mt-3 bg-[#0A0A08] border border-white/[0.07] rounded p-2.5 font-mono text-[11px] text-[#9FE1CB] leading-relaxed">
-              <div>Rθ(t) = {latest?.rtheta.toFixed(3) ?? "—"} °C/W</div>
-              <div>Headroom = {latest?.headroom.toFixed(1) ?? "—"} °C</div>
+              <div>Rθ_eff(t) = {latest?.rthetaCwatt.toFixed(4) ?? "—"} °C/W</div>
+              <div>Formula: (T_gpu - T_amb) / P_draw</div>
+              <div>Headroom = {latest?.headroomC.toFixed(1) ?? "—"} °C to throttle</div>
               <div>
-                Alert: <span style={{ color: rec.actionColor }}>{latest?.alert ?? "—"}</span>
+                Alert: <span style={{ color: rec.color }}>{latest?.alert ?? "—"}</span>
                 <span className="inline-block w-1.5 h-3 bg-[#35C792] ml-1 align-middle animate-pulse" />
               </div>
             </div>
+          </div>
+
+          {/* Key finding callout */}
+          <div className="bg-[#0A0A08] border border-[#EF9F27]/30 rounded-xl p-4">
+            <div className="text-[9px] font-mono uppercase tracking-wider text-[#EF9F27] mb-2">
+              Research Finding — E002/E003/E004
+            </div>
+            <p className="font-mono text-[11px] text-[#a8a89f] leading-relaxed">
+              GPU utilization is a broken thermal state signal. After workload exit, GPU holds elevated temp+power for ~202s (mean, 3 trials) while reporting 0% utilization. Multi-field classifier required.
+            </p>
           </div>
         </div>
       </div>

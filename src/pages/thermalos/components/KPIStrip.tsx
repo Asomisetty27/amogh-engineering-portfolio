@@ -1,40 +1,49 @@
-import { ReactNode } from "react";
 import type { MeasurementRow } from "@/services/thermalosApi";
 
 interface KPI {
   label: string;
   value: string;
   sub?: string;
-  accent: string; // hex
+  accent: string;
   pulse?: boolean;
 }
 
 function buildKpis(m: MeasurementRow | undefined): KPI[] {
   if (!m) {
     return [
-      { label: "T Hot", value: "—", accent: "#888780" },
-      { label: "Power P(t)", value: "—", accent: "#EF9F27" },
-      { label: "Rθ", value: "—", accent: "#1D9E75" },
+      { label: "GPU Temp", value: "—", accent: "#888780" },
+      { label: "Power Draw", value: "—", accent: "#EF9F27" },
+      { label: "Rθ eff", value: "—", accent: "#1D9E75" },
       { label: "Headroom", value: "—", accent: "#1D9E75" },
-      { label: "ΔT", value: "—", accent: "#9FE1CB" },
+      { label: "SM Clock", value: "—", accent: "#9FE1CB" },
       { label: "Alert", value: "—", accent: "#888780" },
     ];
   }
-  const rAccent = m.rtheta > 0.5 ? "#D85A30" : m.rtheta > 0.35 ? "#EF9F27" : "#1D9E75";
-  const hAccent = m.headroom < 10 ? "#D85A30" : m.headroom < 20 ? "#EF9F27" : "#1D9E75";
+  const rAccent = m.rthetaCwatt > 1.8 ? "#D85A30" : m.rthetaCwatt > 1.5 ? "#EF9F27" : "#1D9E75";
+  const hAccent = m.headroomC < 10 ? "#D85A30" : m.headroomC < 20 ? "#EF9F27" : "#1D9E75";
   const alertMap: Record<string, { txt: string; color: string; pulse?: boolean }> = {
     OK: { txt: "🟢 OK", color: "#1D9E75" },
-    LOW_HEADROOM: { txt: "🟡 LOW HEADROOM", color: "#EF9F27" },
+    LOW_HEADROOM: { txt: "🟡 LOW HEAD.", color: "#EF9F27" },
     HIGH_RTHETA: { txt: "🟠 HIGH Rθ", color: "#D85A30" },
     HOT: { txt: "🔴 HOT", color: "#ff4d4d", pulse: true },
   };
   const a = alertMap[m.alert] ?? alertMap.OK;
   return [
-    { label: "T Hot °C", value: m.tHot.toFixed(1), accent: "#D85A30" },
-    { label: "Power P(t) W", value: m.pW.toFixed(1), sub: `${m.v.toFixed(2)} V × ${m.i.toFixed(2)} A`, accent: "#EF9F27" },
-    { label: "Rθ °C/W", value: m.rtheta.toFixed(3), accent: rAccent },
-    { label: "Headroom °C", value: m.headroom.toFixed(1), accent: hAccent },
-    { label: "ΔT °C", value: m.deltaT.toFixed(1), accent: "#9FE1CB" },
+    { label: "GPU Temp °C", value: m.tempC.toFixed(1), accent: "#D85A30" },
+    {
+      label: "Power Draw W",
+      value: m.powerW.toFixed(1),
+      sub: `cap ${m.powerCapW.toFixed(0)} W`,
+      accent: "#EF9F27",
+    },
+    { label: "Rθ eff °C/W", value: m.rthetaCwatt.toFixed(3), accent: rAccent },
+    { label: "Headroom °C", value: m.headroomC.toFixed(1), accent: hAccent },
+    {
+      label: "SM Clock MHz",
+      value: m.smClockMhz.toLocaleString(),
+      sub: `util ${m.utilPct}%`,
+      accent: "#9FE1CB",
+    },
     { label: "Alert State", value: a.txt, accent: a.color, pulse: a.pulse },
   ];
 }
