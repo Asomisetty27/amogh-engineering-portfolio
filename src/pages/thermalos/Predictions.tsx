@@ -1,6 +1,10 @@
 import { useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchMeasurements, generateDemoMeasurements, isDemoModeError } from "@/services/thermalosApi";
+import {
+  fetchMeasurements, generateDemoMeasurements,
+  fetchOutreach, generateDemoOutreach,
+  isDemoModeError,
+} from "@/services/thermalosApi";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ReferenceLine, Area, ComposedChart,
@@ -35,9 +39,24 @@ export default function Predictions() {
     retry: false,
   });
 
+  const { data: outreachData, error: outreachErr, isError: outreachIsErr } = useQuery({
+    queryKey: ["outreach"],
+    queryFn: fetchOutreach,
+    refetchInterval: 30_000,
+    staleTime: 0,
+    retry: false,
+  });
+
   const demo = isError && isDemoModeError(error);
+  const outreachDemo = outreachIsErr && isDemoModeError(outreachErr);
   const rows = demo || !data || data.length === 0 ? generateDemoMeasurements(30) : data;
+  const outreach = outreachDemo || !outreachData || outreachData.length === 0
+    ? generateDemoOutreach()
+    : outreachData;
   const rigRows = rows.filter((r) => r.type === "PHYSICAL_RIG" && r.rtheta > 0);
+  const operatorConversations = outreach.filter((r) =>
+    ["Contacted", "Replied", "Meeting Set", "Positive Quote"].includes(r.status)
+  ).length;
 
   const daysLeft = daysUntil(YC_DEADLINE);
   const weeksLeft = Math.floor(daysLeft / 7);
@@ -98,8 +117,8 @@ export default function Predictions() {
     {
       label: `${TARGET_OPERATORS} operator conversations`,
       target: TARGET_OPERATORS,
-      achieved: false,
-      current: 0,
+      achieved: operatorConversations >= TARGET_OPERATORS,
+      current: operatorConversations,
       unit: "contacts",
       color: "#3b82f6",
     },

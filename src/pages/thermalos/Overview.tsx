@@ -1,0 +1,424 @@
+import { useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, Check, Cpu, FlaskConical } from "lucide-react";
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, ReferenceLine, Area, ComposedChart,
+} from "recharts";
+import {
+  fetchMeasurements, generateDemoMeasurements, isDemoModeError,
+  type MeasurementRow,
+} from "@/services/thermalosApi";
+
+/* ------------------------------------------------------------------ */
+/* Primitives                                                          */
+/* ------------------------------------------------------------------ */
+
+function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div
+      className={`bg-[#141412] border border-white/[0.07] rounded-md ${className}`}
+      style={{ borderWidth: "0.5px" }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function SectionLabel({ children, hint }: { children: React.ReactNode; hint?: string }) {
+  return (
+    <div className="flex items-baseline justify-between mb-3">
+      <div className="text-[10px] font-mono uppercase tracking-[0.15em] text-[#5a5a55]">
+        {children}
+      </div>
+      {hint && <div className="text-[10px] font-mono text-[#5a5a55]">{hint}</div>}
+    </div>
+  );
+}
+
+type Tone = "complete" | "progress" | "queued" | "locked" | "amber" | "gray";
+
+const TONE: Record<Tone, { fg: string; bg: string; border: string }> = {
+  complete: { fg: "#35C792", bg: "#0F6E5615", border: "#1D9E7540" },
+  progress: { fg: "#60a5fa", bg: "#3b82f615", border: "#3b82f640" },
+  queued:   { fg: "#EF9F27", bg: "#EF9F2715", border: "#EF9F2740" },
+  locked:   { fg: "#888780", bg: "#ffffff08", border: "#ffffff15" },
+  amber:    { fg: "#EF9F27", bg: "#EF9F2715", border: "#EF9F2740" },
+  gray:     { fg: "#888780", bg: "#ffffff08", border: "#ffffff15" },
+};
+
+function Pill({ tone, children }: { tone: Tone; children: React.ReactNode }) {
+  const t = TONE[tone];
+  return (
+    <span
+      className="inline-block px-2 py-0.5 rounded-full text-[10px] font-mono whitespace-nowrap"
+      style={{ color: t.fg, background: t.bg, border: `0.5px solid ${t.border}` }}
+    >
+      {children}
+    </span>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Sections                                                            */
+/* ------------------------------------------------------------------ */
+
+function Hero({ rowCount, demo }: { rowCount: number; demo: boolean }) {
+  return (
+    <div className="mb-8">
+      <div className="flex items-center gap-2 mb-3 flex-wrap">
+        <Pill tone="complete">YC W27 target</Pill>
+        <Pill tone="progress">Pre-seed · Pre-revenue</Pill>
+        <Pill tone={demo ? "gray" : "complete"}>
+          {demo ? "Demo data" : `${rowCount.toLocaleString()} live rows`}
+        </Pill>
+      </div>
+      <h1 className="text-[26px] md:text-[34px] font-semibold tracking-tight text-[#E6F7F1] leading-[1.15] mb-3 max-w-3xl">
+        GPU thermal-power forensics for production AI infrastructure.
+      </h1>
+      <p className="text-[14px] md:text-[15px] text-[#a8a89f] leading-relaxed max-w-2xl">
+        Cloud operators run thousands of GPUs without knowing when one is silently throttling. ThermalOS
+        detects cooling-path anomalies from telemetry alone — using power, temperature, and effective
+        thermal resistance (Rθ_eff) as forensic signals.
+      </p>
+    </div>
+  );
+}
+
+function HeadlineFinding() {
+  return (
+    <Card className="p-5 mb-8" >
+      <div className="flex items-start gap-4">
+        <div
+          className="w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0"
+          style={{ background: "#0F6E5615", border: "0.5px solid #1D9E7540" }}
+        >
+          <Cpu size={18} className="text-[#35C792]" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-[#5a5a55]">
+              Headline finding · Stage 1
+            </span>
+            <Pill tone="complete">Tesla T4 · Colab · E001–E004</Pill>
+          </div>
+          <div className="text-[16px] md:text-[17px] font-semibold text-[#E6F7F1] mb-2 leading-snug">
+            Utilization alone does not define thermal state.
+          </div>
+          <p className="text-[13px] text-[#a8a89f] leading-relaxed">
+            Across 6,700 telemetry rows on a Tesla T4 under controlled load, we observed{" "}
+            <span className="text-[#9FE1CB] font-semibold">three distinct power regimes at 0% utilization</span>
+            {" "}— a signal current monitoring tools collapse into a single &ldquo;idle&rdquo; state. The
+            invisible regime gap is where silent throttling and cooling-path degradation live.
+          </p>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Live data panel                                                     */
+/* ------------------------------------------------------------------ */
+
+function LiveData() {
+  const { data, error, isError, isLoading } = useQuery({
+    queryKey: ["measurements"],
+    queryFn: fetchMeasurements,
+    refetchInterval: 30_000,
+    staleTime: 0,
+    retry: false,
+  });
+
+  const demo = isError && isDemoModeError(error);
+  const rows: MeasurementRow[] = useMemo(
+    () => (demo || !data || data.length === 0 ? generateDemoMeasurements(40) : data),
+    [demo, data]
+  );
+
+  const valid = rows.filter((r) => r.rtheta > 0);
+  const latest = valid[valid.length - 1];
+
+  const chartData = valid.slice(-30).map((r, i) => ({
+    i: i + 1,
+    rtheta: r.rtheta,
+    tHot: r.tHot,
+  }));
+
+  const bestRtheta = valid.length ? Math.min(...valid.map((r) => r.rtheta)) : null;
+  const avgRtheta = valid.length ? valid.reduce((a, r) => a + r.rtheta, 0) / valid.length : null;
+  const alertCount = valid.filter((r) => r.alert && r.alert !== "OK" && !r.alert.includes("🟢")).length;
+
+  if (isLoading) {
+    return <div className="h-64 mb-8 bg-[#141412] border border-white/[0.07] rounded-md animate-pulse" />;
+  }
+
+  return (
+    <div className="mb-8">
+      <SectionLabel hint="Auto-refreshes from Google Sheet every 30s">Live telemetry</SectionLabel>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+        <KPI label="Latest Rθ_eff" value={latest ? `${latest.rtheta.toFixed(3)}` : "—"} unit="°C/W" tone={latest && latest.rtheta > 0.5 ? "amber" : "complete"} />
+        <KPI label="Best so far" value={bestRtheta !== null ? `${bestRtheta.toFixed(3)}` : "—"} unit="°C/W" tone="complete" />
+        <KPI label="Avg Rθ_eff" value={avgRtheta !== null ? `${avgRtheta.toFixed(3)}` : "—"} unit="°C/W" tone="gray" />
+        <KPI label="Anomaly events" value={String(alertCount)} unit={`/ ${valid.length} runs`} tone={alertCount > 0 ? "amber" : "complete"} />
+      </div>
+
+      <Card className="p-4">
+        <div className="flex items-baseline justify-between mb-2">
+          <div className="text-[12px] font-semibold text-[#E6F7F1]">Rθ_eff over recent runs</div>
+          <div className="text-[10px] font-mono text-[#5a5a55]">last 30 samples · °C/W</div>
+        </div>
+        <ResponsiveContainer width="100%" height={180}>
+          <ComposedChart data={chartData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+            <CartesianGrid stroke="rgba(255,255,255,0.04)" />
+            <XAxis dataKey="i" tick={{ fill: "#5a5a55", fontSize: 10 }} stroke="#2a2a26" />
+            <YAxis domain={[0, 0.8]} tick={{ fill: "#5a5a55", fontSize: 10 }} stroke="#2a2a26" />
+            <Tooltip
+              contentStyle={{ background: "#0D0D0B", border: "1px solid rgba(255,255,255,0.1)", fontSize: 11 }}
+              formatter={(v: number) => [`${v.toFixed(3)} °C/W`, "Rθ_eff"]}
+              labelFormatter={(v) => `Run ${v}`}
+            />
+            <ReferenceLine y={0.5} stroke="#D85A30" strokeDasharray="4 4" label={{ value: "Anomaly threshold", fill: "#D85A30", fontSize: 10, position: "right" }} />
+            <Area type="monotone" dataKey="rtheta" fill="rgba(29,158,117,0.08)" stroke="none" />
+            <Line type="monotone" dataKey="rtheta" stroke="#1D9E75" strokeWidth={2} dot={false} />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </Card>
+
+      <div className="mt-3 text-right">
+        <Link
+          to="/thermalos/lab"
+          className="inline-flex items-center gap-1 text-[11px] font-mono text-[#9FE1CB] hover:text-[#35C792] transition-colors"
+        >
+          Drill into Lab data <ArrowRight size={11} />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function KPI({ label, value, unit, tone }: { label: string; value: string; unit: string; tone: Tone }) {
+  const t = TONE[tone];
+  return (
+    <Card className="p-3">
+      <div className="text-[10px] font-mono uppercase tracking-[0.15em] text-[#5a5a55] mb-1.5">{label}</div>
+      <div className="flex items-baseline gap-1.5">
+        <span className="text-[20px] font-semibold tabular-nums" style={{ color: t.fg }}>{value}</span>
+        <span className="text-[10px] font-mono text-[#5a5a55]">{unit}</span>
+      </div>
+    </Card>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Condensed roadmap                                                   */
+/* ------------------------------------------------------------------ */
+
+interface RoadmapStage {
+  id: number;
+  title: string;
+  status: "complete" | "in_progress" | "locked";
+  subtitle: string;
+  progress: number;
+}
+
+const ROADMAP: RoadmapStage[] = [
+  { id: 1, title: "Colab baseline", status: "complete", subtitle: "Tesla T4 · 6,700 rows · E001–E004", progress: 100 },
+  { id: 2, title: "Dedicated GPU hardware", status: "in_progress", subtitle: "Physical machine · power-cap sweep · E005–E008", progress: 10 },
+  { id: 3, title: "Anomaly detector v1", status: "locked", subtitle: "Statistical detector on clean baseline", progress: 0 },
+  { id: 4, title: "Multi-GPU validation", status: "locked", subtitle: "A100 / H100 / RTX — generalization", progress: 0 },
+];
+
+function Roadmap() {
+  return (
+    <div className="mb-8">
+      <SectionLabel hint="Detailed methodology in Research →">Research roadmap</SectionLabel>
+      <div className="relative">
+        <div className="absolute left-3 top-3 bottom-3 w-px bg-white/[0.08]" aria-hidden />
+        <div className="space-y-3">
+          {ROADMAP.map((s) => {
+            const tone: Tone = s.status === "complete" ? "complete" : s.status === "in_progress" ? "progress" : "locked";
+            const t = TONE[tone];
+            const dim = s.status === "locked" ? (s.id === 3 ? "opacity-65" : "opacity-45") : "";
+            return (
+              <div key={s.id} className={`relative pl-10 ${dim}`}>
+                <div
+                  className="absolute left-0 top-2 w-6 h-6 rounded-full flex items-center justify-center"
+                  style={{
+                    background: s.status === "complete" ? t.fg : s.status === "in_progress" ? t.fg : "#0A0A08",
+                    border: `0.5px solid ${s.status === "locked" ? "#ffffff15" : t.fg}`,
+                    color: s.status === "locked" ? "#888780" : "white",
+                  }}
+                >
+                  {s.status === "complete" ? <Check size={12} /> : <span className="text-[10px] font-mono font-semibold">{s.id}</span>}
+                </div>
+                <Card className="px-4 py-3">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[10px] font-mono text-[#5a5a55]">Stage {s.id}</span>
+                        <Pill tone={tone}>
+                          {s.status === "complete" ? "Complete" : s.status === "in_progress" ? "In progress" : "Locked"}
+                        </Pill>
+                      </div>
+                      <div className="text-[13px] font-semibold text-[#E6F7F1] leading-tight">{s.title}</div>
+                      <div className="text-[11px] font-mono text-[#888780] mt-0.5 leading-snug truncate">{s.subtitle}</div>
+                    </div>
+                    <div className="text-[11px] font-mono tabular-nums text-[#888780] flex-shrink-0">{s.progress}%</div>
+                  </div>
+                  <div className="w-full h-1 rounded-full bg-white/[0.05] overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{ width: `${s.progress}%`, background: t.fg }}
+                    />
+                  </div>
+                </Card>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Team                                                                */
+/* ------------------------------------------------------------------ */
+
+const PEOPLE = [
+  { name: "Amogh Somisetty", role: "Co-founder · EE · Cal Poly SLO", badge: "Founder", tone: "complete" as Tone },
+  { name: "Sam", role: "Co-founder · ME · Hardware · Cal Poly SLO", badge: "Founder", tone: "complete" as Tone },
+  { name: "Prof. Kundu", role: "Cal Poly EE · informal advising (summer) · EE 4400 (fall)", badge: "Advisor", tone: "amber" as Tone },
+  { name: "Prof. Yu", role: "Signal processing · first meeting tomorrow", badge: "Pending", tone: "gray" as Tone },
+];
+
+function Team() {
+  return (
+    <div className="mb-8">
+      <SectionLabel>Team</SectionLabel>
+      <Card>
+        <ul className="divide-y divide-white/[0.05]">
+          {PEOPLE.map((p) => (
+            <li key={p.name} className="flex items-center justify-between gap-3 px-4 py-3">
+              <div className="min-w-0">
+                <div className="text-[13px] text-[#E6F7F1] truncate">{p.name}</div>
+                <div className="text-[11px] font-mono text-[#888780] truncate">{p.role}</div>
+              </div>
+              <Pill tone={p.tone}>{p.badge}</Pill>
+            </li>
+          ))}
+        </ul>
+      </Card>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Current asks                                                        */
+/* ------------------------------------------------------------------ */
+
+const ASKS = [
+  {
+    title: "AI Factory / GPU cluster access",
+    body: "Dedicated A100/H100/RTX-class machine for Stage 2 power-cap sweep (E006). This is the single critical unlock for the YC headline result — everything else is sequenced behind it.",
+    tone: "queued" as Tone,
+  },
+];
+
+function CurrentAsks() {
+  return (
+    <div className="mb-4">
+      <SectionLabel>What would help right now</SectionLabel>
+      <div className="grid grid-cols-1 gap-3 max-w-xl">
+        {ASKS.map((a) => {
+          const t = TONE[a.tone];
+          return (
+            <Card key={a.title} className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span
+                  className="w-2 h-2 rounded-full"
+                  style={{ background: t.fg }}
+                  aria-hidden
+                />
+                <div className="text-[13px] font-semibold text-[#E6F7F1]">{a.title}</div>
+              </div>
+              <p className="text-[12px] text-[#a8a89f] leading-relaxed">{a.body}</p>
+            </Card>
+          );
+        })}
+      </div>
+      <p className="mt-3 text-[11px] font-mono text-[#5a5a55] text-center">
+        Reach out: <a href="mailto:asomisetty27@gmail.com" className="text-[#9FE1CB] hover:text-[#35C792]">asomisetty27@gmail.com</a>
+      </p>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Methodology footer (links to deeper pages)                          */
+/* ------------------------------------------------------------------ */
+
+function DeepLinks() {
+  const links = [
+    { to: "/thermalos/lab", label: "Lab — live telemetry & runs", icon: Cpu },
+    { to: "/thermalos/research", label: "Research — Rθ methodology", icon: FlaskConical },
+    { to: "/thermalos/yc", label: "YC — evidence & milestones", icon: Check },
+  ];
+  return (
+    <div className="mt-10 pt-6 border-t border-white/[0.05]">
+      <SectionLabel>Deeper views</SectionLabel>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {links.map((l) => {
+          const Icon = l.icon;
+          return (
+            <Link
+              key={l.to}
+              to={l.to}
+              className="group bg-[#141412] border border-white/[0.07] rounded-md px-4 py-3 flex items-center gap-3 hover:bg-white/[0.02] hover:border-[#1D9E75]/40 transition-colors"
+              style={{ borderWidth: "0.5px" }}
+            >
+              <Icon size={14} className="text-[#5a5a55] group-hover:text-[#35C792] transition-colors" />
+              <span className="text-[12px] text-[#a8a89f] group-hover:text-[#E6F7F1] flex-1">{l.label}</span>
+              <ArrowRight size={12} className="text-[#5a5a55] group-hover:text-[#35C792] transition-colors" />
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Page                                                                */
+/* ------------------------------------------------------------------ */
+
+export default function Overview() {
+  useEffect(() => {
+    document.title = "ThermalOS — Overview | amogh.site";
+  }, []);
+
+  const { data, error, isError } = useQuery({
+    queryKey: ["measurements"],
+    queryFn: fetchMeasurements,
+    refetchInterval: 30_000,
+    staleTime: 0,
+    retry: false,
+  });
+  const demo = isError && isDemoModeError(error);
+  const rowCount = demo ? 6700 : data?.length ?? 0;
+
+  return (
+    <div className="max-w-5xl mx-auto">
+      <Hero rowCount={rowCount} demo={demo} />
+      <HeadlineFinding />
+      <LiveData />
+      <Roadmap />
+      <Team />
+      <CurrentAsks />
+      <DeepLinks />
+    </div>
+  );
+}
