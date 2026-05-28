@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import RthetaModel from "./RthetaModel";
+import Findings from "./Findings";
 
 /* ------------------------------------------------------------------ */
 /* Methodology tab — framing for the GPU forensics thesis              */
@@ -136,8 +137,9 @@ function MethodologyTab() {
 /* ------------------------------------------------------------------ */
 
 const TABS = [
-  { value: "methodology", label: "Methodology",   sub: "Framing & findings", Component: MethodologyTab },
-  { value: "rtheta",      label: "Rθ vs Pressure", sub: "Regression model",  Component: RthetaModel    },
+  { value: "methodology", label: "Methodology",    sub: "Framing & questions", Component: MethodologyTab },
+  { value: "findings",    label: "Findings",        sub: "E001-E004 analysis",  Component: Findings       },
+  { value: "rtheta",      label: "Rtheta vs P",     sub: "Regression model",    Component: RthetaModel    },
 ] as const;
 
 type TabValue = (typeof TABS)[number]["value"];
