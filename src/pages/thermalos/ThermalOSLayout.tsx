@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard, Activity, FlaskConical, Award,
-  Menu, X, Loader2,
+  LayoutDashboard, Activity, FlaskConical, Route,
+  Users, BookOpen, Menu, X, Loader2,
 } from "lucide-react";
 import { useIsFetching } from "@tanstack/react-query";
 
@@ -15,10 +15,12 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { to: "/thermalos",          label: "Overview", sub: "Thesis & live data",      icon: LayoutDashboard, end: true },
-  { to: "/thermalos/lab",      label: "Lab",      sub: "Telemetry & runs",        icon: Activity },
-  { to: "/thermalos/research", label: "Research", sub: "Methodology & findings",  icon: FlaskConical },
-  { to: "/thermalos/yc",       label: "YC",       sub: "Evidence & milestones",   icon: Award },
+  { to: "/thermalos",              label: "Overview",     sub: "Thesis & live data",     icon: LayoutDashboard, end: true },
+  { to: "/thermalos/research",     label: "Research",     sub: "Methodology & findings", icon: FlaskConical },
+  { to: "/thermalos/lab",          label: "Lab",          sub: "Telemetry & runs",       icon: Activity },
+  { to: "/thermalos/roadmap",      label: "Roadmap",      sub: "4-stage tracker",        icon: Route },
+  { to: "/thermalos/advisor",      label: "Advisor",      sub: "Questions & decisions",  icon: Users },
+  { to: "/thermalos/publication",  label: "Publication",  sub: "Conference target",      icon: BookOpen },
 ];
 
 function UTCClock() {

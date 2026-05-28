@@ -218,6 +218,173 @@ export async function fetchTodayPlan(): Promise<TodayRow[]> {
   }));
 }
 
+// ---------- ADVISOR QUESTIONS ----------
+
+export interface AdvisorQuestion {
+  id: string;
+  date_raised: string;
+  question: string;
+  what_i_tried: string;
+  status: "open" | "in_discussion" | "answered";
+  answer: string;
+  answered_date: string;
+  priority: "high" | "normal" | "low";
+}
+
+export async function fetchAdvisorQuestions(): Promise<AdvisorQuestion[]> {
+  const rows = await readRange("'AdvisorQuestions'!A4:H200");
+  return rows.filter((r) => r[0]).map((r) => ({
+    id: r[0] ?? "",
+    date_raised: r[1] ?? "",
+    question: r[2] ?? "",
+    what_i_tried: r[3] ?? "",
+    status: (r[4] as AdvisorQuestion["status"]) ?? "open",
+    answer: r[5] ?? "",
+    answered_date: r[6] ?? "",
+    priority: (r[7] as AdvisorQuestion["priority"]) ?? "normal",
+  }));
+}
+
+export function generateDemoAdvisorQuestions(): AdvisorQuestion[] {
+  return [
+    {
+      id: "q1",
+      date_raised: "2026-05-20",
+      question: "How do we handle T_reference uncertainty at low power loads? At 9.5W idle, a 5C ambient error causes a 35% R_theta swing.",
+      what_i_tried: "Ran F002 sensitivity analysis assuming T_ref = 25C from literature. Found 35.3% swing at idle vs 10.2% at load. The metric is most sensitive exactly when power is lowest -- and that is when anomaly detection matters most.",
+      status: "open",
+      answer: "",
+      answered_date: "",
+      priority: "high",
+    },
+    {
+      id: "q2",
+      date_raised: "2026-05-20",
+      question: "Rolling average vs median filter vs steady-state window for R_theta computation -- which method is most valid?",
+      what_i_tried: "Implemented 5s rolling average and 5s median filter, compared against raw power. R_theta std improved by 3.5% max (rolling avg), negligible with median. Variance source is T_reference uncertainty, not power noise (F003 null result).",
+      status: "answered",
+      answer: "Use steady-state window. The null result confirms filtering does not address the root cause. Do not add complexity that does not reduce the dominant error source.",
+      answered_date: "2026-05-27",
+      priority: "normal",
+    },
+    {
+      id: "q3",
+      date_raised: "2026-05-20",
+      question: "Is the rule-based state classifier statistically valid, or should it be probabilistic? Current thresholds misclassify 47-98% of transitional phases.",
+      what_i_tried: "Implemented thresholds: util < 5%, power < 15W, temp < 55C. Works on stable endpoints but fails transitional phases (F004). Reviewed Orange Data Mining -- Naive Bayes and Random Forest both viable. Goal is a model equation, not a black box.",
+      status: "in_discussion",
+      answer: "",
+      answered_date: "",
+      priority: "high",
+    },
+    {
+      id: "q4",
+      date_raised: "2026-05-22",
+      question: "Is the ~447MB NVML memory reported with no active processes a state variable or a driver artifact?",
+      what_i_tried: "Observed consistently across E001-E004 in both nvidia-smi and pyNVML. Appears at driver load, persists through process exit. No named processes attached. Not documented in NVIDIA driver release notes.",
+      status: "open",
+      answer: "",
+      answered_date: "",
+      priority: "normal",
+    },
+    {
+      id: "q5",
+      date_raised: "2026-05-20",
+      question: "t-test vs Mann-Whitney U for small-sample recovery comparison -- given n=3 trials, which is appropriate?",
+      what_i_tried: "n=3 cross-trial CV is low (1.68% load, 0.64% recovery). t-test requires normality at n=3 which is hard to justify. Mann-Whitney U is non-parametric but loses power at small n. Standard recommendation is n >= 10 before reporting p-values.",
+      status: "open",
+      answer: "",
+      answered_date: "",
+      priority: "normal",
+    },
+  ];
+}
+
+// ---------- DECISION LOG ----------
+
+export interface DecisionLogRow {
+  date: string;
+  decision: string;
+  rationale: string;
+  source_question_id: string;
+  status: "active" | "superseded";
+}
+
+export async function fetchDecisionLog(): Promise<DecisionLogRow[]> {
+  const rows = await readRange("'DecisionLog'!A4:E100");
+  return rows.filter((r) => r[0]).map((r) => ({
+    date: r[0] ?? "",
+    decision: r[1] ?? "",
+    rationale: r[2] ?? "",
+    source_question_id: r[3] ?? "",
+    status: (r[4] as DecisionLogRow["status"]) ?? "active",
+  }));
+}
+
+export function generateDemoDecisionLog(): DecisionLogRow[] {
+  return [
+    {
+      date: "2026-05-27",
+      decision: "Use steady-state window for R_theta computation",
+      rationale: "Rolling avg and median filter both showed negligible improvement (3.5% max). Dominant error source is T_reference uncertainty, not power noise. Simpler is better.",
+      source_question_id: "q2",
+      status: "active",
+    },
+    {
+      date: "2026-05-27",
+      decision: "Pursue Bayesian classification over hardcoded thresholds",
+      rationale: "Rule-based classifier fails 47-98% of transitional phases. Bayesian approach via Orange Data Mining allows probabilistic state assignment and produces a model equation rather than a black box.",
+      source_question_id: "q3",
+      status: "active",
+    },
+    {
+      date: "2026-05-27",
+      decision: "Redo E003 and E004 with 10+ trials on Stage 2 hardware",
+      rationale: "n=3 is insufficient for statistical testing. Need n >= 10 before reporting confidence intervals. Repeat on dedicated hardware where ambient is controlled.",
+      source_question_id: "q5",
+      status: "active",
+    },
+    {
+      date: "2026-05-27",
+      decision: "Hold formal t-tests and p-values until sample is larger",
+      rationale: "n=3 descriptive stats are promising but formal tests are unreliable at this sample size. Report CV and descriptive stats only until Stage 2 replications are complete.",
+      source_question_id: "q5",
+      status: "active",
+    },
+    {
+      date: "2026-05-27",
+      decision: "Target a conference publication as the end goal",
+      rationale: "Kundu confirmed this is the appropriate end goal. The research should culminate in a publication. YC application uses the results, but the research is the primary output. Venue TBD -- confirm with Kundu.",
+      source_question_id: "",
+      status: "active",
+    },
+  ];
+}
+
+// ---------- ADVISOR ASKS ----------
+
+export interface AdvisorAsk {
+  id: string;
+  ask: string;
+  status: "open" | "resolved";
+}
+
+export async function fetchAdvisorAsks(): Promise<AdvisorAsk[]> {
+  const rows = await readRange("'AdvisorAsks'!A4:C100");
+  return rows.filter((r) => r[0]).map((r) => ({
+    id: r[0] ?? "",
+    ask: r[1] ?? "",
+    status: (r[2] as AdvisorAsk["status"]) ?? "open",
+  }));
+}
+
+export function generateDemoAdvisorAsks(): AdvisorAsk[] {
+  return [
+    { id: "a1", ask: "Confirm conference target venue and submission deadline", status: "open" },
+    { id: "a2", ask: "Confirm whether informal summer advising suffices to support an AI Factory cluster access request to the Noyce School", status: "open" },
+  ];
+}
+
 export function generateDemoTodayPlan(): TodayRow[] {
   return [
     { priority: "P0 — Critical", phase: "Phase 0 — Foundation", milestone: "Run E005 power-cap sweep (6 levels, PyTorch matmul)", owner: "Amogh", track: "Software", notes: "Use Colab T4, 30min per level, log to sheet" },

@@ -7,12 +7,15 @@ import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ThermalOSLayout from "./pages/thermalos/ThermalOSLayout.tsx";
 
-// New top-level pages
-import Overview from "./pages/thermalos/Overview.tsx";
-import Lab from "./pages/thermalos/Lab.tsx";
-import Research from "./pages/thermalos/Research.tsx";
-import YC from "./pages/thermalos/YC.tsx";
-import Plan from "./pages/thermalos/Plan.tsx";
+// ThermalOS pages
+import Overview     from "./pages/thermalos/Overview.tsx";
+import Lab          from "./pages/thermalos/Lab.tsx";
+import Research     from "./pages/thermalos/Research.tsx";
+import Roadmap      from "./pages/thermalos/Roadmap.tsx";
+import Advisor      from "./pages/thermalos/Advisor.tsx";
+import Publication  from "./pages/thermalos/Publication.tsx";
+import YC           from "./pages/thermalos/YC.tsx";
+import Plan         from "./pages/thermalos/Plan.tsx";
 
 const queryClient = new QueryClient();
 
@@ -27,11 +30,16 @@ const App = () => (
           <Route path="/thermalos" element={<ThermalOSLayout />}>
             <Route index element={<Overview />} />
 
-            {/* 5-pillar IA */}
-            <Route path="lab" element={<Lab />} />
-            <Route path="research" element={<Research />} />
-            <Route path="yc" element={<YC />} />
-            <Route path="plan" element={<Plan />} />
+            {/* 6-pillar IA */}
+            <Route path="research"    element={<Research />} />
+            <Route path="lab"         element={<Lab />} />
+            <Route path="roadmap"     element={<Roadmap />} />
+            <Route path="advisor"     element={<Advisor />} />
+            <Route path="publication" element={<Publication />} />
+            {/* Hidden internal URL */}
+            <Route path="plan"        element={<Plan />} />
+            {/* Legacy -- keeps old routes alive */}
+            <Route path="yc"          element={<YC />} />
 
             {/* Legacy URLs — keep working, redirect into new tabbed pages */}
             <Route path="dashboard"    element={<Navigate to="/thermalos" replace />} />
