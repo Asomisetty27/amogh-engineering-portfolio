@@ -232,17 +232,37 @@ export interface AdvisorQuestion {
 }
 
 export async function fetchAdvisorQuestions(): Promise<AdvisorQuestion[]> {
-  const rows = await readRange("'AdvisorQuestions'!A4:H200");
-  return rows.filter((r) => r[0]).map((r) => ({
-    id: r[0] ?? "",
-    date_raised: r[1] ?? "",
-    question: r[2] ?? "",
-    what_i_tried: r[3] ?? "",
-    status: (r[4] as AdvisorQuestion["status"]) ?? "open",
-    answer: r[5] ?? "",
-    answered_date: r[6] ?? "",
-    priority: (r[7] as AdvisorQuestion["priority"]) ?? "normal",
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from("advisor_questions")
+    .select("*")
+    .order("date_raised", { ascending: false });
+  if (error || !data) throw new Error("DEMO_MODE");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return data.map((r: any) => ({
+    id: r.id,
+    date_raised: r.date_raised ? (r.date_raised as string).slice(0, 10) : "",
+    question: r.question,
+    what_i_tried: r.what_i_tried ?? "",
+    status: r.status as AdvisorQuestion["status"],
+    answer: r.answer ?? "",
+    answered_date: r.answered_at ? (r.answered_at as string).slice(0, 10) : "",
+    priority: r.priority as AdvisorQuestion["priority"],
   }));
+}
+
+export async function updateQuestionAnswer(
+  id: string,
+  answer: string,
+  status: AdvisorQuestion["status"],
+  answeredBy: string,
+): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from("advisor_questions")
+    .update({ answer, status, answered_by: answeredBy, answered_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw error;
 }
 
 export function generateDemoAdvisorQuestions(): AdvisorQuestion[] {
@@ -311,13 +331,19 @@ export interface DecisionLogRow {
 }
 
 export async function fetchDecisionLog(): Promise<DecisionLogRow[]> {
-  const rows = await readRange("'DecisionLog'!A4:E100");
-  return rows.filter((r) => r[0]).map((r) => ({
-    date: r[0] ?? "",
-    decision: r[1] ?? "",
-    rationale: r[2] ?? "",
-    source_question_id: r[3] ?? "",
-    status: (r[4] as DecisionLogRow["status"]) ?? "active",
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from("decision_log")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error || !data) throw new Error("DEMO_MODE");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return data.map((r: any) => ({
+    date: r.created_at ? (r.created_at as string).slice(0, 10) : "",
+    decision: r.decision,
+    rationale: r.rationale ?? "",
+    source_question_id: r.source_question_id ?? "",
+    status: r.status as DecisionLogRow["status"],
   }));
 }
 
@@ -370,11 +396,17 @@ export interface AdvisorAsk {
 }
 
 export async function fetchAdvisorAsks(): Promise<AdvisorAsk[]> {
-  const rows = await readRange("'AdvisorAsks'!A4:C100");
-  return rows.filter((r) => r[0]).map((r) => ({
-    id: r[0] ?? "",
-    ask: r[1] ?? "",
-    status: (r[2] as AdvisorAsk["status"]) ?? "open",
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from("advisor_asks")
+    .select("*")
+    .order("ask");
+  if (error || !data) throw new Error("DEMO_MODE");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return data.map((r: any) => ({
+    id: r.id,
+    ask: r.ask,
+    status: r.status as AdvisorAsk["status"],
   }));
 }
 
