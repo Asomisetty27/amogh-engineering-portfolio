@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Quote } from "lucide-react";
 import { fetchOutreach, generateDemoOutreach, isDemoModeError, type OutreachRow } from "@/services/thermalosApi";
+
+const DISCOVERY_TARGET = 10;
 
 const STATUS_ORDER = ["Not Contacted", "Contacted", "Replied", "Meeting Set", "Positive Quote", "No Response"];
 
@@ -14,6 +17,109 @@ const STATUS_META: Record<string, { color: string; bg: string; border: string }>
 };
 
 function statusMeta(s: string) { return STATUS_META[s] ?? STATUS_META["Not Contacted"]; }
+
+// ─── Discovery Quotes ────────────────────────────────────────────────────────
+
+function extractQuote(notes: string): string | null {
+  if (!notes) return null;
+  // Look for quoted text first (highest signal)
+  const quoted = notes.match(/['"]([^'"]{15,})['"]/);
+  if (quoted) return quoted[1];
+  // Look for pain keywords (signal it's a real quote)
+  const painSignals = /(no idea|hard to|broken|messy|don't know|can't tell|black box|painful|frustrating|wish we|need|problem|issue|throttling)/i;
+  if (painSignals.test(notes) && notes.length >= 25) return notes;
+  return null;
+}
+
+function DiscoveryQuotes({ rows }: { rows: OutreachRow[] }) {
+  // Treat any row that is "Replied", "Meeting Set", or "Positive Quote" as a completed discovery call
+  const discoveryCalls = rows.filter((r) =>
+    ["Replied", "Meeting Set", "Positive Quote"].includes(r.status),
+  );
+
+  const quotes = rows
+    .map((r) => ({ row: r, quote: extractQuote(r.notes) }))
+    .filter((q): q is { row: OutreachRow; quote: string } => q.quote !== null);
+
+  // Sort by status priority — Positive Quote first
+  quotes.sort((a, b) => {
+    const rank = (s: string) =>
+      s === "Positive Quote" ? 0 : s === "Meeting Set" ? 1 : s === "Replied" ? 2 : 3;
+    return rank(a.row.status) - rank(b.row.status);
+  });
+
+  const progressPct = Math.min(100, Math.round((discoveryCalls.length / DISCOVERY_TARGET) * 100));
+
+  return (
+    <div className="bg-[#141412] border border-white/[0.07] rounded-xl p-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+        <div>
+          <div className="text-[9px] font-mono uppercase tracking-wider text-[#5a5a55] mb-0.5">
+            Discovery call evidence
+          </div>
+          <div className="text-[13px] font-semibold text-[#E6F7F1]">
+            Operator pain, in their words
+          </div>
+        </div>
+        <div className="flex items-center gap-3 text-[11px] font-mono">
+          <span className="text-[#9FE1CB]">
+            <span className="font-semibold text-[14px]">{discoveryCalls.length}</span>
+            <span className="text-[#5a5a55]"> / {DISCOVERY_TARGET}</span> calls
+          </span>
+          <div className="w-24 h-1 rounded-full bg-white/[0.05] overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all"
+              style={{ width: `${progressPct}%`, background: "#1D9E75" }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {quotes.length === 0 ? (
+        <p className="text-[12px] font-mono text-[#5a5a55] py-2">
+          No discovery quotes captured yet. Log operator pain in the Outreach &quot;Notes&quot; column.
+          Target: {DISCOVERY_TARGET} discovery calls with verbatim quotes for the YC application.
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+          {quotes.slice(0, 6).map(({ row, quote }, i) => {
+            const isPositive = row.status === "Positive Quote";
+            return (
+              <div
+                key={i}
+                className="p-3 rounded border"
+                style={{
+                  background: isPositive ? "#1D9E7508" : "#ffffff03",
+                  borderColor: isPositive ? "#1D9E7530" : "rgba(255,255,255,0.06)",
+                }}
+              >
+                <Quote
+                  size={11}
+                  className="mb-1.5"
+                  style={{ color: isPositive ? "#35C792" : "#888780" }}
+                />
+                <p className="text-[12px] text-[#E6F7F1] italic leading-snug mb-2">
+                  &ldquo;{quote.length > 160 ? quote.slice(0, 160) + "..." : quote}&rdquo;
+                </p>
+                <div className="text-[10px] font-mono text-[#888780]">
+                  <span className="text-[#9FE1CB]">{row.name}</span>
+                  {row.role && <span className="text-[#5a5a55]">, {row.role}</span>}
+                  {row.org && <span className="text-[#5a5a55]"> · {row.org}</span>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {quotes.length > 6 && (
+        <div className="mt-3 text-[10px] font-mono text-[#5a5a55] text-center">
+          + {quotes.length - 6} more quote{quotes.length - 6 !== 1 ? "s" : ""} in the table below
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Outreach() {
   useEffect(() => { document.title = "ThermalOS — Outreach | amogh.site"; }, []);
@@ -65,6 +171,9 @@ export default function Outreach() {
           Demo Mode — connect the Google Sheet to load live outreach data.
         </div>
       )}
+
+      {/* Discovery quotes — YC evidence */}
+      <DiscoveryQuotes rows={rows} />
 
       {/* Funnel */}
       <div className="bg-[#141412] border border-white/[0.07] rounded-xl p-4">
