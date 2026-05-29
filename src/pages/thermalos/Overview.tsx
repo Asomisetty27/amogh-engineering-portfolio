@@ -336,6 +336,134 @@ function NextStep() {
 }
 
 /* ------------------------------------------------------------------ */
+/* What data goes where                                                */
+/* ------------------------------------------------------------------ */
+
+function detectExperimentId(s: string): string | null {
+  const m = (s ?? "").match(/E(\d{3})/i);
+  return m ? `E${m[1]}` : null;
+}
+
+interface DataMapping {
+  experimentId: string;
+  description: string;
+  tab: string;
+  columns: string[];
+  notes: string;
+}
+
+const EXPERIMENT_DATA_MAP: Record<string, DataMapping> = {
+  E005: {
+    experimentId: "E005",
+    description: "Power-cap sweep (6 levels)",
+    tab: "📡 Measurements",
+    columns: ["timestamp", "temp_c", "power_w", "power_cap_w", "sm_clock_mhz", "util_pct", "rtheta_cwatt"],
+    notes: "Run PyTorch matmul at 150W / 175W / 200W / 225W / 250W / TDP. Log 30min per level. Use steady-state window only.",
+  },
+  E006: {
+    experimentId: "E006",
+    description: "Rolling Rθ baseline + anomaly threshold",
+    tab: "📡 Measurements",
+    columns: ["timestamp", "temp_c", "power_w", "rtheta_cwatt", "headroom_c"],
+    notes: "Compute rolling mean Rθ over 30-sample window. Sweep k = [2, 3, 4] for baseline_mean + k*std threshold. Report false-positive rate per k.",
+  },
+  E007: {
+    experimentId: "E007",
+    description: "Cross-trial replication (n>=10)",
+    tab: "📡 Measurements",
+    columns: ["timestamp", "trial_id", "temp_c", "power_w", "rtheta_cwatt"],
+    notes: "Redo E003/E004 with 10+ trials on Stage 2 hardware. Trial_id column required for grouping. Report CV per metric.",
+  },
+  E008: {
+    experimentId: "E008",
+    description: "Bayesian state classifier training",
+    tab: "📡 Measurements + label",
+    columns: ["timestamp", "temp_c", "power_w", "util_pct", "rtheta_cwatt", "labeled_state"],
+    notes: "Hand-label each transition (idle/ramp/load/cooldown). Train classifier in Orange Data Mining. Export model equation for paper.",
+  },
+};
+
+function WhatDataGoesWhere() {
+  const { data: timelineData } = useQuery({
+    queryKey: ["timeline"],
+    queryFn: fetchTimeline,
+    staleTime: 60_000,
+    retry: false,
+  });
+
+  const timeline = !timelineData || timelineData.length === 0 ? generateDemoTimeline() : timelineData;
+
+  // Find the current active experiment (in-progress or next-up E-prefixed milestone)
+  const inProgressExp = timeline.find(
+    (t) => detectExperimentId(t.milestone) && isInProgress(t.status),
+  );
+  const nextExp = timeline.find(
+    (t) =>
+      detectExperimentId(t.milestone) && !isDone(t.status) && !isInProgress(t.status),
+  );
+
+  const activeRow = inProgressExp || nextExp;
+  const expId = activeRow ? detectExperimentId(activeRow.milestone) : null;
+  const mapping = expId ? EXPERIMENT_DATA_MAP[expId] : null;
+
+  if (!mapping) return null;
+
+  return (
+    <div className="mb-8">
+      <SectionLabel hint={inProgressExp ? "Active experiment" : "Next experiment"}>
+        Where does the data go?
+      </SectionLabel>
+      <Card className="p-4">
+        <div className="flex flex-wrap items-baseline gap-2 mb-3">
+          <span className="text-[11px] font-mono font-semibold text-[#35C792]">{mapping.experimentId}</span>
+          <span className="text-[12px] text-[#E6F7F1]">{mapping.description}</span>
+          <Pill tone={inProgressExp ? "progress" : "queued"}>
+            {inProgressExp ? "Running" : "Up next"}
+          </Pill>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+          <div className="md:col-span-1">
+            <div className="text-[9px] font-mono uppercase tracking-[0.12em] text-[#5a5a55] mb-1">
+              Sheet tab
+            </div>
+            <div className="text-[12px] font-mono text-[#9FE1CB]">{mapping.tab}</div>
+          </div>
+          <div className="md:col-span-2">
+            <div className="text-[9px] font-mono uppercase tracking-[0.12em] text-[#5a5a55] mb-1">
+              Required columns
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {mapping.columns.map((c) => (
+                <span
+                  key={c}
+                  className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.04] border border-white/[0.08] text-[#a8a89f]"
+                >
+                  {c}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <p className="text-[11px] text-[#6b7280] leading-relaxed pt-3 border-t border-white/[0.05]">
+          {mapping.notes}
+        </p>
+
+        <div className="flex items-center justify-end pt-3">
+          <Link
+            to="/thermalos/lab?tab=experiments"
+            className="inline-flex items-center gap-1 text-[11px] font-mono text-[#9FE1CB] hover:text-[#35C792] transition-colors"
+          >
+            Open Lab · Experiments <ArrowRight size={11} />
+          </Link>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Live data panel                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -629,6 +757,7 @@ export default function Overview() {
     <div className="max-w-5xl mx-auto">
       <Hero rowCount={rowCount} demo={demo} />
       <NextStep />
+      <WhatDataGoesWhere />
       <HeadlineFinding />
       <LiveData />
       <Roadmap />
