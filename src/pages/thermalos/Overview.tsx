@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Check, Cpu, FlaskConical } from "lucide-react";
+import { ArrowRight, Check, Cpu, FlaskConical, Zap } from "lucide-react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine, Area, ComposedChart,
@@ -9,7 +9,9 @@ import {
 import {
   fetchMeasurements, generateDemoMeasurements, isDemoModeError,
   fetchRoadmapStages, generateDemoRoadmapStages,
-  type MeasurementRow, type RoadmapStage,
+  fetchTimeline, generateDemoTimeline,
+  fetchAdvisorQuestions, generateDemoAdvisorQuestions,
+  type MeasurementRow, type RoadmapStage, type TimelineRow, type AdvisorQuestion,
 } from "@/services/thermalosApi";
 
 /* ------------------------------------------------------------------ */
@@ -115,6 +117,220 @@ function HeadlineFinding() {
           </p>
         </div>
       </div>
+    </Card>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Next step engine                                                    */
+/* ------------------------------------------------------------------ */
+
+function priorityRank(p: string): number {
+  if (!p) return 3;
+  if (p.includes("P0") || p.toLowerCase().includes("critical")) return 0;
+  if (p.includes("P1") || p.toLowerCase().includes("high")) return 1;
+  if (p.includes("P2") || p.toLowerCase().includes("normal")) return 2;
+  return 3;
+}
+
+function isDone(s: string): boolean {
+  if (!s) return false;
+  const l = s.toLowerCase();
+  return l.includes("done") || l.includes("complete") || s.includes("✓");
+}
+
+function isInProgress(s: string): boolean {
+  if (!s) return false;
+  const l = s.toLowerCase();
+  return l.includes("progress") || l === "doing" || l.includes("active");
+}
+
+type ActionType = "blocked" | "in_progress" | "ready";
+
+interface NextAction {
+  action: string;
+  reason: string;
+  type: ActionType;
+  link: string;
+  owner?: string;
+  priority?: string;
+}
+
+function computeNextSteps(
+  questions: AdvisorQuestion[],
+  timeline: TimelineRow[],
+): { next: NextAction | null; onDeck: NextAction[] } {
+  // Rule 1: Blocked by high-priority open questions
+  const blockingQs = questions.filter(
+    (q) => q.priority === "high" && (q.status === "open" || q.status === "in_discussion"),
+  );
+
+  if (blockingQs.length > 0) {
+    const q = blockingQs[0];
+    const truncated = q.question.length > 90 ? q.question.slice(0, 90) + "..." : q.question;
+    const next: NextAction = {
+      action: `Resolve: ${truncated}`,
+      reason:
+        q.status === "in_discussion"
+          ? "High-priority question is in discussion with Kundu. Methodology decisions downstream are gated on this."
+          : "High-priority advisor question is open. Methodology decisions downstream cannot proceed without resolution.",
+      type: "blocked",
+      link: "/thermalos/advisor",
+    };
+
+    const onDeck: NextAction[] = blockingQs.slice(1, 3).map((qq) => ({
+      action: qq.question.length > 70 ? qq.question.slice(0, 70) + "..." : qq.question,
+      reason: `${qq.priority} priority · ${qq.status === "open" ? "open" : "in discussion"}`,
+      type: "blocked",
+      link: "/thermalos/advisor",
+    }));
+
+    return { next, onDeck };
+  }
+
+  // Rule 2: Highest-priority in-progress task
+  const inProgress = timeline.filter((t) => isInProgress(t.status));
+  if (inProgress.length > 0) {
+    const sorted = [...inProgress].sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority));
+    const top = sorted[0];
+
+    const next: NextAction = {
+      action: top.milestone,
+      reason: `Active work in ${top.phase || "current phase"}. Owner: ${top.owner || "unassigned"}. ${top.priority || ""}`.trim(),
+      type: "in_progress",
+      link: "/thermalos/roadmap",
+      owner: top.owner,
+      priority: top.priority,
+    };
+
+    const onDeck: NextAction[] = sorted.slice(1, 3).map((t) => ({
+      action: t.milestone,
+      reason: `${t.priority || "normal"} · ${t.owner || "unassigned"}`,
+      type: "in_progress",
+      link: "/thermalos/roadmap",
+      owner: t.owner,
+      priority: t.priority,
+    }));
+
+    return { next, onDeck };
+  }
+
+  // Rule 3: Next highest-priority not-started task
+  const todo = timeline.filter((t) => !isDone(t.status) && !isInProgress(t.status));
+  const sorted = [...todo].sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority));
+
+  if (sorted.length > 0) {
+    const top = sorted[0];
+    const next: NextAction = {
+      action: top.milestone,
+      reason: `Next highest-priority task ready to start. Phase: ${top.phase || "current"}. Owner: ${top.owner || "unassigned"}.`,
+      type: "ready",
+      link: "/thermalos/roadmap",
+      owner: top.owner,
+      priority: top.priority,
+    };
+
+    const onDeck: NextAction[] = sorted.slice(1, 3).map((t) => ({
+      action: t.milestone,
+      reason: `${t.priority || "normal"} · ${t.owner || "unassigned"}`,
+      type: "ready",
+      link: "/thermalos/roadmap",
+      owner: t.owner,
+      priority: t.priority,
+    }));
+
+    return { next, onDeck };
+  }
+
+  return { next: null, onDeck: [] };
+}
+
+function NextStep() {
+  const { data: questionsData } = useQuery({
+    queryKey: ["advisor-questions"],
+    queryFn: fetchAdvisorQuestions,
+    staleTime: 30_000,
+    retry: false,
+  });
+  const { data: timelineData } = useQuery({
+    queryKey: ["timeline"],
+    queryFn: fetchTimeline,
+    staleTime: 60_000,
+    retry: false,
+  });
+
+  const questions = !questionsData || questionsData.length === 0 ? generateDemoAdvisorQuestions() : questionsData;
+  const timeline = !timelineData || timelineData.length === 0 ? generateDemoTimeline() : timelineData;
+
+  const { next, onDeck } = useMemo(() => computeNextSteps(questions, timeline), [questions, timeline]);
+
+  if (!next) return null;
+
+  const TYPE_STYLE: Record<ActionType, { tone: Tone; label: string }> = {
+    blocked:     { tone: "queued",   label: "Blocked · resolve to unblock" },
+    in_progress: { tone: "progress", label: "Active work" },
+    ready:       { tone: "complete", label: "Ready to start" },
+  };
+
+  const typeStyle = TYPE_STYLE[next.type];
+  const t = TONE[typeStyle.tone];
+
+  return (
+    <Card
+      className="p-5 mb-8"
+      style={{ borderColor: `${t.fg}40`, background: `linear-gradient(180deg, ${t.fg}06 0%, transparent 100%)` }}
+    >
+      <div className="flex items-start gap-3 mb-3">
+        <div
+          className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0"
+          style={{ background: t.bg, border: `0.5px solid ${t.border}` }}
+        >
+          <Zap size={14} style={{ color: t.fg }} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2 mb-1">
+            <span className="text-[10px] font-mono uppercase tracking-[0.15em] font-semibold" style={{ color: t.fg }}>
+              Next action
+            </span>
+            <Pill tone={typeStyle.tone}>{typeStyle.label}</Pill>
+            {next.priority && next.type !== "blocked" && (
+              <span className="text-[9px] font-mono text-[#5a5a55]">{next.priority}</span>
+            )}
+          </div>
+          <div className="text-[15px] md:text-[16px] font-semibold text-[#E6F7F1] mb-2 leading-snug">
+            {next.action}
+          </div>
+          <p className="text-[12px] text-[#a8a89f] leading-relaxed">{next.reason}</p>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-end pt-1">
+        <Link
+          to={next.link}
+          className="inline-flex items-center gap-1 text-[11px] font-mono text-[#9FE1CB] hover:text-[#35C792] transition-colors"
+        >
+          Open {next.link.split("/").pop()} <ArrowRight size={11} />
+        </Link>
+      </div>
+
+      {onDeck.length > 0 && (
+        <div className="mt-4 pt-3 border-t border-white/[0.05]">
+          <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-[#5a5a55] mb-2">
+            On deck
+          </div>
+          <ul className="space-y-2">
+            {onDeck.map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-[11px] leading-snug">
+                <span className="text-[#5a5a55] font-mono tabular-nums w-5 flex-shrink-0">{i + 2}.</span>
+                <span className="flex-1 min-w-0">
+                  <span className="text-[#a8a89f]">{item.action}</span>
+                  <span className="text-[#5a5a55] ml-2 font-mono">· {item.reason}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </Card>
   );
 }
@@ -412,6 +628,7 @@ export default function Overview() {
   return (
     <div className="max-w-5xl mx-auto">
       <Hero rowCount={rowCount} demo={demo} />
+      <NextStep />
       <HeadlineFinding />
       <LiveData />
       <Roadmap />
