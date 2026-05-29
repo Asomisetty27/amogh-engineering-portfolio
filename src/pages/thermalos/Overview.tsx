@@ -8,7 +8,8 @@ import {
 } from "recharts";
 import {
   fetchMeasurements, generateDemoMeasurements, isDemoModeError,
-  type MeasurementRow,
+  fetchRoadmapStages, generateDemoRoadmapStages,
+  type MeasurementRow, type RoadmapStage,
 } from "@/services/thermalosApi";
 
 /* ------------------------------------------------------------------ */
@@ -216,29 +217,27 @@ function KPI({ label, value, unit, tone }: { label: string; value: string; unit:
 /* Condensed roadmap                                                   */
 /* ------------------------------------------------------------------ */
 
-interface RoadmapStage {
-  id: number;
-  title: string;
-  status: "complete" | "in_progress" | "locked";
-  subtitle: string;
-  progress: number;
-}
-
-const ROADMAP: RoadmapStage[] = [
-  { id: 1, title: "Colab baseline", status: "complete", subtitle: "Tesla T4 · 6,700 rows · E001–E004", progress: 100 },
-  { id: 2, title: "Dedicated GPU hardware", status: "in_progress", subtitle: "Physical machine · power-cap sweep · E005–E008", progress: 10 },
-  { id: 3, title: "Anomaly detector v1", status: "locked", subtitle: "Statistical detector on clean baseline", progress: 0 },
-  { id: 4, title: "Multi-GPU validation", status: "locked", subtitle: "A100 / H100 / RTX — generalization", progress: 0 },
-];
-
 function Roadmap() {
+  const { data, error, isError } = useQuery({
+    queryKey: ["roadmap-stages"],
+    queryFn: fetchRoadmapStages,
+    staleTime: 60_000,
+    retry: false,
+  });
+
+  const demo = isError && isDemoModeError(error);
+  const stages: RoadmapStage[] = useMemo(
+    () => (demo || !data || data.length === 0 ? generateDemoRoadmapStages() : data),
+    [demo, data]
+  );
+
   return (
     <div className="mb-8">
       <SectionLabel hint="Detailed methodology in Research →">Research roadmap</SectionLabel>
       <div className="relative">
         <div className="absolute left-3 top-3 bottom-3 w-px bg-white/[0.08]" aria-hidden />
         <div className="space-y-3">
-          {ROADMAP.map((s) => {
+          {stages.map((s) => {
             const tone: Tone = s.status === "complete" ? "complete" : s.status === "in_progress" ? "progress" : "locked";
             const t = TONE[tone];
             const dim = s.status === "locked" ? (s.id === 3 ? "opacity-65" : "opacity-45") : "";

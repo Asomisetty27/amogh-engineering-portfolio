@@ -1,5 +1,7 @@
-import { useEffect } from "react";
-import { Check } from "lucide-react";
+import { useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Check, Dot } from "lucide-react";
+import { fetchTimeline, generateDemoTimeline, isDemoModeError, type TimelineRow } from "@/services/thermalosApi";
 
 interface Stage {
   id: number;
@@ -57,8 +59,42 @@ export default function Roadmap() {
     document.title = "ThermalOS -- Roadmap | amogh.site";
   }, []);
 
+  const { data, error, isError } = useQuery({
+    queryKey: ["timeline"],
+    queryFn: fetchTimeline,
+    staleTime: 60_000,
+    retry: false,
+  });
+
+  const demo = isError && isDemoModeError(error);
+  const timeline: TimelineRow[] = useMemo(
+    () => (demo || !data || data.length === 0 ? generateDemoTimeline() : data),
+    [demo, data]
+  );
+
+  // Group milestones by phase
+  const milestonesByPhase = new Map<string, TimelineRow[]>();
+  timeline.forEach((row) => {
+    if (!milestonesByPhase.has(row.phase)) {
+      milestonesByPhase.set(row.phase, []);
+    }
+    milestonesByPhase.get(row.phase)!.push(row);
+  });
+
+  const getPriorityColor = (priority: string) => {
+    if (priority.includes("Critical")) return "#f87171";
+    if (priority.includes("High")) return "#60a5fa";
+    return "#888780";
+  };
+
+  const getStatusColor = (status: string) => {
+    if (status.includes("Done")) return "#35C792";
+    if (status.includes("Not")) return "#888780";
+    return "#EF9F27";
+  };
+
   return (
-    <div className="max-w-4xl">
+    <div className="max-w-5xl">
       <div className="mb-6">
         <div className="text-[10px] font-mono uppercase tracking-[0.15em] text-[#5a5a55] mb-1">
           ThermalOS -- Roadmap
@@ -67,11 +103,12 @@ export default function Roadmap() {
           Research roadmap
         </h1>
         <p className="text-[12px] text-[#888780] mt-1 max-w-2xl">
-          Four-stage path from Colab baseline to conference publication. Stage 2 is gated on AI Factory cluster access.
+          Four-stage path from Colab baseline to conference publication. Milestones tracked in Master Timeline.
         </p>
       </div>
 
-      <div className="relative">
+      {/* Stage overview */}
+      <div className="relative mb-10">
         <div className="absolute left-3 top-3 bottom-3 w-px bg-white/[0.08]" aria-hidden />
         <div className="space-y-4">
           {STAGES.map((s) => {
@@ -136,8 +173,43 @@ export default function Roadmap() {
         </div>
       </div>
 
+      {/* Detailed milestones by phase */}
+      {Array.from(milestonesByPhase.entries()).map(([phase, items]) => (
+        <div key={phase} className="mb-8">
+          <div className="text-[11px] font-mono uppercase tracking-[0.15em] text-[#5a5a55] mb-3">
+            {phase}
+          </div>
+          <div className="space-y-2">
+            {items.map((item, i) => (
+              <div
+                key={i}
+                className="bg-[#141412] border border-white/[0.07] rounded-md px-4 py-2.5 flex items-start gap-3"
+                style={{ borderWidth: "0.5px" }}
+              >
+                <Dot size={14} style={{ color: getStatusColor(item.status) }} className="flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[12px] text-[#E6F7F1] mb-1">{item.milestone}</div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[9px] font-mono text-[#5a5a55]">W{item.week}</span>
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/[0.05] text-[#888780]">
+                      {item.owner}
+                    </span>
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/[0.05] text-[#5a5a55]">
+                      {item.layer}
+                    </span>
+                    <span className="text-[9px] font-mono text-[#5a5a55] ml-auto">
+                      {item.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
       <div className="mt-8 px-4 py-3 rounded bg-[#EF9F27]/10 border border-[#EF9F27]/30 text-[11px] font-mono text-[#EF9F27]">
-        Stage 2 is gated on AI Factory cluster access (Cal Poly Noyce School, DGX B200). Publication timeline will be overlaid here once conference target and deadline are confirmed with Kundu.
+        Stage 2 is gated on AI Factory cluster access (Cal Poly Noyce School, DGX B200). Publication timeline will be confirmed with Kundu.
       </div>
     </div>
   );

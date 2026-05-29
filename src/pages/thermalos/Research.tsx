@@ -53,6 +53,95 @@ const STAGE_1_FINDINGS = [
   },
 ];
 
+function SensitivityTab() {
+  return (
+    <div className="space-y-6 max-w-4xl">
+      <div>
+        <SectionLabel>T_reference uncertainty at low power loads</SectionLabel>
+        <Card className="p-5">
+          <p className="text-[13px] text-[#a8a89f] leading-relaxed mb-3">
+            The largest source of measurement error in Rθ_eff comes from T_reference (ambient temperature assumption). At idle (~9.5W), a ±5°C error in T_ref assumption causes a 35% swing in calculated Rθ_eff — exactly when anomaly detection needs precision most.
+          </p>
+          <div className="bg-[#0D0D0B] border border-white/[0.1] rounded p-4 mb-3">
+            <div className="font-mono text-[11px] text-[#9FE1CB] mb-2">Stage 1 sensitivity analysis (F002)</div>
+            <ul className="space-y-1.5 text-[12px] text-[#a8a89f]">
+              <li>• Idle (9.5W): 35.3% Rθ_eff swing with ±5°C ambient error</li>
+              <li>• Load (68W): 10.2% Rθ_eff swing with same ambient error</li>
+              <li>• Error sensitivity is 3.5× worse at idle vs load</li>
+              <li>• Cloud baseline (Colab) has no ambient sensor — T_ref = 25°C assumed</li>
+            </ul>
+          </div>
+          <p className="text-[12px] text-[#888780] leading-relaxed">
+            Solution: Stage 2 hardware includes ambient sensors. Until then, Rθ_eff at idle is treated as a relative signal (trend) rather than absolute (value), and anomalies are reported as deviations from a per-GPU baseline rather than global thresholds.
+          </p>
+        </Card>
+      </div>
+
+      <div>
+        <SectionLabel>Power smoothing — rolling average vs median vs steady-state</SectionLabel>
+        <Card className="p-5">
+          <p className="text-[13px] text-[#a8a89f] leading-relaxed mb-3">
+            Telemetry power readings include measurement noise from the GPU's own power supply. Three smoothing methods were tested:
+          </p>
+          <div className="bg-[#0D0D0B] border border-white/[0.1] rounded p-4 mb-3">
+            <div className="font-mono text-[11px] text-[#9FE1CB] mb-2">Stage 1 filter comparison (F003)</div>
+            <ul className="space-y-1.5 text-[12px] text-[#a8a89f]">
+              <li>• Rolling average (5s): R_theta std improved 3.5%</li>
+              <li>• Median filter (5s): negligible improvement (&lt;0.5%)</li>
+              <li>• Steady-state window (5s stable region): zero filtering needed</li>
+            </ul>
+          </div>
+          <p className="text-[12px] text-[#888780] leading-relaxed">
+            Decision: Use steady-state window. The null result from filtering confirms that power noise is not the dominant error source — T_reference uncertainty is. Filtering adds complexity without addressing root cause.
+          </p>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function ClassificationTab() {
+  return (
+    <div className="space-y-6 max-w-4xl">
+      <div>
+        <SectionLabel>Rule-based vs probabilistic state classification</SectionLabel>
+        <Card className="p-5">
+          <p className="text-[13px] text-[#a8a89f] leading-relaxed mb-3">
+            GPU thermal state (idle / ramp / load) must be inferred from telemetry to anchor Rθ_eff baselines. A rule-based classifier using hard thresholds fails during state transitions.
+          </p>
+          <div className="bg-[#0D0D0B] border border-white/[0.1] rounded p-4 mb-3">
+            <div className="font-mono text-[11px] text-[#9FE1CB] mb-2">Stage 1 rule-based classifier (F004)</div>
+            <ul className="space-y-1.5 text-[12px] text-[#a8a89f]">
+              <li>• Rules: util &lt; 5%, power &lt; 15W, temp &lt; 55°C (all idle)</li>
+              <li>• Stable state accuracy: 100% (idle and load endpoints)</li>
+              <li>• Transitional phase accuracy: 2–53% (47–98% misclassified)</li>
+              <li>• Error mode: false positives in temp ramp (classified as load when still ramping)</li>
+            </ul>
+          </div>
+          <p className="text-[13px] text-[#a8a89f] leading-relaxed mt-3">
+            Solution: Bayesian classifier (Naive Bayes or Random Forest via Orange Data Mining) assigns probabilities rather than hard states. Outputs a model equation (not a black box), enabling audit trails for critical infrastructure decisions.
+          </p>
+        </Card>
+      </div>
+
+      <div>
+        <SectionLabel>Next step — Stage 2 validation</SectionLabel>
+        <Card className="p-5">
+          <p className="text-[12px] text-[#a8a89f] leading-relaxed mb-3">
+            Probabilistic classifier requires training on labeled data from dedicated hardware (Stage 2). Current plan:
+          </p>
+          <ol className="space-y-1.5 text-[12px] text-[#a8a89f]">
+            <li><span className="text-[#9FE1CB]">1. Power-cap sweep (E005–E008)</span> — 6 power levels on Stage 2 hardware, measure state transitions in controlled conditions</li>
+            <li><span className="text-[#9FE1CB]">2. Label transitions</span> — hand-label each transition phase (idle → ramp → load → ramp → idle)</li>
+            <li><span className="text-[#9FE1CB]">3. Train classifier</span> — fit Bayesian model, evaluate on held-out test set</li>
+            <li><span className="text-[#9FE1CB]">4. Deploy</span> — use trained model on live telemetry for anomaly detection</li>
+          </ol>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 function MethodologyTab() {
   return (
     <div className="space-y-6 max-w-4xl">
@@ -136,8 +225,10 @@ function MethodologyTab() {
 /* ------------------------------------------------------------------ */
 
 const TABS = [
-  { value: "methodology", label: "Methodology",   sub: "Framing & findings", Component: MethodologyTab },
-  { value: "rtheta",      label: "Rθ vs Pressure", sub: "Regression model",  Component: RthetaModel    },
+  { value: "methodology",  label: "Methodology",      sub: "Framing & findings",     Component: MethodologyTab },
+  { value: "sensitivity",  label: "Sensitivity",      sub: "T_ref & power smoothing", Component: SensitivityTab },
+  { value: "classification", label: "Classification", sub: "Rule-based vs Bayesian",  Component: ClassificationTab },
+  { value: "rtheta",       label: "Rθ vs Pressure",  sub: "Regression model",       Component: RthetaModel    },
 ] as const;
 
 type TabValue = (typeof TABS)[number]["value"];

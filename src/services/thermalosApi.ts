@@ -427,3 +427,73 @@ export function generateDemoTodayPlan(): TodayRow[] {
     { priority: "P2 — Normal", phase: "Phase 0 — Foundation", milestone: "Reach out to 3 GPU cluster operators from outreach list", owner: "Amogh", track: "Comms", notes: "Lambda Labs, Voltage Park, Crusoe" },
   ];
 }
+
+// ---------- ROADMAP STAGES ----------
+
+export interface RoadmapStage {
+  id: number;
+  title: string;
+  status: "complete" | "in_progress" | "locked";
+  subtitle: string;
+  progress: number;
+}
+
+export async function fetchRoadmapStages(): Promise<RoadmapStage[]> {
+  const rows = await readRange("'🗓 Master Timeline'!A4:I200");
+
+  // Group by phase name, infer status and progress from milestones
+  const phaseMap = new Map<string, { items: string[]; doneCount: number }>();
+
+  rows.forEach((r) => {
+    const phase = r[0]?.trim();
+    const milestone = r[3]?.trim();
+    const status = r[5]?.trim()?.toLowerCase() ?? "";
+
+    if (!phase || !milestone) return;
+
+    if (!phaseMap.has(phase)) {
+      phaseMap.set(phase, { items: [], doneCount: 0 });
+    }
+
+    const p = phaseMap.get(phase)!;
+    p.items.push(milestone);
+    if (status.includes("done")) p.doneCount++;
+  });
+
+  // Convert to RoadmapStage ordered by appearance
+  const seenPhases = new Set<string>();
+  const stages: RoadmapStage[] = [];
+
+  rows.forEach((r) => {
+    const phase = r[0]?.trim();
+    if (!phase || seenPhases.has(phase)) return;
+    seenPhases.add(phase);
+
+    const data = phaseMap.get(phase)!;
+    const progress = data.items.length > 0 ? Math.round((data.doneCount / data.items.length) * 100) : 0;
+    const doneCount = data.doneCount;
+    const totalCount = data.items.length;
+    let status: "complete" | "in_progress" | "locked" = "locked";
+    if (doneCount === totalCount) status = "complete";
+    else if (doneCount > 0) status = "in_progress";
+
+    stages.push({
+      id: stages.length + 1,
+      title: phase.replace(/phase \d+ — /i, "").trim(),
+      status,
+      subtitle: doneCount === totalCount ? `${totalCount} milestones` : `${doneCount}/${totalCount} milestones`,
+      progress,
+    });
+  });
+
+  return stages;
+}
+
+export function generateDemoRoadmapStages(): RoadmapStage[] {
+  return [
+    { id: 1, title: "Colab baseline", status: "complete", subtitle: "Tesla T4 · 6,700 rows · E001–E004", progress: 100 },
+    { id: 2, title: "Dedicated GPU hardware", status: "in_progress", subtitle: "Physical machine · power-cap sweep · E005–E008", progress: 10 },
+    { id: 3, title: "Anomaly detector v1", status: "locked", subtitle: "Statistical detector on clean baseline", progress: 0 },
+    { id: 4, title: "Multi-GPU validation", status: "locked", subtitle: "A100 / H100 / RTX — generalization", progress: 0 },
+  ];
+}
