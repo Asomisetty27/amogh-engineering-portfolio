@@ -13,8 +13,8 @@ const EXPERIMENTS = [
     title: "Idle Baseline — T4 GPU",
     date: "2026-05-14",
     status: "Done",
-    finding: "Stable idle baseline established. T=40.4°C, P=9.47W, Rθ=1.623 °C/W over 60s. Ambient assumption of 25°C introduces noise at low power — calibrate ambient in future runs.",
-    metrics: { avgTemp: 40.4, avgPower: 9.47, avgRtheta: 1.623, samples: 60 },
+    finding: "Stable idle baseline established. T~39°C, P~11-14W, Rθ~1.28 °C/W, 0% utilization, P8 power state, ~450MB memory. Ambient assumption of 25°C introduces noise at low power — calibrate ambient in future runs.",
+    metrics: { avgTemp: 39, avgPower: 12, avgRtheta: 1.28, samples: 120 },
   },
   {
     id: "E002",

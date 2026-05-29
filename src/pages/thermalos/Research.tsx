@@ -30,26 +30,33 @@ const STAGE_2_QUESTIONS = [
   "How to treat T_reference uncertainty at low power loads?",
   "Rolling average vs median filter vs steady-state window for power smoothing?",
   "Is the rule-based state classifier statistically valid, or should it be probabilistic?",
-  "Is ~447 MB NVML memory with no processes a state variable or a reporting artifact?",
   "t-test vs Mann-Whitney U for small-sample recovery comparison?",
 ];
 
 const STAGE_1_FINDINGS = [
   {
-    title: "Three power regimes at 0% utilization",
-    body: "Utilization alone does not define thermal state. At 0% GPU util we observed three distinct steady-state power values, indicating that workload-history affects idle thermal behavior in ways the standard `nvidia-smi` view collapses.",
+    title: "Rθ_eff captures thermal history utilization cannot",
+    body: "R_theta cleanly separates GPU states: clean idle ~1.28 C/W, under load ~0.72 C/W, post-load recovery (same-process) ~1.54 C/W, child-exit recovery ~2.04-2.29 C/W. Recovery R_theta exceeds clean idle because junction temperature lags the power drop. Idle vs load differ by ~77.9%. This thermal history is invisible to utilization and power alone.",
   },
   {
     title: "Same-process termination leaves GPU in P0",
-    body: "After killing a load process in-place, the GPU stayed at P-state P0 (~31.6W, ~74°C) for the full 10-minute observation window — never returning to clean idle.",
+    body: "After killing a load process in-place, the GPU stayed at P-state P0 (~30-31W, ~74°C) for the full 10-minute observation window, never returning to clean idle. The CUDA context held by the still-alive notebook process prevented recovery.",
   },
   {
     title: "Child-process exit recovers cleanly",
-    body: "Child-process exit returns the GPU to clean idle in ~141s (mean 202s, std 14.8s across three trials). The asymmetry between same-process and child-process termination is reproducible and unexplained by NVIDIA documentation.",
+    body: "Child-process exit releases the CUDA context automatically. GPU returned to clean idle in ~141s (E003). The asymmetry between same-process and child-process termination is sharp and invisible to utilization-only monitoring.",
+  },
+  {
+    title: "~447MB NVML memory is CUDA context overhead, not noise",
+    body: "The ~447MB baseline memory reading with no running process is consistent and stable across all idle and recovery phases, jumping to ~840MB under load. It is a clean binary state indicator — context loaded vs not loaded. Resolved.",
   },
   {
     title: "Rθ_eff is fragile at low power loads",
-    body: "Rθ_eff = (T_hot − T_ref) / P is highly sensitive to T_ref assumption at low power (~9.5W). T_ref = 25°C was assumed on shared cloud infrastructure with no ambient sensor — a Stage-1 limitation driving Stage 2.",
+    body: "A 5°C ambient error causes a 35.3% R_theta swing at idle (~11W) but only 10.2% at load (~68W). The metric is least reliable exactly where power is lowest. Stage 2 hardware with ambient sensors addresses this directly.",
+  },
+  {
+    title: "Power smoothing is a null result",
+    body: "Rolling average and median filter barely change R_theta variance (3.5% max improvement). The dominant error source is the ambient temperature assumption, not power noise. Filtering adds complexity without addressing root cause.",
   },
 ];
 

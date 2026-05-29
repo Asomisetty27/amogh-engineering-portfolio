@@ -108,7 +108,7 @@ function HeadlineFinding() {
             Utilization alone does not define thermal state.
           </div>
           <p className="text-[13px] text-[#a8a89f] leading-relaxed">
-            Across 6,700 telemetry rows on a Tesla T4 under controlled load, we observed{" "}
+            Across ~5,700 telemetry rows on a Tesla T4 under controlled load, we observed{" "}
             <span className="text-[#9FE1CB] font-semibold">three distinct power regimes at 0% utilization</span>
             {" "}— a signal current monitoring tools collapse into a single &ldquo;idle&rdquo; state. The
             invisible regime gap is where silent throttling and cooling-path degradation live.
