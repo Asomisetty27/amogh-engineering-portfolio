@@ -16,6 +16,7 @@ import Advisor      from "./pages/thermalos/Advisor.tsx";
 import Publication  from "./pages/thermalos/Publication.tsx";
 import YC           from "./pages/thermalos/YC.tsx";
 import Plan         from "./pages/thermalos/Plan.tsx";
+import QuickEntry   from "./pages/thermalos/QuickEntry.tsx";
 
 const queryClient = new QueryClient();
 
@@ -36,8 +37,9 @@ const App = () => (
             <Route path="roadmap"     element={<Roadmap />} />
             <Route path="advisor"     element={<Advisor />} />
             <Route path="publication" element={<Publication />} />
-            {/* Hidden internal URL */}
+            {/* Hidden internal URLs */}
             <Route path="plan"        element={<Plan />} />
+            <Route path="entry"       element={<QuickEntry />} />
             {/* Legacy -- keeps old routes alive */}
             <Route path="yc"          element={<YC />} />
 

@@ -24,15 +24,14 @@ const corsHeaders = {
 // ─── Allowed tab whitelist ────────────────────────────────────────────────────
 
 const ADMIN_TABS = new Set([
-  "📡 Measurements",
+  "📋 Today Plan",
   "🗓 Master Timeline",
   "📬 Outreach",
   "🏆 Evidence Board",
-  "📋 Today Plan",
-  "🎯 Roadmap",
-  "Tasks",
-  "Decision Log",
-  "Open Questions",
+  "📡 Measurements",
+  "📡 Measurements_Raw",
+  "📊 Experiment_Summary",
+  "🧠 Findings",
 ]);
 
 // ─── JWT signing for Google service account ──────────────────────────────────
