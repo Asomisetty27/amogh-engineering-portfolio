@@ -14,7 +14,107 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      advisor_allowlist: {
+        Row: {
+          email: string
+        }
+        Insert: {
+          email: string
+        }
+        Update: {
+          email?: string
+        }
+        Relationships: []
+      }
+      advisor_asks: {
+        Row: {
+          ask: string
+          id: string
+          status: string
+        }
+        Insert: {
+          ask: string
+          id?: string
+          status?: string
+        }
+        Update: {
+          ask?: string
+          id?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      advisor_questions: {
+        Row: {
+          answer: string | null
+          answered_at: string | null
+          answered_by: string | null
+          date_raised: string
+          id: string
+          priority: string
+          question: string
+          status: string
+          what_i_tried: string | null
+        }
+        Insert: {
+          answer?: string | null
+          answered_at?: string | null
+          answered_by?: string | null
+          date_raised?: string
+          id?: string
+          priority?: string
+          question: string
+          status?: string
+          what_i_tried?: string | null
+        }
+        Update: {
+          answer?: string | null
+          answered_at?: string | null
+          answered_by?: string | null
+          date_raised?: string
+          id?: string
+          priority?: string
+          question?: string
+          status?: string
+          what_i_tried?: string | null
+        }
+        Relationships: []
+      }
+      decision_log: {
+        Row: {
+          created_at: string
+          decision: string
+          id: string
+          rationale: string | null
+          source_question_id: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          decision: string
+          id?: string
+          rationale?: string | null
+          source_question_id?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          decision?: string
+          id?: string
+          rationale?: string | null
+          source_question_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decision_log_source_question_id_fkey"
+            columns: ["source_question_id"]
+            isOneToOne: false
+            referencedRelation: "advisor_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
