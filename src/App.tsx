@@ -8,8 +8,9 @@ import NotFound from "./pages/NotFound.tsx";
 import ThermalOSLayout from "./pages/thermalos/ThermalOSLayout.tsx";
 
 // ThermalOS pages
-import Overview     from "./pages/thermalos/Overview.tsx";
-import Dashboard    from "./pages/thermalos/Dashboard.tsx";
+import Overview      from "./pages/thermalos/Overview.tsx";
+import Dashboard     from "./pages/thermalos/Dashboard.tsx";
+import CommandCenter from "./pages/thermalos/CommandCenter.tsx";
 import Lab          from "./pages/thermalos/Lab.tsx";
 import Research     from "./pages/thermalos/Research.tsx";
 import Roadmap      from "./pages/thermalos/Roadmap.tsx";
@@ -44,7 +45,9 @@ const App = () => (
             {/* Legacy -- keeps old routes alive */}
             <Route path="yc"          element={<YC />} />
 
-            {/* Admin dashboard — real page now, not a redirect */}
+            {/* Admin command center — default admin landing */}
+            <Route path="command"      element={<CommandCenter />} />
+            {/* Admin dashboard — kept for deep links */}
             <Route path="dashboard"    element={<Dashboard />} />
             {/* Legacy URLs — keep working, redirect into new tabbed pages */}
             <Route path="live"         element={<Navigate to="/thermalos/lab" replace />} />

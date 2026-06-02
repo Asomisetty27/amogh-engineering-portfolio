@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Activity, FlaskConical, Route,
-  Users, BookOpen, Menu, X, Loader2, Cpu, LogIn,
+  Users, BookOpen, Menu, X, Loader2, Cpu, LogIn, Terminal,
 } from "lucide-react";
 import { useIsFetching } from "@tanstack/react-query";
 import { ThermalOSRoleProvider, useThermalOSRole } from "@/contexts/ThermalOSRole";
@@ -23,7 +23,7 @@ const PUBLIC_NAV: NavItem[] = [
 ];
 
 const ADMIN_NAV: NavItem[] = [
-  { to: "/thermalos/dashboard",  label: "Dashboard",   sub: "Next action",            icon: LayoutDashboard, end: true },
+  { to: "/thermalos/command",    label: "Command",     sub: "The one thing",          icon: Terminal, end: true },
   { to: "/thermalos/lab",        label: "Lab",         sub: "Telemetry & runs",       icon: Activity },
   { to: "/thermalos/research",   label: "Research",    sub: "Methodology & findings", icon: FlaskConical },
   { to: "/thermalos/advisor",    label: "Advisor",     sub: "Questions & decisions",  icon: Users },
@@ -63,8 +63,11 @@ function InnerLayout() {
   const roleLabel = role === "admin" ? "Admin" : role === "advisor" ? "Advisor" : null;
   const roleTone = role === "admin" ? "#35C792" : "#60a5fa";
 
-  // Advisor landing redirect: on login, go directly to /advisor
+  // Role-based landing redirects
   useEffect(() => {
+    if (role === "admin" && pathname === "/thermalos") {
+      navigate("/thermalos/command", { replace: true });
+    }
     if (role === "advisor" && pathname === "/thermalos") {
       navigate("/thermalos/advisor", { replace: true });
     }

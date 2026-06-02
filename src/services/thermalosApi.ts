@@ -428,6 +428,90 @@ export function generateDemoTodayPlan(): TodayRow[] {
   ];
 }
 
+// ---------- COMMAND CENTER (written by sync-to-sheets skill) ----------
+
+export interface CommandCenterAction {
+  action: string;
+  why: string;
+  how_steps: string[];
+  effort: string;
+  source: string;
+}
+
+export interface CommandCenterOnDeck {
+  title: string;
+  why: string;
+}
+
+export interface CommandCenterBlocker {
+  what: string;
+  type: string;
+  how_to_unblock: string;
+  owner: string;
+  days_open: number;
+}
+
+export interface CommandCenterEscalation {
+  question: string;
+  route_to: string;
+  why: string;
+  draft_ask: string;
+}
+
+export interface CommandCenter {
+  the_one_thing: CommandCenterAction;
+  on_deck: CommandCenterOnDeck[];
+  blockers: CommandCenterBlocker[];
+  escalations: CommandCenterEscalation[];
+}
+
+function parseJSON<T>(s: string, fallback: T): T {
+  try { return JSON.parse(s) as T; } catch { return fallback; }
+}
+
+export async function fetchCommandCenter(): Promise<CommandCenter> {
+  const rows = await readRange("'Command Center'!A:B");
+  const map: Record<string, string> = {};
+  rows.forEach((r) => { if (r[0]) map[r[0]] = r[1] ?? ""; });
+  return {
+    the_one_thing: parseJSON(map["the_one_thing"] ?? "", generateDemoCommandCenter().the_one_thing),
+    on_deck:       parseJSON(map["on_deck"]       ?? "[]", []),
+    blockers:      parseJSON(map["blockers"]      ?? "[]", []),
+    escalations:   parseJSON(map["escalations"]   ?? "[]", []),
+  };
+}
+
+export function generateDemoCommandCenter(): CommandCenter {
+  return {
+    the_one_thing: {
+      action: "Send 10 discovery cold messages to neocloud infra leads",
+      why: "This is the #1 YC blocker — no customer evidence yet. Kundu access is pending. Discovery calls are the highest-leverage thing you can do right now.",
+      how_steps: [
+        "Open wiki/synthesis/neocloud_discovery.md for the framework",
+        "Open raw/strategy/03_discovery_call_script.md for the opener",
+        "Pick first target: Lambda Labs (you're already a customer — warm context)",
+        "Search LinkedIn: 'Lambda Labs infrastructure' or 'Lambda Labs platform'",
+        "Send the opener message from the script",
+        "Log each response with: ingest meeting:[date]-[org]-discovery",
+      ],
+      effort: "~2 hours for first 3 outreaches",
+      source: "wiki/synthesis/neocloud_discovery.md",
+    },
+    on_deck: [
+      { title: "Confirm AI Factory access with Kundu", why: "Unlocks Stage 2 hardware experiments (E005–E008) and publication timeline" },
+      { title: "Run classifiers on Stage 1 data (Orange Data Mining)", why: "MVX-4: Bayesian + Random Forest — no new hardware, does not require DGX access" },
+      { title: "Push E001–E003 notebooks + CSVs to GitHub", why: "Required for Kundu review, YC evidence board, and any co-author share" },
+    ],
+    blockers: [
+      { what: "DGX B200 AI Factory access — waiting on Kundu confirmation", type: "external_dependency", how_to_unblock: "Email Kundu asking if informal summer advising is sufficient for cluster access request to Noyce School. Draft in escalation zone.", owner: "Kundu", days_open: 2 },
+      { what: "Sam returns to campus — fall 2026 hardware work blocked until then", type: "waiting_on_sam", how_to_unblock: "Continue software-only work. Sam picks up E-LT testbed and TIM characterization in fall.", owner: "Sam", days_open: 0 },
+    ],
+    escalations: [
+      { question: "How do we handle T_reference uncertainty at low power loads? 5°C ambient error = 35% R_theta swing at idle.", route_to: "Kundu", why: "Open 13 days, research methodology — beyond web search resolution", draft_ask: "Hi Prof. Kundu,\n\nQuick question as I'm working through the ThermalOS analysis:\n\nHow do we handle T_reference uncertainty at low power loads? At 9.5W idle, a 5°C ambient error causes a ~35% R_theta swing — the metric is most sensitive exactly where we need it most.\n\nI've tried reviewing the sensitivity analysis in F002 and comparing rolling average vs median filter (F003 null result), but the root cause remains T_reference uncertainty. Given your background in silicon validation and research methodology, I'd really value your input.\n\nHappy to discuss at our next meeting or async.\n\nThanks,\nAmogh" },
+    ],
+  };
+}
+
 // ---------- WIKI SUMMARY (written by sync-to-sheets skill) ----------
 
 export interface WikiSummary {
