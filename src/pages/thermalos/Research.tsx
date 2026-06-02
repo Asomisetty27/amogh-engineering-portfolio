@@ -175,7 +175,7 @@ function MethodologyTab() {
 
       {/* Stage 1 findings */}
       <div>
-        <SectionLabel>Stage 1 findings — Tesla T4 / Colab / 6,700 rows</SectionLabel>
+        <SectionLabel>Stage 1 findings — Tesla T4 / Colab / 2,280+ rows</SectionLabel>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {STAGE_1_FINDINGS.map((f) => (
             <Card key={f.title} className="p-4">

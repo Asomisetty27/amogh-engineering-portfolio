@@ -8,7 +8,7 @@ import {
 } from "recharts";
 import {
   fetchMeasurements, generateDemoMeasurements, isDemoModeError,
-  fetchRoadmapStages, generateDemoRoadmapStages,
+  generateDemoRoadmapStages,
   fetchTimeline, generateDemoTimeline,
   fetchAdvisorQuestions, generateDemoAdvisorQuestions,
   fetchWikiSummary, generateDemoWikiSummary,
@@ -571,18 +571,8 @@ function KPI({ label, value, unit, tone }: { label: string; value: string; unit:
 /* ------------------------------------------------------------------ */
 
 function Roadmap() {
-  const { data, error, isError } = useQuery({
-    queryKey: ["roadmap-stages"],
-    queryFn: fetchRoadmapStages,
-    staleTime: 60_000,
-    retry: false,
-  });
-
-  const demo = isError && isDemoModeError(error);
-  const stages: RoadmapStage[] = useMemo(
-    () => (demo || !data || data.length === 0 ? generateDemoRoadmapStages() : data),
-    [demo, data]
-  );
+  // Stages are vault state, not live-derived — Sheets timeline phase grouping is unreliable
+  const stages = generateDemoRoadmapStages();
 
   return (
     <div className="mb-8">
