@@ -428,6 +428,57 @@ export function generateDemoTodayPlan(): TodayRow[] {
   ];
 }
 
+// ---------- WIKI SUMMARY (written by sync-to-sheets skill) ----------
+
+export interface WikiSummary {
+  sync_timestamp: string;
+  overview_stage: string;
+  open_questions_count: string;
+  open_questions_list: string;
+  experiments_complete: string;
+  experiments_planned: string;
+  findings_current: string;
+  next_action: string;
+  conflicts_found: string;
+  conflicts_detail: string;
+  vault_last_updated: string;
+}
+
+export async function fetchWikiSummary(): Promise<WikiSummary> {
+  const rows = await readRange("'Wiki Summary'!A:B");
+  const map: Record<string, string> = {};
+  rows.forEach((r) => { if (r[0]) map[r[0]] = r[1] ?? ""; });
+  return {
+    sync_timestamp: map["sync_timestamp"] ?? "",
+    overview_stage: map["overview_stage"] ?? "",
+    open_questions_count: map["open_questions_count"] ?? "",
+    open_questions_list: map["open_questions_list"] ?? "",
+    experiments_complete: map["experiments_complete"] ?? "",
+    experiments_planned: map["experiments_planned"] ?? "",
+    findings_current: map["findings_current"] ?? "",
+    next_action: map["next_action"] ?? "",
+    conflicts_found: map["conflicts_found"] ?? "",
+    conflicts_detail: map["conflicts_detail"] ?? "",
+    vault_last_updated: map["vault_last_updated"] ?? "",
+  };
+}
+
+export function generateDemoWikiSummary(): WikiSummary {
+  return {
+    sync_timestamp: new Date().toISOString(),
+    overview_stage: "Stage 1 complete (Colab T4, 2,280+ rows, E001–E003). Stage 2 pending DGX B200 access confirmation.",
+    open_questions_count: "7",
+    open_questions_list: "Q_AI_Factory_access; Q_E004_data; Q_Kundu_email; Q_ambient_measurement; Q_conference_venue; Q_lead_time; Q_discovery_progress",
+    experiments_complete: "E001, E002, E003, E004",
+    experiments_planned: "E-LT, E005, E006, E007, E008",
+    findings_current: "6",
+    next_action: "Confirm AI Factory access with Kundu. Run discovery calls (10 target). Build anomaly detector code (MVX-4).",
+    conflicts_found: "1",
+    conflicts_detail: "E004 replication data not found in CSV. Row count should be 2,280+ not 5,700.",
+    vault_last_updated: "2026-06-01",
+  };
+}
+
 // ---------- ROADMAP STAGES ----------
 
 export interface RoadmapStage {
@@ -491,7 +542,7 @@ export async function fetchRoadmapStages(): Promise<RoadmapStage[]> {
 
 export function generateDemoRoadmapStages(): RoadmapStage[] {
   return [
-    { id: 1, title: "Colab baseline", status: "complete", subtitle: "Tesla T4 · 6,700 rows · E001–E004", progress: 100 },
+    { id: 1, title: "Colab baseline", status: "complete", subtitle: "Tesla T4 · 2,280+ rows · E001–E003 complete", progress: 100 },
     { id: 2, title: "Dedicated GPU hardware", status: "in_progress", subtitle: "Physical machine · power-cap sweep · E005–E008", progress: 10 },
     { id: 3, title: "Anomaly detector v1", status: "locked", subtitle: "Statistical detector on clean baseline", progress: 0 },
     { id: 4, title: "Multi-GPU validation", status: "locked", subtitle: "A100 / H100 / RTX — generalization", progress: 0 },

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Activity, FlaskConical, Route,
-  Users, BookOpen, Menu, X, Loader2,
+  Users, BookOpen, Menu, X, Loader2, Cpu, LogIn,
 } from "lucide-react";
 import { useIsFetching } from "@tanstack/react-query";
+import { ThermalOSRoleProvider, useThermalOSRole } from "@/contexts/ThermalOSRole";
 
 interface NavItem {
   to: string;
@@ -14,13 +15,28 @@ interface NavItem {
   end?: boolean;
 }
 
-const navItems: NavItem[] = [
-  { to: "/thermalos",              label: "Overview",     sub: "Thesis & live data",     icon: LayoutDashboard, end: true },
-  { to: "/thermalos/research",     label: "Research",     sub: "Methodology & findings", icon: FlaskConical },
-  { to: "/thermalos/lab",          label: "Lab",          sub: "Telemetry & runs",       icon: Activity },
-  { to: "/thermalos/roadmap",      label: "Roadmap",      sub: "4-stage tracker",        icon: Route },
-  { to: "/thermalos/advisor",      label: "Advisor",      sub: "Questions & decisions",  icon: Users },
-  { to: "/thermalos/publication",  label: "Publication",  sub: "Conference target",      icon: BookOpen },
+// Three nav sets — each scoped to what that viewer needs
+const PUBLIC_NAV: NavItem[] = [
+  { to: "/thermalos",          label: "Overview",    sub: "What & where we are",    icon: LayoutDashboard, end: true },
+  { to: "/thermalos/research", label: "Research",    sub: "Methodology & findings", icon: FlaskConical },
+  { to: "/thermalos/yc",       label: "YC",          sub: "Evidence & milestones",  icon: Cpu },
+];
+
+const ADMIN_NAV: NavItem[] = [
+  { to: "/thermalos/dashboard",  label: "Dashboard",   sub: "Next action",            icon: LayoutDashboard, end: true },
+  { to: "/thermalos/lab",        label: "Lab",         sub: "Telemetry & runs",       icon: Activity },
+  { to: "/thermalos/research",   label: "Research",    sub: "Methodology & findings", icon: FlaskConical },
+  { to: "/thermalos/advisor",    label: "Advisor",     sub: "Questions & decisions",  icon: Users },
+  { to: "/thermalos/publication",label: "Publication", sub: "Conference tracker",     icon: BookOpen },
+  { to: "/thermalos/yc",         label: "YC",          sub: "Evidence & milestones",  icon: Cpu },
+  { to: "/thermalos/roadmap",    label: "Roadmap",     sub: "4-stage tracker",        icon: Route },
+];
+
+const ADVISOR_NAV: NavItem[] = [
+  { to: "/thermalos/lab",        label: "Lab",         sub: "Telemetry & runs",       icon: Activity },
+  { to: "/thermalos/research",   label: "Research",    sub: "Methodology & findings", icon: FlaskConical },
+  { to: "/thermalos/advisor",    label: "Advisor",     sub: "Questions & decisions",  icon: Users, end: true },
+  { to: "/thermalos/publication",label: "Publication", sub: "Conference tracker",     icon: BookOpen },
 ];
 
 function UTCClock() {
@@ -36,28 +52,35 @@ function UTCClock() {
   );
 }
 
-export default function ThermalOSLayout() {
+function InnerLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const fetching = useIsFetching();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { role, session } = useThermalOSRole();
+
+  const navItems = role === "admin" ? ADMIN_NAV : role === "advisor" ? ADVISOR_NAV : PUBLIC_NAV;
+  const roleLabel = role === "admin" ? "Admin" : role === "advisor" ? "Advisor" : null;
+  const roleTone = role === "admin" ? "#35C792" : "#60a5fa";
+
+  // Advisor landing redirect: on login, go directly to /advisor
+  useEffect(() => {
+    if (role === "advisor" && pathname === "/thermalos") {
+      navigate("/thermalos/advisor", { replace: true });
+    }
+  }, [role, pathname, navigate]);
 
   useEffect(() => {
-    // 🌡 favicon while in /thermalos
     const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement | null;
     const prev = link?.href;
     const tmp = document.createElement("link");
     tmp.rel = "icon";
     tmp.href = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌡</text></svg>";
     document.head.appendChild(tmp);
-    return () => {
-      tmp.remove();
-      if (link && prev) link.href = prev;
-    };
+    return () => { tmp.remove(); if (link && prev) link.href = prev; };
   }, []);
 
-  useEffect(() => {
-    setSidebarOpen(false);
-  }, [pathname]);
+  useEffect(() => { setSidebarOpen(false); }, [pathname]);
 
   return (
     <div className="min-h-screen bg-[#0A0A08] text-[#E6F7F1] font-sans">
@@ -71,25 +94,38 @@ export default function ThermalOSLayout() {
           {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
 
-        <Link
-          to="/"
-          className="text-[11px] font-mono text-[#888780] hover:text-[#9FE1CB] transition-colors whitespace-nowrap"
-        >
+        <Link to="/" className="text-[11px] font-mono text-[#888780] hover:text-[#9FE1CB] transition-colors whitespace-nowrap">
           ← Portfolio
         </Link>
 
         <div className="flex items-baseline gap-2 ml-2">
-          <span className="font-bold text-[16px] md:text-[18px] tracking-tight">
-            🌡 ThermalOS
-          </span>
-          <span className="font-mono text-[10px] text-[#35C792] hidden sm:inline">
-            / amogh.site/thermalos
-          </span>
+          <span className="font-bold text-[16px] md:text-[18px] tracking-tight">🌡 ThermalOS</span>
+          <span className="font-mono text-[10px] text-[#35C792] hidden sm:inline">/ amogh.site/thermalos</span>
         </div>
 
         <div className="flex-1" />
 
         {fetching > 0 && <Loader2 size={14} className="animate-spin text-[#35C792]" />}
+
+        {/* Role badge */}
+        {roleLabel && (
+          <span
+            className="text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full hidden sm:inline"
+            style={{ color: roleTone, background: `${roleTone}15`, border: `0.5px solid ${roleTone}40` }}
+          >
+            {roleLabel} · {session?.user?.email?.split("@")[0]}
+          </span>
+        )}
+
+        {/* Sign-in button for public users */}
+        {role === "public" && (
+          <Link
+            to="/thermalos/advisor"
+            className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono text-[#888780] hover:text-[#9FE1CB] transition-colors px-2 py-1 rounded border border-white/[0.08] hover:border-[#1D9E75]/40"
+          >
+            <LogIn size={11} /> Sign in
+          </Link>
+        )}
 
         <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-[#0F6E56]/15 border border-[#0F6E56]/40">
           <span className="relative flex h-1.5 w-1.5">
@@ -105,9 +141,7 @@ export default function ThermalOSLayout() {
       <div className="flex">
         {/* Sidebar */}
         <aside
-          className={`${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 fixed md:sticky top-14 left-0 z-20 w-52 h-[calc(100vh-3.5rem)] bg-[#0D0D0B] border-r border-white/[0.07] transition-transform overflow-y-auto`}
+          className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 fixed md:sticky top-14 left-0 z-20 w-52 h-[calc(100vh-3.5rem)] bg-[#0D0D0B] border-r border-white/[0.07] transition-transform overflow-y-auto`}
         >
           <nav className="p-3 space-y-1">
             {navItems.map((it) => {
@@ -134,28 +168,36 @@ export default function ThermalOSLayout() {
               );
             })}
           </nav>
+
           <div className="p-3 mt-2 border-t border-white/[0.05] text-[9px] font-mono text-[#5a5a55] leading-relaxed">
-            Amogh (EE · Cal Poly) · Sam (ME · Cal Poly)
-            <br />
-            YC W27 · GPU thermal forensics
+            {role === "advisor" ? (
+              <>Advisor view · Research data only<br />Business sections hidden</>
+            ) : (
+              <>Amogh (EE · Cal Poly) · Sam (ME · Cal Poly)<br />YC W27 · GPU thermal forensics</>
+            )}
           </div>
         </aside>
 
         {sidebarOpen && (
-          <div
-            className="md:hidden fixed inset-0 top-14 bg-black/60 z-10"
-            onClick={() => setSidebarOpen(false)}
-          />
+          <div className="md:hidden fixed inset-0 top-14 bg-black/60 z-10" onClick={() => setSidebarOpen(false)} />
         )}
 
         {/* Content */}
         <main className="flex-1 min-w-0 p-4 md:p-6">
           <Outlet />
           <footer className="mt-10 pt-4 border-t border-white/[0.05] text-[10px] font-mono text-[#5a5a55] text-center">
-            ThermalOS · amogh.site/thermalos · Amogh (EE · Cal Poly) + Sam (ME · UCI) · YC W27
+            ThermalOS · amogh.site/thermalos · Amogh (EE · Cal Poly) + Sam (ME · Cal Poly) · YC W27
           </footer>
         </main>
       </div>
     </div>
+  );
+}
+
+export default function ThermalOSLayout() {
+  return (
+    <ThermalOSRoleProvider>
+      <InnerLayout />
+    </ThermalOSRoleProvider>
   );
 }

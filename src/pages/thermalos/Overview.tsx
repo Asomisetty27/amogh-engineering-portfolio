@@ -11,6 +11,7 @@ import {
   fetchRoadmapStages, generateDemoRoadmapStages,
   fetchTimeline, generateDemoTimeline,
   fetchAdvisorQuestions, generateDemoAdvisorQuestions,
+  fetchWikiSummary, generateDemoWikiSummary,
   type MeasurementRow, type RoadmapStage, type TimelineRow, type AdvisorQuestion,
 } from "@/services/thermalosApi";
 
@@ -67,15 +68,16 @@ function Pill({ tone, children }: { tone: Tone; children: React.ReactNode }) {
 /* Sections                                                            */
 /* ------------------------------------------------------------------ */
 
-function Hero({ rowCount, demo }: { rowCount: number; demo: boolean }) {
+function Hero({ rowCount, demo, syncedAt }: { rowCount: number; demo: boolean; syncedAt?: string }) {
   return (
     <div className="mb-8">
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <Pill tone="complete">YC W27 target</Pill>
         <Pill tone="progress">Pre-seed · Pre-revenue</Pill>
-        <Pill tone={demo ? "gray" : "complete"}>
-          {demo ? "Demo data" : `${rowCount.toLocaleString()} live rows`}
-        </Pill>
+        <Pill tone="complete">Stage 1 complete · 2,280+ rows</Pill>
+        {syncedAt && (
+          <span className="text-[10px] font-mono text-[#5a5a55]">synced {syncedAt}</span>
+        )}
       </div>
       <h1 className="text-[26px] md:text-[34px] font-semibold tracking-tight text-[#E6F7F1] leading-[1.15] mb-3 max-w-3xl">
         GPU thermal-power forensics for production AI infrastructure.
@@ -755,16 +757,31 @@ export default function Overview() {
     staleTime: 0,
     retry: false,
   });
+  const { data: summaryData, error: summaryErr, isError: summaryIsErr } = useQuery({
+    queryKey: ["wiki-summary"],
+    queryFn: fetchWikiSummary,
+    staleTime: 60_000,
+    retry: false,
+  });
+
   const demo = isError && isDemoModeError(error);
   const rowCount = demo ? 2280 : data?.length ?? 0;
+  const summary = (summaryIsErr && isDemoModeError(summaryErr)) || !summaryData
+    ? generateDemoWikiSummary()
+    : summaryData;
+
+  const syncedAt = summary.vault_last_updated
+    ? summary.vault_last_updated
+    : undefined;
+
+  // Only show live data panel when the sheet is actually connected (not demo mode)
+  const showLiveData = !demo && rowCount > 0;
 
   return (
     <div className="max-w-5xl mx-auto">
-      <Hero rowCount={rowCount} demo={demo} />
-      <NextStep />
-      <WhatDataGoesWhere />
+      <Hero rowCount={rowCount} demo={demo} syncedAt={syncedAt} />
       <HeadlineFinding />
-      <LiveData />
+      {showLiveData && <LiveData />}
       <Roadmap />
       <Team />
       <CurrentAsks />

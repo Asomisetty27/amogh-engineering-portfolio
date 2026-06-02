@@ -9,6 +9,7 @@ import ThermalOSLayout from "./pages/thermalos/ThermalOSLayout.tsx";
 
 // ThermalOS pages
 import Overview     from "./pages/thermalos/Overview.tsx";
+import Dashboard    from "./pages/thermalos/Dashboard.tsx";
 import Lab          from "./pages/thermalos/Lab.tsx";
 import Research     from "./pages/thermalos/Research.tsx";
 import Roadmap      from "./pages/thermalos/Roadmap.tsx";
@@ -43,8 +44,9 @@ const App = () => (
             {/* Legacy -- keeps old routes alive */}
             <Route path="yc"          element={<YC />} />
 
+            {/* Admin dashboard — real page now, not a redirect */}
+            <Route path="dashboard"    element={<Dashboard />} />
             {/* Legacy URLs — keep working, redirect into new tabbed pages */}
-            <Route path="dashboard"    element={<Navigate to="/thermalos" replace />} />
             <Route path="live"         element={<Navigate to="/thermalos/lab" replace />} />
             <Route path="experiments"  element={<Navigate to="/thermalos/lab?tab=experiments" replace />} />
             <Route path="cycling"      element={<Navigate to="/thermalos/lab?tab=cycling" replace />} />
