@@ -15,7 +15,6 @@ interface NavItem {
   end?: boolean;
 }
 
-// Three nav sets — each scoped to what that viewer needs
 const PUBLIC_NAV: NavItem[] = [
   { to: "/thermalos",          label: "Overview",    sub: "What & where we are",    icon: LayoutDashboard, end: true },
   { to: "/thermalos/research", label: "Research",    sub: "Methodology & findings", icon: FlaskConical },
@@ -46,9 +45,42 @@ function UTCClock() {
     return () => clearInterval(t);
   }, []);
   return (
-    <span className="font-mono text-[11px] text-[#9FE1CB]/70 tabular-nums hidden md:inline">
+    <span className="font-mono text-[11px] tabular-nums hidden md:inline" style={{ color: "var(--t-faint)" }}>
       {now.toISOString().slice(11, 19)} UTC
     </span>
+  );
+}
+
+/* Isotherm mark — core dot + concentric rings. Ring spacing encodes R_theta: wider = healthy. */
+function IsothermMark({ size = 20 }: { size?: number }) {
+  const c = size / 2;
+  const r = size / 2;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} fill="none" aria-hidden>
+      <circle cx={c} cy={c} r={r * 0.15} fill="var(--t-healthy)" />
+      <circle cx={c} cy={c} r={r * 0.38} stroke="var(--t-healthy)" strokeWidth="0.9" strokeOpacity="0.75" />
+      <circle cx={c} cy={c} r={r * 0.62} stroke="var(--t-healthy)" strokeWidth="0.7" strokeOpacity="0.45" />
+      <circle cx={c} cy={c} r={r * 0.84} stroke="var(--t-healthy)" strokeWidth="0.55" strokeOpacity="0.22" />
+    </svg>
+  );
+}
+
+/* Faint isotherm field bleeding from the top-right corner — the "structure" depth layer. */
+function IsothermTexture() {
+  return (
+    <div
+      className="pointer-events-none fixed top-0 right-0 overflow-hidden"
+      style={{ width: 520, height: 520, zIndex: 0 }}
+      aria-hidden
+    >
+      <svg width="520" height="520" viewBox="0 0 520 520" fill="none" style={{ position: "absolute", top: -60, right: -60 }}>
+        <circle cx="480" cy="40" r="90"  stroke="var(--t-healthy)" strokeWidth="0.9" strokeOpacity="0.06" />
+        <circle cx="480" cy="40" r="170" stroke="var(--t-healthy)" strokeWidth="0.75" strokeOpacity="0.05" />
+        <circle cx="480" cy="40" r="265" stroke="var(--t-healthy)" strokeWidth="0.6" strokeOpacity="0.04" />
+        <circle cx="480" cy="40" r="370" stroke="var(--t-drift)"   strokeWidth="0.5" strokeOpacity="0.03" />
+        <circle cx="480" cy="40" r="480" stroke="var(--t-caution)" strokeWidth="0.4" strokeOpacity="0.02" />
+      </svg>
+    </div>
   );
 }
 
@@ -61,9 +93,8 @@ function InnerLayout() {
 
   const navItems = role === "admin" ? ADMIN_NAV : role === "advisor" ? ADVISOR_NAV : PUBLIC_NAV;
   const roleLabel = role === "admin" ? "Admin" : role === "advisor" ? "Advisor" : null;
-  const roleTone = role === "admin" ? "#35C792" : "#60a5fa";
+  const roleFg = role === "admin" ? "var(--t-healthy)" : "#60a5fa";
 
-  // Role-based landing redirects
   useEffect(() => {
     if (role === "admin" && pathname === "/thermalos") {
       navigate("/thermalos/command", { replace: true });
@@ -78,7 +109,7 @@ function InnerLayout() {
     const prev = link?.href;
     const tmp = document.createElement("link");
     tmp.rel = "icon";
-    tmp.href = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌡</text></svg>";
+    tmp.href = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><circle cx='10' cy='10' r='2' fill='%232FB36B'/><circle cx='10' cy='10' r='5' stroke='%232FB36B' stroke-width='1' fill='none' opacity='.6'/><circle cx='10' cy='10' r='8.5' stroke='%232FB36B' stroke-width='.7' fill='none' opacity='.3'/></svg>";
     document.head.appendChild(tmp);
     return () => { tmp.remove(); if (link && prev) link.href = prev; };
   }, []);
@@ -86,9 +117,20 @@ function InnerLayout() {
   useEffect(() => { setSidebarOpen(false); }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-[#0A0A08] text-[#E6F7F1] font-sans">
+    <div
+      className="min-h-screen font-sans relative"
+      style={{ background: "var(--t-abyss)", color: "var(--t-text)" }}
+    >
+      <IsothermTexture />
+
       {/* Topbar */}
-      <header className="sticky top-0 z-30 h-14 bg-[#0D0D0B]/85 backdrop-blur border-b border-white/[0.07] flex items-center px-3 md:px-5 gap-3">
+      <header
+        className="sticky top-0 z-30 h-14 backdrop-blur flex items-center px-3 md:px-5 gap-3"
+        style={{
+          background: "color-mix(in srgb, var(--t-abyss) 88%, transparent)",
+          borderBottom: "1px solid var(--t-border)",
+        }}
+      >
         <button
           className="md:hidden p-1.5 rounded hover:bg-white/[0.05]"
           onClick={() => setSidebarOpen((v) => !v)}
@@ -97,54 +139,86 @@ function InnerLayout() {
           {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
 
-        <Link to="/" className="text-[11px] font-mono text-[#888780] hover:text-[#9FE1CB] transition-colors whitespace-nowrap">
+        <Link
+          to="/"
+          className="text-[11px] font-mono transition-colors whitespace-nowrap"
+          style={{ color: "var(--t-faint)" }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--t-healthy)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--t-faint)")}
+        >
           ← Portfolio
         </Link>
 
-        <div className="flex items-baseline gap-2 ml-2">
-          <span className="font-bold text-[16px] md:text-[18px] tracking-tight">🌡 ThermalOS</span>
-          <span className="font-mono text-[10px] text-[#35C792] hidden sm:inline">/ amogh.site/thermalos</span>
+        <div className="flex items-center gap-2.5 ml-2">
+          <IsothermMark size={20} />
+          <div className="flex items-baseline gap-2">
+            <span
+              className="font-display font-semibold text-[16px] md:text-[17px]"
+              style={{ color: "var(--t-text)", letterSpacing: "-0.02em" }}
+            >
+              ThermalOS
+            </span>
+            <span className="font-mono text-[10px] hidden sm:inline" style={{ color: "var(--t-healthy)" }}>
+              / amogh.site/thermalos
+            </span>
+          </div>
         </div>
 
         <div className="flex-1" />
 
-        {fetching > 0 && <Loader2 size={14} className="animate-spin text-[#35C792]" />}
+        {fetching > 0 && <Loader2 size={14} className="animate-spin" style={{ color: "var(--t-healthy)" }} />}
 
-        {/* Role badge */}
         {roleLabel && (
           <span
             className="text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full hidden sm:inline"
-            style={{ color: roleTone, background: `${roleTone}15`, border: `0.5px solid ${roleTone}40` }}
+            style={{ color: roleFg, background: `color-mix(in srgb, ${roleFg} 12%, transparent)`, border: `0.5px solid color-mix(in srgb, ${roleFg} 35%, transparent)` }}
           >
             {roleLabel} · {session?.user?.email?.split("@")[0]}
           </span>
         )}
 
-        {/* Sign-in button for public users */}
         {role === "public" && (
           <Link
             to="/thermalos/advisor"
-            className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono text-[#888780] hover:text-[#9FE1CB] transition-colors px-2 py-1 rounded border border-white/[0.08] hover:border-[#1D9E75]/40"
+            className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono transition-colors px-2 py-1 rounded"
+            style={{ color: "var(--t-muted)", border: "1px solid var(--t-border)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--t-healthy)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--t-muted)")}
           >
             <LogIn size={11} /> Sign in
           </Link>
         )}
 
-        <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-[#0F6E56]/15 border border-[#0F6E56]/40">
+        <div
+          className="flex items-center gap-1.5 px-2 py-1 rounded-full"
+          style={{
+            background: "color-mix(in srgb, var(--t-stable) 12%, transparent)",
+            border: "1px solid color-mix(in srgb, var(--t-stable) 35%, transparent)",
+          }}
+        >
           <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#35C792] opacity-75" />
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#35C792]" />
+            <span
+              className="absolute inline-flex h-full w-full rounded-full animate-thermal-pulse"
+              style={{ background: "var(--t-healthy)" }}
+            />
+            <span
+              className="relative inline-flex rounded-full h-1.5 w-1.5"
+              style={{ background: "var(--t-healthy)" }}
+            />
           </span>
-          <span className="text-[10px] font-mono uppercase tracking-wider text-[#9FE1CB]">Live</span>
+          <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: "var(--t-healthy)" }}>Live</span>
         </div>
 
         <UTCClock />
       </header>
 
-      <div className="flex">
+      <div className="flex relative z-10">
         {/* Sidebar */}
         <aside
-          className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 fixed md:sticky top-14 left-0 z-20 w-52 h-[calc(100vh-3.5rem)] bg-[#0D0D0B] border-r border-white/[0.07] transition-transform overflow-y-auto`}
+          className={`${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0 fixed md:sticky top-14 left-0 z-20 w-52 h-[calc(100vh-3.5rem)] transition-transform overflow-y-auto`}
+          style={{ background: "var(--t-abyss)", borderRight: "1px solid var(--t-border)" }}
         >
           <nav className="p-3 space-y-1">
             {navItems.map((it) => {
@@ -156,23 +230,33 @@ function InnerLayout() {
                   end={it.end}
                   className={({ isActive }) =>
                     `flex items-start gap-2.5 px-2.5 py-2 rounded border-l-2 transition-colors ${
-                      isActive
-                        ? "border-[#1D9E75] bg-[#0F6E56]/15 text-[#35C792]"
-                        : "border-transparent text-[#a8a89f] hover:bg-white/[0.03] hover:text-[#E6F7F1]"
+                      isActive ? "" : "border-transparent hover:bg-white/[0.03]"
                     }`
+                  }
+                  style={({ isActive }) =>
+                    isActive
+                      ? {
+                          borderLeftColor: "var(--t-stable)",
+                          background: "color-mix(in srgb, var(--t-stable) 10%, transparent)",
+                          color: "var(--t-healthy)",
+                        }
+                      : { color: "var(--t-muted)" }
                   }
                 >
                   <Icon size={14} className="mt-0.5 flex-shrink-0" />
                   <div className="min-w-0">
                     <div className="text-[13px] font-semibold leading-tight">{it.label}</div>
-                    <div className="text-[10px] font-mono text-[#5a5a55] leading-tight mt-0.5">{it.sub}</div>
+                    <div className="text-[10px] font-mono leading-tight mt-0.5" style={{ color: "var(--t-faint)" }}>{it.sub}</div>
                   </div>
                 </NavLink>
               );
             })}
           </nav>
 
-          <div className="p-3 mt-2 border-t border-white/[0.05] text-[9px] font-mono text-[#5a5a55] leading-relaxed">
+          <div
+            className="p-3 mt-2 text-[9px] font-mono leading-relaxed"
+            style={{ borderTop: "1px solid color-mix(in srgb, var(--t-border) 60%, transparent)", color: "var(--t-faint)" }}
+          >
             {role === "advisor" ? (
               <>Advisor view · Research data only<br />Business sections hidden</>
             ) : (
@@ -188,7 +272,10 @@ function InnerLayout() {
         {/* Content */}
         <main className="flex-1 min-w-0 p-4 md:p-6">
           <Outlet />
-          <footer className="mt-10 pt-4 border-t border-white/[0.05] text-[10px] font-mono text-[#5a5a55] text-center">
+          <footer
+            className="mt-10 pt-4 text-[10px] font-mono text-center"
+            style={{ borderTop: "1px solid var(--t-border)", color: "var(--t-faint)" }}
+          >
             ThermalOS · amogh.site/thermalos · Amogh (EE · Cal Poly) + Sam (ME · Cal Poly) · YC W27
           </footer>
         </main>

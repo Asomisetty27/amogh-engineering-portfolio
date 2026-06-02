@@ -19,11 +19,11 @@ import {
 /* Primitives                                                          */
 /* ------------------------------------------------------------------ */
 
-function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function Card({ children, className = "", style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
   return (
     <div
-      className={`bg-[#141412] border border-white/[0.07] rounded-md ${className}`}
-      style={{ borderWidth: "0.5px" }}
+      className={`rounded-md ${className}`}
+      style={{ background: "var(--t-deep-field)", border: "0.5px solid var(--t-border)", ...style }}
     >
       {children}
     </div>
@@ -33,10 +33,10 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
 function SectionLabel({ children, hint }: { children: React.ReactNode; hint?: string }) {
   return (
     <div className="flex items-baseline justify-between mb-3">
-      <div className="text-[10px] font-mono uppercase tracking-[0.15em] text-[#5a5a55]">
+      <div className="text-[10px] font-mono uppercase tracking-[0.15em]" style={{ color: "var(--t-faint)" }}>
         {children}
       </div>
-      {hint && <div className="text-[10px] font-mono text-[#5a5a55]">{hint}</div>}
+      {hint && <div className="text-[10px] font-mono" style={{ color: "var(--t-faint)" }}>{hint}</div>}
     </div>
   );
 }
@@ -44,12 +44,12 @@ function SectionLabel({ children, hint }: { children: React.ReactNode; hint?: st
 type Tone = "complete" | "progress" | "queued" | "locked" | "amber" | "gray";
 
 const TONE: Record<Tone, { fg: string; bg: string; border: string }> = {
-  complete: { fg: "#35C792", bg: "#0F6E5615", border: "#1D9E7540" },
+  complete: { fg: "#2FB36B", bg: "#2FB36B12", border: "#2FB36B38" },
   progress: { fg: "#60a5fa", bg: "#3b82f615", border: "#3b82f640" },
-  queued:   { fg: "#EF9F27", bg: "#EF9F2715", border: "#EF9F2740" },
-  locked:   { fg: "#888780", bg: "#ffffff08", border: "#ffffff15" },
-  amber:    { fg: "#EF9F27", bg: "#EF9F2715", border: "#EF9F2740" },
-  gray:     { fg: "#888780", bg: "#ffffff08", border: "#ffffff15" },
+  queued:   { fg: "#E8B23A", bg: "#E8B23A12", border: "#E8B23A38" },
+  locked:   { fg: "#8A938F", bg: "#ffffff08", border: "#ffffff15" },
+  amber:    { fg: "#E8B23A", bg: "#E8B23A12", border: "#E8B23A38" },
+  gray:     { fg: "#8A938F", bg: "#ffffff08", border: "#ffffff15" },
 };
 
 function Pill({ tone, children }: { tone: Tone; children: React.ReactNode }) {
@@ -76,13 +76,16 @@ function Hero({ rowCount, demo, syncedAt }: { rowCount: number; demo: boolean; s
         <Pill tone="progress">Pre-seed · Pre-revenue</Pill>
         <Pill tone="complete">Stage 1 complete · 2,280+ rows</Pill>
         {syncedAt && (
-          <span className="text-[10px] font-mono text-[#5a5a55]">synced {syncedAt}</span>
+          <span className="text-[10px] font-mono" style={{ color: "var(--t-faint)" }}>synced {syncedAt}</span>
         )}
       </div>
-      <h1 className="text-[26px] md:text-[34px] font-semibold tracking-tight text-[#E6F7F1] leading-[1.15] mb-3 max-w-3xl">
+      <h1
+        className="text-[26px] md:text-[34px] font-display font-semibold leading-[1.15] mb-3 max-w-3xl"
+        style={{ color: "var(--t-text)", letterSpacing: "-0.02em" }}
+      >
         GPU thermal-power forensics for production AI infrastructure.
       </h1>
-      <p className="text-[14px] md:text-[15px] text-[#a8a89f] leading-relaxed max-w-2xl">
+      <p className="text-[14px] md:text-[15px] leading-relaxed max-w-2xl" style={{ color: "var(--t-muted)" }}>
         Cloud operators run thousands of GPUs without knowing when one is silently throttling. ThermalOS
         detects cooling-path anomalies from telemetry alone — using power, temperature, and effective
         thermal resistance (Rθ_eff) as forensic signals.
@@ -97,23 +100,23 @@ function HeadlineFinding() {
       <div className="flex items-start gap-4">
         <div
           className="w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0"
-          style={{ background: "#0F6E5615", border: "0.5px solid #1D9E7540" }}
+          style={{ background: "#2FB36B12", border: "0.5px solid #2FB36B38" }}
         >
-          <Cpu size={18} className="text-[#35C792]" />
+          <Cpu size={18} style={{ color: "var(--t-healthy)" }} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-[#5a5a55]">
+            <span className="text-[10px] font-mono uppercase tracking-[0.15em]" style={{ color: "var(--t-faint)" }}>
               Headline finding · Stage 1
             </span>
             <Pill tone="complete">Tesla T4 · Colab · E001–E004</Pill>
           </div>
-          <div className="text-[16px] md:text-[17px] font-semibold text-[#E6F7F1] mb-2 leading-snug">
+          <div className="text-[16px] md:text-[17px] font-semibold mb-2 leading-snug" style={{ color: "var(--t-text)" }}>
             Utilization alone does not define thermal state.
           </div>
-          <p className="text-[13px] text-[#a8a89f] leading-relaxed">
+          <p className="text-[13px] leading-relaxed" style={{ color: "var(--t-muted)" }}>
             Across 2,280+ telemetry rows on a Tesla T4 under controlled load, we observed{" "}
-            <span className="text-[#9FE1CB] font-semibold">three distinct power regimes at 0% utilization</span>
+            <span className="font-semibold" style={{ color: "var(--t-healthy)" }}>three distinct power regimes at 0% utilization</span>
             {" "}— a signal current monitoring tools collapse into a single &ldquo;idle&rdquo; state. The
             invisible regime gap is where silent throttling and cooling-path degradation live.
           </p>
@@ -296,37 +299,38 @@ function NextStep() {
             </span>
             <Pill tone={typeStyle.tone}>{typeStyle.label}</Pill>
             {next.priority && next.type !== "blocked" && (
-              <span className="text-[9px] font-mono text-[#5a5a55]">{next.priority}</span>
+              <span className="text-[9px] font-mono" style={{ color: "var(--t-faint)" }}>{next.priority}</span>
             )}
           </div>
-          <div className="text-[15px] md:text-[16px] font-semibold text-[#E6F7F1] mb-2 leading-snug">
+          <div className="text-[15px] md:text-[16px] font-semibold mb-2 leading-snug" style={{ color: "var(--t-text)" }}>
             {next.action}
           </div>
-          <p className="text-[12px] text-[#a8a89f] leading-relaxed">{next.reason}</p>
+          <p className="text-[12px] leading-relaxed" style={{ color: "var(--t-muted)" }}>{next.reason}</p>
         </div>
       </div>
 
       <div className="flex items-center justify-end pt-1">
         <Link
           to={next.link}
-          className="inline-flex items-center gap-1 text-[11px] font-mono text-[#9FE1CB] hover:text-[#35C792] transition-colors"
+          className="inline-flex items-center gap-1 text-[11px] font-mono transition-colors"
+          style={{ color: "var(--t-healthy)" }}
         >
           Open {next.link.split("/").pop()} <ArrowRight size={11} />
         </Link>
       </div>
 
       {onDeck.length > 0 && (
-        <div className="mt-4 pt-3 border-t border-white/[0.05]">
-          <div className="text-[9px] font-mono uppercase tracking-[0.15em] text-[#5a5a55] mb-2">
+        <div className="mt-4 pt-3" style={{ borderTop: "1px solid var(--t-border)" }}>
+          <div className="text-[9px] font-mono uppercase tracking-[0.15em] mb-2" style={{ color: "var(--t-faint)" }}>
             On deck
           </div>
           <ul className="space-y-2">
             {onDeck.map((item, i) => (
               <li key={i} className="flex items-start gap-2 text-[11px] leading-snug">
-                <span className="text-[#5a5a55] font-mono tabular-nums w-5 flex-shrink-0">{i + 2}.</span>
+                <span className="font-mono tabular-nums w-5 flex-shrink-0" style={{ color: "var(--t-faint)" }}>{i + 2}.</span>
                 <span className="flex-1 min-w-0">
-                  <span className="text-[#a8a89f]">{item.action}</span>
-                  <span className="text-[#5a5a55] ml-2 font-mono">· {item.reason}</span>
+                  <span style={{ color: "var(--t-muted)" }}>{item.action}</span>
+                  <span className="ml-2 font-mono" style={{ color: "var(--t-faint)" }}>· {item.reason}</span>
                 </span>
               </li>
             ))}
@@ -417,8 +421,8 @@ function WhatDataGoesWhere() {
       </SectionLabel>
       <Card className="p-4">
         <div className="flex flex-wrap items-baseline gap-2 mb-3">
-          <span className="text-[11px] font-mono font-semibold text-[#35C792]">{mapping.experimentId}</span>
-          <span className="text-[12px] text-[#E6F7F1]">{mapping.description}</span>
+          <span className="text-[11px] font-mono font-semibold" style={{ color: "var(--t-healthy)" }}>{mapping.experimentId}</span>
+          <span className="text-[12px]" style={{ color: "var(--t-text)" }}>{mapping.description}</span>
           <Pill tone={inProgressExp ? "progress" : "queued"}>
             {inProgressExp ? "Running" : "Up next"}
           </Pill>
@@ -426,20 +430,21 @@ function WhatDataGoesWhere() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
           <div className="md:col-span-1">
-            <div className="text-[9px] font-mono uppercase tracking-[0.12em] text-[#5a5a55] mb-1">
+            <div className="text-[9px] font-mono uppercase tracking-[0.12em] mb-1" style={{ color: "var(--t-faint)" }}>
               Sheet tab
             </div>
-            <div className="text-[12px] font-mono text-[#9FE1CB]">{mapping.tab}</div>
+            <div className="text-[12px] font-mono" style={{ color: "var(--t-healthy)" }}>{mapping.tab}</div>
           </div>
           <div className="md:col-span-2">
-            <div className="text-[9px] font-mono uppercase tracking-[0.12em] text-[#5a5a55] mb-1">
+            <div className="text-[9px] font-mono uppercase tracking-[0.12em] mb-1" style={{ color: "var(--t-faint)" }}>
               Required columns
             </div>
             <div className="flex flex-wrap gap-1">
               {mapping.columns.map((c) => (
                 <span
                   key={c}
-                  className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.04] border border-white/[0.08] text-[#a8a89f]"
+                  className="text-[10px] font-mono px-1.5 py-0.5 rounded"
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid var(--t-border)", color: "var(--t-muted)" }}
                 >
                   {c}
                 </span>
@@ -448,14 +453,15 @@ function WhatDataGoesWhere() {
           </div>
         </div>
 
-        <p className="text-[11px] text-[#6b7280] leading-relaxed pt-3 border-t border-white/[0.05]">
+        <p className="text-[11px] leading-relaxed pt-3" style={{ color: "var(--t-faint)", borderTop: "1px solid var(--t-border)" }}>
           {mapping.notes}
         </p>
 
         <div className="flex items-center justify-end pt-3">
           <Link
             to="/thermalos/lab?tab=experiments"
-            className="inline-flex items-center gap-1 text-[11px] font-mono text-[#9FE1CB] hover:text-[#35C792] transition-colors"
+            className="inline-flex items-center gap-1 text-[11px] font-mono transition-colors"
+            style={{ color: "var(--t-healthy)" }}
           >
             Open Lab · Experiments <ArrowRight size={11} />
           </Link>
@@ -498,7 +504,7 @@ function LiveData() {
   const alertCount = valid.filter((r) => r.alert && r.alert !== "OK" && !r.alert.includes("🟢")).length;
 
   if (isLoading) {
-    return <div className="h-64 mb-8 bg-[#141412] border border-white/[0.07] rounded-md animate-pulse" />;
+    return <div className="h-64 mb-8 rounded-md animate-pulse" style={{ background: "var(--t-deep-field)", border: "0.5px solid var(--t-border)" }} />;
   }
 
   return (
@@ -514,22 +520,22 @@ function LiveData() {
 
       <Card className="p-4">
         <div className="flex items-baseline justify-between mb-2">
-          <div className="text-[12px] font-semibold text-[#E6F7F1]">Rθ_eff over recent runs</div>
-          <div className="text-[10px] font-mono text-[#5a5a55]">last 30 samples · °C/W</div>
+          <div className="text-[12px] font-semibold" style={{ color: "var(--t-text)" }}>Rθ_eff over recent runs</div>
+          <div className="text-[10px] font-mono" style={{ color: "var(--t-faint)" }}>last 30 samples · °C/W</div>
         </div>
         <ResponsiveContainer width="100%" height={180}>
           <ComposedChart data={chartData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
-            <CartesianGrid stroke="rgba(255,255,255,0.04)" />
-            <XAxis dataKey="i" tick={{ fill: "#5a5a55", fontSize: 10 }} stroke="#2a2a26" />
-            <YAxis domain={[0, 0.8]} tick={{ fill: "#5a5a55", fontSize: 10 }} stroke="#2a2a26" />
+            <CartesianGrid stroke="rgba(255,255,255,0.03)" />
+            <XAxis dataKey="i" tick={{ fill: "#525a55", fontSize: 10 }} stroke="#1C2630" />
+            <YAxis domain={[0, 0.8]} tick={{ fill: "#525a55", fontSize: 10 }} stroke="#1C2630" />
             <Tooltip
-              contentStyle={{ background: "#0D0D0B", border: "1px solid rgba(255,255,255,0.1)", fontSize: 11 }}
+              contentStyle={{ background: "#0A0E14", border: "1px solid #1C2630", fontSize: 11 }}
               formatter={(v: number) => [`${v.toFixed(3)} °C/W`, "Rθ_eff"]}
               labelFormatter={(v) => `Run ${v}`}
             />
-            <ReferenceLine y={0.5} stroke="#D85A30" strokeDasharray="4 4" label={{ value: "Anomaly threshold", fill: "#D85A30", fontSize: 10, position: "right" }} />
-            <Area type="monotone" dataKey="rtheta" fill="rgba(29,158,117,0.08)" stroke="none" />
-            <Line type="monotone" dataKey="rtheta" stroke="#1D9E75" strokeWidth={2} dot={false} />
+            <ReferenceLine y={0.5} stroke="#E8743A" strokeDasharray="4 4" label={{ value: "Anomaly threshold", fill: "#E8743A", fontSize: 10, position: "right" }} />
+            <Area type="monotone" dataKey="rtheta" fill="rgba(47,179,107,0.07)" stroke="none" />
+            <Line type="monotone" dataKey="rtheta" stroke="#2FB36B" strokeWidth={2} dot={false} />
           </ComposedChart>
         </ResponsiveContainer>
       </Card>
@@ -537,7 +543,8 @@ function LiveData() {
       <div className="mt-3 text-right">
         <Link
           to="/thermalos/lab"
-          className="inline-flex items-center gap-1 text-[11px] font-mono text-[#9FE1CB] hover:text-[#35C792] transition-colors"
+          className="inline-flex items-center gap-1 text-[11px] font-mono transition-colors"
+          style={{ color: "var(--t-healthy)" }}
         >
           Drill into Lab data <ArrowRight size={11} />
         </Link>
@@ -550,10 +557,10 @@ function KPI({ label, value, unit, tone }: { label: string; value: string; unit:
   const t = TONE[tone];
   return (
     <Card className="p-3">
-      <div className="text-[10px] font-mono uppercase tracking-[0.15em] text-[#5a5a55] mb-1.5">{label}</div>
+      <div className="text-[10px] font-mono uppercase tracking-[0.15em] mb-1.5" style={{ color: "var(--t-faint)" }}>{label}</div>
       <div className="flex items-baseline gap-1.5">
-        <span className="text-[20px] font-semibold tabular-nums" style={{ color: t.fg }}>{value}</span>
-        <span className="text-[10px] font-mono text-[#5a5a55]">{unit}</span>
+        <span className="text-[20px] font-mono font-semibold tabular-nums" style={{ color: t.fg }}>{value}</span>
+        <span className="text-[10px] font-mono" style={{ color: "var(--t-faint)" }}>{unit}</span>
       </div>
     </Card>
   );
@@ -592,9 +599,9 @@ function Roadmap() {
                 <div
                   className="absolute left-0 top-2 w-6 h-6 rounded-full flex items-center justify-center"
                   style={{
-                    background: s.status === "complete" ? t.fg : s.status === "in_progress" ? t.fg : "#0A0A08",
-                    border: `0.5px solid ${s.status === "locked" ? "#ffffff15" : t.fg}`,
-                    color: s.status === "locked" ? "#888780" : "white",
+                    background: s.status === "complete" ? t.fg : s.status === "in_progress" ? t.fg : "var(--t-abyss)",
+                    border: `0.5px solid ${s.status === "locked" ? "var(--t-border)" : t.fg}`,
+                    color: s.status === "locked" ? "var(--t-muted)" : "white",
                   }}
                 >
                   {s.status === "complete" ? <Check size={12} /> : <span className="text-[10px] font-mono font-semibold">{s.id}</span>}
@@ -603,15 +610,15 @@ function Roadmap() {
                   <div className="flex items-center justify-between gap-3 mb-2">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-[10px] font-mono text-[#5a5a55]">Stage {s.id}</span>
+                        <span className="text-[10px] font-mono" style={{ color: "var(--t-faint)" }}>Stage {s.id}</span>
                         <Pill tone={tone}>
                           {s.status === "complete" ? "Complete" : s.status === "in_progress" ? "In progress" : "Locked"}
                         </Pill>
                       </div>
-                      <div className="text-[13px] font-semibold text-[#E6F7F1] leading-tight">{s.title}</div>
-                      <div className="text-[11px] font-mono text-[#888780] mt-0.5 leading-snug truncate">{s.subtitle}</div>
+                      <div className="text-[13px] font-semibold leading-tight" style={{ color: "var(--t-text)" }}>{s.title}</div>
+                      <div className="text-[11px] font-mono mt-0.5 leading-snug truncate" style={{ color: "var(--t-muted)" }}>{s.subtitle}</div>
                     </div>
-                    <div className="text-[11px] font-mono tabular-nums text-[#888780] flex-shrink-0">{s.progress}%</div>
+                    <div className="text-[11px] font-mono tabular-nums flex-shrink-0" style={{ color: "var(--t-muted)" }}>{s.progress}%</div>
                   </div>
                   <div className="w-full h-1 rounded-full bg-white/[0.05] overflow-hidden">
                     <div
@@ -645,12 +652,12 @@ function Team() {
     <div className="mb-8">
       <SectionLabel>Team</SectionLabel>
       <Card>
-        <ul className="divide-y divide-white/[0.05]">
+        <ul className="divide-y" style={{ borderColor: "var(--t-border)" }}>
           {PEOPLE.map((p) => (
             <li key={p.name} className="flex items-center justify-between gap-3 px-4 py-3">
               <div className="min-w-0">
-                <div className="text-[13px] text-[#E6F7F1] truncate">{p.name}</div>
-                <div className="text-[11px] font-mono text-[#888780] truncate">{p.role}</div>
+                <div className="text-[13px] truncate" style={{ color: "var(--t-text)" }}>{p.name}</div>
+                <div className="text-[11px] font-mono truncate" style={{ color: "var(--t-muted)" }}>{p.role}</div>
               </div>
               <Pill tone={p.tone}>{p.badge}</Pill>
             </li>
@@ -693,15 +700,15 @@ function CurrentAsks() {
                   style={{ background: t.fg }}
                   aria-hidden
                 />
-                <div className="text-[13px] font-semibold text-[#E6F7F1]">{a.title}</div>
+                <div className="text-[13px] font-semibold" style={{ color: "var(--t-text)" }}>{a.title}</div>
               </div>
-              <p className="text-[12px] text-[#a8a89f] leading-relaxed">{a.body}</p>
+              <p className="text-[12px] leading-relaxed" style={{ color: "var(--t-muted)" }}>{a.body}</p>
             </Card>
           );
         })}
       </div>
-      <p className="mt-3 text-[11px] font-mono text-[#5a5a55] text-center">
-        Reach out: <a href="mailto:asomisetty27@gmail.com" className="text-[#9FE1CB] hover:text-[#35C792]">asomisetty27@gmail.com</a>
+      <p className="mt-3 text-[11px] font-mono text-center" style={{ color: "var(--t-faint)" }}>
+        Reach out: <a href="mailto:asomisetty27@gmail.com" style={{ color: "var(--t-healthy)" }}>asomisetty27@gmail.com</a>
       </p>
     </div>
   );
@@ -718,7 +725,7 @@ function DeepLinks() {
     { to: "/thermalos/yc", label: "YC — evidence & milestones", icon: Check },
   ];
   return (
-    <div className="mt-10 pt-6 border-t border-white/[0.05]">
+    <div className="mt-10 pt-6" style={{ borderTop: "1px solid var(--t-border)" }}>
       <SectionLabel>Deeper views</SectionLabel>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {links.map((l) => {
@@ -727,12 +734,12 @@ function DeepLinks() {
             <Link
               key={l.to}
               to={l.to}
-              className="group bg-[#141412] border border-white/[0.07] rounded-md px-4 py-3 flex items-center gap-3 hover:bg-white/[0.02] hover:border-[#1D9E75]/40 transition-colors"
-              style={{ borderWidth: "0.5px" }}
+              className="group rounded-md px-4 py-3 flex items-center gap-3 hover:bg-white/[0.02] transition-colors"
+              style={{ background: "var(--t-deep-field)", border: "0.5px solid var(--t-border)" }}
             >
-              <Icon size={14} className="text-[#5a5a55] group-hover:text-[#35C792] transition-colors" />
-              <span className="text-[12px] text-[#a8a89f] group-hover:text-[#E6F7F1] flex-1">{l.label}</span>
-              <ArrowRight size={12} className="text-[#5a5a55] group-hover:text-[#35C792] transition-colors" />
+              <Icon size={14} className="transition-colors" style={{ color: "var(--t-faint)" }} />
+              <span className="text-[12px] flex-1 transition-colors" style={{ color: "var(--t-muted)" }}>{l.label}</span>
+              <ArrowRight size={12} className="transition-colors" style={{ color: "var(--t-faint)" }} />
             </Link>
           );
         })}
