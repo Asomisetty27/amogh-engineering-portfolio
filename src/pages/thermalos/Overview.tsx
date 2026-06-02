@@ -110,7 +110,7 @@ function HeadlineFinding() {
             Utilization alone does not define thermal state.
           </div>
           <p className="text-[13px] text-[#a8a89f] leading-relaxed">
-            Across ~5,700 telemetry rows on a Tesla T4 under controlled load, we observed{" "}
+            Across 2,280+ telemetry rows on a Tesla T4 under controlled load, we observed{" "}
             <span className="text-[#9FE1CB] font-semibold">three distinct power regimes at 0% utilization</span>
             {" "}— a signal current monitoring tools collapse into a single &ldquo;idle&rdquo; state. The
             invisible regime gap is where silent throttling and cooling-path degradation live.
@@ -635,7 +635,7 @@ const PEOPLE = [
   { name: "Amogh Somisetty", role: "Co-founder · EE · Cal Poly SLO", badge: "Founder", tone: "complete" as Tone },
   { name: "Sam", role: "Co-founder · ME · Hardware · Cal Poly SLO", badge: "Founder", tone: "complete" as Tone },
   { name: "Prof. Kundu", role: "Cal Poly EE · informal advising (summer) · EE 4400 (fall)", badge: "Advisor", tone: "amber" as Tone },
-  { name: "Prof. Yu", role: "Signal processing · first meeting tomorrow", badge: "Pending", tone: "gray" as Tone },
+  { name: "Prof. Yu", role: "Signal processing · first meeting pending", badge: "Pending", tone: "gray" as Tone },
 ];
 
 function Team() {
@@ -665,9 +665,14 @@ function Team() {
 
 const ASKS = [
   {
-    title: "AI Factory / GPU cluster access",
-    body: "Dedicated A100/H100/RTX-class machine for Stage 2 power-cap sweep (E006). This is the single critical unlock for the YC headline result — everything else is sequenced behind it.",
+    title: "Cal Poly AI Factory access",
+    body: "Dedicated access to Cal Poly's new DGX B200 cluster ($3M Noyce School investment, 4 nodes, operational since Jan 2026) for Stage 2 experiments. This is the single critical unlock — publication-grade R_theta data requires measured ambient temperature, which the DGX cluster enables. Everything downstream sequences behind this.",
     tone: "queued" as Tone,
+  },
+  {
+    title: "Neocloud introductions",
+    body: "Warm introductions to infra/platform leads at Lambda, CoreWeave, Crusoe, RunPod, or Vast. Running 10 discovery calls to validate the cooling-anomaly pain before building further. Their words on whether this is a real, costly problem are the strongest possible YC slide.",
+    tone: "amber" as Tone,
   },
 ];
 
@@ -751,7 +756,7 @@ export default function Overview() {
     retry: false,
   });
   const demo = isError && isDemoModeError(error);
-  const rowCount = demo ? 6700 : data?.length ?? 0;
+  const rowCount = demo ? 2280 : data?.length ?? 0;
 
   return (
     <div className="max-w-5xl mx-auto">

@@ -15,14 +15,14 @@ const STAGES: Stage[] = [
   {
     id: 1,
     title: "Colab baseline",
-    subtitle: "Tesla T4 · 5,700 rows · E001-E004 complete",
+    subtitle: "Tesla T4 · 2,280+ rows · E001-E003 complete · E004 replication pending",
     status: "complete",
     progress: 100,
   },
   {
     id: 2,
     title: "Dedicated GPU hardware",
-    subtitle: "Physical machine · power-cap sweep · E005-E008 · ambient sensor",
+    subtitle: "Cal Poly DGX B200 AI Factory · measured ambient · E005-E008 · pending access confirmation",
     status: "in_progress",
     progress: 10,
   },
