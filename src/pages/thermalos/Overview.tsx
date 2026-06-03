@@ -490,17 +490,17 @@ function LiveData() {
     [demo, data]
   );
 
-  const valid = rows.filter((r) => r.rtheta > 0);
+  const valid = rows.filter((r) => r.rthetaCwatt > 0);
   const latest = valid[valid.length - 1];
 
   const chartData = valid.slice(-30).map((r, i) => ({
     i: i + 1,
-    rtheta: r.rtheta,
-    tHot: r.tHot,
+    rtheta: r.rthetaCwatt,
+    tHot: r.tempC,
   }));
 
-  const bestRtheta = valid.length ? Math.min(...valid.map((r) => r.rtheta)) : null;
-  const avgRtheta = valid.length ? valid.reduce((a, r) => a + r.rtheta, 0) / valid.length : null;
+  const bestRtheta = valid.length ? Math.min(...valid.map((r) => r.rthetaCwatt)) : null;
+  const avgRtheta = valid.length ? valid.reduce((a, r) => a + r.rthetaCwatt, 0) / valid.length : null;
   const alertCount = valid.filter((r) => r.alert && r.alert !== "OK" && !r.alert.includes("🟢")).length;
 
   if (isLoading) {
@@ -512,7 +512,7 @@ function LiveData() {
       <SectionLabel hint="Auto-refreshes from Google Sheet every 30s">Live telemetry</SectionLabel>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
-        <KPI label="Latest Rθ_eff" value={latest ? `${latest.rtheta.toFixed(3)}` : "—"} unit="°C/W" tone={latest && latest.rtheta > 0.5 ? "amber" : "complete"} />
+        <KPI label="Latest Rθ_eff" value={latest ? `${latest.rthetaCwatt.toFixed(3)}` : "—"} unit="°C/W" tone={latest && latest.rthetaCwatt > 0.5 ? "amber" : "complete"} />
         <KPI label="Best so far" value={bestRtheta !== null ? `${bestRtheta.toFixed(3)}` : "—"} unit="°C/W" tone="complete" />
         <KPI label="Avg Rθ_eff" value={avgRtheta !== null ? `${avgRtheta.toFixed(3)}` : "—"} unit="°C/W" tone="gray" />
         <KPI label="Anomaly events" value={String(alertCount)} unit={`/ ${valid.length} runs`} tone={alertCount > 0 ? "amber" : "complete"} />
