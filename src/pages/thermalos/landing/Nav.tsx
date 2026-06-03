@@ -1,5 +1,8 @@
+import { useEffect, useRef } from 'react';
 import { Github, ArrowUpRight } from 'lucide-react';
+import { animate, stagger } from 'animejs';
 import { IsothermMark } from './primitives';
+import { DUR, STAGGER, EASE_OUT_EXPO, prefersReducedMotion } from './motion';
 
 const NAV_ITEMS = [
   { label: 'signal',    href: '#signal' },
@@ -9,16 +12,49 @@ const NAV_ITEMS = [
 ];
 
 export function Nav() {
+  const navRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const root = navRef.current;
+    if (!root) return;
+
+    if (prefersReducedMotion()) {
+      root.style.opacity = '1';
+      return;
+    }
+
+    // Bar itself drops in from above
+    animate(root, {
+      translateY: [-20, 0],
+      opacity:    [0, 1],
+      duration:   DUR.base,
+      ease:       EASE_OUT_EXPO,
+    });
+
+    // Then the inner content staggers in
+    const items = root.querySelectorAll('[data-nav]');
+    animate(Array.from(items), {
+      translateY: [-8, 0],
+      opacity:    [0, 1],
+      duration:   DUR.fast,
+      delay:      stagger(STAGGER.base, { start: 120 }),
+      ease:       EASE_OUT_EXPO,
+    });
+  }, []);
+
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 border-b backdrop-blur-xl"
+      ref={navRef}
+      className="fixed top-0 left-0 right-0 z-50 border-b backdrop-blur-xl t-anim-nav"
       style={{
         background: 'color-mix(in oklab, var(--t-surface-0) 82%, transparent)',
         borderColor: 'var(--t-border)',
+        opacity: 0,
+        willChange: 'transform, opacity',
       }}
     >
       <div className="mx-auto flex h-14 max-w-[1240px] items-center justify-between px-6 md:px-10">
-        <div className="flex items-center gap-3">
+        <div data-nav className="flex items-center gap-3">
           <IsothermMark size={18} />
           <span
             className="t-font-display text-[14px] font-medium tracking-tight"
@@ -42,6 +78,7 @@ export function Nav() {
           {NAV_ITEMS.map((item) => (
             <a
               key={item.label}
+              data-nav
               href={item.href}
               className="t-mono-sm transition-colors"
               style={{ color: 'var(--t-muted)' }}
@@ -53,7 +90,7 @@ export function Nav() {
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div data-nav className="flex items-center gap-2">
           <a
             href="https://github.com/asomisetty/thermalos"
             target="_blank" rel="noopener noreferrer"
@@ -88,6 +125,12 @@ export function Nav() {
           </a>
         </div>
       </div>
+
+      <style>{`
+        @media (prefers-reduced-motion: reduce) {
+          .t-anim-nav { opacity: 1 !important; transform: none !important; }
+        }
+      `}</style>
     </nav>
   );
 }

@@ -1,4 +1,11 @@
+// Footer — link reveal cascade on viewport entry. Each column's links
+// stagger in, and columns themselves are offset so the cascade feels
+// like a wave moving left-to-right.
+
+import { animate, stagger } from 'animejs';
 import { IsothermMark } from './primitives';
+import { DUR, STAGGER, EASE_OUT_EXPO } from './motion';
+import { useAnimeOnView } from './useAnimeOnView';
 
 const COLS = [
   {
@@ -31,14 +38,46 @@ const COLS = [
 ];
 
 export function Footer() {
+  const footerRef = useAnimeOnView<HTMLElement>(({ root, reducedMotion }) => {
+    const columns = Array.from(root.querySelectorAll<HTMLElement>('[data-anim="foot-col"]'));
+    if (reducedMotion) {
+      columns.forEach((c) => {
+        c.style.opacity = '1';
+        c.querySelectorAll<HTMLElement>('[data-anim="foot-link"]').forEach((el) => { el.style.opacity = '1'; });
+      });
+      return;
+    }
+
+    columns.forEach((col, colIdx) => {
+      animate(col, {
+        translateY: [8, 0],
+        opacity:    [0, 1],
+        duration:   DUR.fast,
+        delay:      colIdx * 120,
+        ease:       EASE_OUT_EXPO,
+      });
+      const links = Array.from(col.querySelectorAll<HTMLElement>('[data-anim="foot-link"]'));
+      if (links.length) {
+        animate(links, {
+          translateY: [6, 0],
+          opacity:    [0, 1],
+          duration:   DUR.fast,
+          delay:      stagger(STAGGER.fine, { start: 120 + colIdx * 120 }),
+          ease:       EASE_OUT_EXPO,
+        });
+      }
+    });
+  });
+
   return (
     <footer
-      className="relative border-t"
+      ref={footerRef}
+      className="relative border-t t-anim-footer"
       style={{ borderColor: 'var(--t-border)', background: 'var(--t-surface-0)' }}
     >
       <div className="mx-auto max-w-[1240px] px-6 py-16 md:px-10">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
-          <div className="col-span-2 md:col-span-1">
+          <div data-anim="foot-col" className="col-span-2 md:col-span-1" style={{ opacity: 0, willChange: 'transform, opacity' }}>
             <div className="mb-3 flex items-center gap-2">
               <IsothermMark size={16} />
               <span
@@ -85,7 +124,11 @@ export function Footer() {
           </div>
 
           {COLS.map(({ title, links }) => (
-            <div key={title}>
+            <div
+              key={title}
+              data-anim="foot-col"
+              style={{ opacity: 0, willChange: 'transform, opacity' }}
+            >
               <div
                 className="t-eyebrow mb-4"
                 style={{ color: 'var(--t-text)' }}
@@ -94,7 +137,11 @@ export function Footer() {
               </div>
               <ul className="space-y-2.5">
                 {links.map(({ l, href }) => (
-                  <li key={l}>
+                  <li
+                    key={l}
+                    data-anim="foot-link"
+                    style={{ opacity: 0, willChange: 'transform, opacity' }}
+                  >
                     <a
                       href={href}
                       target={href.startsWith('http') ? '_blank' : undefined}
@@ -125,6 +172,12 @@ export function Footer() {
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (prefers-reduced-motion: reduce) {
+          .t-anim-footer [data-anim] { opacity: 1 !important; transform: none !important; }
+        }
+      `}</style>
     </footer>
   );
 }

@@ -1,14 +1,61 @@
 // Bento — 5-card capability grid. Each card has a real visual: a chart, a
 // code shell, a stack diagram. No card is just text.
+//
+// Motion: on viewport enter, the cards cascade in (scale + opacity + lift)
+// with a stagger, the DriftChart bars rise from 0 with their own stagger,
+// and the StackRows slide in from the right.
 
-import { motion } from 'framer-motion';
+import * as React from 'react';
 import { ChevronRight } from 'lucide-react';
-import { CalloutBox, SectionHeader, BlueprintField, StatusPill } from './primitives';
-import { EASE, HEX } from './tokens';
+import { animate, stagger } from 'animejs';
+import { SectionHeader, BlueprintField, StatusPill } from './primitives';
+import { HEX } from './tokens';
+import { DUR, STAGGER, EASE_OUT_EXPO } from './motion';
+import { useAnimeOnView } from './useAnimeOnView';
+
+void React; // keep the React import for JSX type resolution in some configs
 
 export function Bento() {
+  // Section-level cascade: cards stagger in on viewport enter.
+  const sectionRef = useAnimeOnView<HTMLDivElement>(({ root, reducedMotion }) => {
+    if (reducedMotion) {
+      root.querySelectorAll<HTMLElement>('[data-anim="bento-card"]').forEach((el) => {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      });
+      return;
+    }
+
+    const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-anim="bento-card"]'));
+    animate(cards, {
+      translateY: [16, 0],
+      scale:      [0.96, 1],
+      opacity:    [0, 1],
+      duration:   DUR.slow,
+      delay:      stagger(STAGGER.loose),
+      ease:       EASE_OUT_EXPO,
+    });
+
+    // StackRows — slide in from right
+    const rows = Array.from(root.querySelectorAll<HTMLElement>('[data-anim="stack-row"]'));
+    if (rows.length) {
+      animate(rows, {
+        translateX: [16, 0],
+        opacity:    [0, 1],
+        duration:   DUR.base,
+        delay:      stagger(STAGGER.base, { start: 400 }),
+        ease:       EASE_OUT_EXPO,
+      });
+    }
+  });
+
   return (
-    <section id="features" className="relative border-t" style={{ borderColor: 'var(--t-border)' }}>
+    <section
+      id="features"
+      ref={sectionRef}
+      className="relative border-t t-anim-bento"
+      style={{ borderColor: 'var(--t-border)' }}
+    >
       <BlueprintField opacity={0.18} />
 
       <div className="relative mx-auto max-w-[1240px] px-6 py-24 md:px-10 lg:py-32">
@@ -101,6 +148,20 @@ export function Bento() {
           </Card>
         </div>
       </div>
+
+      <style>{`
+        .t-anim-bento [data-anim="bento-card"] {
+          opacity: 0;
+          will-change: transform, opacity;
+        }
+        .t-anim-bento [data-anim="stack-row"] {
+          opacity: 0;
+          will-change: transform, opacity;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .t-anim-bento [data-anim] { opacity: 1 !important; transform: none !important; }
+        }
+      `}</style>
     </section>
   );
 }
@@ -126,13 +187,9 @@ function Card({
     span === 2 ? 'md:col-span-2' : 'md:col-span-2';
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-10%' }}
-      transition={{ duration: 0.6, ease: EASE }}
-      whileHover={{ y: -2 }}
-      className={`group relative overflow-hidden rounded-[6px] border ${spanCls}`}
+    <div
+      data-anim="bento-card"
+      className={`group relative overflow-hidden rounded-[6px] border ${spanCls} transition-transform duration-200 hover:-translate-y-0.5`}
       style={{
         background: 'var(--t-surface-1)',
         borderColor: 'var(--t-border)',
@@ -162,7 +219,7 @@ function Card({
         </h3>
         {children}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -178,9 +235,28 @@ function DriftChart() {
   const sigma = 4;
   const threshold = baseline + k * sigma; // 50
 
+  // Each bar grows from 0 → full height on viewport entry, staggered.
+  const ref = useAnimeOnView<HTMLDivElement>(({ root, reducedMotion }) => {
+    const bars = Array.from(root.querySelectorAll<SVGRectElement>('[data-anim="drift-bar"]'));
+    if (!bars.length) return;
+    if (reducedMotion) {
+      bars.forEach((b) => { b.setAttribute('transform', 'scale(1, 1)'); });
+      return;
+    }
+    animate(bars, {
+      // scaleY via transform on each rect using its bottom-edge transform-origin
+      // (set via CSS below).
+      transform: ['scaleY(0)', 'scaleY(1)'],
+      duration:  DUR.slow,
+      delay:     stagger(STAGGER.base, { start: 80 }),
+      ease:      EASE_OUT_EXPO,
+    });
+  }, { threshold: 0.35 });
+
   return (
     <div
-      className="relative rounded-[4px] border p-4"
+      ref={ref}
+      className="relative rounded-[4px] border p-4 t-anim-drift"
       style={{ background: 'var(--t-surface-2)', borderColor: 'var(--t-border)' }}
     >
       <div className="mb-3 flex items-center justify-between t-mono-xs">
@@ -209,16 +285,19 @@ function DriftChart() {
                                     HEX.healthy;
             const x = 4 + i * 20;
             return (
-              <motion.rect
+              <rect
                 key={i}
+                data-anim="drift-bar"
                 x={x} y={80 - v}
                 width={14} height={v}
                 fill={color}
                 fillOpacity={0.85}
-                initial={{ scaleY: 0, transformOrigin: 'bottom' }}
-                whileInView={{ scaleY: 1 }}
-                viewport={{ once: true, margin: '-5%' }}
-                transition={{ duration: 0.4, delay: i * 0.04, ease: EASE }}
+                style={{
+                  transformBox: 'fill-box',
+                  transformOrigin: 'center bottom',
+                  willChange: 'transform',
+                  transform: 'scaleY(0)',
+                }}
               />
             );
           })}
@@ -230,6 +309,12 @@ function DriftChart() {
         <span>k·σ alert threshold</span>
         <span>1.85 critical</span>
       </div>
+
+      <style>{`
+        @media (prefers-reduced-motion: reduce) {
+          .t-anim-drift [data-anim="drift-bar"] { transform: scaleY(1) !important; }
+        }
+      `}</style>
     </div>
   );
 }
@@ -283,6 +368,7 @@ function StackRow({
 }) {
   return (
     <div
+      data-anim="stack-row"
       className="flex items-center justify-between rounded-[3px] border px-2.5 py-2 t-font-mono"
       style={{
         background: 'var(--t-surface-2)',
@@ -299,3 +385,4 @@ function StackRow({
     </div>
   );
 }
+

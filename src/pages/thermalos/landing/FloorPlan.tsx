@@ -11,9 +11,12 @@
 // `useAnimationSequence` motion values — no discrete phases, no jumps.
 
 import * as React from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { motion, useTransform, type MotionValue } from 'framer-motion';
+import { animate, createTimeline, stagger, svg, utils } from 'animejs';
 import { HEX } from './tokens';
 import type { SequenceValues } from './useAnimationSequence';
+import { DUR, STAGGER, EASE_OUT_EXPO, prefersReducedMotion } from './motion';
 
 // ── viewBox geometry (in mm-ish units; arbitrary but consistent) ───────────
 export const VB = { w: 520, h: 260 } as const;
@@ -130,8 +133,75 @@ export function FloorPlan({ seq }: { seq: SequenceValues }) {
     ([a, r]: number[]) => a * (1 - r)
   );
 
+  // ── BLUEPRINT DRAW-ON ─────────────────────────────────────────────────
+  // On first mount, the floor-plan draws itself like a CAD plotter:
+  // frame → corner ticks → aisle dividers → rack outlines → GPU slots →
+  // ToR switches + topology lines. Total ~1.2s, completes before the
+  // Framer camera glide kicks in (~1.6s).
+  const svgRef = useRef<SVGSVGElement | null>(null);
+
+  useLayoutEffect(() => {
+    const root = svgRef.current;
+    if (!root) return;
+    if (prefersReducedMotion()) return;
+
+    // Helper to drawable-ize then animate a group of elements.
+    const draw = (sel: string) => {
+      const els = Array.from(root.querySelectorAll<SVGGeometryElement>(sel));
+      if (!els.length) return [] as ReturnType<typeof svg.createDrawable>;
+      return svg.createDrawable(els);
+    };
+
+    const frame      = draw('[data-draw="frame"]');
+    const corners    = draw('[data-draw="corner"]');
+    const dividers   = draw('[data-draw="divider"]');
+    const rackOuts   = draw('[data-draw="rack-outline"]');
+    const gpuSlots   = draw('[data-draw="gpu-slot"]');
+    const torSwitch  = draw('[data-draw="tor"]');
+    const netLines   = draw('[data-draw="net-link"]');
+
+    // Synchronously hide all drawables before paint so there's no FOUC.
+    const allDrawables = [
+      ...frame, ...corners, ...dividers, ...rackOuts,
+      ...gpuSlots, ...torSwitch, ...netLines,
+    ];
+    utils.set(allDrawables as unknown as object[], { draw: '0 0' });
+
+    // Stagger label opacities (text isn't drawable, just fade)
+    const fadeIns = Array.from(root.querySelectorAll<SVGElement>('[data-fade="in"]'));
+    fadeIns.forEach((el) => { el.style.opacity = '0'; });
+
+    const tl = createTimeline({
+      defaults: { ease: EASE_OUT_EXPO },
+    });
+
+    tl
+      .add(frame as unknown as object[], { draw: ['0 0', '0 1'], duration: DUR.slow }, 0)
+      .add(corners as unknown as object[], { draw: ['0 0', '0 1'], duration: DUR.fast, delay: stagger(STAGGER.fine) }, 200)
+      .add(dividers as unknown as object[], { draw: ['0 0', '0 1'], duration: DUR.base, delay: stagger(STAGGER.base) }, 280)
+      .add(rackOuts as unknown as object[], { draw: ['0 0', '0 1'], duration: DUR.base, delay: stagger(STAGGER.base) }, 380)
+      .add(gpuSlots as unknown as object[], { draw: ['0 0', '0 1'], duration: DUR.fast, delay: stagger(STAGGER.fine) }, 620)
+      .add(netLines as unknown as object[], { draw: ['0 0', '0 1'], duration: DUR.base, delay: stagger(STAGGER.base) }, 700)
+      .add(torSwitch as unknown as object[], { draw: ['0 0', '0 1'], duration: DUR.fast, delay: stagger(STAGGER.fine) }, 820);
+
+    // Fade in the text labels in a parallel sweep
+    if (fadeIns.length) {
+      animate(fadeIns, {
+        opacity:  [0, 1],
+        duration: DUR.base,
+        delay:    stagger(STAGGER.fine, { start: 600 }),
+        ease:     EASE_OUT_EXPO,
+      });
+    }
+
+    return () => {
+      tl.cancel?.();
+    };
+  }, []);
+
   return (
     <svg
+      ref={svgRef}
       viewBox={`0 0 ${VB.w} ${VB.h}`}
       preserveAspectRatio="xMidYMid meet"
       className="block h-full w-full"
@@ -164,6 +234,7 @@ export function FloorPlan({ seq }: { seq: SequenceValues }) {
 
       {/* drawing border frame — like a real CAD sheet */}
       <rect
+        data-draw="frame"
         x={4} y={4} width={VB.w - 8} height={VB.h - 8}
         fill="none" stroke={HEX.border} strokeWidth="0.4"
       />
@@ -172,8 +243,8 @@ export function FloorPlan({ seq }: { seq: SequenceValues }) {
         [4, 4], [VB.w - 4, 4], [4, VB.h - 4], [VB.w - 4, VB.h - 4],
       ].map(([x, y], i) => (
         <g key={i} stroke={HEX.blueprintInk} strokeWidth="0.6">
-          <line x1={x - 4} y1={y} x2={x + 4} y2={y} />
-          <line x1={x} y1={y - 4} x2={x} y2={y + 4} />
+          <line data-draw="corner" x1={x - 4} y1={y} x2={x + 4} y2={y} />
+          <line data-draw="corner" x1={x} y1={y - 4} x2={x} y2={y + 4} />
         </g>
       ))}
 
@@ -203,9 +274,9 @@ export function FloorPlan({ seq }: { seq: SequenceValues }) {
         <AisleLabel y={198} text="COLD AISLE B" />
 
         {/* aisle dividers */}
-        <line x1={36} y1={70} x2={VB.w - 36} y2={70} stroke={HEX.border} strokeWidth="0.4" strokeDasharray="2 3" />
-        <line x1={36} y1={136} x2={VB.w - 36} y2={136} stroke={HEX.border} strokeWidth="0.4" strokeDasharray="2 3" />
-        <line x1={36} y1={192} x2={VB.w - 36} y2={192} stroke={HEX.border} strokeWidth="0.4" strokeDasharray="2 3" />
+        <line data-draw="divider" x1={36} y1={70} x2={VB.w - 36} y2={70} stroke={HEX.border} strokeWidth="0.4" strokeDasharray="2 3" />
+        <line data-draw="divider" x1={36} y1={136} x2={VB.w - 36} y2={136} stroke={HEX.border} strokeWidth="0.4" strokeDasharray="2 3" />
+        <line data-draw="divider" x1={36} y1={192} x2={VB.w - 36} y2={192} stroke={HEX.border} strokeWidth="0.4" strokeDasharray="2 3" />
       </motion.g>
 
       {/* main scene — camera transform */}
@@ -225,6 +296,7 @@ export function FloorPlan({ seq }: { seq: SequenceValues }) {
             <g key={rack.id}>
               {/* rack body */}
               <motion.rect
+                data-draw="rack-outline"
                 x={rack.x} y={rack.y}
                 width={RACK_W} height={RACK_H}
                 fill={HEX.surface2}
@@ -346,6 +418,7 @@ export function FloorPlan({ seq }: { seq: SequenceValues }) {
             return (
               <g key={`net-${i}`}>
                 <line
+                  data-draw="net-link"
                   x1={rack.x + RACK_W / 2} y1={y}
                   x2={next.x + RACK_W / 2}  y2={y}
                   stroke={HEX.blueprintInk}
@@ -359,12 +432,14 @@ export function FloorPlan({ seq }: { seq: SequenceValues }) {
           {RACKS.map((rack) => (
             <g key={`tor-${rack.id}`}>
               <rect
+                data-draw="tor"
                 x={rack.x + RACK_W / 2 - 6}
                 y={rack.y + RACK_H + 9}
                 width={12} height={6}
                 fill={HEX.surface2} stroke={HEX.border} strokeWidth="0.4" rx={0.5}
               />
               <text
+                data-fade="in"
                 x={rack.x + RACK_W / 2}
                 y={rack.y + RACK_H + 13.2}
                 textAnchor="middle"
@@ -434,6 +509,7 @@ function GpuSlot({
         style={{ opacity: fillOpacity }}
       />
       <motion.rect
+        data-draw="gpu-slot"
         x={x} y={y} width={GPU_W} height={GPU_H} rx={0.6}
         fill="none"
         style={{ stroke, strokeWidth: isTarget ? 0.9 : 0.5 }}
