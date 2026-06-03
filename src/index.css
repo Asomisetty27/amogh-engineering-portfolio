@@ -134,20 +134,140 @@
 
 /* ThermalOS brand tokens — Isotherm system */
 :root {
-  --t-abyss:      #0A0E14;
-  --t-deep-field: #12203A;
-  --t-cold-probe: #15445E;
-  --t-stable:     #1E7A6E;
-  --t-healthy:    #2FB36B;
-  --t-drift:      #9FCB3B;
-  --t-caution:    #E8B23A;
-  --t-rising:     #E8743A;
-  --t-critical:   #D63D3D;
-  --t-text:       #F2F5F4;
-  --t-muted:      #8A938F;
-  --t-faint:      #525a55;
-  --t-border:     #1C2630;
+  --t-abyss:        #0A0E14;
+  --t-deep-field:   #12203A;
+  --t-cold-probe:   #15445E;
+  --t-stable:       #1E7A6E;
+  --t-healthy:      #2FB36B;
+  --t-healthy-dim:  #1E7A4A;
+  --t-drift:        #9FCB3B;
+  --t-caution:      #E8B23A;
+  --t-rising:       #E8743A;
+  --t-critical:     #D63D3D;
+  --t-critical-dim: #8C2828;
+  --t-text:         #F2F5F4;
+  --t-muted:        #8A938F;
+  --t-faint:        #525a55;
+  --t-ghost:        #2A3138;
+  --t-border:       #1C2630;
+  --t-border-hi:    #2A3850;
+
+  /* Landing surfaces */
+  --t-surface-0:    #07090E;   /* page bg */
+  --t-surface-1:    #0C1117;   /* card bg */
+  --t-surface-2:    #11171F;   /* inner card */
+
+  /* Blueprint architectural ink */
+  --t-blueprint:        rgba(110, 145, 200, 0.10);
+  --t-blueprint-hi:     rgba(110, 145, 200, 0.22);
+  --t-blueprint-ink:    #6E91C8;
+  --t-blueprint-tint:   rgba(110, 145, 200, 0.06);
+
+  /* Type stacks */
+  --t-font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --t-font-mono:    'JetBrains Mono', 'Fira Mono', ui-monospace, monospace;
 }
+
+/* Landing page utility classes — used by /landing components */
+.t-font-display { font-family: var(--t-font-display); }
+.t-font-mono    { font-family: var(--t-font-mono); }
+
+.t-display-xl {
+  font-family: var(--t-font-display);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+.t-display-lg {
+  font-family: var(--t-font-display);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+}
+.t-display-md {
+  font-family: var(--t-font-display);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.t-eyebrow {
+  font-family: var(--t-font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--t-faint);
+}
+.t-mono-sm {
+  font-family: var(--t-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+.t-mono-xs {
+  font-family: var(--t-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+.t-body {
+  font-family: var(--t-font-display);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--t-muted);
+}
+
+/* Range input styled */
+.t-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2px;
+  background: var(--t-border);
+  border-radius: 1px;
+  outline: none;
+}
+.t-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--t-healthy);
+  border: 2px solid var(--t-surface-0);
+  box-shadow: 0 0 0 1px var(--t-healthy);
+  cursor: pointer;
+}
+.t-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--t-healthy);
+  border: 2px solid var(--t-surface-0);
+  box-shadow: 0 0 0 1px var(--t-healthy);
+  cursor: pointer;
+}
+
+/* Subtle blueprint grid background — used by landing */
+.t-bp-grid {
+  background-image:
+    linear-gradient(var(--t-blueprint) 1px, transparent 1px),
+    linear-gradient(90deg, var(--t-blueprint) 1px, transparent 1px),
+    linear-gradient(var(--t-blueprint-tint) 1px, transparent 1px),
+    linear-gradient(90deg, var(--t-blueprint-tint) 1px, transparent 1px);
+  background-size: 96px 96px, 96px 96px, 24px 24px, 24px 24px;
+  background-position: -1px -1px;
+}
+
+/* Landing-specific keyframes */
+@keyframes t-blip {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+.animate-t-blip { animation: t-blip 1.6s ease-in-out infinite; }
+
+@keyframes t-isotherm-pulse {
+  0%   { transform: scale(1);    opacity: 0.55; }
+  100% { transform: scale(2.6);  opacity: 0; }
+}
+.animate-t-isotherm { animation: t-isotherm-pulse 2.4s ease-out infinite; }
 
 @keyframes thermal-pulse {
   0%   { transform: scale(1);   opacity: 0.7; }

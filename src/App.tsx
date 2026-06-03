@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ThermalOSLayout from "./pages/thermalos/ThermalOSLayout.tsx";
+import Landing        from "./pages/thermalos/Landing.tsx";
 
 // ThermalOS pages
 import Overview      from "./pages/thermalos/Overview.tsx";
@@ -30,6 +31,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/landing" element={<Landing />} />
           <Route path="/thermalos" element={<ThermalOSLayout />}>
             <Route index element={<Overview />} />
 
