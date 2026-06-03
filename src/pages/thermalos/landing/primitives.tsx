@@ -2,7 +2,21 @@
 // Keep these dumb and presentational. No data, no business logic.
 
 import * as React from 'react';
+import { useMotionValueEvent, type MotionValue } from 'framer-motion';
 import { HEX } from './tokens';
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * MotionText — bridge MotionValue → React text node
+ *
+ * MotionValues cannot be rendered directly as JSX children (React throws
+ * "Objects are not valid as a React child"). This subscribes and re-renders
+ * on every change. Works for both HTML <span> and SVG <text> children.
+ * ─────────────────────────────────────────────────────────────────────── */
+export function MotionText({ value }: { value: MotionValue<string | number> }) {
+  const [text, setText] = React.useState<string | number>(value.get());
+  useMotionValueEvent(value, 'change', (v) => setText(v));
+  return <>{text}</>;
+}
 
 /* ─────────────────────────────────────────────────────────────────────────
  * IsothermMark — the brand glyph

@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { useIsFetching } from "@tanstack/react-query";
 import { ThermalOSRoleProvider, useThermalOSRole } from "@/contexts/ThermalOSRole";
+import { APP_BASE, appPath, sitePath } from "./config";
 
 interface NavItem {
   to: string;
@@ -16,26 +17,26 @@ interface NavItem {
 }
 
 const PUBLIC_NAV: NavItem[] = [
-  { to: "/thermalos",          label: "Overview",    sub: "What & where we are",    icon: LayoutDashboard, end: true },
-  { to: "/thermalos/research", label: "Research",    sub: "Methodology & findings", icon: FlaskConical },
-  { to: "/thermalos/yc",       label: "YC",          sub: "Evidence & milestones",  icon: Cpu },
+  { to: appPath(),            label: "Overview",    sub: "What & where we are",    icon: LayoutDashboard, end: true },
+  { to: appPath("research"),  label: "Research",    sub: "Methodology & findings", icon: FlaskConical },
+  { to: appPath("yc"),        label: "YC",          sub: "Evidence & milestones",  icon: Cpu },
 ];
 
 const ADMIN_NAV: NavItem[] = [
-  { to: "/thermalos/command",    label: "Command",     sub: "The one thing",          icon: Terminal, end: true },
-  { to: "/thermalos/lab",        label: "Lab",         sub: "Telemetry & runs",       icon: Activity },
-  { to: "/thermalos/research",   label: "Research",    sub: "Methodology & findings", icon: FlaskConical },
-  { to: "/thermalos/advisor",    label: "Advisor",     sub: "Questions & decisions",  icon: Users },
-  { to: "/thermalos/publication",label: "Publication", sub: "Conference tracker",     icon: BookOpen },
-  { to: "/thermalos/yc",         label: "YC",          sub: "Evidence & milestones",  icon: Cpu },
-  { to: "/thermalos/roadmap",    label: "Roadmap",     sub: "4-stage tracker",        icon: Route },
+  { to: appPath("command"),    label: "Command",     sub: "The one thing",          icon: Terminal, end: true },
+  { to: appPath("lab"),        label: "Lab",         sub: "Telemetry & runs",       icon: Activity },
+  { to: appPath("research"),   label: "Research",    sub: "Methodology & findings", icon: FlaskConical },
+  { to: appPath("advisor"),    label: "Advisor",     sub: "Questions & decisions",  icon: Users },
+  { to: appPath("publication"),label: "Publication", sub: "Conference tracker",     icon: BookOpen },
+  { to: appPath("yc"),         label: "YC",          sub: "Evidence & milestones",  icon: Cpu },
+  { to: appPath("roadmap"),    label: "Roadmap",     sub: "4-stage tracker",        icon: Route },
 ];
 
 const ADVISOR_NAV: NavItem[] = [
-  { to: "/thermalos/lab",        label: "Lab",         sub: "Telemetry & runs",       icon: Activity },
-  { to: "/thermalos/research",   label: "Research",    sub: "Methodology & findings", icon: FlaskConical },
-  { to: "/thermalos/advisor",    label: "Advisor",     sub: "Questions & decisions",  icon: Users, end: true },
-  { to: "/thermalos/publication",label: "Publication", sub: "Conference tracker",     icon: BookOpen },
+  { to: appPath("lab"),        label: "Lab",         sub: "Telemetry & runs",       icon: Activity },
+  { to: appPath("research"),   label: "Research",    sub: "Methodology & findings", icon: FlaskConical },
+  { to: appPath("advisor"),    label: "Advisor",     sub: "Questions & decisions",  icon: Users, end: true },
+  { to: appPath("publication"),label: "Publication", sub: "Conference tracker",     icon: BookOpen },
 ];
 
 function UTCClock() {
@@ -96,11 +97,11 @@ function InnerLayout() {
   const roleFg = role === "admin" ? "var(--t-healthy)" : "#60a5fa";
 
   useEffect(() => {
-    if (role === "admin" && pathname === "/thermalos") {
-      navigate("/thermalos/command", { replace: true });
+    if (role === "admin" && pathname === APP_BASE) {
+      navigate(appPath("command"), { replace: true });
     }
-    if (role === "advisor" && pathname === "/thermalos") {
-      navigate("/thermalos/advisor", { replace: true });
+    if (role === "advisor" && pathname === APP_BASE) {
+      navigate(appPath("advisor"), { replace: true });
     }
   }, [role, pathname, navigate]);
 
@@ -119,8 +120,20 @@ function InnerLayout() {
   return (
     <div
       className="min-h-screen font-sans relative"
-      style={{ background: "var(--t-abyss)", color: "var(--t-text)" }}
+      style={{ background: "var(--t-surface-0, var(--t-abyss))", color: "var(--t-text)" }}
     >
+      {/* Blueprint grid — shared visual language with the public landing. */}
+      <div
+        className="pointer-events-none fixed inset-0"
+        style={{
+          zIndex: 0,
+          opacity: 0.5,
+          backgroundImage:
+            "linear-gradient(var(--t-blueprint, rgba(56,120,220,0.10)) 1px, transparent 1px), linear-gradient(90deg, var(--t-blueprint, rgba(56,120,220,0.10)) 1px, transparent 1px)",
+          backgroundSize: "80px 80px, 80px 80px",
+        }}
+        aria-hidden
+      />
       <IsothermTexture />
 
       {/* Topbar */}
@@ -140,26 +153,26 @@ function InnerLayout() {
         </button>
 
         <Link
-          to="/"
+          to={sitePath()}
           className="text-[11px] font-mono transition-colors whitespace-nowrap"
           style={{ color: "var(--t-faint)" }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "var(--t-healthy)")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "var(--t-faint)")}
         >
-          ← Portfolio
+          ← ThermalOS
         </Link>
 
         <div className="flex items-center gap-2.5 ml-2">
           <IsothermMark size={20} />
           <div className="flex items-baseline gap-2">
             <span
-              className="font-display font-semibold text-[16px] md:text-[17px]"
+              className="font-display font-semibold text-[16px] md:text-[17px] lowercase"
               style={{ color: "var(--t-text)", letterSpacing: "-0.02em" }}
             >
-              ThermalOS
+              thermalos
             </span>
             <span className="font-mono text-[10px] hidden sm:inline" style={{ color: "var(--t-healthy)" }}>
-              / amogh.site/thermalos
+              / app
             </span>
           </div>
         </div>
@@ -179,7 +192,7 @@ function InnerLayout() {
 
         {role === "public" && (
           <Link
-            to="/thermalos/advisor"
+            to={appPath("advisor")}
             className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono transition-colors px-2 py-1 rounded"
             style={{ color: "var(--t-muted)", border: "1px solid var(--t-border)" }}
             onMouseEnter={(e) => (e.currentTarget.style.color = "var(--t-healthy)")}
@@ -276,7 +289,7 @@ function InnerLayout() {
             className="mt-10 pt-4 text-[10px] font-mono text-center"
             style={{ borderTop: "1px solid var(--t-border)", color: "var(--t-faint)" }}
           >
-            ThermalOS · amogh.site/thermalos · Amogh (EE · Cal Poly) + Sam (ME · Cal Poly) · YC W27
+            ThermalOS · Amogh (EE · Cal Poly) + Sam (ME · Cal Poly) · YC W27
           </footer>
         </main>
       </div>

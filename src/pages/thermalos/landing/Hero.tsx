@@ -14,7 +14,7 @@ import { useEffect, useRef } from 'react';
 import { motion, useTransform } from 'framer-motion';
 import { ArrowRight, Github } from 'lucide-react';
 import { animate, createTimeline, stagger, text, utils } from 'animejs';
-import { CalloutBox, BlueprintField, Cite, StatusPill } from './primitives';
+import { CalloutBox, BlueprintField, Cite, StatusPill, MotionText } from './primitives';
 import { FloorPlan, FLOOR_PLAN_TARGET, VB } from './FloorPlan';
 import { useAnimationSequence } from './useAnimationSequence';
 import { HEX, EASE } from './tokens';
@@ -190,7 +190,7 @@ export function Hero() {
             className="t-display-xl mb-7 text-[56px] md:text-[68px] lg:text-[76px]"
             style={{ color: 'var(--t-text)' }}
           >
-            <span data-split className="t-split-host">Know </span>
+            <span data-split className="t-split-host">Know&nbsp;</span>
             <span data-anim="accent" data-split className="t-split-host" style={{ color: 'var(--t-text)' }}>why</span>
             <br />
             <span data-split className="t-split-host">your GPU is hot.</span>
@@ -277,10 +277,10 @@ export function Hero() {
                   className="t-mono-xs font-medium"
                   style={{ color: statusColor as unknown as string }}
                 >
-                  {statusLabel}
+                  <MotionText value={statusLabel} />
                 </motion.span>
                 <motion.span className="t-mono-xs" style={{ color: 'var(--t-muted)' }}>
-                  · {statusSub}
+                  · <MotionText value={statusSub} />
                 </motion.span>
               </div>
             }
@@ -313,7 +313,7 @@ export function Hero() {
                   className="t-font-mono text-[18px] font-medium"
                   style={{ color: anomalyColor as unknown as string }}
                 >
-                  {anomalyCount}
+                  <MotionText value={anomalyCount} />
                 </motion.div>
                 <div className="t-mono-xs mt-0.5" style={{ color: 'var(--t-faint)' }}>
                   ANOMALY

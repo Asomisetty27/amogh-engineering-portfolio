@@ -17,6 +17,7 @@ import { animate, createTimeline, stagger, svg, utils } from 'animejs';
 import { HEX } from './tokens';
 import type { SequenceValues } from './useAnimationSequence';
 import { DUR, STAGGER, EASE_OUT_EXPO, prefersReducedMotion } from './motion';
+import { MotionText } from './primitives';
 
 // ── viewBox geometry (in mm-ish units; arbitrary but consistent) ───────────
 export const VB = { w: 520, h: 260 } as const;
@@ -539,17 +540,17 @@ function CoordReadout({ seq }: { seq: SequenceValues }) {
         FLEET-VIEW · DGX-EQUIVALENT
       </text>
       <motion.text x={10} y={22} fontSize="3.8" fill={HEX.faint} fontFamily="var(--t-font-mono)">
-        {zoomText}
+        <MotionText value={zoomText} />
       </motion.text>
       <motion.text x={68} y={22} fontSize="3.8" fill={HEX.faint} fontFamily="var(--t-font-mono)">
-        {panText}
+        <MotionText value={panText} />
       </motion.text>
     </g>
   );
 }
 
 function TargetRthetaReadout({ seq, cx, y }: { seq: SequenceValues; cx: number; y: number }) {
-  const text = useTransform(seq.rtheta, (v) => `R_θ ${v.toFixed(2)} C/W`);
+  const label = useTransform(seq.rtheta, (v) => `R_θ ${v.toFixed(2)} C/W`);
   const color = useTransform(
     [seq.rtheta, seq.resolved] as unknown as MotionValueArr,
     ([v, r]: number[]) => {
@@ -566,7 +567,7 @@ function TargetRthetaReadout({ seq, cx, y }: { seq: SequenceValues; cx: number; 
       fontSize="3.6" fontFamily="var(--t-font-mono)"
       style={{ fill: color, opacity: seq.isZoomed }}
     >
-      {text}
+      <MotionText value={label} />
     </motion.text>
   );
 }
