@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { Github, ArrowUpRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Github, ArrowUpRight, LayoutGrid } from 'lucide-react';
 import { animate, stagger } from 'animejs';
 import { IsothermMark } from './primitives';
 import { DUR, STAGGER, EASE_OUT_EXPO, prefersReducedMotion } from './motion';
@@ -60,7 +61,7 @@ export function Nav() {
             className="t-font-display text-[14px] font-medium tracking-tight"
             style={{ color: 'var(--t-text)' }}
           >
-            thermalos
+            isotherm
           </span>
           <span
             className="hidden md:inline-block rounded-[3px] border px-1.5 py-[2px] t-mono-xs"
@@ -91,6 +92,24 @@ export function Nav() {
         </div>
 
         <div data-nav className="flex items-center gap-2">
+          <Link
+            to="/isotherm/fleet"
+            className="hidden md:inline-flex items-center gap-1.5 rounded-[4px] border px-2.5 py-1.5 t-mono-sm transition-colors"
+            style={{
+              borderColor: 'var(--t-border)',
+              color: 'var(--t-muted)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--t-healthy)';
+              e.currentTarget.style.borderColor = 'var(--t-border-hi)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--t-muted)';
+              e.currentTarget.style.borderColor = 'var(--t-border)';
+            }}
+          >
+            <LayoutGrid size={13} /> live demo
+          </Link>
           <a
             href="https://github.com/asomisetty/thermalos"
             target="_blank" rel="noopener noreferrer"
@@ -111,7 +130,7 @@ export function Nav() {
             <Github size={13} /> github
           </a>
           <a
-            href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access"
+            href="mailto:asomisetty27@gmail.com?subject=Isotherm early access"
             className="inline-flex items-center gap-1.5 rounded-[4px] px-3 py-1.5 t-mono-sm font-medium transition-all"
             style={{
               background: 'var(--t-healthy)',

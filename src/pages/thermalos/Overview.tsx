@@ -711,7 +711,7 @@ function CurrentAsks() {
 function DeepLinks() {
   const links = [
     { to: "/thermalos/lab", label: "Lab — live telemetry & runs", icon: Cpu },
-    { to: "/thermalos/research", label: "Research — Rθ methodology", icon: FlaskConical },
+    { to: "/thermalos/findings", label: "Research — Rθ methodology", icon: FlaskConical },
     { to: "/thermalos/yc", label: "YC — evidence & milestones", icon: Check },
   ];
   return (

@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { useIsFetching } from "@tanstack/react-query";
 import { ThermalOSRoleProvider, useThermalOSRole } from "@/contexts/ThermalOSRole";
-import { APP_BASE, appPath, sitePath } from "./config";
+import { RESEARCH_BASE, researchPath } from "./config";
 
 interface NavItem {
   to: string;
@@ -17,26 +17,26 @@ interface NavItem {
 }
 
 const PUBLIC_NAV: NavItem[] = [
-  { to: appPath(),            label: "Overview",    sub: "What & where we are",    icon: LayoutDashboard, end: true },
-  { to: appPath("research"),  label: "Research",    sub: "Methodology & findings", icon: FlaskConical },
-  { to: appPath("yc"),        label: "YC",          sub: "Evidence & milestones",  icon: Cpu },
+  { to: researchPath(),            label: "Overview",   sub: "What & where we are",    icon: LayoutDashboard, end: true },
+  { to: researchPath("findings"),  label: "Findings",   sub: "Methodology & findings", icon: FlaskConical },
+  { to: researchPath("yc"),        label: "YC",         sub: "Evidence & milestones",  icon: Cpu },
 ];
 
 const ADMIN_NAV: NavItem[] = [
-  { to: appPath("command"),    label: "Command",     sub: "The one thing",          icon: Terminal, end: true },
-  { to: appPath("lab"),        label: "Lab",         sub: "Telemetry & runs",       icon: Activity },
-  { to: appPath("research"),   label: "Research",    sub: "Methodology & findings", icon: FlaskConical },
-  { to: appPath("advisor"),    label: "Advisor",     sub: "Questions & decisions",  icon: Users },
-  { to: appPath("publication"),label: "Publication", sub: "Conference tracker",     icon: BookOpen },
-  { to: appPath("yc"),         label: "YC",          sub: "Evidence & milestones",  icon: Cpu },
-  { to: appPath("roadmap"),    label: "Roadmap",     sub: "4-stage tracker",        icon: Route },
+  { to: researchPath("command"),    label: "Command",     sub: "The one thing",          icon: Terminal, end: true },
+  { to: researchPath("lab"),        label: "Lab",         sub: "Telemetry & runs",       icon: Activity },
+  { to: researchPath("findings"),   label: "Findings",    sub: "Methodology & findings", icon: FlaskConical },
+  { to: researchPath("advisor"),    label: "Advisor",     sub: "Questions & decisions",  icon: Users },
+  { to: researchPath("publication"),label: "Publication", sub: "Conference tracker",     icon: BookOpen },
+  { to: researchPath("yc"),         label: "YC",          sub: "Evidence & milestones",  icon: Cpu },
+  { to: researchPath("roadmap"),    label: "Roadmap",     sub: "4-stage tracker",        icon: Route },
 ];
 
 const ADVISOR_NAV: NavItem[] = [
-  { to: appPath("lab"),        label: "Lab",         sub: "Telemetry & runs",       icon: Activity },
-  { to: appPath("research"),   label: "Research",    sub: "Methodology & findings", icon: FlaskConical },
-  { to: appPath("advisor"),    label: "Advisor",     sub: "Questions & decisions",  icon: Users, end: true },
-  { to: appPath("publication"),label: "Publication", sub: "Conference tracker",     icon: BookOpen },
+  { to: researchPath("lab"),        label: "Lab",         sub: "Telemetry & runs",       icon: Activity },
+  { to: researchPath("findings"),   label: "Findings",    sub: "Methodology & findings", icon: FlaskConical },
+  { to: researchPath("advisor"),    label: "Advisor",     sub: "Questions & decisions",  icon: Users, end: true },
+  { to: researchPath("publication"),label: "Publication", sub: "Conference tracker",     icon: BookOpen },
 ];
 
 function UTCClock() {
@@ -97,11 +97,11 @@ function InnerLayout() {
   const roleFg = role === "admin" ? "var(--t-healthy)" : "#60a5fa";
 
   useEffect(() => {
-    if (role === "admin" && pathname === APP_BASE) {
-      navigate(appPath("command"), { replace: true });
+    if (role === "admin" && pathname === RESEARCH_BASE) {
+      navigate(researchPath("command"), { replace: true });
     }
-    if (role === "advisor" && pathname === APP_BASE) {
-      navigate(appPath("advisor"), { replace: true });
+    if (role === "advisor" && pathname === RESEARCH_BASE) {
+      navigate(researchPath("advisor"), { replace: true });
     }
   }, [role, pathname, navigate]);
 
@@ -153,13 +153,13 @@ function InnerLayout() {
         </button>
 
         <Link
-          to={sitePath()}
+          to="/"
           className="text-[11px] font-mono transition-colors whitespace-nowrap"
           style={{ color: "var(--t-faint)" }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "var(--t-healthy)")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "var(--t-faint)")}
         >
-          ← ThermalOS
+          ← Portfolio
         </Link>
 
         <div className="flex items-center gap-2.5 ml-2">
@@ -172,7 +172,7 @@ function InnerLayout() {
               thermalos
             </span>
             <span className="font-mono text-[10px] hidden sm:inline" style={{ color: "var(--t-healthy)" }}>
-              / app
+              / research
             </span>
           </div>
         </div>
@@ -192,7 +192,7 @@ function InnerLayout() {
 
         {role === "public" && (
           <Link
-            to={appPath("advisor")}
+            to={researchPath("advisor")}
             className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono transition-colors px-2 py-1 rounded"
             style={{ color: "var(--t-muted)", border: "1px solid var(--t-border)" }}
             onMouseEnter={(e) => (e.currentTarget.style.color = "var(--t-healthy)")}

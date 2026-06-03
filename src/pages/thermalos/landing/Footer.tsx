@@ -84,7 +84,7 @@ export function Footer() {
                 className="t-font-display text-[14px] font-medium"
                 style={{ color: 'var(--t-text)' }}
               >
-                thermalos
+                isotherm
               </span>
             </div>
             <p
@@ -165,7 +165,7 @@ export function Footer() {
           style={{ borderColor: 'var(--t-border)' }}
         >
           <div className="t-mono-xs" style={{ color: 'var(--t-faint)' }}>
-            © 2026 thermalos · MIT License
+            © 2026 Isotherm · built on the open-source thermalos engine · MIT License
           </div>
           <div className="t-mono-xs" style={{ color: 'var(--t-faint)' }}>
             R_θ = ΔT / P  —  the one ratio nobody else ships.

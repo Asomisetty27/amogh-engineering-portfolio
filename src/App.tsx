@@ -7,7 +7,8 @@ import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ThermalOSLayout from "./pages/thermalos/ThermalOSLayout.tsx";
 import Landing        from "./pages/thermalos/Landing.tsx";
-import { APP_SEGMENTS } from "./pages/thermalos/config.ts";
+import FleetDashboard from "./pages/thermalos/FleetDashboard.tsx";
+import { LEGACY_REDIRECTS } from "./pages/thermalos/config.ts";
 
 // ThermalOS pages
 import Overview      from "./pages/thermalos/Overview.tsx";
@@ -33,18 +34,19 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
 
-          {/* ── ThermalOS — public marketing landing ──────────────────────
-              Domain-portable: this becomes "/" if ThermalOS moves to its own
-              domain. Routing constants live in pages/thermalos/config.ts. */}
-          <Route path="/thermalos" element={<Landing />} />
+          {/* ══ ISOTHERM — the startup (customer-facing) ══════════════════
+              Domain-portable: /isotherm + /isotherm/fleet become "/" + "/fleet"
+              on isotherm.io. Constants live in pages/thermalos/config.ts. */}
+          <Route path="/isotherm" element={<Landing />} />
+          <Route path="/isotherm/fleet" element={<FleetDashboard />} />
 
-          {/* ── ThermalOS — internal app / dashboard ──────────────────────
-              Domain-portable: becomes "/app" on a standalone domain. */}
-          <Route path="/thermalos/app" element={<ThermalOSLayout />}>
+          {/* ══ THERMALOS — the research & academic project ═══════════════
+              Independent zone: the science, not the startup. */}
+          <Route path="/thermalos" element={<ThermalOSLayout />}>
             <Route index element={<Overview />} />
 
-            {/* 6-pillar IA */}
-            <Route path="research"    element={<Research />} />
+            {/* methodology page — segment is "findings" */}
+            <Route path="findings"    element={<Research />} />
             <Route path="lab"         element={<Lab />} />
             <Route path="roadmap"     element={<Roadmap />} />
             <Route path="advisor"     element={<Advisor />} />
@@ -58,31 +60,27 @@ const App = () => (
             <Route path="command"      element={<CommandCenter />} />
             {/* Admin dashboard — kept for deep links */}
             <Route path="dashboard"    element={<Dashboard />} />
-            {/* In-app legacy tab redirects */}
-            <Route path="live"         element={<Navigate to="/thermalos/app/lab" replace />} />
-            <Route path="experiments"  element={<Navigate to="/thermalos/app/lab?tab=experiments" replace />} />
-            <Route path="cycling"      element={<Navigate to="/thermalos/app/lab?tab=cycling" replace />} />
-            <Route path="alerts"       element={<Navigate to="/thermalos/app/lab?tab=alerts" replace />} />
-            <Route path="model"        element={<Navigate to="/thermalos/app/research?tab=rtheta" replace />} />
-            <Route path="tim"          element={<Navigate to="/thermalos/app/research?tab=tim" replace />} />
-            <Route path="evidence"     element={<Navigate to="/thermalos/app/yc" replace />} />
-            <Route path="predictions"  element={<Navigate to="/thermalos/app/yc?tab=milestones" replace />} />
-            <Route path="outreach"     element={<Navigate to="/thermalos/app/yc?tab=outreach" replace />} />
-            <Route path="today"        element={<Navigate to="/thermalos/app/plan" replace />} />
-            <Route path="timeline"     element={<Navigate to="/thermalos/app/plan?tab=timeline" replace />} />
+            {/* In-hub legacy tab redirects */}
+            <Route path="live"         element={<Navigate to="/thermalos/lab" replace />} />
+            <Route path="experiments"  element={<Navigate to="/thermalos/lab?tab=experiments" replace />} />
+            <Route path="cycling"      element={<Navigate to="/thermalos/lab?tab=cycling" replace />} />
+            <Route path="alerts"       element={<Navigate to="/thermalos/lab?tab=alerts" replace />} />
+            <Route path="research"     element={<Navigate to="/thermalos/findings" replace />} />
+            <Route path="model"        element={<Navigate to="/thermalos/findings?tab=rtheta" replace />} />
+            <Route path="tim"          element={<Navigate to="/thermalos/findings?tab=tim" replace />} />
+            <Route path="evidence"     element={<Navigate to="/thermalos/yc" replace />} />
+            <Route path="predictions"  element={<Navigate to="/thermalos/yc?tab=milestones" replace />} />
+            <Route path="outreach"     element={<Navigate to="/thermalos/yc?tab=outreach" replace />} />
+            <Route path="today"        element={<Navigate to="/thermalos/plan" replace />} />
+            <Route path="timeline"     element={<Navigate to="/thermalos/plan?tab=timeline" replace />} />
           </Route>
 
-          {/* ── Legacy deep links: old /thermalos/<seg> → /thermalos/app/<seg>
-              Keeps previously-shared dashboard URLs working after the move. */}
-          {APP_SEGMENTS.map((seg) => (
-            <Route
-              key={seg}
-              path={`/thermalos/${seg}`}
-              element={<Navigate to={`/thermalos/app/${seg}`} replace />}
-            />
+          {/* ── Redirects from superseded URLs (map in config.ts) ─────────── */}
+          {Object.entries(LEGACY_REDIRECTS).map(([from, to]) => (
+            <Route key={from} path={from} element={<Navigate to={to} replace />} />
           ))}
-          {/* /landing → canonical public URL */}
-          <Route path="/landing" element={<Navigate to="/thermalos" replace />} />
+          {/* old app shell deep links → research hub */}
+          <Route path="/thermalos/app/*" element={<Navigate to="/thermalos" replace />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

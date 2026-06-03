@@ -221,7 +221,7 @@ export function Pricing() {
 
               {/* CTA */}
               <a
-                href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access"
+                href="mailto:asomisetty27@gmail.com?subject=Isotherm early access"
                 className="flex w-full items-center justify-center gap-2 rounded-[5px] py-3 t-font-display text-[14px] font-medium transition-all"
                 style={{ background: 'var(--t-healthy)', color: '#06150C' }}
                 onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.08)')}

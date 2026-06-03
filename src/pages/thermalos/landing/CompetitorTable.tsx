@@ -13,7 +13,7 @@ import { useAnimeOnView } from './useAnimeOnView';
 type MarkKind = 'yes' | 'no' | 'partial';
 interface Row { cap: string; cells: MarkKind[]; note?: string }
 
-const COLS = ['DCGM', 'Mission Control', 'Phaidra', 'In-house', 'ThermalOS'];
+const COLS = ['DCGM', 'Mission Control', 'Phaidra', 'In-house', 'Isotherm'];
 
 const ROWS: Row[] = [
   { cap: 'Exposes T_junction + P_GPU',          cells: ['yes', 'yes', 'partial', 'partial', 'yes'] },

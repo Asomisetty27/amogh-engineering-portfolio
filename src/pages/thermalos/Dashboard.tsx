@@ -167,7 +167,7 @@ const ACTION_META: Record<ActionType, { tone: Tone; icon: typeof Zap }> = {
 
 const QUICK_LINKS = [
   { to: "/thermalos/lab",         label: "Lab",         sub: "Telemetry & runs",       icon: Activity },
-  { to: "/thermalos/research",    label: "Research",    sub: "Rθ methodology",         icon: FlaskConical },
+  { to: "/thermalos/findings",    label: "Research",    sub: "Rθ methodology",         icon: FlaskConical },
   { to: "/thermalos/advisor",     label: "Advisor",     sub: "Questions & decisions",  icon: Users },
   { to: "/thermalos/publication", label: "Publication", sub: "Conference tracker",     icon: BookOpen },
   { to: "/thermalos/yc",          label: "YC",          sub: "Evidence & milestones",  icon: Cpu },
