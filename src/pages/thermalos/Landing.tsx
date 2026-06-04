@@ -183,7 +183,7 @@ function RthetaTrace() {
           <Tag><Pulse color={T.rising} />&nbsp;recovery</Tag>
         </div>
       }>
-        <div style={{ background: T.s0, padding: '0 0 4px' }}>
+        <div className="tos-trace-live" style={{ background: T.s0, padding: '0 0 4px' }}>
           <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }} aria-label="R-theta time series trace">
             {/* Fine grid lines */}
             {yTicks.map(v => (
@@ -271,21 +271,61 @@ function Nav() {
           ))}
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <a href="https://github.com/asomisetty/thermalos" target="_blank" rel="noreferrer"
+          <a href="https://github.com/Asomisetty27/thermalos" target="_blank" rel="noreferrer"
             style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: FM, fontSize: 10.5, padding: '6px 10px', borderRadius: 4, border: `1px solid ${T.border}`, color: T.muted, textDecoration: 'none', transition: 'border-color .15s, color .15s' }}
             onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = T.borderHi; (e.currentTarget as HTMLAnchorElement).style.color = T.text; }}
             onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = T.border; (e.currentTarget as HTMLAnchorElement).style.color = T.muted; }}>
             <GithubIcon s={12} /> github
           </a>
-          <a href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access"
+          <a href="https://pypi.org/project/thermalos/" target="_blank" rel="noreferrer"
             style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: FD, fontSize: 13, fontWeight: 500, padding: '6px 14px', borderRadius: 4, background: T.healthy, color: '#051A0D', textDecoration: 'none', transition: 'opacity .15s' }}
             onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.88')}
             onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
-            early access <ArrowRight s={11} />
+            install <ArrowRight s={11} />
           </a>
         </div>
       </div>
     </nav>
+  );
+}
+
+/* ─── Install command — copy-on-click with caret blink ──────────────────── */
+function InstallBlock() {
+  const [copied, setCopied] = useState(false);
+  const cmd = 'pip install thermalos';
+  const copy = useCallback(() => {
+    navigator.clipboard?.writeText(cmd);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1400);
+  }, []);
+
+  return (
+    <button
+      onClick={copy}
+      style={{
+        display: 'flex', alignItems: 'center', width: '100%', maxWidth: 440,
+        padding: '12px 16px', borderRadius: 5,
+        border: `1px solid ${T.border}`, background: T.s0,
+        cursor: 'pointer', fontFamily: FM, fontSize: 13, color: T.text,
+        position: 'relative', overflow: 'hidden', textAlign: 'left',
+        transition: 'border-color .2s, background .2s',
+      }}
+      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = T.healthy + '66'; (e.currentTarget as HTMLButtonElement).style.background = T.s1; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = T.border; (e.currentTarget as HTMLButtonElement).style.background = T.s0; }}
+      aria-label="Copy install command"
+    >
+      <span style={{ color: T.healthy, marginRight: 12, userSelect: 'none' }}>$</span>
+      <span style={{ flex: 1, color: T.text }}>{cmd}</span>
+      <span className="tos-caret" style={{ display: 'inline-block', width: 7, height: 14, background: T.healthy, marginLeft: 4, verticalAlign: 'middle' }} />
+      <span style={{
+        marginLeft: 14, fontSize: 10, letterSpacing: '.08em',
+        color: copied ? T.healthy : T.faint,
+        transition: 'color .2s',
+        textTransform: 'uppercase',
+      }}>
+        {copied ? '✓ copied' : 'copy'}
+      </span>
+    </button>
   );
 }
 
@@ -319,30 +359,34 @@ function Hero() {
       <div className="tos-grid-bg" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
       <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: 64, padding: '72px 32px 96px', alignItems: 'start' }} className="tos-hero-layout">
         <div>
-          <div data-h style={{ opacity: 0, marginBottom: 24 }}>
-            <Tag accent><Pulse />&nbsp;v0 ships jun 2026 · MIT licensed</Tag>
+          <div data-h style={{ opacity: 0, marginBottom: 24, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <Tag accent><Pulse />&nbsp;v0.1.0 live on PyPI</Tag>
+            <Tag>MIT licensed · single-node free forever</Tag>
           </div>
           <h1 data-h style={{ opacity: 0, fontFamily: FD, fontSize: 'clamp(44px,5.2vw,72px)', fontWeight: 500, letterSpacing: '-.035em', lineHeight: 0.97, marginBottom: 24 }}>
             Know <span style={{ color: T.healthy }}>why</span><br />your GPU is hot.
           </h1>
-          <p data-h style={{ opacity: 0, fontFamily: FD, fontSize: 15.5, lineHeight: 1.65, color: T.muted, maxWidth: 440, marginBottom: 36 }}>
+          <p data-h style={{ opacity: 0, fontFamily: FD, fontSize: 15.5, lineHeight: 1.65, color: T.muted, maxWidth: 440, marginBottom: 28 }}>
             Temperature alone is ambiguous — a hot GPU could be busy or failing.
             ThermalOS computes{' '}
             <span style={{ fontFamily: FM, color: T.text, fontSize: 14 }}>R_θ = ΔT / P</span>{' '}
-            in real time from your existing DCGM telemetry. That ratio is the only signal that cleanly separates the two states.
+            in real time from your existing DCGM telemetry. The only signal that cleanly separates the two states.
           </p>
+          <div data-h style={{ opacity: 0, marginBottom: 14 }}>
+            <InstallBlock />
+          </div>
           <div data-h style={{ opacity: 0, display: 'flex', gap: 10, marginBottom: 44, flexWrap: 'wrap' }}>
-            <a href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 5, background: T.healthy, color: '#051A0D', fontFamily: FD, fontSize: 14, fontWeight: 500, textDecoration: 'none', transition: 'opacity .15s' }}
-              onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.87')}
-              onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
-              get early access <ArrowRight />
-            </a>
-            <a href="https://github.com/asomisetty/thermalos" target="_blank" rel="noreferrer"
+            <a href="https://github.com/Asomisetty27/thermalos" target="_blank" rel="noreferrer"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 5, border: `1px solid ${T.borderHi}`, background: T.s1, color: T.text, fontFamily: FD, fontSize: 14, fontWeight: 500, textDecoration: 'none', transition: 'border-color .15s' }}
               onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.borderColor = T.muted)}
               onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.borderColor = T.borderHi)}>
-              <GithubIcon /> read the paper
+              <GithubIcon /> github
+            </a>
+            <a href="https://pypi.org/project/thermalos/" target="_blank" rel="noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 5, border: `1px solid ${T.borderHi}`, background: T.s1, color: T.text, fontFamily: FD, fontSize: 14, fontWeight: 500, textDecoration: 'none', transition: 'border-color .15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.borderColor = T.muted)}
+              onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.borderColor = T.borderHi)}>
+              pypi
             </a>
           </div>
           {/* Stats row */}
@@ -922,11 +966,11 @@ function Pricing() {
                   </div>
                 ))}
               </div>
-              <a href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access"
+              <a href="mailto:asomisetty27@gmail.com?subject=ThermalOS fleet tier"
                 style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 11, borderRadius: 4, background: T.healthy, color: '#051A0D', fontFamily: FD, fontSize: 14, fontWeight: 500, textDecoration: 'none', transition: 'opacity .15s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.87')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
-                Get early access <ArrowRight />
+                Request fleet tier <ArrowRight />
               </a>
             </div>
           </Panel>
@@ -939,7 +983,7 @@ function Pricing() {
 /* ─── Footer ──────────────────────────────────────────────────────────────── */
 function Footer() {
   const COLS = [
-    { t: 'product',  ls: [{ l: 'overview', h: FLEET_BASE, int: true }, { l: 'github', h: 'https://github.com/asomisetty/thermalos' }, { l: 'live fleet demo', h: FLEET_BASE, int: true }, { l: 'changelog', h: '#' }] },
+    { t: 'product',  ls: [{ l: 'overview', h: FLEET_BASE, int: true }, { l: 'github', h: 'https://github.com/Asomisetty27/thermalos' }, { l: 'live fleet demo', h: FLEET_BASE, int: true }, { l: 'changelog', h: '#' }] },
     { t: 'research', ls: [{ l: 'stage 1 findings', h: researchPath('findings'), int: true }, { l: 'R_θ metric', h: '#signal' }, { l: 'lead-time testbed', h: researchPath('lab'), int: true }, { l: 'publication', h: researchPath('publication'), int: true }] },
     { t: 'company',  ls: [{ l: 'about', h: '#' }, { l: 'contact', h: 'mailto:asomisetty27@gmail.com' }, { l: 'privacy', h: '#' }, { l: 'MIT license', h: '#' }] },
   ];
@@ -1017,6 +1061,22 @@ const STYLES = `
 /* Pulse dot — no glow, just opacity cycle */
 @keyframes tos-pulse { 0%,100% { opacity:.3 } 50% { opacity:.9 } }
 .tos-pulse { animation: tos-pulse 1.8s ease-in-out infinite; }
+
+/* Terminal caret blink — clean square block, no glow */
+@keyframes tos-caret-blink { 0%, 49% { opacity: 1 } 50%, 100% { opacity: 0 } }
+.tos-caret { animation: tos-caret-blink 1.06s steps(1) infinite; }
+
+/* Trace live-data breathe — subtle 4% opacity oscillation to feel live */
+@keyframes tos-trace-breathe { 0%, 100% { opacity: 1 } 50% { opacity: .94 } }
+.tos-trace-live { animation: tos-trace-breathe 5s ease-in-out infinite; }
+
+/* Scrolling row — for the live readout marquee */
+@keyframes tos-scroll-up {
+  0%   { transform: translateY(0) }
+  100% { transform: translateY(-50%) }
+}
+.tos-scroll-up { animation: tos-scroll-up 22s linear infinite; will-change: transform; }
+.tos-scroll-up:hover { animation-play-state: paused; }
 
 /* Range thumb — no glow ring */
 .tos-range::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: ${T.healthy}; border: 2px solid ${T.s0}; cursor: pointer; }
