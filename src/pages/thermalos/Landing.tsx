@@ -490,7 +490,9 @@ function Signal() {
                   </thead>
                   <tbody>
                     {STATE_TABLE.map((row, i) => (
-                      <tr key={row.state} style={{ background: i % 2 === 0 ? 'transparent' : T.s0 }}>
+                      <tr key={row.state}
+                        className="tos-state-row"
+                        style={{ background: i % 2 === 0 ? 'transparent' : T.s0, transition: 'background .2s' }}>
                         <td style={{ padding: '9px 8px', color: T.text, borderBottom: `1px solid ${T.border}`, fontSize: 10.5 }}>{row.state}</td>
                         <td style={{ padding: '9px 8px', color: T.healthy, borderBottom: `1px solid ${T.border}`, fontVariantNumeric: 'tabular-nums', fontSize: 12, fontWeight: 500 }}>
                           {row.r}<span style={{ color: T.faint, fontWeight: 400, fontSize: 10 }}> {row.sub}</span>
@@ -561,7 +563,13 @@ function TrialChart({ metric, max, label, unit }: {
           <div key={tr.t} style={{ display: 'grid', gridTemplateColumns: '48px 1fr 52px', gap: 8, alignItems: 'center', marginBottom: 6 }}>
             <span style={{ fontFamily: FM, fontSize: 10, color: isA ? T.bp : T.muted }}>T{tr.t} · {tr.start}°</span>
             <div style={{ height: 18, background: T.s3, borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
-              <div data-bar style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: barColor, borderRadius: 2, transformOrigin: 'left center' }} />
+              <div
+              data-bar
+              title={`Trial ${tr.t} · start ${tr.start}°C · ${metric === 'loadR' ? 'load' : 'recovery'} R_θ = ${val.toFixed(4)} C/W · power recovery ${tr.pwrRec}s`}
+              style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: barColor, borderRadius: 2, transformOrigin: 'left center', cursor: 'help', transition: 'filter .15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLDivElement).style.filter = 'brightness(1.25)')}
+              onMouseLeave={e => ((e.currentTarget as HTMLDivElement).style.filter = 'brightness(1)')}
+            />
             </div>
             <span style={{ fontFamily: FM, fontSize: 11, color: T.text, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{val.toFixed(3)}{unit}</span>
           </div>
@@ -1070,6 +1078,10 @@ const STYLES = `
 /* Trace live-data breathe — subtle 4% opacity oscillation to feel live */
 @keyframes tos-trace-breathe { 0%, 100% { opacity: 1 } 50% { opacity: .94 } }
 .tos-trace-live { animation: tos-trace-breathe 5s ease-in-out infinite; }
+
+/* Signal state table — hover lift */
+.tos-state-row:hover { background: ${T.s2} !important; }
+.tos-state-row:hover td:first-child { color: ${T.healthy} !important; }
 
 /* CRT scanline — barely visible horizontal lines for realism, never pulses */
 .tos-scanline {
