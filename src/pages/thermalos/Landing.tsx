@@ -1,888 +1,985 @@
-// ThermalOS — Landing page.
-// Faithful React port of the Claude Design bundle landing UI kit
-// (project/ui_kits/landing/index.html). Self-contained: tokens, primitives,
-// and sections all live in this file. No anime.js / framer-motion — the kit
-// uses plain CSS fadein animations and that is sufficient.
-//
-// Hero background = the ORGANIC THERMAL FIELD (feTurbulence displacement SVG
-// from project/preview/brand-blueprint.html) overlaid on the blueprint grid.
+/**
+ * ThermalOS — Landing page (v2)
+ *
+ * Design principles:
+ *   · No neon glows. Color encodes information only.
+ *   · Precision instrument aesthetic: oscilloscope / DAQ / PCB.
+ *   · Custom named-area CSS grids. No generic span-N bento.
+ *   · Animations: line-draw, bar-fill, count-up. Nothing decorative.
+ *   · Typography drives the page. Graphics serve the data.
+ */
 
 import * as React from 'react';
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { FLEET_BASE, researchPath } from './config';
-import { motion, useInView, useScroll, useSpring, useTransform } from 'framer-motion';
-import { animate, createTimeline, stagger } from 'animejs';
+import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { animate, stagger } from 'animejs';
 
-/* ── Tokens ── */
-const HEX = {
-  abyss: '#0A0E14',
-  s0: '#07090E',
-  s1: '#0C1117',
-  s2: '#11171F',
-  border: '#1C2630',
-  borderHi: '#2A3850',
-  ghost: '#2A3138',
-  text: '#F2F5F4',
-  muted: '#8A938F',
-  faint: '#525a55',
-  healthy: '#2FB36B',
-  caution: '#E8B23A',
-  rising: '#E8743A',
-  critical: '#D63D3D',
-  bp: '#6E91C8',
+/* ─── Design tokens ───────────────────────────────────────────────────────── */
+const T = {
+  bg:        '#09090D',
+  s0:        '#0C0C11',
+  s1:        '#111117',
+  s2:        '#17171E',
+  s3:        '#1C1C24',
+  border:    '#232330',
+  borderHi:  '#2E2E3E',
+  text:      '#E8E8F0',
+  muted:     '#818190',
+  faint:     '#404050',
+  healthy:   '#27A05A',
+  caution:   '#C8942A',
+  rising:    '#C85F2A',
+  critical:  '#B83030',
+  bp:        '#5878A8',
 };
 
-type Tone = 'default' | 'info' | 'healthy' | 'caution' | 'rising' | 'critical';
+const FD  = "'Space Grotesk', system-ui, sans-serif";
+const FM  = "'JetBrains Mono', ui-monospace, monospace";
+const EASE = [0.25, 0.46, 0.45, 0.94] as const;
 
-const toneColor = (t: Tone): string =>
-  t === 'critical' ? HEX.critical :
-  t === 'healthy' ? HEX.healthy :
-  t === 'caution' ? HEX.caution :
-  t === 'rising' ? HEX.rising :
-  HEX.bp;
-
-const FD = "'Space Grotesk', system-ui, sans-serif";
-const FM = "'JetBrains Mono', ui-monospace, monospace";
-const EASE = [0.32, 0.72, 0, 1] as const;
-
-function reduceMotion() {
-  return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function rm() {
+  return typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-function useAnimeSection<T extends HTMLElement>(selector = '[data-reveal]', amount = 0.18) {
-  const ref = useRef<T | null>(null);
-  const inView = useInView(ref, { once: true, amount });
-
-  useEffect(() => {
-    if (!inView || !ref.current || reduceMotion()) return;
-    const nodes = ref.current.querySelectorAll<HTMLElement>(selector);
-    if (!nodes.length) return;
-    animate(nodes, {
-      opacity: [0, 1],
-      translateY: [18, 0],
-      duration: 760,
-      delay: stagger(70),
-      ease: 'outExpo',
-    });
-  }, [inView, selector]);
-
-  return ref;
-}
-
-function useAnimatedNumber(value: number, format: (n: number) => string) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const previous = useRef(value);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (reduceMotion()) {
-      el.textContent = format(value);
-      previous.current = value;
-      return;
-    }
-    const state = { v: previous.current };
-    animate(state, {
-      v: value,
-      duration: 420,
-      ease: 'outCubic',
-      onUpdate: () => {
-        el.textContent = format(state.v);
-      },
-      onComplete: () => {
-        previous.current = value;
-        el.textContent = format(value);
-      },
-    });
-  }, [value, format]);
-
-  return ref;
-}
-
-/* ── Icons ── */
-const ArrowRight = ({ s = 14 }: { s?: number }) => (
-  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+/* ─── Primitive icons ─────────────────────────────────────────────────────── */
+const ArrowRight = ({ s = 13 }: { s?: number }) => (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M5 12h14M12 5l7 7-7 7" />
   </svg>
 );
-const GithubIcon = ({ s = 14 }: { s?: number }) => (
-  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+const GithubIcon = ({ s = 13 }: { s?: number }) => (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
     <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" />
   </svg>
 );
-const ChevronRight = ({ s = 10 }: { s?: number }) => (
-  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-    <path d="M9 18l6-6-6-6" />
-  </svg>
-);
 
-/* ── Primitives ── */
-function IsothermMark({ size = 18, critical = false }: { size?: number; critical?: boolean }) {
-  const c = size / 2;
-  const r = size / 2;
-  const col = critical ? HEX.critical : HEX.healthy;
-  const ri = critical ? [r * 0.18, r * 0.38, r * 0.58, r * 0.75] : [r * 0.15, r * 0.38, r * 0.62, r * 0.84];
+/* ─── Shared primitives ───────────────────────────────────────────────────── */
+function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} fill="none" aria-hidden>
-      <circle cx={c} cy={c} r={ri[0]} fill={col} />
-      <circle cx={c} cy={c} r={ri[1]} stroke={col} strokeWidth=".9" opacity=".75" />
-      <circle cx={c} cy={c} r={ri[2]} stroke={col} strokeWidth=".7" opacity=".45" />
-      <circle cx={c} cy={c} r={ri[3]} stroke={col} strokeWidth=".55" opacity=".22" />
-    </svg>
-  );
-}
-
-/* CalloutBox — card with 7px L-shaped corner ticks in the accent color. */
-function CalloutBox({
-  children, label, rightLabel, tone = 'default',
-}: {
-  children: React.ReactNode;
-  label?: string;
-  rightLabel?: React.ReactNode;
-  tone?: Tone;
-}) {
-  const accent = toneColor(tone === 'default' ? 'info' : tone);
-  const tick = (vy: 'top' | 'bottom', vx: 'left' | 'right', i: number): React.CSSProperties => ({
-    pointerEvents: 'none',
-    position: 'absolute',
-    height: 7,
-    width: 7,
-    [vy]: -1,
-    [vx]: -1,
-    [vy === 'top' ? 'borderTop' : 'borderBottom']: `1px solid ${accent}`,
-    [vx === 'left' ? 'borderLeft' : 'borderRight']: `1px solid ${accent}`,
-    display: 'block',
-  });
-  return (
-    <motion.div
-      whileHover={{ y: -3, borderColor: HEX.borderHi }}
-      transition={{ duration: 0.28, ease: EASE }}
-      style={{ position: 'relative', borderRadius: 6, border: `1px solid ${HEX.border}`, background: HEX.s1 }}
-    >
-      <span style={tick('top', 'left', 0)} />
-      <span style={tick('top', 'right', 1)} />
-      <span style={tick('bottom', 'left', 2)} />
-      <span style={tick('bottom', 'right', 3)} />
-      {(label || rightLabel) && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${HEX.border}`, padding: '10px 16px' }}>
-          {label && <span className="iso-eyebrow" style={{ color: HEX.faint }}>{label}</span>}
-          {rightLabel}
-        </div>
-      )}
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontFamily: FM, fontSize: 10, fontWeight: 500, letterSpacing: '.18em', textTransform: 'uppercase', color: T.faint }}>
+      <span style={{ display: 'block', width: 20, height: 1, background: T.borderHi, flexShrink: 0 }} />
       {children}
-    </motion.div>
-  );
-}
-
-function StatusPill({ tone, label, pulse = false }: { tone: Tone; label: string; pulse?: boolean }) {
-  const col = toneColor(tone);
-  return (
-    <span className="iso-mono-xs" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, borderRadius: 3, border: `1px solid ${HEX.border}`, padding: '3px 6px', color: col, background: HEX.s2 }}>
-      <span className={pulse ? 'iso-blip' : ''} style={{ width: 6, height: 6, borderRadius: '50%', background: col, flexShrink: 0, display: 'inline-block' }} />
-      {label}
-    </span>
-  );
-}
-
-function SectionHeader({ eyebrow, title, lede, center = false }: {
-  eyebrow: string;
-  title: React.ReactNode;
-  lede?: React.ReactNode;
-  center?: boolean;
-}) {
-  return (
-    <div style={{ maxWidth: 520, ...(center ? { marginLeft: 'auto', marginRight: 'auto', textAlign: 'center' } : {}) }}>
-      <div className="iso-eyebrow" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8, ...(center ? { justifyContent: 'center' } : {}) }}>
-        <span style={{ display: 'inline-block', height: 1, width: 24, background: HEX.borderHi }} />
-        {eyebrow}
-      </div>
-      <h2 style={{ fontFamily: FD, fontSize: 'clamp(28px,3.5vw,42px)', fontWeight: 500, letterSpacing: '-.03em', lineHeight: 1.02, color: HEX.text, marginBottom: 14, textWrap: 'pretty' }}>{title}</h2>
-      {lede && <p style={{ fontFamily: FD, fontSize: 15, lineHeight: 1.6, color: HEX.muted }}>{lede}</p>}
     </div>
   );
 }
 
-/* ── Organic thermal field (hero background) ──
-   feTurbulence + feDisplacementMap, three GPU heat sources:
-   G-03-B critical (amber/tight rings), G-08 & G-17 healthy (green/wide rings). */
-function ThermalField() {
+function Tag({ children, accent = false }: { children: React.ReactNode; accent?: boolean }) {
   return (
-    <svg
-      width="100%" height="100%" viewBox="0 0 700 195" preserveAspectRatio="xMidYMid slice"
-      fill="none" aria-hidden
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
-    >
-      <defs>
-        <filter id="iso-tf-organic" x="-30%" y="-30%" width="160%" height="160%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.016 0.022" numOctaves="3" seed="11">
-            <animate attributeName="baseFrequency"
-              values="0.016 0.022;0.020 0.018;0.014 0.024;0.016 0.022"
-              dur="18s" repeatCount="indefinite" />
-          </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" xChannelSelector="R" yChannelSelector="G" scale="22" />
-        </filter>
-        <filter id="iso-glow-hot">
-          <feGaussianBlur stdDeviation="5" result="blur" />
-          <feComposite in="SourceGraphic" in2="blur" operator="over" />
-        </filter>
-        <clipPath id="iso-canvas"><rect width="700" height="195" /></clipPath>
-      </defs>
-
-      <g clipPath="url(#iso-canvas)">
-        {/* Source A: G-03-B (CRITICAL — tight ring spacing, warm colors) */}
-        <g filter="url(#iso-tf-organic)">
-          <circle data-field-ring cx="175" cy="96" r="18" stroke="#E8743A" strokeWidth="1.1" opacity=".42" style={{ animation: 'iso-breathe-hot 3.8s ease-in-out infinite' }} />
-          <circle data-field-ring cx="175" cy="96" r="34" stroke="#E8B23A" strokeWidth="1.0" opacity=".30" style={{ animation: 'iso-breathe-hot 3.8s .3s ease-in-out infinite' }} />
-          <circle data-field-ring cx="175" cy="96" r="51" stroke="#E8B23A" strokeWidth=".85" opacity=".22" style={{ animation: 'iso-breathe-warm 4.6s .5s ease-in-out infinite' }} />
-          <circle data-field-ring cx="175" cy="96" r="68" stroke="#6E91C8" strokeWidth=".75" opacity=".16" style={{ animation: 'iso-breathe-warm 5.2s .7s ease-in-out infinite' }} />
-          <circle data-field-ring cx="175" cy="96" r="86" stroke="#6E91C8" strokeWidth=".65" opacity=".12" style={{ animation: 'iso-breathe-cool 6.0s .9s ease-in-out infinite' }} />
-          <circle data-field-ring cx="175" cy="96" r="106" stroke="#2FB36B" strokeWidth=".5" opacity=".07" style={{ animation: 'iso-breathe-cool 7.0s 1.1s ease-in-out infinite' }} />
-        </g>
-        {/* Source B: G-08 (HEALTHY — wide ring spacing, green) */}
-        <g filter="url(#iso-tf-organic)">
-          <circle data-field-ring cx="388" cy="108" r="14" stroke="#2FB36B" strokeWidth=".9" opacity=".40" style={{ animation: 'iso-breathe-cool 5.5s 0.4s ease-in-out infinite' }} />
-          <circle data-field-ring cx="388" cy="108" r="40" stroke="#2FB36B" strokeWidth=".75" opacity=".22" style={{ animation: 'iso-breathe-cool 6.3s 0.8s ease-in-out infinite' }} />
-          <circle data-field-ring cx="388" cy="108" r="74" stroke="#6E91C8" strokeWidth=".65" opacity=".14" style={{ animation: 'iso-breathe-cool 7.2s 1.4s ease-in-out infinite' }} />
-          <circle data-field-ring cx="388" cy="108" r="116" stroke="#6E91C8" strokeWidth=".55" opacity=".09" style={{ animation: 'iso-breathe-cool 8.0s 1.8s ease-in-out infinite' }} />
-          <circle data-field-ring cx="388" cy="108" r="162" stroke="#2FB36B" strokeWidth=".4" opacity=".05" style={{ animation: 'iso-breathe-cool 9.0s 2.2s ease-in-out infinite' }} />
-        </g>
-        {/* Source C: G-17 (HEALTHY — far right, partial rings) */}
-        <g filter="url(#iso-tf-organic)">
-          <circle data-field-ring cx="590" cy="62" r="16" stroke="#2FB36B" strokeWidth=".8" opacity=".35" style={{ animation: 'iso-breathe-cool 6.0s 1.0s ease-in-out infinite' }} />
-          <circle data-field-ring cx="590" cy="62" r="46" stroke="#2FB36B" strokeWidth=".65" opacity=".18" style={{ animation: 'iso-breathe-cool 7.4s 1.5s ease-in-out infinite' }} />
-          <circle data-field-ring cx="590" cy="62" r="84" stroke="#6E91C8" strokeWidth=".55" opacity=".11" style={{ animation: 'iso-breathe-cool 8.5s 2.0s ease-in-out infinite' }} />
-          <circle data-field-ring cx="590" cy="62" r="130" stroke="#6E91C8" strokeWidth=".4" opacity=".07" style={{ animation: 'iso-breathe-cool 9.5s 2.5s ease-in-out infinite' }} />
-        </g>
-        {/* Hot core glow dots */}
-        <circle cx="175" cy="96" r="5" fill="#E8743A" opacity=".65" filter="url(#iso-glow-hot)" />
-        <circle cx="175" cy="96" r="2.5" fill="#F2F5F4" opacity=".9" />
-        <circle cx="388" cy="108" r="3.5" fill="#2FB36B" opacity=".6" filter="url(#iso-glow-hot)" />
-        <circle cx="388" cy="108" r="2" fill="#F2F5F4" opacity=".8" />
-        <circle cx="590" cy="62" r="3" fill="#2FB36B" opacity=".5" filter="url(#iso-glow-hot)" />
-        <circle cx="590" cy="62" r="1.8" fill="#F2F5F4" opacity=".7" />
-        {/* Live scan sweep */}
-        <line x1="0" y1="0" x2="700" y2="0" stroke="rgba(110,145,200,.18)" strokeWidth="1.5" style={{ animation: 'iso-scan-sweep 7s linear infinite' }} />
-      </g>
-    </svg>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: FM, fontSize: 10, letterSpacing: '.03em', padding: '3px 7px', borderRadius: 3, border: `1px solid ${accent ? T.healthy + '55' : T.border}`, color: accent ? T.healthy : T.muted, background: accent ? T.healthy + '0C' : T.s2 }}>
+      {children}
+    </span>
   );
 }
 
-/* ── Nav ── */
-function Nav() {
+function Pulse({ color = T.healthy }: { color?: string }) {
   return (
-    <motion.nav
-      initial={reduceMotion() ? false : { y: -18, opacity: 0 }}
-      animate={reduceMotion() ? undefined : { y: 0, opacity: 1 }}
-      transition={{ duration: 0.55, ease: EASE }}
-      style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: `1px solid ${HEX.border}`, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', background: 'rgba(10,14,20,.85)' }}
-    >
-      <div style={{ maxWidth: 1240, margin: '0 auto', display: 'flex', alignItems: 'center', height: 56, padding: '0 32px', gap: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
-          <IsothermMark size={18} />
-          <span style={{ fontFamily: FD, fontSize: 14, fontWeight: 500, letterSpacing: '-.01em' }}>ThermalOS</span>
-          <span className="iso-mono-xs" style={{ color: HEX.bp, background: 'rgba(110,145,200,.08)', border: `1px solid rgba(110,145,200,.2)`, borderRadius: 3, padding: '2px 6px' }}>v0 · beta</span>
+    <span className="tos-pulse" style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: color, flexShrink: 0 }} />
+  );
+}
+
+function Panel({ children, label, corner, style }: {
+  children: React.ReactNode;
+  label?: string;
+  corner?: React.ReactNode;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <div style={{ border: `1px solid ${T.border}`, borderRadius: 5, background: T.s1, overflow: 'hidden', ...style }}>
+      {(label || corner) && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 14px', borderBottom: `1px solid ${T.border}`, background: T.s0 }}>
+          {label && <span style={{ fontFamily: FM, fontSize: 9.5, letterSpacing: '.16em', textTransform: 'uppercase', color: T.faint }}>{label}</span>}
+          {corner}
         </div>
-        <div className="iso-nav-links" style={{ display: 'flex', gap: 28 }}>
-          {['signal', 'features', 'gap', 'pricing'].map((l) => (
-            <motion.a key={l} href={`#${l}`} whileHover={{ y: -1, color: HEX.text }} className="iso-mono-sm iso-nav-link" style={{ color: HEX.muted }}>{l}</motion.a>
+      )}
+      {children}
+    </div>
+  );
+}
+
+/* ─── Section header ──────────────────────────────────────────────────────── */
+function SectionHead({ eyebrow, title, body, center }: {
+  eyebrow: string;
+  title: React.ReactNode;
+  body?: React.ReactNode;
+  center?: boolean;
+}) {
+  return (
+    <div style={{ maxWidth: 540, ...(center ? { margin: '0 auto', textAlign: 'center' } : {}) }}>
+      <Eyebrow>{eyebrow}</Eyebrow>
+      <h2 style={{ fontFamily: FD, fontSize: 'clamp(26px,3.2vw,40px)', fontWeight: 500, letterSpacing: '-.03em', lineHeight: 1.06, color: T.text, margin: '14px 0 12px' }}>
+        {title}
+      </h2>
+      {body && <p style={{ fontFamily: FD, fontSize: 14.5, lineHeight: 1.65, color: T.muted }}>{body}</p>}
+    </div>
+  );
+}
+
+/* ─── R_theta trace (hero visualization) ─────────────────────────────────── */
+/*
+ * Schematic trace of R_theta over a single E003-style experiment:
+ *   Segments: pre_load (flat ~1.28) → load (ramp down to 0.72) → recovery (spike to 2.1, decay)
+ * Drawn with stroke-dashoffset animation — no glows, just hairline paths.
+ */
+function RthetaTrace() {
+  const svgRef  = useRef<SVGSVGElement | null>(null);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const inView  = useInView(wrapRef, { once: true, amount: 0.4 });
+
+  /* Trace path points (viewport: 480w × 140h, y-domain 0–2.6 C/W) */
+  const W = 480; const H = 140; const pad = { t: 16, b: 28, l: 44, r: 16 };
+  const cw = W - pad.l - pad.r;
+  const ch = H - pad.t - pad.b;
+
+  function py(v: number): number { return pad.t + ch - (v / 2.6) * ch; }
+  function px(t: number): number { return pad.l + (t / 1) * cw; }     // t ∈ [0,1]
+
+  /* Key waypoints as [t, rtheta] pairs */
+  const trace: [number, number][] = [
+    [0,     1.28], [0.18,  1.28], [0.22,  1.14], [0.26, 0.90],
+    [0.30,  0.72], [0.52,  0.72], [0.56,  1.35], [0.60, 1.90],
+    [0.63,  2.10], [0.70,  1.95], [0.78,  1.72], [0.86, 1.50],
+    [0.92,  1.38], [0.97,  1.30], [1.00,  1.28],
+  ];
+
+  const pts = trace.map(([t, v]) => `${px(t).toFixed(1)},${py(v).toFixed(1)}`).join(' ');
+
+  /* Region boundaries */
+  const regions = [
+    { label: 'PRE-LOAD', x0: 0, x1: 0.22, color: T.bp },
+    { label: 'LOAD', x0: 0.22, x1: 0.56, color: T.healthy },
+    { label: 'RECOVERY', x0: 0.56, x1: 1.0, color: T.rising },
+  ];
+
+  /* Y-axis ticks */
+  const yTicks = [0.5, 1.0, 1.5, 2.0, 2.5];
+
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg || !inView || rm()) return;
+
+    const path = svg.querySelector<SVGPolylineElement>('[data-trace]');
+    if (!path) return;
+    const len = path.getTotalLength?.() ?? 600;
+    path.style.strokeDasharray  = String(len);
+    path.style.strokeDashoffset = String(len);
+    path.style.opacity = '1';
+
+    animate(path, {
+      strokeDashoffset: [len, 0],
+      duration: 1400,
+      ease: 'inOutSine',
+    });
+  }, [inView]);
+
+  return (
+    <div ref={wrapRef}>
+      <Panel label="RΘEFF TRACE · SINGLE EXPERIMENT · SCHEMATIC" corner={
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Tag><Pulse color={T.bp} />&nbsp;clean_idle</Tag>
+          <Tag accent><Pulse />&nbsp;under_load</Tag>
+          <Tag><Pulse color={T.rising} />&nbsp;recovery</Tag>
+        </div>
+      }>
+        <div style={{ background: T.s0, padding: '0 0 4px' }}>
+          <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }} aria-label="R-theta time series trace">
+            {/* Fine grid lines */}
+            {yTicks.map(v => (
+              <line key={v} x1={pad.l} x2={W - pad.r} y1={py(v)} y2={py(v)} stroke={T.border} strokeWidth="0.5" />
+            ))}
+
+            {/* Region labels */}
+            {regions.map(r => (
+              <g key={r.label}>
+                <line x1={px(r.x0)} x2={px(r.x0)} y1={pad.t} y2={H - pad.b} stroke={T.border} strokeWidth="0.5" strokeDasharray="3 2" />
+                <text x={(px(r.x0) + px(r.x1)) / 2} y={pad.t - 4} textAnchor="middle" fontFamily={FM} fontSize="8" fill={r.color} opacity="0.7">{r.label}</text>
+              </g>
+            ))}
+
+            {/* Threshold lines */}
+            <line x1={pad.l} x2={W - pad.r} y1={py(1.28)} y2={py(1.28)} stroke={T.bp} strokeWidth="0.6" strokeDasharray="4 3" opacity="0.5" />
+            <line x1={pad.l} x2={W - pad.r} y1={py(0.72)} y2={py(0.72)} stroke={T.healthy} strokeWidth="0.6" strokeDasharray="4 3" opacity="0.5" />
+
+            {/* Y-axis labels */}
+            {yTicks.map(v => (
+              <text key={v} x={pad.l - 6} y={py(v) + 3.5} textAnchor="end" fontFamily={FM} fontSize="8.5" fill={T.faint}>{v.toFixed(1)}</text>
+            ))}
+            <text x={pad.l - 6} y={py(2.6) + 3} textAnchor="end" fontFamily={FM} fontSize="8" fill={T.faint}>C/W</text>
+
+            {/* The trace */}
+            <polyline
+              data-trace
+              points={pts}
+              fill="none"
+              stroke={T.text}
+              strokeWidth="1.5"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              style={{ opacity: 0 }}
+            />
+
+            {/* Highlight markers */}
+            <circle cx={px(0.3)} cy={py(0.72)} r="3" fill={T.healthy} />
+            <text x={px(0.3) + 6} y={py(0.72) - 4} fontFamily={FM} fontSize="9" fill={T.healthy}>0.72</text>
+            <circle cx={px(0.63)} cy={py(2.10)} r="3" fill={T.rising} />
+            <text x={px(0.63) + 5} y={py(2.10) - 4} fontFamily={FM} fontSize="9" fill={T.rising}>2.10</text>
+            <circle cx={px(0)} cy={py(1.28)} r="3" fill={T.bp} />
+            <text x={px(0) + 6} y={py(1.28) - 4} fontFamily={FM} fontSize="9" fill={T.bp}>1.28</text>
+          </svg>
+          <div style={{ padding: '8px 16px 10px', borderTop: `1px solid ${T.border}`, display: 'flex', gap: 20 }}>
+            <span style={{ fontFamily: FM, fontSize: 10, color: T.faint }}>77.9% separation idle→load</span>
+            <span style={{ fontFamily: FM, fontSize: 10, color: T.faint }}>·</span>
+            <span style={{ fontFamily: FM, fontSize: 10, color: T.faint }}>recovery R_θ &gt; clean idle — thermal memory</span>
+            <span style={{ fontFamily: FM, fontSize: 10, color: T.faint }}>·</span>
+            <span style={{ fontFamily: FM, fontSize: 10, color: T.faint }}>E001–E004 · Tesla T4</span>
+          </div>
+        </div>
+      </Panel>
+    </div>
+  );
+}
+
+/* ─── Nav ─────────────────────────────────────────────────────────────────── */
+function Nav() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 12);
+    window.addEventListener('scroll', fn, { passive: true });
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
+  return (
+    <nav className="tos-nav" style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: `1px solid ${scrolled ? T.border : 'transparent'}`, background: scrolled ? T.bg + 'E8' : 'transparent', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', transition: 'border-color .2s, background .2s' }}>
+      <div style={{ maxWidth: 1240, margin: '0 auto', display: 'flex', alignItems: 'center', height: 54, padding: '0 32px', gap: 28 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="2" fill={T.healthy} />
+            <circle cx="8" cy="8" r="5" stroke={T.healthy} strokeWidth="0.8" opacity="0.45" />
+            <circle cx="8" cy="8" r="7.5" stroke={T.healthy} strokeWidth="0.5" opacity="0.18" />
+          </svg>
+          <span style={{ fontFamily: FD, fontSize: 13.5, fontWeight: 500, letterSpacing: '-.01em', color: T.text }}>ThermalOS</span>
+          <span style={{ fontFamily: FM, fontSize: 9.5, color: T.bp, border: `1px solid ${T.border}`, borderRadius: 3, padding: '2px 5px' }}>v0</span>
+        </div>
+        <div className="tos-nav-links" style={{ display: 'flex', gap: 26 }}>
+          {['signal', 'evidence', 'gap', 'pricing'].map(l => (
+            <a key={l} href={`#${l}`} style={{ fontFamily: FM, fontSize: 10.5, letterSpacing: '.04em', color: T.muted, textDecoration: 'none', transition: 'color .15s' }}
+              onMouseEnter={e => (e.currentTarget.style.color = T.text)}
+              onMouseLeave={e => (e.currentTarget.style.color = T.muted)}>
+              {l}
+            </a>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <motion.a whileHover={{ y: -1, borderColor: HEX.borderHi, color: HEX.text }} href="https://github.com/asomisetty/thermalos" target="_blank" rel="noreferrer"
-            className="iso-mono-sm iso-ghost-link" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 4, border: `1px solid ${HEX.border}`, color: HEX.muted }}>
-            <GithubIcon s={13} /> github
-          </motion.a>
-          <motion.a whileHover={{ y: -1, filter: 'brightness(1.08)' }} whileTap={{ scale: 0.98 }} href="mailto:asomisetty27@gmail.com?subject=Isotherm early access"
-            className="iso-mono-sm iso-cta" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 4, background: HEX.healthy, color: '#06150C', fontWeight: 500 }}>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <a href="https://github.com/asomisetty/thermalos" target="_blank" rel="noreferrer"
+            style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: FM, fontSize: 10.5, padding: '6px 10px', borderRadius: 4, border: `1px solid ${T.border}`, color: T.muted, textDecoration: 'none', transition: 'border-color .15s, color .15s' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = T.borderHi; (e.currentTarget as HTMLAnchorElement).style.color = T.text; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = T.border; (e.currentTarget as HTMLAnchorElement).style.color = T.muted; }}>
+            <GithubIcon s={12} /> github
+          </a>
+          <a href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access"
+            style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: FD, fontSize: 13, fontWeight: 500, padding: '6px 14px', borderRadius: 4, background: T.healthy, color: '#051A0D', textDecoration: 'none', transition: 'opacity .15s' }}
+            onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.88')}
+            onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
             early access <ArrowRight s={11} />
-          </motion.a>
+          </a>
         </div>
       </div>
-    </motion.nav>
+    </nav>
   );
 }
 
-/* ── Hero Fleet Preview ── */
-interface GpuNode { id: string; r: number; s: 'healthy' | 'caution' | 'rising' | 'critical' }
-const GPU_NODES: GpuNode[] = [
-  { id: 'G-01', r: 0.71, s: 'healthy' }, { id: 'G-02', r: 0.73, s: 'healthy' },
-  { id: 'G-03-B', r: 2.10, s: 'critical' }, { id: 'G-04', r: 0.74, s: 'healthy' },
-  { id: 'G-05', r: 0.76, s: 'healthy' }, { id: 'G-06', r: 0.72, s: 'healthy' },
-  { id: 'G-07', r: 1.28, s: 'caution' }, { id: 'G-08', r: 0.75, s: 'healthy' },
-  { id: 'G-09', r: 0.74, s: 'healthy' }, { id: 'G-10', r: 0.71, s: 'healthy' },
-  { id: 'G-11', r: 0.73, s: 'healthy' }, { id: 'G-12', r: 0.77, s: 'healthy' },
-  { id: 'G-13', r: 0.72, s: 'healthy' }, { id: 'G-14', r: 1.72, s: 'rising' },
-  { id: 'G-15', r: 0.74, s: 'healthy' }, { id: 'G-16', r: 0.71, s: 'healthy' },
-  { id: 'G-17', r: 0.73, s: 'healthy' }, { id: 'G-18', r: 0.75, s: 'healthy' },
-  { id: 'G-19', r: 0.72, s: 'healthy' }, { id: 'G-20', r: 0.70, s: 'healthy' },
+/* ─── Hero ────────────────────────────────────────────────────────────────── */
+const HERO_STATS = [
+  { v: '77.9%',    l: 'R_θ separation',    s: 'idle vs load · F1' },
+  { v: '4,570',    l: 'telemetry rows',     s: 'Stage 1 · Tesla T4' },
+  { v: '99.9%',    l: 'classifier acc.',    s: 'Naive Bayes + 15s window' },
 ];
 
-function GPUNodeCard({ id, r, s }: GpuNode) {
-  const col = s === 'critical' ? HEX.critical : s === 'caution' ? HEX.caution : s === 'rising' ? HEX.rising : HEX.healthy;
-  const bg = s === 'critical' ? 'rgba(214,61,61,.06)' : s === 'caution' ? 'rgba(232,178,58,.04)' : s === 'rising' ? 'rgba(232,116,58,.04)' : 'rgba(47,179,107,.03)';
-  return (
-    <motion.div
-      data-gpu-card
-      whileHover={{ y: -3, borderColor: `${col}66`, backgroundColor: s === 'healthy' ? 'rgba(47,179,107,.075)' : bg }}
-      animate={s === 'critical' ? { boxShadow: ['0 0 0 rgba(214,61,61,0)', '0 0 24px rgba(214,61,61,.16)', '0 0 0 rgba(214,61,61,0)'] } : undefined}
-      transition={s === 'critical' ? { duration: 2.4, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.2 }}
-      style={{ background: bg, border: `1px solid ${col}26`, borderRadius: 4, padding: '5px 6px', opacity: 0 }}
-    >
-      <div className="iso-mono-xs" style={{ color: HEX.faint, fontSize: 9, marginBottom: 2 }}>{id}</div>
-      <div className="iso-mono-xs" style={{ color: col, fontSize: 11, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{r.toFixed(2)}</div>
-    </motion.div>
-  );
-}
-
-function FleetPreview() {
-  const healthy = GPU_NODES.filter((g) => g.s === 'healthy').length;
-  const anomalies = GPU_NODES.filter((g) => g.s === 'critical').length;
-  return (
-    <CalloutBox label="THERMALOS / FLEET-VIEW / LIVE" tone="info" rightLabel={
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span className="iso-blip" style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: HEX.healthy }} />
-        <span className="iso-mono-xs" style={{ color: HEX.healthy, fontWeight: 500 }}>MONITORING</span>
-        <span className="iso-mono-xs" style={{ color: HEX.muted }}>· All cooling paths nominal</span>
-      </div>
-    }>
-      <div style={{ background: HEX.s0, padding: 14 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 5, marginBottom: 10 }}>
-          {GPU_NODES.map((g) => <GPUNodeCard key={g.id} {...g} />)}
-        </div>
-        <div style={{ borderTop: `1px solid ${HEX.border}`, paddingTop: 8, display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 0 }}>
-          {[
-            { l: 'GPUS', v: '20', c: HEX.text },
-            { l: 'HEALTHY', v: String(healthy), c: HEX.healthy },
-            { l: 'ANOMALY', v: String(anomalies), c: HEX.critical },
-            { l: 'CAUTION', v: '2', c: HEX.caution },
-          ].map((s) => (
-            <div key={s.l} style={{ padding: '6px 10px', borderLeft: `1px solid ${HEX.border}` }}>
-              <div style={{ fontFamily: FM, fontSize: 17, fontWeight: 500, color: s.c, fontVariantNumeric: 'tabular-nums' }}>{s.v}</div>
-              <div className="iso-mono-xs" style={{ color: HEX.faint, fontSize: 9, marginTop: 1 }}>{s.l}</div>
-            </div>
-          ))}
-        </div>
-        <div style={{ borderTop: `1px solid ${HEX.border}`, marginTop: 8, paddingTop: 10 }}>
-          <Link to={FLEET_BASE} className="iso-mono-sm iso-fleet-link" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: HEX.muted }}>
-            open live fleet dashboard <ChevronRight s={11} />
-          </Link>
-        </div>
-      </div>
-    </CalloutBox>
-  );
-}
-
-/* ── Hero ── */
 function Hero() {
   const heroRef = useRef<HTMLElement | null>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
-  const fieldY = useSpring(useTransform(scrollYProgress, [0, 1], [0, 72]), { stiffness: 80, damping: 22 });
-  const fieldScale = useSpring(useTransform(scrollYProgress, [0, 1], [1, 1.08]), { stiffness: 80, damping: 22 });
-  const stats = [
-    { v: '77.9%', l: 'R_θ separation', s: 'idle vs load · F1' },
-    { v: '1 / 3 hr', l: 'GPU failure rate', s: 'Meta · 16,384 H100s' },
-    { v: '$6,000/hr', l: 'cluster cost', s: 'undiagnosed downtime' },
-  ];
+  const fadeOut = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
   useEffect(() => {
     const root = heroRef.current;
-    if (!root || reduceMotion()) return;
-
-    const tl = createTimeline({ defaults: { ease: 'outExpo' } });
-    tl.add(root.querySelectorAll('[data-field-ring]'), {
-      opacity: [0, (_el: Element) => Number((_el as SVGCircleElement).getAttribute('opacity') || 0.2)],
-      scale: [0.94, 1],
-      duration: 1200,
-      delay: stagger(32),
-    }, 60)
-      .add(root.querySelectorAll('[data-hero-reveal]'), {
-        opacity: [0, 1],
-        translateY: [22, 0],
-        duration: 820,
-        delay: stagger(90),
-      }, 180)
-      .add(root.querySelectorAll('[data-gpu-card]'), {
-        opacity: [0, 1],
-        translateY: [12, 0],
-        scale: [0.985, 1],
-        duration: 620,
-        delay: stagger(22, { grid: [5, 4], from: 2 }),
-      }, 460);
-
-    return () => tl.cancel?.();
+    if (!root || rm()) return;
+    animate(root.querySelectorAll('[data-h]'), {
+      opacity: [0, 1],
+      translateY: [16, 0],
+      duration: 720,
+      delay: stagger(80),
+      ease: 'outExpo',
+    });
   }, []);
 
   return (
-    <section ref={heroRef} id="hero" style={{ position: 'relative', paddingTop: 56, overflow: 'hidden' }}>
-      <div className="iso-bp-grid" style={{ position: 'absolute', inset: 0, opacity: 0.55, pointerEvents: 'none' }} />
-      <motion.div style={{ position: 'absolute', inset: 0, opacity: 0.9, pointerEvents: 'none', y: fieldY, scale: fieldScale }}><ThermalField /></motion.div>
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 60% 40% at 50% 30%,rgba(110,145,200,.08),transparent 70%)', pointerEvents: 'none' }} />
-      <div className="iso-hero-grid" style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.05fr', gap: 64, padding: '80px 32px 100px', alignItems: 'center' }}>
+    <motion.section ref={heroRef} id="hero" style={{ position: 'relative', paddingTop: 40, opacity: fadeOut }}>
+      {/* Fine blueprint grid — structural, not decorative */}
+      <div className="tos-grid-bg" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
+      <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: 64, padding: '72px 32px 96px', alignItems: 'start' }} className="tos-hero-layout">
         <div>
-          <div data-hero-reveal style={{ marginBottom: 28, display: 'flex', alignItems: 'center', gap: 12, opacity: 0 }}>
-            <StatusPill tone="info" label="v0 ships  jun 2026" pulse />
-            <span className="iso-mono-xs" style={{ color: HEX.faint }}>MIT licensed · single-node free</span>
+          <div data-h style={{ opacity: 0, marginBottom: 24 }}>
+            <Tag accent><Pulse />&nbsp;v0 ships jun 2026 · MIT licensed</Tag>
           </div>
-          <h1 data-hero-reveal style={{ fontFamily: FD, fontSize: 'clamp(48px,5.5vw,76px)', fontWeight: 500, letterSpacing: '-.035em', lineHeight: 0.98, marginBottom: 28, opacity: 0 }}>
-            Know <span style={{ color: HEX.healthy }}>why</span><br />your GPU is hot.
+          <h1 data-h style={{ opacity: 0, fontFamily: FD, fontSize: 'clamp(44px,5.2vw,72px)', fontWeight: 500, letterSpacing: '-.035em', lineHeight: 0.97, marginBottom: 24 }}>
+            Know <span style={{ color: T.healthy }}>why</span><br />your GPU is hot.
           </h1>
-          <p data-hero-reveal style={{ fontFamily: FD, fontSize: 16, lineHeight: 1.6, color: HEX.muted, maxWidth: 440, marginBottom: 40, opacity: 0 }}>
-            Temperature alone is ambiguous — a hot GPU is either busy or failing. Isotherm computes{' '}
-            <span style={{ fontFamily: FM, color: HEX.text }}>R<sub>θ</sub> = ΔT / P</span>{' '}
-            in real time from your existing DCGM telemetry. That ratio is the only signal that separates the two.
+          <p data-h style={{ opacity: 0, fontFamily: FD, fontSize: 15.5, lineHeight: 1.65, color: T.muted, maxWidth: 440, marginBottom: 36 }}>
+            Temperature alone is ambiguous — a hot GPU could be busy or failing.
+            ThermalOS computes{' '}
+            <span style={{ fontFamily: FM, color: T.text, fontSize: 14 }}>R_θ = ΔT / P</span>{' '}
+            in real time from your existing DCGM telemetry. That ratio is the only signal that cleanly separates the two states.
           </p>
-          <div data-hero-reveal style={{ display: 'flex', gap: 12, marginBottom: 48, flexWrap: 'wrap', opacity: 0 }}>
-            <a href="mailto:asomisetty27@gmail.com?subject=Isotherm early access"
-              className="iso-cta"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 5, background: HEX.healthy, color: '#06150C', fontFamily: FD, fontSize: 14, fontWeight: 500 }}>
-              Get early access <ArrowRight />
+          <div data-h style={{ opacity: 0, display: 'flex', gap: 10, marginBottom: 44, flexWrap: 'wrap' }}>
+            <a href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 5, background: T.healthy, color: '#051A0D', fontFamily: FD, fontSize: 14, fontWeight: 500, textDecoration: 'none', transition: 'opacity .15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.87')}
+              onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
+              get early access <ArrowRight />
             </a>
             <a href="https://github.com/asomisetty/thermalos" target="_blank" rel="noreferrer"
-              className="iso-ghost-btn"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 5, border: `1px solid ${HEX.borderHi}`, background: HEX.s1, fontFamily: FD, fontSize: 14, fontWeight: 500, color: HEX.text }}>
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 5, border: `1px solid ${T.borderHi}`, background: T.s1, color: T.text, fontFamily: FD, fontSize: 14, fontWeight: 500, textDecoration: 'none', transition: 'border-color .15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.borderColor = T.muted)}
+              onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.borderColor = T.borderHi)}>
               <GithubIcon /> read the paper
             </a>
           </div>
-          <div data-hero-reveal style={{ borderTop: `1px solid ${HEX.border}`, paddingTop: 28, display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24, opacity: 0 }}>
-            {stats.map((s) => (
+          {/* Stats row */}
+          <div data-h style={{ opacity: 0, borderTop: `1px solid ${T.border}`, paddingTop: 24, display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
+            {HERO_STATS.map(s => (
               <div key={s.l}>
-                <div style={{ fontFamily: FD, fontSize: 26, fontWeight: 500, letterSpacing: '-.025em', color: HEX.text }}>{s.v}</div>
-                <div className="iso-mono-xs" style={{ color: HEX.text, marginTop: 4 }}>{s.l}</div>
-                <div className="iso-mono-xs" style={{ color: HEX.faint }}>{s.s}</div>
+                <div style={{ fontFamily: FD, fontSize: 24, fontWeight: 500, letterSpacing: '-.025em', color: T.text, fontVariantNumeric: 'tabular-nums' }}>{s.v}</div>
+                <div style={{ fontFamily: FM, fontSize: 9.5, color: T.text, marginTop: 4, letterSpacing: '.02em' }}>{s.l}</div>
+                <div style={{ fontFamily: FM, fontSize: 9.5, color: T.faint, letterSpacing: '.02em' }}>{s.s}</div>
               </div>
             ))}
           </div>
         </div>
-        <motion.div
-          data-hero-reveal
-          style={{ opacity: 0 }}
-          whileHover={{ y: -6, scale: 1.01 }}
-          transition={{ duration: 0.34, ease: EASE }}
-        >
-          <FleetPreview />
-        </motion.div>
+        {/* Right: R_theta trace visualization */}
+        <div data-h style={{ opacity: 0 }}>
+          <RthetaTrace />
+        </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
-/* ── Signal ── */
-const STATE_ROWS: { s: string; v: string; tone: Tone; d: string }[] = [
-  { s: 'clean idle', v: '1.28', tone: 'info', d: 'cool junction, low power → high resistance' },
-  { s: 'under load', v: '0.72', tone: 'healthy', d: 'thermal equilibrium, working as designed' },
-  { s: 'degrading', v: '1.85', tone: 'rising', d: 'power steady, ΔT rising — cooling path failing' },
-  { s: 'critical', v: '2.10+', tone: 'critical', d: 'throttling imminent, mechanical intervention' },
+/* ─── Signal section ──────────────────────────────────────────────────────── */
+const STATE_TABLE = [
+  { state: 'clean_idle',          r: '1.28', sub: '±0.21',  pwr: '11.4W', util: '0%',  ps: 'P8', note: 'T_j lags cool junction' },
+  { state: 'under_load',          r: '0.72', sub: '±0.08',  pwr: '68.0W', util: '97%', ps: 'P0', note: 'thermal equilibrium' },
+  { state: 'zombie_recovery',     r: '1.54', sub: '±0.05',  pwr: '31.6W', util: '0%',  ps: 'P0', note: 'CUDA context retained' },
+  { state: 'child_exit_recovery', r: '2.04', sub: '±0.46',  pwr: '12.6W', util: '0%',  ps: '~P8', note: 'T_j lags power drop' },
 ];
 
 function Signal() {
-  const ref = useAnimeSection<HTMLElement>('[data-reveal]');
+  const ref = useRef<HTMLElement | null>(null);
+  const inView = useInView(ref, { once: true, amount: 0.2 });
+  useEffect(() => {
+    const root = ref.current;
+    if (!root || !inView || rm()) return;
+    animate(root.querySelectorAll('[data-r]'), { opacity: [0, 1], translateY: [14, 0], duration: 680, delay: stagger(65), ease: 'outExpo' });
+  }, [inView]);
+
   return (
-    <section ref={ref} id="signal" style={{ position: 'relative', borderTop: `1px solid ${HEX.border}` }}>
-      <div className="iso-bp-grid" style={{ position: 'absolute', inset: 0, opacity: 0.22, pointerEvents: 'none' }} />
-      <div className="iso-two-col" style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: 80, padding: '96px 32px', alignItems: 'start' }}>
-        <div data-reveal style={{ opacity: 0 }}>
-          <SectionHeader eyebrow="THE SIGNAL" title={<>One equation.<br />Two states.<br />Zero hardware.</>}
-            lede="DCGM exposes T_junction and P_GPU as separate instantaneous fields and never divides them. R_θ is the one derived quantity every telemetry stack has the ingredients for — and no incumbent computes it." />
-        </div>
-        <div data-reveal style={{ opacity: 0 }}>
-          <CalloutBox label="EFFECTIVE THERMAL RESISTANCE · DERIVATION">
-          <div style={{ padding: '28px 24px 0' }}>
-            <svg viewBox="0 0 380 90" preserveAspectRatio="xMidYMid meet" style={{ width: '100%', maxWidth: 400 }} aria-label="R-theta-eff equals T-junction minus T-reference over P-GPU">
-              <text x="0" y="50" fontFamily={FM} fontSize="22" fill={HEX.text}>R</text>
-              <text x="14" y="58" fontFamily={FM} fontSize="11" fill={HEX.muted}>θ,eff</text>
-              <text x="46" y="50" fontFamily={FM} fontSize="17" fill={HEX.muted}>(t)</text>
-              <text x="80" y="50" fontFamily={FM} fontSize="21" fill={HEX.text}>=</text>
-              <text x="200" y="36" textAnchor="middle" fontFamily={FM} fontSize="17" fill={HEX.text}>T<tspan fontSize="10" baselineShift="-30%" fill={HEX.muted}>junction</tspan> <tspan dx="4">−</tspan> <tspan dx="4">T<tspan fontSize="10" baselineShift="-30%" fill={HEX.muted}>ref</tspan></tspan></text>
-              <line x1="108" y1="46" x2="292" y2="46" stroke={HEX.text} strokeWidth=".7" />
-              <text x="200" y="74" textAnchor="middle" fontFamily={FM} fontSize="17" fill={HEX.text}>P<tspan fontSize="10" baselineShift="-30%" fill={HEX.muted}>GPU</tspan>(t)</text>
-              <text x="308" y="54" fontFamily={FM} fontSize="13" fill={HEX.faint}>[ °C/W ]</text>
-            </svg>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, marginTop: 16, background: HEX.border, borderTop: `1px solid ${HEX.border}` }}>
-            {STATE_ROWS.map((row) => (
-              <div key={row.s} style={{ padding: '12px 14px', background: HEX.s1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-                  <span className="iso-mono-xs" style={{ color: HEX.faint }}>{row.s}</span>
-                  <span style={{ fontFamily: FM, fontSize: 18, fontWeight: 500, color: toneColor(row.tone), fontVariantNumeric: 'tabular-nums' }}>{row.v}</span>
+    <section ref={ref} id="signal" style={{ borderTop: `1px solid ${T.border}` }}>
+      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '88px 32px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: 72, alignItems: 'start' }} className="tos-two-col">
+          <div>
+            <div data-r style={{ opacity: 0, marginBottom: 16 }}>
+              <SectionHead eyebrow="The Signal" title={<>One equation.<br />Four states.<br />Zero hardware.</>}
+                body="DCGM exposes T_junction and P_GPU as separate fields and never divides them. R_θ is the one derived quantity every telemetry stack has the ingredients for — and no incumbent computes it." />
+            </div>
+            <div data-r style={{ opacity: 0, marginTop: 28 }}>
+              <Panel label="Why utilization fails" style={{ marginTop: 0 }}>
+                <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {[
+                    ['zombie_recovery', '0%', '31W', 'CUDA zombie — invisible to util'],
+                    ['child_exit_recovery', '0%', '13W', 'clean recovery — invisible to util'],
+                    ['clean_idle', '0%', '11W', 'true idle'],
+                  ].map(([state, util, pwr, note]) => (
+                    <div key={state} style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 10, alignItems: 'center', padding: '7px 0', borderBottom: `1px solid ${T.border}` }}>
+                      <span style={{ fontFamily: FM, fontSize: 10.5, color: T.muted }}>{note}</span>
+                      <span style={{ fontFamily: FM, fontSize: 10.5, color: T.text, fontVariantNumeric: 'tabular-nums' }}>util={util}</span>
+                      <span style={{ fontFamily: FM, fontSize: 10.5, color: T.text, fontVariantNumeric: 'tabular-nums' }}>{pwr}</span>
+                    </div>
+                  ))}
+                  <p style={{ fontFamily: FM, fontSize: 9.5, color: T.faint, lineHeight: 1.7, marginTop: 4 }}>
+                    Three states, identical utilization readings. R_θ separates all three.
+                  </p>
                 </div>
-                <div className="iso-mono-xs" style={{ color: HEX.muted }}>{row.d}</div>
-              </div>
-            ))}
+              </Panel>
+            </div>
           </div>
-          </CalloutBox>
+          <div data-r style={{ opacity: 0 }}>
+            <Panel label="Rθeff · Formula + Class-Conditional Means · Naive Bayes" corner={<Tag accent>NB acc 99.9%</Tag>}>
+              <div style={{ padding: '20px 18px' }}>
+                {/* Formula display — clean, no glow */}
+                <div style={{ borderRadius: 4, border: `1px solid ${T.border}`, background: T.s0, padding: '20px 24px', marginBottom: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg viewBox="0 0 400 80" style={{ width: '100%', maxWidth: 380, display: 'block' }} aria-label="R theta eff formula">
+                    <text x="0" y="46" fontFamily={FM} fontSize="22" fill={T.text}>R</text>
+                    <text x="14" y="54" fontFamily={FM} fontSize="10" fill={T.muted}>θ,eff</text>
+                    <text x="48" y="46" fontFamily={FM} fontSize="17" fill={T.muted}>(t)</text>
+                    <text x="80" y="46" fontFamily={FM} fontSize="20" fill={T.text}>=</text>
+                    <text x="196" y="32" textAnchor="middle" fontFamily={FM} fontSize="15" fill={T.text}>
+                      T<tspan fontSize="9" baselineShift="-30%" fill={T.muted}>junction</tspan>
+                      <tspan dx="6">−</tspan>
+                      <tspan dx="6">T<tspan fontSize="9" baselineShift="-30%" fill={T.muted}>ref</tspan></tspan>
+                    </text>
+                    <line x1="106" y1="42" x2="286" y2="42" stroke={T.borderHi} strokeWidth="0.7" />
+                    <text x="196" y="66" textAnchor="middle" fontFamily={FM} fontSize="15" fill={T.text}>
+                      P<tspan fontSize="9" baselineShift="-30%" fill={T.muted}>GPU</tspan>(t)
+                    </text>
+                    <text x="302" y="50" fontFamily={FM} fontSize="11" fill={T.faint}>[ °C/W ]</text>
+                  </svg>
+                </div>
+                {/* State table */}
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: FM, fontSize: 11 }}>
+                  <thead>
+                    <tr style={{ background: T.s0 }}>
+                      {['STATE', 'R_θ (μ±σ)', 'POWER', 'UTIL', 'P-STATE', 'INTERPRETATION'].map(h => (
+                        <th key={h} style={{ borderBottom: `1px solid ${T.border}`, padding: '7px 8px', textAlign: 'left', fontWeight: 400, fontSize: 9, letterSpacing: '.12em', color: T.faint, textTransform: 'uppercase' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {STATE_TABLE.map((row, i) => (
+                      <tr key={row.state} style={{ background: i % 2 === 0 ? 'transparent' : T.s0 }}>
+                        <td style={{ padding: '9px 8px', color: T.text, borderBottom: `1px solid ${T.border}`, fontSize: 10.5 }}>{row.state}</td>
+                        <td style={{ padding: '9px 8px', color: T.healthy, borderBottom: `1px solid ${T.border}`, fontVariantNumeric: 'tabular-nums', fontSize: 12, fontWeight: 500 }}>
+                          {row.r}<span style={{ color: T.faint, fontWeight: 400, fontSize: 10 }}> {row.sub}</span>
+                        </td>
+                        <td style={{ padding: '9px 8px', color: T.muted, borderBottom: `1px solid ${T.border}`, fontVariantNumeric: 'tabular-nums' }}>{row.pwr}</td>
+                        <td style={{ padding: '9px 8px', color: T.muted, borderBottom: `1px solid ${T.border}` }}>{row.util}</td>
+                        <td style={{ padding: '9px 8px', color: T.muted, borderBottom: `1px solid ${T.border}` }}>{row.ps}</td>
+                        <td style={{ padding: '9px 8px', color: T.faint, borderBottom: `1px solid ${T.border}`, fontSize: 10 }}>{row.note}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Panel>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-/* ── Features / Bento ── */
-type BentoTone = 'default' | 'critical' | 'healthy';
-function BentoCard({ span, index, title, tone = 'default', children }: {
-  span: number; index: string; title: string; tone?: BentoTone; children: React.ReactNode;
+/* ─── Evidence section ────────────────────────────────────────────────────── */
+/*
+ * Shows the thermal-memory finding from the 7-trial E004 rerun:
+ * trials 1–2 (cool start) vs 3–7 (warm start) produce different R_theta.
+ * Visualized as horizontal bars — no glow, just fill + border.
+ */
+const E004_TRIALS = [
+  { t: 1, start: 43, loadR: 0.442, recR: 2.28,  pwrRec: 36.6, group: 'A' as const },
+  { t: 2, start: 39, loadR: 0.426, recR: 2.69,  pwrRec: 24.5, group: 'A' as const },
+  { t: 3, start: 49, loadR: 0.601, recR: 3.13,  pwrRec: 26.5, group: 'B' as const },
+  { t: 4, start: 49, loadR: 0.587, recR: 3.15,  pwrRec: 25.5, group: 'B' as const },
+  { t: 5, start: 49, loadR: 0.596, recR: 3.12,  pwrRec: 21.4, group: 'B' as const },
+  { t: 6, start: 49, loadR: 0.590, recR: 3.11,  pwrRec: 12.3, group: 'B' as const },
+  { t: 7, start: 48, loadR: 0.570, recR: 3.10,  pwrRec: 10.3, group: 'B' as const },
+];
+
+function TrialChart({ metric, max, label, unit }: {
+  metric: 'loadR' | 'recR';
+  max: number;
+  label: string;
+  unit: string;
 }) {
-  const accent = tone === 'critical' ? HEX.critical : tone === 'healthy' ? HEX.healthy : HEX.bp;
-  return (
-    <motion.div
-      data-reveal
-      whileHover={{ y: -5, borderColor: HEX.borderHi }}
-      transition={{ duration: 0.28, ease: EASE }}
-      className={`iso-bento-card iso-bento-span-${span}`}
-      style={{ position: 'relative', overflow: 'hidden', borderRadius: 6, border: `1px solid ${HEX.border}`, background: HEX.s1, opacity: 0 }}
-    >
-      <div style={{ position: 'absolute', insetInline: 0, top: 0, height: 1, background: `linear-gradient(90deg, transparent, ${accent} 30%, ${accent} 70%, transparent)` }} />
-      <div style={{ position: 'relative', padding: 24 }}>
-        <div style={{ marginBottom: 20 }}>
-          <span className="iso-mono-xs" style={{ color: accent }}>{index} · capability</span>
-        </div>
-        <h3 style={{ fontFamily: FD, marginBottom: 12, fontSize: 18, fontWeight: 500, letterSpacing: '-.01em', color: HEX.text }}>{title}</h3>
-        {children}
-      </div>
-    </motion.div>
-  );
-}
-
-function BentoBody({ children }: { children: React.ReactNode }) {
-  return <p style={{ fontFamily: FD, fontSize: 13.5, lineHeight: 1.6, color: HEX.muted, marginBottom: 20 }}>{children}</p>;
-}
-
-function DriftChart() {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const inView = useInView(ref, { once: true, amount: 0.5 });
-  const samples = [38, 40, 39, 41, 42, 41, 45, 48, 52, 58, 66, 76, 88, 95];
-  const baseline = 42;
-  const threshold = baseline + 2 * 4; // 50
+  const barRef = useRef<HTMLDivElement | null>(null);
+  const inView = useInView(barRef, { once: true, amount: 0.3 });
 
   useEffect(() => {
-    if (!inView || !ref.current || reduceMotion()) return;
-    animate(ref.current.querySelectorAll<SVGRectElement>('[data-bar]'), {
-      scaleY: [0, 1],
-      opacity: [0.2, 0.85],
-      duration: 620,
-      delay: stagger(28),
+    const root = barRef.current;
+    if (!root || !inView || rm()) return;
+    animate(root.querySelectorAll('[data-bar]'), {
+      scaleX: [0, 1],
+      opacity: [0.2, 1],
+      duration: 580,
+      delay: stagger(55),
       ease: 'outExpo',
     });
   }, [inView]);
 
   return (
-    <div ref={ref} style={{ position: 'relative', borderRadius: 4, border: `1px solid ${HEX.border}`, background: HEX.s2, padding: 16 }}>
-      <div className="iso-mono-xs" style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between' }}>
-        <span style={{ color: HEX.faint }}>R_θ · 14-sample window</span>
-        <span style={{ color: HEX.rising }}>+38% drift</span>
-      </div>
-      <div style={{ position: 'relative', height: 80 }}>
-        <svg viewBox="0 0 280 80" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, height: '100%', width: '100%' }}>
-          <line x1="0" y1={80 - threshold} x2="280" y2={80 - threshold} stroke={HEX.caution} strokeWidth="0.8" strokeDasharray="3 3" opacity="0.6" />
-          <line x1="0" y1={80 - baseline} x2="280" y2={80 - baseline} stroke={HEX.healthy} strokeWidth="0.8" strokeDasharray="2 2" opacity="0.5" />
-          {samples.map((v, i) => {
-            const color = v > threshold + 30 ? HEX.critical : v > threshold ? HEX.rising : v > baseline + 6 ? HEX.caution : HEX.healthy;
-            return <rect data-bar key={i} x={4 + i * 20} y={80 - v} width={14} height={v} fill={color} fillOpacity={0.85} style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }} />;
-          })}
-        </svg>
-      </div>
-      <div className="iso-mono-xs" style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', color: HEX.faint }}>
-        <span>baseline 0.72</span>
-        <span>k·σ alert threshold</span>
-        <span>1.85 critical</span>
+    <div ref={barRef}>
+      <div style={{ fontFamily: FM, fontSize: 9.5, color: T.faint, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 12 }}>{label}</div>
+      {E004_TRIALS.map(tr => {
+        const val = tr[metric];
+        const pct = (val / max) * 100;
+        const isA = tr.group === 'A';
+        const barColor = isA ? T.bp : T.healthy;
+        return (
+          <div key={tr.t} style={{ display: 'grid', gridTemplateColumns: '48px 1fr 52px', gap: 8, alignItems: 'center', marginBottom: 6 }}>
+            <span style={{ fontFamily: FM, fontSize: 10, color: isA ? T.bp : T.muted }}>T{tr.t} · {tr.start}°</span>
+            <div style={{ height: 18, background: T.s3, borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
+              <div data-bar style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: barColor, borderRadius: 2, transformOrigin: 'left center' }} />
+            </div>
+            <span style={{ fontFamily: FM, fontSize: 11, color: T.text, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{val.toFixed(3)}{unit}</span>
+          </div>
+        );
+      })}
+      <div style={{ fontFamily: FM, fontSize: 9, color: T.faint, marginTop: 8, paddingTop: 8, borderTop: `1px solid ${T.border}` }}>
+        <span style={{ color: T.bp }}>■</span> Group A (cool start, 39–43°C) &nbsp;
+        <span style={{ color: T.healthy }}>■</span> Group B (warm start, 48–49°C)
       </div>
     </div>
   );
 }
 
-function CodeBlock({ lines }: { lines: Array<{ p: string; t: string; tone?: BentoTone | 'caution' }> }) {
-  const toneC: Record<string, string> = { healthy: HEX.healthy, critical: HEX.critical, caution: HEX.caution };
+function Evidence() {
+  const ref = useRef<HTMLElement | null>(null);
+  const inView = useInView(ref, { once: true, amount: 0.15 });
+  useEffect(() => {
+    const root = ref.current;
+    if (!root || !inView || rm()) return;
+    animate(root.querySelectorAll('[data-e]'), { opacity: [0, 1], translateY: [14, 0], duration: 680, delay: stagger(70), ease: 'outExpo' });
+  }, [inView]);
+
   return (
-    <div style={{ borderRadius: 4, border: `1px solid ${HEX.border}`, background: HEX.s2, padding: 14, fontFamily: FM, fontSize: 11.5, lineHeight: 1.65 }}>
+    <section ref={ref} id="evidence" style={{ borderTop: `1px solid ${T.border}`, position: 'relative' }}>
+      <div className="tos-grid-bg" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.3 }} />
+      <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '88px 32px' }}>
+        <div data-e style={{ opacity: 0, marginBottom: 48 }}>
+          <SectionHead eyebrow="Stage 1 Evidence" title={<>Same workload.<br />Different temperature.<br />35% R_θ delta.</>}
+            body="E004 rerun (7 trials, 2026-06-03): 60s cooldown gaps left trials 3–7 starting warm. The resulting R_theta shift is not noise — it is the thermal-memory signature the product exists to detect. Within-group CV: 2.0%. Between-group: 14%." />
+        </div>
+        {/* Evidence grid: custom named areas */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'auto auto', gap: 16 }} className="tos-evidence-grid">
+          {/* Top left: load R_theta bars */}
+          <div data-e style={{ opacity: 0 }}>
+            <Panel label="Under-load R_θ · E004 v1 · 7 trials">
+              <div style={{ padding: '16px 18px' }}>
+                <TrialChart metric="loadR" max={0.8} label="Load R_theta (C/W)" unit=" C/W" />
+              </div>
+            </Panel>
+          </div>
+          {/* Top right: recovery R_theta bars */}
+          <div data-e style={{ opacity: 0 }}>
+            <Panel label="Recovery R_θ · post child-exit · 7 trials">
+              <div style={{ padding: '16px 18px' }}>
+                <TrialChart metric="recR" max={3.6} label="Recovery R_theta (C/W)" unit=" C/W" />
+              </div>
+            </Panel>
+          </div>
+          {/* Bottom: interpretation + key numbers */}
+          <div data-e style={{ opacity: 0, gridColumn: '1 / -1' }}>
+            <Panel label="Key numbers · thermal memory demonstration">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 0 }}>
+                {[
+                  { v: '35%',   l: 'R_θ delta',         s: 'cool vs warm start' },
+                  { v: '2.0%',  l: 'within-group CV',    s: 'trials 3–7, Group B' },
+                  { v: '14%',   l: 'cross-group CV',      s: 'this is the F1 signal' },
+                  { v: '5–6s',  l: 'P-state recovery',   s: 'P8 return · all 7 trials' },
+                  { v: '9',     l: 'child-exit trials',  s: 'E003 + E003r + E004 v1' },
+                ].map((k, i) => (
+                  <div key={k.l} style={{ padding: '18px 20px', borderLeft: i > 0 ? `1px solid ${T.border}` : 'none' }}>
+                    <div style={{ fontFamily: FD, fontSize: 28, fontWeight: 500, letterSpacing: '-.025em', color: T.text, fontVariantNumeric: 'tabular-nums' }}>{k.v}</div>
+                    <div style={{ fontFamily: FM, fontSize: 10, color: T.text, marginTop: 5 }}>{k.l}</div>
+                    <div style={{ fontFamily: FM, fontSize: 9.5, color: T.faint, marginTop: 2 }}>{k.s}</div>
+                  </div>
+                ))}
+              </div>
+            </Panel>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Features grid (named-area layout) ──────────────────────────────────── */
+function FeaturesGrid() {
+  const ref = useRef<HTMLElement | null>(null);
+  const inView = useInView(ref, { once: true, amount: 0.1 });
+  useEffect(() => {
+    const root = ref.current;
+    if (!root || !inView || rm()) return;
+    animate(root.querySelectorAll('[data-f]'), { opacity: [0, 1], translateY: [12, 0], duration: 640, delay: stagger(60), ease: 'outExpo' });
+  }, [inView]);
+
+  return (
+    <section ref={ref} id="features" style={{ borderTop: `1px solid ${T.border}` }}>
+      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '88px 32px' }}>
+        <div data-f style={{ opacity: 0, marginBottom: 48 }}>
+          <SectionHead eyebrow="Capabilities" title={<>Built for fleets<br />NVIDIA won&apos;t serve.</>}
+            body="Mission Control ships only on Blackwell DGX/GB200 systems. The long tail of mixed-vendor, older-gen neocloud fleets is structurally out of reach. That's the lane." />
+        </div>
+        {/* 12-column named-area bento */}
+        <div className="tos-features-grid" style={{ display: 'grid', gap: 12 }}>
+          {/* Row 1: drift (7) + zombie (5) */}
+          <div data-f className="tos-feat-drift" style={{ opacity: 0 }}>
+            <FeatureCard title="Drift detection, not thresholds" index="01">
+              <p style={{ fontFamily: FD, fontSize: 13, lineHeight: 1.65, color: T.muted, marginBottom: 16 }}>
+                <span style={{ fontFamily: FM, color: T.text }}>baseline_mean + k·σ</span>{' '}
+                sustained over a steady-state window. Flags cooling degradation relative to the GPU's own healthy baseline — no hard-coded absolutes that go stale by generation.
+              </p>
+              <DriftViz />
+            </FeatureCard>
+          </div>
+          <div data-f className="tos-feat-zombie" style={{ opacity: 0 }}>
+            <FeatureCard title="Zombie-GPU detection (F6)" index="02" tone="critical">
+              <p style={{ fontFamily: FD, fontSize: 13, lineHeight: 1.65, color: T.muted, marginBottom: 14 }}>
+                CUDA context retention keeps GPUs drawing 30–31W at 0% utilization. Invisible to DCGM. R_θ catches the stuck P-state directly.
+              </p>
+              <Codeblock lines={[
+                { p: '!', t: 'GPU 2 · stuck P0', tone: 'critical' },
+                { p: '·', t: 'util=0% · P=31.2W · ΔT=41°C' },
+                { p: '·', t: 'R_θ=1.54 · expected ≤0.80' },
+                { p: '→', t: 'release CUDA context', tone: 'caution' },
+              ]} />
+            </FeatureCard>
+          </div>
+          {/* Row 2: ambient (4) + cross-vendor (4) + oss (4) */}
+          <div data-f className="tos-feat-ambient" style={{ opacity: 0 }}>
+            <FeatureCard title="Virtual ambient" index="03">
+              <p style={{ fontFamily: FD, fontSize: 13, lineHeight: 1.65, color: T.muted, marginBottom: 14 }}>
+                T_reference derived from the GPU's own idle windows. No thermocouples, no rack mods.
+              </p>
+              <Codeblock lines={[
+                { p: '>', t: 'thermalos baseline --gpu 0' },
+                { p: '·', t: 'T_ref locked @ 41.2°C σ=0.18' },
+                { p: '✓', t: 'no thermocouple required', tone: 'healthy' },
+              ]} />
+            </FeatureCard>
+          </div>
+          <div data-f className="tos-feat-vendor" style={{ opacity: 0 }}>
+            <FeatureCard title="Cross-vendor" index="04">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                {[
+                  { v: 'NVIDIA', p: 'DCGM / pynvml',  s: 'live',         c: T.healthy },
+                  { v: 'AMD',    p: 'ROCm / amd-smi', s: 'v1 · q4 2026', c: T.caution },
+                  { v: 'Intel',  p: 'oneAPI / xpu-smi', s: 'scoped',       c: T.faint },
+                ].map(row => (
+                  <div key={row.v} style={{ display: 'flex', justifyContent: 'space-between', borderRadius: 3, border: `1px solid ${T.border}`, background: T.s2, padding: '7px 10px', fontFamily: FM, fontSize: 11 }}>
+                    <span style={{ display: 'flex', gap: 8 }}>
+                      <span style={{ color: T.text }}>{row.v}</span>
+                      <span style={{ color: T.faint }}>{row.p}</span>
+                    </span>
+                    <span style={{ color: row.c }}>{row.s}</span>
+                  </div>
+                ))}
+              </div>
+            </FeatureCard>
+          </div>
+          <div data-f className="tos-feat-oss" style={{ opacity: 0 }}>
+            <FeatureCard title="OSS agent — single node free" index="05" tone="healthy">
+              <p style={{ fontFamily: FD, fontSize: 13, lineHeight: 1.65, color: T.muted, marginBottom: 14 }}>
+                <span style={{ fontFamily: FM, color: T.text }}>pip install thermalos</span> — 60 seconds to first R_θ reading.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                {['Free · single node · live readout', 'Paid · fleet dashboard + alerts', 'Paid · cross-node correlation'].map((f, i) => (
+                  <div key={f} style={{ display: 'flex', gap: 8, alignItems: 'center', fontFamily: FM, fontSize: 10.5, color: T.muted }}>
+                    <span style={{ color: i === 0 ? T.healthy : T.faint, fontSize: 9 }}>▶</span>
+                    {f}
+                  </div>
+                ))}
+              </div>
+            </FeatureCard>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FeatureCard({ title, index, tone, children }: {
+  title: string;
+  index: string;
+  tone?: 'critical' | 'healthy';
+  children: React.ReactNode;
+}) {
+  const accent = tone === 'critical' ? T.critical : tone === 'healthy' ? T.healthy : T.bp;
+  return (
+    <div style={{ height: '100%', border: `1px solid ${T.border}`, borderTop: `2px solid ${accent}`, borderRadius: 5, background: T.s1, overflow: 'hidden', transition: 'border-color .2s' }}
+      onMouseEnter={e => (e.currentTarget.style.borderColor = T.borderHi)}
+      onMouseLeave={e => (e.currentTarget.style.borderColor = T.border)}>
+      <div style={{ padding: 22 }}>
+        <div style={{ fontFamily: FM, fontSize: 9.5, color: accent, letterSpacing: '.12em', marginBottom: 10 }}>{index} · CAPABILITY</div>
+        <h3 style={{ fontFamily: FD, fontSize: 17, fontWeight: 500, letterSpacing: '-.01em', color: T.text, marginBottom: 14 }}>{title}</h3>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function DriftViz() {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const inView = useInView(ref, { once: true, amount: 0.5 });
+  const samples = [40, 40, 41, 41, 42, 43, 44, 46, 50, 56, 64, 74, 82, 90];
+  useEffect(() => {
+    const root = ref.current;
+    if (!root || !inView || rm()) return;
+    animate(root.querySelectorAll('[data-bar]'), { scaleY: [0, 1], opacity: [0.15, 1], duration: 580, delay: stagger(28), ease: 'outExpo' });
+  }, [inView]);
+  return (
+    <div ref={ref} style={{ borderRadius: 4, border: `1px solid ${T.border}`, background: T.s2, padding: 14 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+        <span style={{ fontFamily: FM, fontSize: 9.5, color: T.faint }}>R_θ · 14-sample window</span>
+        <span style={{ fontFamily: FM, fontSize: 9.5, color: T.rising }}>+38% drift detected</span>
+      </div>
+      <div style={{ position: 'relative', height: 70 }}>
+        <svg viewBox="0 0 280 70" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, height: '100%', width: '100%' }}>
+          <line x1="0" y1={70 - 50} x2="280" y2={70 - 50} stroke={T.caution} strokeWidth="0.7" strokeDasharray="3 2" opacity="0.5" />
+          <line x1="0" y1={70 - 42} x2="280" y2={70 - 42} stroke={T.healthy} strokeWidth="0.7" strokeDasharray="2 2" opacity="0.4" />
+          {samples.map((v, i) => {
+            const c = v > 80 ? T.critical : v > 60 ? T.rising : v > 48 ? T.caution : T.healthy;
+            return <rect data-bar key={i} x={4 + i * 20} y={70 - v} width={13} height={v} fill={c} opacity="0.9" rx="1" style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }} />;
+          })}
+        </svg>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+        <span style={{ fontFamily: FM, fontSize: 9, color: T.faint }}>baseline 0.72</span>
+        <span style={{ fontFamily: FM, fontSize: 9, color: T.faint }}>k·σ alert</span>
+        <span style={{ fontFamily: FM, fontSize: 9, color: T.critical }}>1.85 critical</span>
+      </div>
+    </div>
+  );
+}
+
+function Codeblock({ lines }: { lines: Array<{ p: string; t: string; tone?: string }> }) {
+  const toneColor: Record<string, string> = { healthy: T.healthy, critical: T.critical, caution: T.caution };
+  return (
+    <div style={{ borderRadius: 4, border: `1px solid ${T.border}`, background: T.s0, padding: '11px 13px', fontFamily: FM, fontSize: 11, lineHeight: 1.7 }}>
       {lines.map((l, i) => (
         <div key={i} style={{ display: 'flex', gap: 8 }}>
-          <span style={{ color: l.tone ? toneC[l.tone] : HEX.faint, width: 12, flexShrink: 0 }}>{l.p}</span>
-          <span style={{ color: l.tone ? toneC[l.tone] : HEX.muted }}>{l.t}</span>
+          <span style={{ color: l.tone ? toneColor[l.tone] : T.faint, width: 12, flexShrink: 0 }}>{l.p}</span>
+          <span style={{ color: l.tone ? toneColor[l.tone] : T.muted }}>{l.t}</span>
         </div>
       ))}
     </div>
   );
 }
 
-function StackRow({ vendor, path, tone, label }: { vendor: string; path: string; tone: Tone; label: string }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderRadius: 3, border: `1px solid ${HEX.border}`, background: HEX.s2, padding: '8px 10px', fontFamily: FM, fontSize: 11.5 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ color: HEX.text }}>{vendor}</span>
-        <span style={{ color: HEX.faint }}>·</span>
-        <span style={{ color: HEX.muted }}>{path}</span>
-      </div>
-      <StatusPill tone={tone} label={label} />
-    </div>
-  );
-}
-
-function Bento() {
-  const ref = useAnimeSection<HTMLElement>('[data-reveal]');
-  return (
-    <section ref={ref} id="features" style={{ position: 'relative', borderTop: `1px solid ${HEX.border}` }}>
-      <div className="iso-bp-grid" style={{ position: 'absolute', inset: 0, opacity: 0.18, pointerEvents: 'none' }} />
-      <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '96px 32px' }}>
-        <div data-reveal style={{ opacity: 0 }}>
-          <SectionHeader eyebrow="CAPABILITIES" title={<>Built for the fleets<br />NVIDIA won&apos;t serve.</>}
-            lede="Mission Control ships only on Blackwell DGX/GB200 systems. The long tail of mixed-vendor, mixed-generation neocloud fleets is structurally out of reach. That's the lane." />
-        </div>
-        <div className="iso-bento-grid" style={{ marginTop: 64, display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: 16 }}>
-          <BentoCard span={3} index="01" title="Drift detection, not thresholds">
-            <BentoBody>
-              <span style={{ fontFamily: FM, color: HEX.text }}>baseline_mean + k·σ</span>{' '}
-              sustained over a steady-state window. Flags cooling degradation relative to the GPU&apos;s own healthy state — no hard-coded absolutes that go stale by generation.
-            </BentoBody>
-            <DriftChart />
-          </BentoCard>
-          <BentoCard span={3} index="02" title="Virtual ambient — zero extra hardware">
-            <BentoBody>
-              T_reference derived from the GPU&apos;s own idle windows. No thermocouples, no rack mods, no MAX31856 deployment. Works on any cloud or on-prem fleet from day zero.
-            </BentoBody>
-            <CodeBlock lines={[
-              { p: '>', t: 'thermalos baseline --gpu 0' },
-              { p: '·', t: 'sampling idle window… 10.0s' },
-              { p: '·', t: 'T_ref locked @ 41.2 °C  σ=0.18' },
-              { p: '✓', t: 'no thermocouple required', tone: 'healthy' },
-            ]} />
-          </BentoCard>
-          <BentoCard span={2} index="03" title="Cross-vendor, architected day one">
-            <BentoBody>
-              NVIDIA first (DCGM + pynvml). AMD MI300 in v1. Mission Control will never cover mixed fleets — that&apos;s the structural opening.
-            </BentoBody>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <StackRow vendor="NVIDIA" path="DCGM / pynvml" tone="healthy" label="live" />
-              <StackRow vendor="AMD" path="ROCm / amd-smi" tone="caution" label="v1 · q4 2026" />
-              <StackRow vendor="Intel" path="oneAPI / xpu-smi" tone="default" label="scoped" />
-            </div>
-          </BentoCard>
-          <BentoCard span={2} index="04" title="Zombie-GPU detection (F6)" tone="critical">
-            <BentoBody>
-              CUDA context retention keeps GPUs drawing 30–31 W at 0% utilization — invisible to DCGM utilization alone. R<sub>θ</sub> flags the stuck P-state directly.
-            </BentoBody>
-            <CodeBlock lines={[
-              { p: '!', t: 'GPU 2 · stuck @ P0', tone: 'critical' },
-              { p: '·', t: 'util=0% · P=31W · ΔT=42°C' },
-              { p: '·', t: 'R_θ=1.36 · expected ≤0.8' },
-              { p: '→', t: 'release CUDA context', tone: 'caution' },
-            ]} />
-          </BentoCard>
-          <BentoCard span={2} index="05" title="OSS agent — free single-node, forever" tone="healthy">
-            <BentoBody>
-              <span style={{ fontFamily: FM, color: HEX.text }}>pip install thermalos</span>. 60 seconds to first R<sub>θ</sub> reading. Fleet dashboard + alerting as paid tier — same motion Grafana used to $400M ARR.
-            </BentoBody>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {['Free · single node · live readout', 'Paid · fleet dashboard, alerts', 'Paid · cross-node correlation'].map((f, i) => (
-                <div key={f} className="iso-mono-xs" style={{ display: 'flex', alignItems: 'center', gap: 8, color: HEX.muted }}>
-                  <span style={{ color: i === 0 ? HEX.healthy : HEX.faint, display: 'inline-flex', flexShrink: 0 }}><ChevronRight s={10} /></span>
-                  {f}
-                </div>
-              ))}
-            </div>
-          </BentoCard>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ── Gap / Competitor table ── */
-type MarkKind = 'yes' | 'no' | 'partial';
+/* ─── Competitor table ────────────────────────────────────────────────────── */
+type Mark = 'yes' | 'no' | 'partial';
 const CMP_COLS = ['DCGM', 'Mission Control', 'Phaidra', 'In-house', 'ThermalOS'];
-const CMP_ROWS: { cap: string; cells: MarkKind[] }[] = [
-  { cap: 'Exposes T_junction + P_GPU', cells: ['yes', 'yes', 'partial', 'partial', 'yes'] },
-  { cap: 'Computes R_θ (ΔT / P) metric', cells: ['no', 'no', 'no', 'no', 'yes'] },
-  { cap: 'Separates busy-hot vs failing-hot', cells: ['no', 'no', 'no', 'no', 'yes'] },
-  { cap: 'Drift detector (baseline + k·σ)', cells: ['no', 'no', 'partial', 'no', 'yes'] },
-  { cap: 'Cross-vendor (NVIDIA + AMD)', cells: ['no', 'no', 'partial', 'partial', 'yes'] },
-  { cap: 'CUDA-context aware (F6)', cells: ['no', 'no', 'no', 'no', 'yes'] },
-  { cap: 'Virtual ambient (zero hardware)', cells: ['no', 'no', 'no', 'no', 'yes'] },
-  { cap: 'Serves mixed / older / neocloud fleets', cells: ['yes', 'no', 'no', 'partial', 'yes'] },
-  { cap: 'Open-source agent', cells: ['yes', 'no', 'no', 'no', 'yes'] },
+const CMP_ROWS: { cap: string; cells: Mark[] }[] = [
+  { cap: 'Exposes T_junction + P_GPU',         cells: ['yes', 'yes', 'partial', 'partial', 'yes'] },
+  { cap: 'Computes R_θ (ΔT / P)',              cells: ['no', 'no', 'no', 'no', 'yes'] },
+  { cap: 'Separates busy-hot vs failing-hot',  cells: ['no', 'no', 'no', 'no', 'yes'] },
+  { cap: 'Drift detector (baseline + k·σ)',    cells: ['no', 'no', 'partial', 'no', 'yes'] },
+  { cap: 'CUDA-context aware (zombie GPU)',     cells: ['no', 'no', 'no', 'no', 'yes'] },
+  { cap: 'Cross-vendor (NVIDIA + AMD)',         cells: ['no', 'no', 'partial', 'partial', 'yes'] },
+  { cap: 'Virtual ambient (zero hardware)',     cells: ['no', 'no', 'no', 'no', 'yes'] },
+  { cap: 'Serves neocloud / mixed fleets',     cells: ['yes', 'no', 'no', 'partial', 'yes'] },
+  { cap: 'Open-source agent',                  cells: ['yes', 'no', 'no', 'no', 'yes'] },
 ];
 
-function Mark({ mark, emphasis }: { mark: MarkKind; emphasis?: boolean }) {
-  if (mark === 'yes') {
-    return <span style={{ fontFamily: FM, color: emphasis ? HEX.healthy : HEX.muted, fontSize: emphasis ? 14 : 12, fontWeight: emphasis ? 600 : 400 }}>●</span>;
-  }
-  if (mark === 'no') {
-    return <span style={{ fontFamily: FM, color: HEX.ghost, fontSize: 12 }}>○</span>;
-  }
-  return <span style={{ fontFamily: FM, color: HEX.caution, fontSize: 12 }}>◐</span>;
+function MarkCell({ m, us }: { m: Mark; us: boolean }) {
+  if (m === 'yes') return <span style={{ fontFamily: FM, fontSize: us ? 14 : 12, color: us ? T.healthy : T.muted, fontWeight: us ? 600 : 400 }}>●</span>;
+  if (m === 'no')  return <span style={{ fontFamily: FM, fontSize: 12, color: T.faint }}>○</span>;
+  return <span style={{ fontFamily: FM, fontSize: 12, color: T.caution }}>◐</span>;
 }
 
 function CompetitorTable() {
-  const ref = useAnimeSection<HTMLElement>('[data-reveal]');
-  const usTint = 'rgba(47,179,107,.05)';
+  const ref = useRef<HTMLElement | null>(null);
+  const inView = useInView(ref, { once: true, amount: 0.15 });
+  useEffect(() => {
+    const root = ref.current;
+    if (!root || !inView || rm()) return;
+    animate(root.querySelectorAll('[data-c]'), { opacity: [0, 1], translateY: [12, 0], duration: 640, delay: stagger(65), ease: 'outExpo' });
+  }, [inView]);
+  const us = CMP_COLS.length - 1;
   return (
-    <section ref={ref} id="gap" style={{ position: 'relative', borderTop: `1px solid ${HEX.border}` }}>
-      <div className="iso-bp-grid" style={{ position: 'absolute', inset: 0, opacity: 0.15, pointerEvents: 'none' }} />
-      <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '96px 32px' }}>
-        <div data-reveal style={{ opacity: 0 }}>
-          <SectionHeader eyebrow="THE GAP" title={<>NVIDIA ships three telemetry products.<br />None compute R<sub>θ</sub>.</>}
-            lede="DCGM, Mission Control, and NVIDIA's newest opt-in fleet agent all expose T and P as separate fields. The ratio — the signal — is verifiably absent from every incumbent." />
+    <section ref={ref} id="gap" style={{ borderTop: `1px solid ${T.border}` }}>
+      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '88px 32px' }}>
+        <div data-c style={{ opacity: 0, marginBottom: 48 }}>
+          <SectionHead eyebrow="The Gap" title={<>NVIDIA ships three<br />telemetry products.<br />None compute R<sub>θ</sub>.</>}
+            body="DCGM, Mission Control, and NVIDIA's newest fleet agent all expose T and P as separate fields. The ratio — the signal — is absent from every incumbent." />
         </div>
-        <div data-reveal style={{ marginTop: 56, opacity: 0 }}>
-          <CalloutBox label="CAPABILITY MATRIX · 2026-06">
+        <div data-c style={{ opacity: 0 }}>
+          <Panel label="Capability matrix · 2026-06">
             <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: FM, fontSize: 11.5 }}>
                 <thead>
                   <tr>
-                    <th className="iso-mono-xs" style={{ borderBottom: `1px solid ${HEX.border}`, padding: '16px 24px', textAlign: 'left', fontWeight: 400, color: HEX.faint }}>CAPABILITY</th>
-                    {CMP_COLS.map((c, i) => {
-                      const isUs = i === CMP_COLS.length - 1;
-                      return (
-                        <th key={c} className="iso-mono-xs" style={{ borderBottom: `1px solid ${isUs ? HEX.healthy : HEX.border}`, padding: '16px', fontWeight: 400, textAlign: isUs ? 'right' : 'center', color: isUs ? HEX.healthy : HEX.faint, background: isUs ? usTint : 'transparent' }}>{c}</th>
-                      );
-                    })}
+                    <th style={{ borderBottom: `1px solid ${T.border}`, padding: '14px 20px', textAlign: 'left', fontWeight: 400, fontSize: 9.5, color: T.faint, textTransform: 'uppercase', letterSpacing: '.12em' }}>CAPABILITY</th>
+                    {CMP_COLS.map((c, i) => (
+                      <th key={c} style={{ borderBottom: `1px solid ${i === us ? T.healthy : T.border}`, padding: '14px 12px', textAlign: 'center', fontWeight: 400, fontSize: 9.5, color: i === us ? T.healthy : T.faint, background: i === us ? T.healthy + '08' : 'transparent', textTransform: 'uppercase', letterSpacing: '.1em' }}>{c}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {CMP_ROWS.map((row) => (
-                    <motion.tr key={row.cap} whileHover={{ backgroundColor: 'rgba(110,145,200,.035)' }}>
-                      <td style={{ borderBottom: `1px solid ${HEX.border}`, padding: '14px 24px', fontFamily: FM, color: HEX.text, fontSize: 12.5 }}>{row.cap}</td>
-                      {row.cells.map((m, ci) => {
-                        const isUs = ci === row.cells.length - 1;
-                        return (
-                          <td key={ci} style={{ borderBottom: `1px solid ${isUs ? HEX.healthy : HEX.border}`, padding: '14px 16px', textAlign: isUs ? 'right' : 'center', background: isUs ? usTint : 'transparent' }}>
-                            <Mark mark={m} emphasis={isUs} />
-                          </td>
-                        );
-                      })}
-                    </motion.tr>
+                  {CMP_ROWS.map((row, ri) => (
+                    <tr key={row.cap} style={{ background: ri % 2 === 1 ? T.s0 : 'transparent' }}>
+                      <td style={{ borderBottom: `1px solid ${T.border}`, padding: '12px 20px', color: T.text }}>{row.cap}</td>
+                      {row.cells.map((m, ci) => (
+                        <td key={ci} style={{ borderBottom: `1px solid ${ci === us ? T.healthy + '44' : T.border}`, padding: '12px', textAlign: 'center', background: ci === us ? T.healthy + '06' : 'transparent' }}>
+                          <MarkCell m={m} us={ci === us} />
+                        </td>
+                      ))}
+                    </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <div className="iso-mono-xs" style={{ borderTop: `1px solid ${HEX.border}`, padding: '16px 24px', color: HEX.faint }}>
-              <span style={{ color: HEX.muted }}>Legend:</span>
-              <span style={{ marginLeft: 12 }}><Mark mark="yes" /> shipped</span>
-              <span style={{ marginLeft: 12 }}><Mark mark="partial" /> partial / different layer</span>
-              <span style={{ marginLeft: 12 }}><Mark mark="no" /> not present</span>
+            <div style={{ borderTop: `1px solid ${T.border}`, padding: '12px 20px', display: 'flex', gap: 20 }}>
+              {[{ m: 'yes' as Mark, l: 'shipped' }, { m: 'partial' as Mark, l: 'partial' }, { m: 'no' as Mark, l: 'absent' }].map(({ m, l }) => (
+                <span key={l} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: FM, fontSize: 10, color: T.faint }}>
+                  <MarkCell m={m} us={false} /> {l}
+                </span>
+              ))}
             </div>
-          </CalloutBox>
+          </Panel>
         </div>
       </div>
     </section>
   );
 }
 
-/* ── Pricing ── */
-const PRICING_FEATURES = ['Fleet R_θ dashboard', 'Drift alerts + incident log', 'Cross-node correlation', 'Power-cap optimization', 'Opt-in telemetry dataset', 'Priority Slack support'];
+/* ─── Pricing ─────────────────────────────────────────────────────────────── */
+const PRICING_FEATS = ['Fleet R_θ dashboard', 'Drift alerts + incident log', 'Cross-node correlation', 'Power-cap optimization', 'Telemetry dataset access', 'Priority Slack support'];
+
+function useCountUp(value: number, fmt: (n: number) => string) {
+  const el = useRef<HTMLDivElement | null>(null);
+  const prev = useRef(value);
+  useEffect(() => {
+    const node = el.current;
+    if (!node) return;
+    if (rm()) { node.textContent = fmt(value); prev.current = value; return; }
+    const state = { v: prev.current };
+    animate(state, { v: value, duration: 380, ease: 'outCubic', onUpdate: () => { node.textContent = fmt(state.v); }, onComplete: () => { prev.current = value; node.textContent = fmt(value); } });
+  }, [value, fmt]);
+  return el;
+}
 
 function Pricing() {
-  const ref = useAnimeSection<HTMLElement>('[data-reveal]');
+  const ref = useRef<HTMLElement | null>(null);
+  const inView = useInView(ref, { once: true, amount: 0.2 });
   const [annual, setAnnual] = useState(true);
   const [gpus, setGpus] = useState(80);
   const { price, period, saved } = useMemo(() => {
     const mo = gpus * 4;
-    if (annual) {
-      const yr = Math.round(mo * 12 * 0.75);
-      return { price: yr, period: 'year', saved: mo * 12 - yr };
-    }
+    if (annual) { const yr = Math.round(mo * 12 * 0.75); return { price: yr, period: 'year', saved: mo * 12 - yr }; }
     return { price: mo, period: 'month', saved: 0 };
   }, [annual, gpus]);
-  const formatPrice = useMemo(() => (n: number) => `$${Math.round(n).toLocaleString()}`, []);
-  const priceRef = useAnimatedNumber(price, formatPrice);
+  const fmt = useCallback((n: number) => `$${Math.round(n).toLocaleString()}`, []);
+  const priceRef = useCountUp(price, fmt);
+
+  useEffect(() => {
+    const root = ref.current;
+    if (!root || !inView || rm()) return;
+    animate(root.querySelectorAll('[data-p]'), { opacity: [0, 1], translateY: [12, 0], duration: 640, delay: stagger(60), ease: 'outExpo' });
+  }, [inView]);
 
   return (
-    <section ref={ref} id="pricing" style={{ position: 'relative', borderTop: `1px solid ${HEX.border}` }}>
-      <div className="iso-bp-grid" style={{ position: 'absolute', inset: 0, opacity: 0.15, pointerEvents: 'none' }} />
-      <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '96px 32px' }}>
-        <div data-reveal style={{ opacity: 0 }}>
-          <SectionHeader center eyebrow="PRICING" title={<>Free forever for one node.</>}
-            lede="Fleet dashboard and team alerting for operators managing multiple GPUs. No procurement, no signup until you scale." />
+    <section ref={ref} id="pricing" style={{ borderTop: `1px solid ${T.border}` }}>
+      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '88px 32px' }}>
+        <div data-p style={{ opacity: 0, marginBottom: 48, textAlign: 'center' }}>
+          <SectionHead center eyebrow="Pricing" title="Free forever for one node."
+            body="Fleet dashboard and alerting for operators managing multiple GPUs. No signup until you scale." />
         </div>
-        <div data-reveal style={{ maxWidth: 480, margin: '56px auto 0', opacity: 0 }}>
-          <CalloutBox label="FLEET TIER · INTERACTIVE">
-            <div style={{ padding: 24 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div data-p style={{ opacity: 0, maxWidth: 460, margin: '0 auto' }}>
+          <Panel label="Fleet tier · interactive">
+            <div style={{ padding: 22 }}>
+              {/* Toggle */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
                 <div>
-                  <div style={{ fontFamily: FD, fontSize: 14, fontWeight: 500 }}>Fleet tier</div>
-                  <div className="iso-mono-xs" style={{ color: HEX.faint, marginTop: 3 }}>single-node agent is always free</div>
+                  <div style={{ fontFamily: FD, fontSize: 13.5, fontWeight: 500, color: T.text }}>Fleet tier</div>
+                  <div style={{ fontFamily: FM, fontSize: 9.5, color: T.faint, marginTop: 3 }}>single-node agent is always free</div>
                 </div>
-                <div style={{ display: 'flex', borderRadius: 4, border: `1px solid ${HEX.border}`, background: HEX.s2, padding: 2 }}>
-                  {[{ l: 'monthly', v: false }, { l: 'annual', v: true }].map((o) => (
-                    <motion.button key={o.l} whileTap={{ scale: 0.96 }} onClick={() => setAnnual(o.v)} style={{ borderRadius: 3, padding: '5px 10px', border: 'none', cursor: 'pointer', transition: 'all .15s', background: annual === o.v ? HEX.s1 : 'transparent', color: annual === o.v ? HEX.text : HEX.muted, fontFamily: FM, fontSize: 10, letterSpacing: '.02em' }}>
-                      {o.l}{o.v && <span style={{ color: HEX.healthy, marginLeft: 4 }}>−25%</span>}
-                    </motion.button>
+                <div style={{ display: 'flex', borderRadius: 4, border: `1px solid ${T.border}`, background: T.s2, padding: 2, gap: 2 }}>
+                  {[{ l: 'monthly', v: false }, { l: 'annual', v: true }].map(o => (
+                    <button key={o.l} onClick={() => setAnnual(o.v)}
+                      style={{ borderRadius: 3, padding: '5px 10px', border: 'none', cursor: 'pointer', background: annual === o.v ? T.s1 : 'transparent', color: annual === o.v ? T.text : T.muted, fontFamily: FM, fontSize: 10, letterSpacing: '.03em', transition: 'background .15s, color .15s' }}>
+                      {o.l}{o.v && <span style={{ color: T.healthy, marginLeft: 4 }}>−25%</span>}
+                    </button>
                   ))}
                 </div>
               </div>
-              <div style={{ marginBottom: 24 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <span className="iso-mono-xs" style={{ color: HEX.faint }}>GPU count</span>
-                  <span style={{ fontFamily: FM, fontSize: 13, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{gpus} GPUs</span>
+              {/* Slider */}
+              <div style={{ marginBottom: 22 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}>
+                  <span style={{ fontFamily: FM, fontSize: 9.5, color: T.faint }}>GPU count</span>
+                  <span style={{ fontFamily: FM, fontSize: 12, fontWeight: 500, fontVariantNumeric: 'tabular-nums', color: T.text }}>{gpus} GPUs</span>
                 </div>
-                <input className="iso-range" type="range" min={10} max={500} step={10} value={gpus} onChange={(e) => setGpus(+e.target.value)}
-                  style={{ width: '100%', WebkitAppearance: 'none', appearance: 'none', height: 2, background: `linear-gradient(to right,${HEX.healthy} ${((gpus - 10) / 490) * 100}%,${HEX.border} 0)`, borderRadius: 1, outline: 'none', cursor: 'pointer' }} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-                  <span className="iso-mono-xs" style={{ color: HEX.faint }}>10</span>
-                  <span className="iso-mono-xs" style={{ color: HEX.faint }}>500+</span>
-                </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginBottom: 24 }}>
-                <div ref={priceRef} style={{ fontFamily: FD, fontSize: 52, fontWeight: 500, letterSpacing: '-.035em', lineHeight: 1 }}>${price.toLocaleString()}</div>
-                <div style={{ paddingBottom: 6 }}>
-                  <div className="iso-mono-xs" style={{ color: HEX.muted }}>/ {period}</div>
-                  {annual && saved > 0 && <div className="iso-mono-xs" style={{ color: HEX.healthy }}>saves ${saved.toLocaleString()}/yr</div>}
+                <input type="range" min={10} max={500} step={10} value={gpus} onChange={e => setGpus(+e.target.value)}
+                  className="tos-range"
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', height: 2, background: `linear-gradient(to right,${T.healthy} ${((gpus - 10) / 490) * 100}%,${T.border} 0)`, borderRadius: 1, outline: 'none', cursor: 'pointer' }} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 5 }}>
+                  <span style={{ fontFamily: FM, fontSize: 9, color: T.faint }}>10</span>
+                  <span style={{ fontFamily: FM, fontSize: 9, color: T.faint }}>500+</span>
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 20px', borderTop: `1px solid ${HEX.border}`, paddingTop: 20, marginBottom: 20 }}>
-                {PRICING_FEATURES.map((f) => (
-                  <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ width: 4, height: 4, borderRadius: '50%', background: HEX.healthy, flexShrink: 0, display: 'inline-block' }} />
-                    <span className="iso-mono-xs" style={{ color: HEX.muted }}>{f}</span>
+              {/* Price */}
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginBottom: 20, borderTop: `1px solid ${T.border}`, paddingTop: 20 }}>
+                <div ref={priceRef} style={{ fontFamily: FD, fontSize: 48, fontWeight: 500, letterSpacing: '-.035em', lineHeight: 1, color: T.text }}>{fmt(price)}</div>
+                <div style={{ paddingBottom: 5 }}>
+                  <div style={{ fontFamily: FM, fontSize: 10, color: T.muted }}>/ {period}</div>
+                  {annual && saved > 0 && <div style={{ fontFamily: FM, fontSize: 9.5, color: T.healthy }}>saves ${saved.toLocaleString()}/yr</div>}
+                </div>
+              </div>
+              {/* Features */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '7px 16px', marginBottom: 18 }}>
+                {PRICING_FEATS.map(f => (
+                  <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: FM, fontSize: 10.5, color: T.muted }}>
+                    <span style={{ width: 4, height: 4, borderRadius: '50%', background: T.healthy, flexShrink: 0, display: 'inline-block' }} />
+                    {f}
                   </div>
                 ))}
               </div>
-              <a href="mailto:asomisetty27@gmail.com?subject=Isotherm early access" className="iso-cta"
-                style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 11, borderRadius: 5, background: HEX.healthy, color: '#06150C', fontFamily: FD, fontSize: 14, fontWeight: 500 }}>
+              <a href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access"
+                style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 11, borderRadius: 4, background: T.healthy, color: '#051A0D', fontFamily: FD, fontSize: 14, fontWeight: 500, textDecoration: 'none', transition: 'opacity .15s' }}
+                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.87')}
+                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
                 Get early access <ArrowRight />
               </a>
             </div>
-          </CalloutBox>
+          </Panel>
         </div>
       </div>
     </section>
   );
 }
 
-/* ── Footer ── */
-const FOOTER_COLS = [
-  { t: 'product', ls: [{ l: 'overview', h: '#hero' }, { l: 'github', h: 'https://github.com/asomisetty/thermalos' }, { l: 'live fleet demo', h: FLEET_BASE, internal: true }, { l: 'changelog', h: '#' }] },
-  { t: 'research', ls: [{ l: 'stage 1 findings', h: researchPath('findings'), internal: true }, { l: 'R_θ metric', h: '#signal' }, { l: 'lead-time testbed', h: researchPath('lab'), internal: true }, { l: 'publication', h: researchPath('publication'), internal: true }] },
-  { t: 'company', ls: [{ l: 'about', h: '#' }, { l: 'contact', h: 'mailto:asomisetty27@gmail.com' }, { l: 'privacy', h: '#' }, { l: 'license · MIT', h: '#' }] },
-];
-
+/* ─── Footer ──────────────────────────────────────────────────────────────── */
 function Footer() {
-  const ref = useAnimeSection<HTMLElement>('[data-reveal]', 0.1);
+  const COLS = [
+    { t: 'product',  ls: [{ l: 'overview', h: FLEET_BASE, int: true }, { l: 'github', h: 'https://github.com/asomisetty/thermalos' }, { l: 'live fleet demo', h: FLEET_BASE, int: true }, { l: 'changelog', h: '#' }] },
+    { t: 'research', ls: [{ l: 'stage 1 findings', h: researchPath('findings'), int: true }, { l: 'R_θ metric', h: '#signal' }, { l: 'lead-time testbed', h: researchPath('lab'), int: true }, { l: 'publication', h: researchPath('publication'), int: true }] },
+    { t: 'company',  ls: [{ l: 'about', h: '#' }, { l: 'contact', h: 'mailto:asomisetty27@gmail.com' }, { l: 'privacy', h: '#' }, { l: 'MIT license', h: '#' }] },
+  ];
   return (
-    <footer ref={ref} style={{ borderTop: `1px solid ${HEX.border}`, background: HEX.s0 }}>
-      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '64px 32px' }}>
-        <div className="iso-footer-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: 40 }}>
-          <div data-reveal style={{ opacity: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <IsothermMark size={16} />
-              <span style={{ fontFamily: FD, fontSize: 14, fontWeight: 500 }}>ThermalOS</span>
+    <footer style={{ borderTop: `1px solid ${T.border}`, background: T.s0 }}>
+      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '56px 32px' }}>
+        <div className="tos-footer-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: 36 }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="2" fill={T.healthy} />
+                <circle cx="8" cy="8" r="5" stroke={T.healthy} strokeWidth="0.8" opacity="0.4" />
+              </svg>
+              <span style={{ fontFamily: FD, fontSize: 13, fontWeight: 500, color: T.text }}>ThermalOS</span>
             </div>
-            <p style={{ fontFamily: FM, fontSize: 11, color: HEX.faint, lineHeight: 1.7, marginBottom: 20 }}>GPU thermal-power forensics.<br />Built at Cal Poly · MIT License.</p>
-            <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', border: `1px solid ${HEX.border}`, borderRadius: 4, overflow: 'hidden', maxWidth: 280 }}>
-              <input type="email" placeholder="stay updated" style={{ flex: 1, background: 'transparent', border: 'none', padding: '7px 10px', color: HEX.text, fontFamily: FM, fontSize: 10, outline: 'none' }} />
-              <button type="submit" className="iso-mono-xs iso-subscribe" style={{ padding: '7px 10px', background: HEX.s2, border: 'none', borderLeft: `1px solid ${HEX.border}`, color: HEX.text, cursor: 'pointer' }}>subscribe →</button>
+            <p style={{ fontFamily: FM, fontSize: 10.5, color: T.faint, lineHeight: 1.7, marginBottom: 18 }}>GPU thermal-power forensics.<br />Built at Cal Poly · MIT License.</p>
+            <form onSubmit={e => e.preventDefault()} style={{ display: 'flex', border: `1px solid ${T.border}`, borderRadius: 4, overflow: 'hidden', maxWidth: 260 }}>
+              <input type="email" placeholder="stay updated" style={{ flex: 1, background: 'transparent', border: 'none', padding: '7px 10px', color: T.text, fontFamily: FM, fontSize: 10, outline: 'none' }} />
+              <button type="submit" style={{ padding: '7px 10px', background: T.s2, border: 'none', borderLeft: `1px solid ${T.border}`, color: T.muted, fontFamily: FM, fontSize: 10, cursor: 'pointer', transition: 'color .15s' }}
+                onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = T.healthy)}
+                onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = T.muted)}>
+                subscribe →
+              </button>
             </form>
           </div>
-          {FOOTER_COLS.map((col) => (
-            <div data-reveal key={col.t} style={{ opacity: 0 }}>
-              <div className="iso-eyebrow" style={{ color: HEX.text, marginBottom: 16 }}>{col.t}</div>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10, padding: 0, margin: 0 }}>
-                {col.ls.map((link) => (
+          {COLS.map(col => (
+            <div key={col.t}>
+              <div style={{ fontFamily: FM, fontSize: 9.5, letterSpacing: '.16em', textTransform: 'uppercase', color: T.text, marginBottom: 14 }}>{col.t}</div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 9 }}>
+                {col.ls.map(link => (
                   <li key={link.l}>
-                    {('internal' in link && link.internal) ? (
-                      <Link to={link.h} className="iso-mono-xs iso-footer-link" style={{ color: HEX.muted }}>{link.l}</Link>
+                    {'int' in link && link.int ? (
+                      <Link to={link.h} style={{ fontFamily: FM, fontSize: 11, color: T.muted, textDecoration: 'none', transition: 'color .15s' }}
+                        onMouseEnter={e => (e.currentTarget.style.color = T.text)}
+                        onMouseLeave={e => (e.currentTarget.style.color = T.muted)}>{link.l}</Link>
                     ) : (
-                      <a href={link.h} target={link.h.startsWith('http') ? '_blank' : undefined} rel={link.h.startsWith('http') ? 'noopener noreferrer' : undefined}
-                        className="iso-mono-xs iso-footer-link" style={{ color: HEX.muted }}>{link.l}</a>
+                      <a href={link.h} target={link.h.startsWith('http') ? '_blank' : undefined} rel={link.h.startsWith('http') ? 'noreferrer' : undefined}
+                        style={{ fontFamily: FM, fontSize: 11, color: T.muted, textDecoration: 'none', transition: 'color .15s' }}
+                        onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = T.text)}
+                        onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = T.muted)}>{link.l}</a>
                     )}
                   </li>
                 ))}
@@ -890,73 +987,83 @@ function Footer() {
             </div>
           ))}
         </div>
-        <div style={{ borderTop: `1px solid ${HEX.border}`, marginTop: 48, paddingTop: 20, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <span className="iso-mono-xs" style={{ color: HEX.faint }}>© 2026 ThermalOS · MIT License</span>
-          <span className="iso-mono-xs" style={{ color: HEX.faint }}>R_θ = ΔT / P  —  the one ratio nobody else ships.</span>
+        <div style={{ borderTop: `1px solid ${T.border}`, marginTop: 44, paddingTop: 18, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+          <span style={{ fontFamily: FM, fontSize: 10, color: T.faint }}>© 2026 ThermalOS · MIT License</span>
+          <span style={{ fontFamily: FM, fontSize: 10, color: T.faint }}>R_θ = ΔT / P — the one ratio nobody else ships.</span>
         </div>
       </div>
     </footer>
   );
 }
 
-/* ── Page styles ── */
+/* ─── Global styles ───────────────────────────────────────────────────────── */
 const STYLES = `
-.iso-root{background:${HEX.abyss};color:${HEX.text};font-family:${FD};-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;min-height:100vh;overflow-x:clip}
-.iso-root a{text-decoration:none;color:inherit}
-.iso-bp-grid{background-image:linear-gradient(rgba(110,145,200,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(110,145,200,.10) 1px,transparent 1px),linear-gradient(rgba(110,145,200,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(110,145,200,.06) 1px,transparent 1px);background-size:96px 96px,96px 96px,24px 24px,24px 24px;background-position:-1px -1px}
-.iso-eyebrow{font-family:${FM};font-size:10.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:${HEX.faint}}
-.iso-mono-xs{font-family:${FM};font-size:10px;letter-spacing:.02em}
-.iso-mono-sm{font-family:${FM};font-size:11px;letter-spacing:.02em}
-@keyframes iso-blip{0%,100%{opacity:.35}50%{opacity:1}}
-.iso-blip{animation:iso-blip 1.6s ease-in-out infinite}
-@keyframes iso-fadein{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.iso-fadein{animation:iso-fadein .7s cubic-bezier(.32,.72,0,1) both}
-.iso-fadein-d{animation:iso-fadein .7s .15s cubic-bezier(.32,.72,0,1) both}
-@keyframes iso-breathe-hot{0%,100%{opacity:.9}50%{opacity:.6}}
-@keyframes iso-breathe-warm{0%,100%{opacity:.7}50%{opacity:.45}}
-@keyframes iso-breathe-cool{0%,100%{opacity:.55}50%{opacity:.3}}
-@keyframes iso-scan-sweep{from{transform:translateY(0)}to{transform:translateY(195px)}}
-.iso-nav-link{transition:color .15s}
-.iso-nav-link:hover{color:${HEX.text}}
-.iso-ghost-link{transition:color .15s,border-color .15s}
-.iso-ghost-link:hover{color:${HEX.text};border-color:${HEX.borderHi}}
-.iso-cta{transition:filter .15s}
-.iso-cta:hover{filter:brightness(1.08)}
-.iso-ghost-btn{transition:border-color .15s}
-.iso-ghost-btn:hover{border-color:${HEX.muted}}
-.iso-fleet-link{transition:color .15s}
-.iso-fleet-link:hover{color:${HEX.text}}
-.iso-footer-link{transition:color .15s}
-.iso-footer-link:hover{color:${HEX.text}}
-.iso-subscribe{transition:color .15s}
-.iso-subscribe:hover{color:${HEX.healthy}}
-.iso-bento-card{transition:transform .2s}
-.iso-bento-card:hover{transform:translateY(-2px)}
-.iso-bento-span-2{grid-column:span 2}
-.iso-bento-span-3{grid-column:span 3}
-.iso-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:${HEX.healthy};border:2px solid ${HEX.s0};box-shadow:0 0 0 1px ${HEX.healthy};cursor:pointer}
-.iso-range::-moz-range-thumb{width:14px;height:14px;border:2px solid ${HEX.s0};border-radius:50%;background:${HEX.healthy};cursor:pointer}
-@media (max-width:900px){
-  .iso-hero-grid{grid-template-columns:1fr!important;gap:48px!important}
-  .iso-two-col{grid-template-columns:1fr!important;gap:48px!important}
-  .iso-bento-grid{grid-template-columns:1fr!important}
-  .iso-bento-span-2,.iso-bento-span-3{grid-column:span 1!important}
-  .iso-footer-grid{grid-template-columns:1fr 1fr!important}
-  .iso-nav-links{display:none!important}
+.tos-root { background: ${T.bg}; color: ${T.text}; font-family: ${FD}; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; min-height: 100vh; overflow-x: clip; }
+.tos-root a { text-decoration: none; color: inherit; }
+.tos-root * { box-sizing: border-box; }
+.tos-root button { box-sizing: border-box; }
+
+/* Blueprint grid — structural reference lines, no decoration */
+.tos-grid-bg {
+  background-image:
+    linear-gradient(rgba(88,120,168,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(88,120,168,.07) 1px, transparent 1px),
+    linear-gradient(rgba(88,120,168,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(88,120,168,.04) 1px, transparent 1px);
+  background-size: 96px 96px, 96px 96px, 24px 24px, 24px 24px;
+  background-position: -1px -1px;
 }
-@media (prefers-reduced-motion:reduce){
-  .iso-fadein,.iso-fadein-d,.iso-blip,[data-field-ring], [data-hero-reveal], [data-reveal], [data-gpu-card]{animation:none!important;opacity:1!important;transform:none!important}
+
+/* Pulse dot — no glow, just opacity cycle */
+@keyframes tos-pulse { 0%,100% { opacity:.3 } 50% { opacity:.9 } }
+.tos-pulse { animation: tos-pulse 1.8s ease-in-out infinite; }
+
+/* Range thumb — no glow ring */
+.tos-range::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: ${T.healthy}; border: 2px solid ${T.s0}; cursor: pointer; }
+.tos-range::-moz-range-thumb { width: 14px; height: 14px; border: 2px solid ${T.s0}; border-radius: 50%; background: ${T.healthy}; cursor: pointer; }
+
+/* Features named-area grid */
+.tos-features-grid {
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: auto auto;
+}
+.tos-feat-drift   { grid-column: 1 / 8; grid-row: 1; }
+.tos-feat-zombie  { grid-column: 8 / 13; grid-row: 1; }
+.tos-feat-ambient { grid-column: 1 / 5; grid-row: 2; }
+.tos-feat-vendor  { grid-column: 5 / 9; grid-row: 2; }
+.tos-feat-oss     { grid-column: 9 / 13; grid-row: 2; }
+
+/* Responsive */
+@media (max-width: 960px) {
+  .tos-hero-layout { grid-template-columns: 1fr !important; gap: 48px !important; }
+  .tos-two-col { grid-template-columns: 1fr !important; gap: 48px !important; }
+  .tos-features-grid { grid-template-columns: 1fr 1fr !important; }
+  .tos-feat-drift, .tos-feat-zombie, .tos-feat-ambient, .tos-feat-vendor, .tos-feat-oss { grid-column: span 1 !important; grid-row: auto !important; }
+  .tos-evidence-grid { grid-template-columns: 1fr !important; }
+  .tos-footer-grid { grid-template-columns: 1fr 1fr !important; }
+  .tos-nav-links { display: none !important; }
+}
+@media (max-width: 600px) {
+  .tos-features-grid { grid-template-columns: 1fr !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tos-pulse, [data-bar], [data-trace], [data-h], [data-r], [data-e], [data-f], [data-c], [data-p] {
+    animation: none !important; opacity: 1 !important; transform: none !important;
+    stroke-dasharray: none !important; stroke-dashoffset: 0 !important;
+  }
 }
 `;
 
+/* ─── Root ────────────────────────────────────────────────────────────────── */
 export default function ThermalOSLanding() {
   return (
-    <main className="iso-root">
+    <main className="tos-root">
       <style>{STYLES}</style>
       <Nav />
       <Hero />
       <Signal />
-      <Bento />
+      <Evidence />
+      <FeaturesGrid />
       <CompetitorTable />
       <Pricing />
       <Footer />
