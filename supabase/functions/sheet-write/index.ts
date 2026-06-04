@@ -125,7 +125,10 @@ async function appendRow(
   });
 
   const body = await res.text();
-  if (!res.ok) throw new Error(`Sheets append failed: ${res.status} ${body}`);
+  if (!res.ok) {
+    console.error("Sheets append failed:", res.status, body);
+    throw new Error("sheets_append_failed");
+  }
   return JSON.parse(body);
 }
 
