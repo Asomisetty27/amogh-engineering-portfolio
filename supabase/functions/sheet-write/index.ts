@@ -170,13 +170,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Determine role. For now: anyone on advisor_allowlist is "admin".
-    // Tighten by adding a `role` column to advisor_allowlist (admin/research) and reading it here.
-    const { data: allow } = await supabase
-      .from("advisor_allowlist")
-      .select("email")
-      .eq("email", user.email)
-      .maybeSingle();
+    // Membership check via SECURITY DEFINER helper (caller can only check own email).
+    const { data: allow, error: allowErr } = await supabase.rpc("is_current_user_allowlisted");
+    if (allowErr) {
+      console.error("allowlist check failed:", allowErr);
+      return new Response(JSON.stringify({ error: "internal_error" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     if (!allow) {
       return new Response(JSON.stringify({ error: "not_allowlisted" }), {
