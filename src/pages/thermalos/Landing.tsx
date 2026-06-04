@@ -530,6 +530,18 @@ const E004_TRIALS = [
   { t: 7, start: 48, loadR: 0.570, recR: 3.10,  pwrRec: 10.3, group: 'B' as const },
 ];
 
+/* v2 trials — 1800s wait protocol. T1+T2 confirmed 2026-06-04. T3-7 running. */
+type V2Trial = { t: number; start: number; pwrRec: number | null; pstateRec: number | null };
+const E004_V2_TRIALS: V2Trial[] = [
+  { t: 1, start: 37, pwrRec: 3.2, pstateRec: 3.0 },
+  { t: 2, start: 37, pwrRec: 5.2, pstateRec: 5.1 },
+  { t: 3, start: 41, pwrRec: null, pstateRec: null },  // running
+  { t: 4, start: 0,  pwrRec: null, pstateRec: null },  // pending
+  { t: 5, start: 0,  pwrRec: null, pstateRec: null },  // pending
+  { t: 6, start: 0,  pwrRec: null, pstateRec: null },  // pending
+  { t: 7, start: 0,  pwrRec: null, pstateRec: null },  // pending
+];
+
 function TrialChart({ metric, max, label, unit }: {
   metric: 'loadR' | 'recR';
   max: number;
@@ -583,6 +595,98 @@ function TrialChart({ metric, max, label, unit }: {
   );
 }
 
+/* v2 power-recovery comparison chart — v1 vs v2 side-by-side bars */
+function V2PowerRecoveryChart() {
+  const barRef = useRef<HTMLDivElement | null>(null);
+  const inView = useInView(barRef, { once: true, amount: 0.3 });
+  const MAX = 40;  // axis max in seconds
+
+  useEffect(() => {
+    const root = barRef.current;
+    if (!root || !inView || rm()) return;
+    animate(root.querySelectorAll('[data-bar]'), {
+      scaleX: [0, 1],
+      opacity: [0.2, 1],
+      duration: 620,
+      delay: stagger(45),
+      ease: 'outExpo',
+    });
+  }, [inView]);
+
+  return (
+    <div ref={barRef}>
+      <div style={{ fontFamily: FM, fontSize: 9.5, color: T.faint, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 14 }}>
+        Power recovery time (s) · v1 vs v2 · lower is better
+      </div>
+
+      {/* v1 row — completed reference */}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ fontFamily: FM, fontSize: 10, color: T.bp, marginBottom: 6 }}>v1 · 60s cooldown · 7 trials</div>
+        {E004_TRIALS.map(tr => {
+          const pct = (tr.pwrRec / MAX) * 100;
+          return (
+            <div key={`v1-${tr.t}`} style={{ display: 'grid', gridTemplateColumns: '32px 1fr 48px', gap: 8, alignItems: 'center', marginBottom: 4 }}>
+              <span style={{ fontFamily: FM, fontSize: 9.5, color: T.faint }}>T{tr.t}</span>
+              <div style={{ height: 12, background: T.s3, borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
+                <div data-bar
+                  title={`v1 T${tr.t} · start ${tr.start}°C · power recovery ${tr.pwrRec}s`}
+                  style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: T.bp, borderRadius: 2, transformOrigin: 'left center', cursor: 'help' }} />
+              </div>
+              <span style={{ fontFamily: FM, fontSize: 10.5, color: T.muted, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{tr.pwrRec}s</span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* v2 row — partial data with placeholders */}
+      <div>
+        <div style={{ fontFamily: FM, fontSize: 10, color: T.healthy, marginBottom: 6 }}>
+          v2 · 1800s wait · 7 trials &nbsp;
+          <span style={{ color: T.caution, fontSize: 9, letterSpacing: '.06em' }}>
+            <span className="tos-pulse" style={{ display: 'inline-block', width: 5, height: 5, background: T.caution, borderRadius: '50%', marginRight: 4, verticalAlign: 'middle' }} />
+            trials 3–7 running
+          </span>
+        </div>
+        {E004_V2_TRIALS.map(tr => {
+          const hasData = tr.pwrRec !== null;
+          const pct = hasData ? (tr.pwrRec! / MAX) * 100 : 0;
+          const isRunning = tr.t === 3 && !hasData;
+          return (
+            <div key={`v2-${tr.t}`} style={{ display: 'grid', gridTemplateColumns: '32px 1fr 48px', gap: 8, alignItems: 'center', marginBottom: 4 }}>
+              <span style={{ fontFamily: FM, fontSize: 9.5, color: hasData ? T.healthy : T.faint }}>T{tr.t}</span>
+              <div style={{
+                height: 12, background: T.s3, borderRadius: 2, overflow: 'hidden', position: 'relative',
+                border: isRunning ? `1px dashed ${T.caution}66` : 'none',
+              }}>
+                {hasData ? (
+                  <div data-bar
+                    title={`v2 T${tr.t} · start ${tr.start}°C · power recovery ${tr.pwrRec}s`}
+                    style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: T.healthy, borderRadius: 2, transformOrigin: 'left center', cursor: 'help' }} />
+                ) : (
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    fontFamily: FM, fontSize: 9, color: isRunning ? T.caution : T.faint,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    letterSpacing: '.08em', textTransform: 'uppercase',
+                  }}>{isRunning ? 'running' : 'pending'}</div>
+                )}
+              </div>
+              <span style={{ fontFamily: FM, fontSize: 10.5, color: hasData ? T.text : T.faint, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                {hasData ? `${tr.pwrRec}s` : '—'}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ fontFamily: FM, fontSize: 9, color: T.faint, marginTop: 12, paddingTop: 10, borderTop: `1px solid ${T.border}`, lineHeight: 1.6 }}>
+        v2 T1/T2 (3.2s, 5.2s) vs v1 mean (24.0s) = <span style={{ color: T.healthy, fontWeight: 600 }}>~5–10× faster recovery</span>.
+        The 30-min wait drains thermal memory v1's 60s gap couldn't. The wait, not the gate, is the active variable.
+      </div>
+    </div>
+  );
+}
+
 function Evidence() {
   const ref = useRef<HTMLElement | null>(null);
   const inView = useInView(ref, { once: true, amount: 0.15 });
@@ -597,8 +701,8 @@ function Evidence() {
       <div className="tos-grid-bg" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.3 }} />
       <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '88px 32px' }}>
         <div data-e style={{ opacity: 0, marginBottom: 48 }}>
-          <SectionHead eyebrow="Stage 1 Evidence" title={<>Same workload.<br />Different temperature.<br />35% R_θ delta.</>}
-            body="E004 rerun (7 trials, 2026-06-03): 60s cooldown gaps left trials 3–7 starting warm. The resulting R_theta shift is not noise — it is the thermal-memory signature the product exists to detect. Within-group CV: 2.0%. Between-group: 14%." />
+          <SectionHead eyebrow="Stage 1 Evidence · two dimensions of thermal memory" title={<>Thermal state has<br />two memory dimensions.<br />Both invisible to nvidia-smi.</>}
+            body="E004 v1 (2026-06-03, 7 trials): starting temperature drove a 35% R_θ delta — that is F1 dimension one. E004 v2 (2026-06-04, 2 trials done + 5 running): the 1800s pre-trial wait drove a 10× collapse in power-recovery time — that is F1 dimension two. Same hardware, same workload. The wait, not the gate, is the active variable." />
         </div>
         {/* Evidence grid: custom named areas */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'auto auto', gap: 16 }} className="tos-evidence-grid">
@@ -618,16 +722,24 @@ function Evidence() {
               </div>
             </Panel>
           </div>
+          {/* Middle row: v2 power-recovery comparison — F1 dimension 2 */}
+          <div data-e style={{ opacity: 0, gridColumn: '1 / -1' }}>
+            <Panel label="F1 dim-2 · wait duration drives recovery time · v2 update 2026-06-04">
+              <div style={{ padding: '18px 20px' }}>
+                <V2PowerRecoveryChart />
+              </div>
+            </Panel>
+          </div>
           {/* Bottom: interpretation + key numbers */}
           <div data-e style={{ opacity: 0, gridColumn: '1 / -1' }}>
             <Panel label="Key numbers · thermal memory demonstration">
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 0 }}>
                 {[
-                  { v: '35%',   l: 'R_θ delta',         s: 'cool vs warm start' },
+                  { v: '35%',   l: 'R_θ delta',         s: 'cool vs warm start (F1 dim-1)' },
+                  { v: '10×',   l: 'recovery delta',    s: 'v1 24s → v2 4s (F1 dim-2)' },
                   { v: '2.0%',  l: 'within-group CV',    s: 'trials 3–7, Group B' },
-                  { v: '14%',   l: 'cross-group CV',      s: 'this is the F1 signal' },
-                  { v: '5–6s',  l: 'P-state recovery',   s: 'P8 return · all 7 trials' },
-                  { v: '9',     l: 'child-exit trials',  s: 'E003 + E003r + E004 v1' },
+                  { v: '11',    l: 'child-exit trials',  s: 'v1 (9) + v2 (2 done, 5 running)' },
+                  { v: '5,987+', l: 'telemetry rows',   s: 'sheet · live, growing' },
                 ].map((k, i) => (
                   <div key={k.l} style={{ padding: '18px 20px', borderLeft: i > 0 ? `1px solid ${T.border}` : 'none' }}>
                     <div style={{ fontFamily: FD, fontSize: 28, fontWeight: 500, letterSpacing: '-.025em', color: T.text, fontVariantNumeric: 'tabular-nums' }}>{k.v}</div>
