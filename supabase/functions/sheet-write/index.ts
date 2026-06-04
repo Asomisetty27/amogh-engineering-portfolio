@@ -94,7 +94,8 @@ async function getAccessToken(saJson: string): Promise<string> {
   });
 
   if (!tokenRes.ok) {
-    throw new Error(`Token exchange failed: ${tokenRes.status} ${await tokenRes.text()}`);
+    console.error("Token exchange failed:", tokenRes.status, await tokenRes.text());
+    throw new Error("token_exchange_failed");
   }
 
   const tokenJson = await tokenRes.json();
