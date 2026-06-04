@@ -120,7 +120,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      is_advisor_allowlisted: { Args: { _email: string }; Returns: boolean }
+      is_current_user_allowlisted: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
