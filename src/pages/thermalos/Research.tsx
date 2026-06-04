@@ -35,8 +35,12 @@ const STAGE_2_QUESTIONS = [
 
 const STAGE_1_FINDINGS = [
   {
-    title: "Rθ_eff captures thermal memory directly observable across 7 trials",
-    body: "E004 v1 rerun (2026-06-03) produced the cleanest demonstration of thermal memory possible: trials 1–2 started at 39–43°C → load R_theta ≈ 0.43, recovery ≈ 2.5. Trials 3–7 started at 48–49°C → load R_theta ≈ 0.59, recovery ≈ 3.1. Same workload, same hardware, ~35% R_theta delta from starting temperature alone. Utilization and raw power miss this entirely. v2 protocol (T_GPU < 35°C thermal gate) will replicate under controlled conditions.",
+    title: "F1 dim-1 · starting temperature → R_theta variance",
+    body: "E004 v1 rerun (2026-06-03) produced the cleanest demonstration of thermal memory possible: trials 1–2 started at 39–43°C → load R_theta ≈ 0.43, recovery ≈ 2.5. Trials 3–7 started at 48–49°C → load R_theta ≈ 0.59, recovery ≈ 3.1. Same workload, same hardware, ~35% R_theta delta from starting temperature alone. Utilization and raw power miss this entirely.",
+  },
+  {
+    title: "F1 dim-2 · wait duration → recovery-time variance (v2, 2026-06-04)",
+    body: "E004 v2 trials 1–2 used a 1800s pre-trial wait. Power recovery times collapsed: 3.2s and 5.2s, vs v1's 10–37s across all 7 trials. The 35°C thermal gate was unreachable on Colab T4 (idle floor ~37°C), but the 30-min wait normalized starts better than a gate would have — and revealed a 10x recovery-time improvement. The wait, not the gate, is the active variable. F1 has two memory dimensions: starting temp and wait duration. Trials 3–7 running now.",
   },
   {
     title: "Same-process termination leaves GPU in P0",
@@ -167,11 +171,11 @@ function ClassificationTab() {
         <SectionLabel>Next — Stage 2 validation on DGX B200</SectionLabel>
         <Card className="p-5">
           <ol className="space-y-1.5 text-[12px] text-[#a8a89f]">
-            <li><span className="text-[#9FE1CB]">1. v2 thermal-gate rerun</span> — confirm F1 disappears under controlled T_GPU &lt; 35°C starts</li>
-            <li><span className="text-[#9FE1CB]">2. Power-cap sweep (E005–E008)</span> — 6 power levels on DGX B200, measured ambient</li>
-            <li><span className="text-[#9FE1CB]">3. Refit classifier</span> — confirm 100% accuracy transfers to new hardware</li>
+            <li><span className="text-[#9FE1CB]">1. v2 trials 3–7</span> — <span className="text-[#60a5fa]">running in Colab now</span>, ~3.5hr ETA. Replicate v2 T1/T2 protocol with 1800s wait.</li>
+            <li><span className="text-[#9FE1CB]">2. Retrain classifier on full v2 dataset</span> — confirm DT/NB stability with 7-trial v2 control</li>
+            <li><span className="text-[#9FE1CB]">3. Power-cap sweep (E005–E008)</span> — 6 power levels on DGX B200, measured ambient</li>
             <li><span className="text-[#9FE1CB]">4. Lead-time testbed (E-LT)</span> — Sam returns Fall 2026, simulate cooling degradation</li>
-            <li><span className="text-[#9FE1CB]">5. Conference submission</span> — Naive Bayes equation + sensitivity bands + thermal-memory demo</li>
+            <li><span className="text-[#9FE1CB]">5. Conference submission</span> — Two-dimensional F1 finding + Naive Bayes equation + sensitivity bands</li>
           </ol>
         </Card>
       </div>
@@ -205,7 +209,7 @@ function MethodologyTab() {
 
       {/* Stage 1 findings */}
       <div>
-        <SectionLabel>Stage 1 findings — Tesla T4 / Colab / 4,570 rows / 9 child-exit trials</SectionLabel>
+        <SectionLabel>Stage 1 findings — Tesla T4 / Colab / 5,987+ rows / 11 child-exit trials (v2 in progress)</SectionLabel>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {STAGE_1_FINDINGS.map((f) => (
             <Card key={f.title} className="p-4">
