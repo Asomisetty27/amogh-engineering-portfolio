@@ -13,6 +13,7 @@ import * as React from 'react';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { FLEET_BASE, researchPath } from './config';
+import { ChevronRight } from 'lucide-react';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { animate, stagger } from 'animejs';
 
