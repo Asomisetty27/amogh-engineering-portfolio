@@ -21,7 +21,7 @@ const STAGES: Stage[] = [
   },
   {
     id: 2,
-    title: "Agent v0.1.0 shipped",
+    title: "Agent v0.1.2 shipped",
     subtitle: "pip install thermalos · open-source on PyPI · Decision Tree 100% CV + Naive Bayes 99.8% · Prometheus + Grafana + Docker",
     status: "complete",
     progress: 100,

@@ -75,7 +75,7 @@ function Hero({ rowCount, demo, syncedAt }: { rowCount: number; demo: boolean; s
         <Pill tone="complete">YC W27 target</Pill>
         <Pill tone="progress">Pre-seed · Pre-revenue</Pill>
         <Pill tone="complete">Stage 1 complete · 4,570 rows · 9 trials</Pill>
-        <Pill tone="complete">Agent v0.1.0 · pip install thermalos</Pill>
+        <Pill tone="complete">Agent v0.1.2 · pip install thermalos</Pill>
         {syncedAt && (
           <span className="text-[10px] font-mono" style={{ color: "var(--t-faint)" }}>synced {syncedAt}</span>
         )}

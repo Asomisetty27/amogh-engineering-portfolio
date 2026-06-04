@@ -361,7 +361,7 @@ function Hero() {
       <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: 64, padding: '72px 32px 96px', alignItems: 'start' }} className="tos-hero-layout">
         <div>
           <div data-h style={{ opacity: 0, marginBottom: 24, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <Tag accent><Pulse />&nbsp;v0.1.0 live on PyPI</Tag>
+            <Tag accent><Pulse />&nbsp;v0.1.2 live on PyPI</Tag>
             <Tag>MIT licensed · single-node free forever</Tag>
           </div>
           <h1 data-h style={{ opacity: 0, fontFamily: FD, fontSize: 'clamp(44px,5.2vw,72px)', fontWeight: 500, letterSpacing: '-.035em', lineHeight: 0.97, marginBottom: 24 }}>
@@ -1271,9 +1271,9 @@ const DEMO_SCRIPT: TermLine[] = [
   { kind: 'cmd', text: 'pip install thermalos' },
   { kind: 'wait', ms: 400 },
   { kind: 'out', text: 'Collecting thermalos', color: T.muted },
-  { kind: 'out', text: '  Downloading thermalos-0.1.0-py3-none-any.whl (50.3 kB)', color: T.faint },
+  { kind: 'out', text: '  Downloading thermalos-0.1.2-py3-none-any.whl (47.6 kB)', color: T.faint },
   { kind: 'out', text: '  Installing collected packages: thermalos', color: T.faint },
-  { kind: 'out', text: 'Successfully installed thermalos-0.1.0', color: T.healthy },
+  { kind: 'out', text: 'Successfully installed thermalos-0.1.2', color: T.healthy },
   { kind: 'wait', ms: 700 },
   { kind: 'cmd', text: 'thermalos setup' },
   { kind: 'wait', ms: 500 },
