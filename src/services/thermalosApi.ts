@@ -26,17 +26,21 @@ export interface TimelineRow {
 }
 
 async function readRange(range: string): Promise<string[][]> {
-  const res = await fetch(`${FN_URL}?range=${encodeURIComponent(range)}`, {
-    headers: {
-      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    },
-  });
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers: Record<string, string> = {
+    apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+  };
+  if (session?.access_token) {
+    headers.Authorization = `Bearer ${session.access_token}`;
+  }
+  const res = await fetch(`${FN_URL}?range=${encodeURIComponent(range)}`, { headers });
   if (!res.ok) throw new Error(`sheets-read ${res.status}`);
   const data = await res.json();
   if (data.error === "missing_config") throw new Error("DEMO_MODE");
   if (data.error) throw new Error(data.error?.message ?? String(data.error));
   return data.values ?? [];
 }
+
 
 function deriveAlert(m: Omit<MeasurementRow, "alert">): string {
   if (m.tempC >= 85) return "HOT";

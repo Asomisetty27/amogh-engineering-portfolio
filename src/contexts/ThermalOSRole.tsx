@@ -32,8 +32,7 @@ export function ThermalOSRoleProvider({ children }: { children: React.ReactNode 
   const role: ThermalOSRole =
     email === ADVISOR_EMAIL ? "advisor"
     : ADMIN_EMAILS.includes(email) ? "admin"
-    : session ? "admin"   // any authenticated non-advisor is treated as admin
-    : "public";
+    : "public"; // authenticated but not explicitly listed → still public
 
   return <Ctx.Provider value={{ session, role, loading }}>{children}</Ctx.Provider>;
 }

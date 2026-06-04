@@ -94,7 +94,8 @@ async function getAccessToken(saJson: string): Promise<string> {
   });
 
   if (!tokenRes.ok) {
-    throw new Error(`Token exchange failed: ${tokenRes.status} ${await tokenRes.text()}`);
+    console.error("Token exchange failed:", tokenRes.status, await tokenRes.text());
+    throw new Error("token_exchange_failed");
   }
 
   const tokenJson = await tokenRes.json();
@@ -124,7 +125,10 @@ async function appendRow(
   });
 
   const body = await res.text();
-  if (!res.ok) throw new Error(`Sheets append failed: ${res.status} ${body}`);
+  if (!res.ok) {
+    console.error("Sheets append failed:", res.status, body);
+    throw new Error("sheets_append_failed");
+  }
   return JSON.parse(body);
 }
 
@@ -166,13 +170,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Determine role. For now: anyone on advisor_allowlist is "admin".
-    // Tighten by adding a `role` column to advisor_allowlist (admin/research) and reading it here.
-    const { data: allow } = await supabase
-      .from("advisor_allowlist")
-      .select("email")
-      .eq("email", user.email)
-      .maybeSingle();
+    // Membership check via SECURITY DEFINER helper (caller can only check own email).
+    const { data: allow, error: allowErr } = await supabase.rpc("is_current_user_allowlisted");
+    if (allowErr) {
+      console.error("allowlist check failed:", allowErr);
+      return new Response(JSON.stringify({ error: "internal_error" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     if (!allow) {
       return new Response(JSON.stringify({ error: "not_allowlisted" }), {
@@ -220,7 +226,8 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: String(e) }), {
+    console.error("sheet-write unhandled error:", e);
+    return new Response(JSON.stringify({ error: "internal_error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
