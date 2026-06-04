@@ -8,9 +8,11 @@
 // from project/preview/brand-blueprint.html) overlaid on the blueprint grid.
 
 import * as React from 'react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FLEET_BASE, researchPath } from './config';
+import { motion, useInView, useScroll, useSpring, useTransform } from 'framer-motion';
+import { animate, createTimeline, stagger } from 'animejs';
 
 /* ── Tokens ── */
 const HEX = {
@@ -42,6 +44,61 @@ const toneColor = (t: Tone): string =>
 
 const FD = "'Space Grotesk', system-ui, sans-serif";
 const FM = "'JetBrains Mono', ui-monospace, monospace";
+const EASE = [0.32, 0.72, 0, 1] as const;
+
+function reduceMotion() {
+  return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function useAnimeSection<T extends HTMLElement>(selector = '[data-reveal]', amount = 0.18) {
+  const ref = useRef<T | null>(null);
+  const inView = useInView(ref, { once: true, amount });
+
+  useEffect(() => {
+    if (!inView || !ref.current || reduceMotion()) return;
+    const nodes = ref.current.querySelectorAll<HTMLElement>(selector);
+    if (!nodes.length) return;
+    animate(nodes, {
+      opacity: [0, 1],
+      translateY: [18, 0],
+      duration: 760,
+      delay: stagger(70),
+      ease: 'outExpo',
+    });
+  }, [inView, selector]);
+
+  return ref;
+}
+
+function useAnimatedNumber(value: number, format: (n: number) => string) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const previous = useRef(value);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (reduceMotion()) {
+      el.textContent = format(value);
+      previous.current = value;
+      return;
+    }
+    const state = { v: previous.current };
+    animate(state, {
+      v: value,
+      duration: 420,
+      ease: 'outCubic',
+      onUpdate: () => {
+        el.textContent = format(state.v);
+      },
+      onComplete: () => {
+        previous.current = value;
+        el.textContent = format(value);
+      },
+    });
+  }, [value, format]);
+
+  return ref;
+}
 
 /* ── Icons ── */
 const ArrowRight = ({ s = 14 }: { s?: number }) => (
@@ -98,7 +155,11 @@ function CalloutBox({
     display: 'block',
   });
   return (
-    <div style={{ position: 'relative', borderRadius: 6, border: `1px solid ${HEX.border}`, background: HEX.s1 }}>
+    <motion.div
+      whileHover={{ y: -3, borderColor: HEX.borderHi }}
+      transition={{ duration: 0.28, ease: EASE }}
+      style={{ position: 'relative', borderRadius: 6, border: `1px solid ${HEX.border}`, background: HEX.s1 }}
+    >
       <span style={tick('top', 'left', 0)} />
       <span style={tick('top', 'right', 1)} />
       <span style={tick('bottom', 'left', 2)} />
@@ -110,7 +171,7 @@ function CalloutBox({
         </div>
       )}
       {children}
-    </div>
+    </motion.div>
   );
 }
 
@@ -171,27 +232,27 @@ function ThermalField() {
       <g clipPath="url(#iso-canvas)">
         {/* Source A: G-03-B (CRITICAL — tight ring spacing, warm colors) */}
         <g filter="url(#iso-tf-organic)">
-          <circle cx="175" cy="96" r="18" stroke="#E8743A" strokeWidth="1.1" opacity=".42" style={{ animation: 'iso-breathe-hot 3.8s ease-in-out infinite' }} />
-          <circle cx="175" cy="96" r="34" stroke="#E8B23A" strokeWidth="1.0" opacity=".30" style={{ animation: 'iso-breathe-hot 3.8s .3s ease-in-out infinite' }} />
-          <circle cx="175" cy="96" r="51" stroke="#E8B23A" strokeWidth=".85" opacity=".22" style={{ animation: 'iso-breathe-warm 4.6s .5s ease-in-out infinite' }} />
-          <circle cx="175" cy="96" r="68" stroke="#6E91C8" strokeWidth=".75" opacity=".16" style={{ animation: 'iso-breathe-warm 5.2s .7s ease-in-out infinite' }} />
-          <circle cx="175" cy="96" r="86" stroke="#6E91C8" strokeWidth=".65" opacity=".12" style={{ animation: 'iso-breathe-cool 6.0s .9s ease-in-out infinite' }} />
-          <circle cx="175" cy="96" r="106" stroke="#2FB36B" strokeWidth=".5" opacity=".07" style={{ animation: 'iso-breathe-cool 7.0s 1.1s ease-in-out infinite' }} />
+          <circle data-field-ring cx="175" cy="96" r="18" stroke="#E8743A" strokeWidth="1.1" opacity=".42" style={{ animation: 'iso-breathe-hot 3.8s ease-in-out infinite' }} />
+          <circle data-field-ring cx="175" cy="96" r="34" stroke="#E8B23A" strokeWidth="1.0" opacity=".30" style={{ animation: 'iso-breathe-hot 3.8s .3s ease-in-out infinite' }} />
+          <circle data-field-ring cx="175" cy="96" r="51" stroke="#E8B23A" strokeWidth=".85" opacity=".22" style={{ animation: 'iso-breathe-warm 4.6s .5s ease-in-out infinite' }} />
+          <circle data-field-ring cx="175" cy="96" r="68" stroke="#6E91C8" strokeWidth=".75" opacity=".16" style={{ animation: 'iso-breathe-warm 5.2s .7s ease-in-out infinite' }} />
+          <circle data-field-ring cx="175" cy="96" r="86" stroke="#6E91C8" strokeWidth=".65" opacity=".12" style={{ animation: 'iso-breathe-cool 6.0s .9s ease-in-out infinite' }} />
+          <circle data-field-ring cx="175" cy="96" r="106" stroke="#2FB36B" strokeWidth=".5" opacity=".07" style={{ animation: 'iso-breathe-cool 7.0s 1.1s ease-in-out infinite' }} />
         </g>
         {/* Source B: G-08 (HEALTHY — wide ring spacing, green) */}
         <g filter="url(#iso-tf-organic)">
-          <circle cx="388" cy="108" r="14" stroke="#2FB36B" strokeWidth=".9" opacity=".40" style={{ animation: 'iso-breathe-cool 5.5s 0.4s ease-in-out infinite' }} />
-          <circle cx="388" cy="108" r="40" stroke="#2FB36B" strokeWidth=".75" opacity=".22" style={{ animation: 'iso-breathe-cool 6.3s 0.8s ease-in-out infinite' }} />
-          <circle cx="388" cy="108" r="74" stroke="#6E91C8" strokeWidth=".65" opacity=".14" style={{ animation: 'iso-breathe-cool 7.2s 1.4s ease-in-out infinite' }} />
-          <circle cx="388" cy="108" r="116" stroke="#6E91C8" strokeWidth=".55" opacity=".09" style={{ animation: 'iso-breathe-cool 8.0s 1.8s ease-in-out infinite' }} />
-          <circle cx="388" cy="108" r="162" stroke="#2FB36B" strokeWidth=".4" opacity=".05" style={{ animation: 'iso-breathe-cool 9.0s 2.2s ease-in-out infinite' }} />
+          <circle data-field-ring cx="388" cy="108" r="14" stroke="#2FB36B" strokeWidth=".9" opacity=".40" style={{ animation: 'iso-breathe-cool 5.5s 0.4s ease-in-out infinite' }} />
+          <circle data-field-ring cx="388" cy="108" r="40" stroke="#2FB36B" strokeWidth=".75" opacity=".22" style={{ animation: 'iso-breathe-cool 6.3s 0.8s ease-in-out infinite' }} />
+          <circle data-field-ring cx="388" cy="108" r="74" stroke="#6E91C8" strokeWidth=".65" opacity=".14" style={{ animation: 'iso-breathe-cool 7.2s 1.4s ease-in-out infinite' }} />
+          <circle data-field-ring cx="388" cy="108" r="116" stroke="#6E91C8" strokeWidth=".55" opacity=".09" style={{ animation: 'iso-breathe-cool 8.0s 1.8s ease-in-out infinite' }} />
+          <circle data-field-ring cx="388" cy="108" r="162" stroke="#2FB36B" strokeWidth=".4" opacity=".05" style={{ animation: 'iso-breathe-cool 9.0s 2.2s ease-in-out infinite' }} />
         </g>
         {/* Source C: G-17 (HEALTHY — far right, partial rings) */}
         <g filter="url(#iso-tf-organic)">
-          <circle cx="590" cy="62" r="16" stroke="#2FB36B" strokeWidth=".8" opacity=".35" style={{ animation: 'iso-breathe-cool 6.0s 1.0s ease-in-out infinite' }} />
-          <circle cx="590" cy="62" r="46" stroke="#2FB36B" strokeWidth=".65" opacity=".18" style={{ animation: 'iso-breathe-cool 7.4s 1.5s ease-in-out infinite' }} />
-          <circle cx="590" cy="62" r="84" stroke="#6E91C8" strokeWidth=".55" opacity=".11" style={{ animation: 'iso-breathe-cool 8.5s 2.0s ease-in-out infinite' }} />
-          <circle cx="590" cy="62" r="130" stroke="#6E91C8" strokeWidth=".4" opacity=".07" style={{ animation: 'iso-breathe-cool 9.5s 2.5s ease-in-out infinite' }} />
+          <circle data-field-ring cx="590" cy="62" r="16" stroke="#2FB36B" strokeWidth=".8" opacity=".35" style={{ animation: 'iso-breathe-cool 6.0s 1.0s ease-in-out infinite' }} />
+          <circle data-field-ring cx="590" cy="62" r="46" stroke="#2FB36B" strokeWidth=".65" opacity=".18" style={{ animation: 'iso-breathe-cool 7.4s 1.5s ease-in-out infinite' }} />
+          <circle data-field-ring cx="590" cy="62" r="84" stroke="#6E91C8" strokeWidth=".55" opacity=".11" style={{ animation: 'iso-breathe-cool 8.5s 2.0s ease-in-out infinite' }} />
+          <circle data-field-ring cx="590" cy="62" r="130" stroke="#6E91C8" strokeWidth=".4" opacity=".07" style={{ animation: 'iso-breathe-cool 9.5s 2.5s ease-in-out infinite' }} />
         </g>
         {/* Hot core glow dots */}
         <circle cx="175" cy="96" r="5" fill="#E8743A" opacity=".65" filter="url(#iso-glow-hot)" />
@@ -200,17 +261,6 @@ function ThermalField() {
         <circle cx="388" cy="108" r="2" fill="#F2F5F4" opacity=".8" />
         <circle cx="590" cy="62" r="3" fill="#2FB36B" opacity=".5" filter="url(#iso-glow-hot)" />
         <circle cx="590" cy="62" r="1.8" fill="#F2F5F4" opacity=".7" />
-        {/* GPU ID labels */}
-        <text x="183" y="92" fontFamily={FM} fontSize="8" fill="#E8B23A" opacity=".7" letterSpacing=".12em">G-03-B</text>
-        <text x="183" y="102" fontFamily={FM} fontSize="7" fill="#E8743A" opacity=".5" letterSpacing=".08em">CRITICAL</text>
-        <text x="396" y="104" fontFamily={FM} fontSize="8" fill="#2FB36B" opacity=".55" letterSpacing=".12em">G-08</text>
-        <text x="396" y="114" fontFamily={FM} fontSize="7" fill="#2FB36B" opacity=".4" letterSpacing=".08em">NOMINAL</text>
-        <text x="598" y="58" fontFamily={FM} fontSize="8" fill="#2FB36B" opacity=".45" letterSpacing=".12em">G-17</text>
-        {/* R_θ annotation lines */}
-        <line x1="175" y1="50" x2="175" y2="18" stroke="#E8743A" strokeWidth=".5" opacity=".3" strokeDasharray="2 3" />
-        <text x="60" y="15" fontFamily={FM} fontSize="7.5" fill="#E8743A" opacity=".45" letterSpacing=".06em">tight rings → high R_θ → failing</text>
-        <line x1="388" y1="50" x2="388" y2="18" stroke="#2FB36B" strokeWidth=".5" opacity=".25" strokeDasharray="2 3" />
-        <text x="300" y="15" fontFamily={FM} fontSize="7.5" fill="#2FB36B" opacity=".4" letterSpacing=".06em">wide rings → low R_θ → healthy</text>
         {/* Live scan sweep */}
         <line x1="0" y1="0" x2="700" y2="0" stroke="rgba(110,145,200,.18)" strokeWidth="1.5" style={{ animation: 'iso-scan-sweep 7s linear infinite' }} />
       </g>
@@ -221,30 +271,35 @@ function ThermalField() {
 /* ── Nav ── */
 function Nav() {
   return (
-    <nav style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: `1px solid ${HEX.border}`, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', background: 'rgba(10,14,20,.85)' }}>
+    <motion.nav
+      initial={reduceMotion() ? false : { y: -18, opacity: 0 }}
+      animate={reduceMotion() ? undefined : { y: 0, opacity: 1 }}
+      transition={{ duration: 0.55, ease: EASE }}
+      style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: `1px solid ${HEX.border}`, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', background: 'rgba(10,14,20,.85)' }}
+    >
       <div style={{ maxWidth: 1240, margin: '0 auto', display: 'flex', alignItems: 'center', height: 56, padding: '0 32px', gap: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
           <IsothermMark size={18} />
-          <span style={{ fontFamily: FD, fontSize: 14, fontWeight: 500, letterSpacing: '-.01em' }}>thermalos</span>
+          <span style={{ fontFamily: FD, fontSize: 14, fontWeight: 500, letterSpacing: '-.01em' }}>isotherm</span>
           <span className="iso-mono-xs" style={{ color: HEX.bp, background: 'rgba(110,145,200,.08)', border: `1px solid rgba(110,145,200,.2)`, borderRadius: 3, padding: '2px 6px' }}>v0 · beta</span>
         </div>
         <div className="iso-nav-links" style={{ display: 'flex', gap: 28 }}>
           {['signal', 'features', 'gap', 'pricing'].map((l) => (
-            <a key={l} href={`#${l}`} className="iso-mono-sm iso-nav-link" style={{ color: HEX.muted }}>{l}</a>
+            <motion.a key={l} href={`#${l}`} whileHover={{ y: -1, color: HEX.text }} className="iso-mono-sm iso-nav-link" style={{ color: HEX.muted }}>{l}</motion.a>
           ))}
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <a href="https://github.com/asomisetty/thermalos" target="_blank" rel="noreferrer"
+          <motion.a whileHover={{ y: -1, borderColor: HEX.borderHi, color: HEX.text }} href="https://github.com/asomisetty/thermalos" target="_blank" rel="noreferrer"
             className="iso-mono-sm iso-ghost-link" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 4, border: `1px solid ${HEX.border}`, color: HEX.muted }}>
             <GithubIcon s={13} /> github
-          </a>
-          <a href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access"
+          </motion.a>
+          <motion.a whileHover={{ y: -1, filter: 'brightness(1.08)' }} whileTap={{ scale: 0.98 }} href="mailto:asomisetty27@gmail.com?subject=Isotherm early access"
             className="iso-mono-sm iso-cta" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 4, background: HEX.healthy, color: '#06150C', fontWeight: 500 }}>
             early access <ArrowRight s={11} />
-          </a>
+          </motion.a>
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 }
 
@@ -267,10 +322,16 @@ function GPUNodeCard({ id, r, s }: GpuNode) {
   const col = s === 'critical' ? HEX.critical : s === 'caution' ? HEX.caution : s === 'rising' ? HEX.rising : HEX.healthy;
   const bg = s === 'critical' ? 'rgba(214,61,61,.06)' : s === 'caution' ? 'rgba(232,178,58,.04)' : s === 'rising' ? 'rgba(232,116,58,.04)' : 'rgba(47,179,107,.03)';
   return (
-    <div style={{ background: bg, border: `1px solid ${col}26`, borderRadius: 4, padding: '5px 6px' }}>
+    <motion.div
+      data-gpu-card
+      whileHover={{ y: -3, borderColor: `${col}66`, backgroundColor: s === 'healthy' ? 'rgba(47,179,107,.075)' : bg }}
+      animate={s === 'critical' ? { boxShadow: ['0 0 0 rgba(214,61,61,0)', '0 0 24px rgba(214,61,61,.16)', '0 0 0 rgba(214,61,61,0)'] } : undefined}
+      transition={s === 'critical' ? { duration: 2.4, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.2 }}
+      style={{ background: bg, border: `1px solid ${col}26`, borderRadius: 4, padding: '5px 6px', opacity: 0 }}
+    >
       <div className="iso-mono-xs" style={{ color: HEX.faint, fontSize: 9, marginBottom: 2 }}>{id}</div>
       <div className="iso-mono-xs" style={{ color: col, fontSize: 11, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{r.toFixed(2)}</div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -314,32 +375,65 @@ function FleetPreview() {
 
 /* ── Hero ── */
 function Hero() {
+  const heroRef = useRef<HTMLElement | null>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
+  const fieldY = useSpring(useTransform(scrollYProgress, [0, 1], [0, 72]), { stiffness: 80, damping: 22 });
+  const fieldScale = useSpring(useTransform(scrollYProgress, [0, 1], [1, 1.08]), { stiffness: 80, damping: 22 });
   const stats = [
     { v: '77.9%', l: 'R_θ separation', s: 'idle vs load · F1' },
     { v: '1 / 3 hr', l: 'GPU failure rate', s: 'Meta · 16,384 H100s' },
     { v: '$6,000/hr', l: 'cluster cost', s: 'undiagnosed downtime' },
   ];
+
+  useEffect(() => {
+    const root = heroRef.current;
+    if (!root || reduceMotion()) return;
+
+    const tl = createTimeline({ defaults: { ease: 'outExpo' } });
+    tl.add(root.querySelectorAll('[data-field-ring]'), {
+      opacity: [0, (_el: Element) => Number((_el as SVGCircleElement).getAttribute('opacity') || 0.2)],
+      scale: [0.94, 1],
+      duration: 1200,
+      delay: stagger(32),
+    }, 60)
+      .add(root.querySelectorAll('[data-hero-reveal]'), {
+        opacity: [0, 1],
+        translateY: [22, 0],
+        duration: 820,
+        delay: stagger(90),
+      }, 180)
+      .add(root.querySelectorAll('[data-gpu-card]'), {
+        opacity: [0, 1],
+        translateY: [12, 0],
+        scale: [0.985, 1],
+        duration: 620,
+        delay: stagger(22, { grid: [5, 4], from: 2 }),
+      }, 460);
+
+    return () => tl.cancel?.();
+  }, []);
+
   return (
-    <section id="hero" style={{ position: 'relative', paddingTop: 56 }}>
+    <section ref={heroRef} id="hero" style={{ position: 'relative', paddingTop: 56, overflow: 'hidden' }}>
       <div className="iso-bp-grid" style={{ position: 'absolute', inset: 0, opacity: 0.55, pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.9, pointerEvents: 'none' }}><ThermalField /></div>
+      <motion.div style={{ position: 'absolute', inset: 0, opacity: 0.9, pointerEvents: 'none', y: fieldY, scale: fieldScale }}><ThermalField /></motion.div>
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 60% 40% at 50% 30%,rgba(110,145,200,.08),transparent 70%)', pointerEvents: 'none' }} />
       <div className="iso-hero-grid" style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.05fr', gap: 64, padding: '80px 32px 100px', alignItems: 'center' }}>
-        <div className="iso-fadein">
-          <div style={{ marginBottom: 28, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div>
+          <div data-hero-reveal style={{ marginBottom: 28, display: 'flex', alignItems: 'center', gap: 12, opacity: 0 }}>
             <StatusPill tone="info" label="v0 ships  jun 2026" pulse />
             <span className="iso-mono-xs" style={{ color: HEX.faint }}>MIT licensed · single-node free</span>
           </div>
-          <h1 style={{ fontFamily: FD, fontSize: 'clamp(48px,5.5vw,76px)', fontWeight: 500, letterSpacing: '-.035em', lineHeight: 0.98, marginBottom: 28 }}>
+          <h1 data-hero-reveal style={{ fontFamily: FD, fontSize: 'clamp(48px,5.5vw,76px)', fontWeight: 500, letterSpacing: '-.035em', lineHeight: 0.98, marginBottom: 28, opacity: 0 }}>
             Know <span style={{ color: HEX.healthy }}>why</span><br />your GPU is hot.
           </h1>
-          <p style={{ fontFamily: FD, fontSize: 16, lineHeight: 1.6, color: HEX.muted, maxWidth: 440, marginBottom: 40 }}>
-            Temperature alone is ambiguous — a hot GPU is either busy or failing. ThermalOS computes{' '}
+          <p data-hero-reveal style={{ fontFamily: FD, fontSize: 16, lineHeight: 1.6, color: HEX.muted, maxWidth: 440, marginBottom: 40, opacity: 0 }}>
+            Temperature alone is ambiguous — a hot GPU is either busy or failing. Isotherm computes{' '}
             <span style={{ fontFamily: FM, color: HEX.text }}>R<sub>θ</sub> = ΔT / P</span>{' '}
             in real time from your existing DCGM telemetry. That ratio is the only signal that separates the two.
           </p>
-          <div style={{ display: 'flex', gap: 12, marginBottom: 48, flexWrap: 'wrap' }}>
-            <a href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access"
+          <div data-hero-reveal style={{ display: 'flex', gap: 12, marginBottom: 48, flexWrap: 'wrap', opacity: 0 }}>
+            <a href="mailto:asomisetty27@gmail.com?subject=Isotherm early access"
               className="iso-cta"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 5, background: HEX.healthy, color: '#06150C', fontFamily: FD, fontSize: 14, fontWeight: 500 }}>
               Get early access <ArrowRight />
@@ -350,7 +444,7 @@ function Hero() {
               <GithubIcon /> read the paper
             </a>
           </div>
-          <div style={{ borderTop: `1px solid ${HEX.border}`, paddingTop: 28, display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24 }}>
+          <div data-hero-reveal style={{ borderTop: `1px solid ${HEX.border}`, paddingTop: 28, display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24, opacity: 0 }}>
             {stats.map((s) => (
               <div key={s.l}>
                 <div style={{ fontFamily: FD, fontSize: 26, fontWeight: 500, letterSpacing: '-.025em', color: HEX.text }}>{s.v}</div>
@@ -360,7 +454,14 @@ function Hero() {
             ))}
           </div>
         </div>
-        <div className="iso-fadein-d"><FleetPreview /></div>
+        <motion.div
+          data-hero-reveal
+          style={{ opacity: 0 }}
+          whileHover={{ y: -6, scale: 1.01 }}
+          transition={{ duration: 0.34, ease: EASE }}
+        >
+          <FleetPreview />
+        </motion.div>
       </div>
     </section>
   );
@@ -375,13 +476,17 @@ const STATE_ROWS: { s: string; v: string; tone: Tone; d: string }[] = [
 ];
 
 function Signal() {
+  const ref = useAnimeSection<HTMLElement>('[data-reveal]');
   return (
-    <section id="signal" style={{ position: 'relative', borderTop: `1px solid ${HEX.border}` }}>
+    <section ref={ref} id="signal" style={{ position: 'relative', borderTop: `1px solid ${HEX.border}` }}>
       <div className="iso-bp-grid" style={{ position: 'absolute', inset: 0, opacity: 0.22, pointerEvents: 'none' }} />
       <div className="iso-two-col" style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: 80, padding: '96px 32px', alignItems: 'start' }}>
-        <SectionHeader eyebrow="THE SIGNAL" title={<>One equation.<br />Two states.<br />Zero hardware.</>}
-          lede="DCGM exposes T_junction and P_GPU as separate instantaneous fields and never divides them. R_θ is the one derived quantity every telemetry stack has the ingredients for — and no incumbent computes it." />
-        <CalloutBox label="EFFECTIVE THERMAL RESISTANCE · DERIVATION">
+        <div data-reveal style={{ opacity: 0 }}>
+          <SectionHeader eyebrow="THE SIGNAL" title={<>One equation.<br />Two states.<br />Zero hardware.</>}
+            lede="DCGM exposes T_junction and P_GPU as separate instantaneous fields and never divides them. R_θ is the one derived quantity every telemetry stack has the ingredients for — and no incumbent computes it." />
+        </div>
+        <div data-reveal style={{ opacity: 0 }}>
+          <CalloutBox label="EFFECTIVE THERMAL RESISTANCE · DERIVATION">
           <div style={{ padding: '28px 24px 0' }}>
             <svg viewBox="0 0 380 90" preserveAspectRatio="xMidYMid meet" style={{ width: '100%', maxWidth: 400 }} aria-label="R-theta-eff equals T-junction minus T-reference over P-GPU">
               <text x="0" y="50" fontFamily={FM} fontSize="22" fill={HEX.text}>R</text>
@@ -405,7 +510,8 @@ function Signal() {
               </div>
             ))}
           </div>
-        </CalloutBox>
+          </CalloutBox>
+        </div>
       </div>
     </section>
   );
@@ -418,7 +524,13 @@ function BentoCard({ span, index, title, tone = 'default', children }: {
 }) {
   const accent = tone === 'critical' ? HEX.critical : tone === 'healthy' ? HEX.healthy : HEX.bp;
   return (
-    <div className={`iso-bento-card iso-bento-span-${span}`} style={{ position: 'relative', overflow: 'hidden', borderRadius: 6, border: `1px solid ${HEX.border}`, background: HEX.s1 }}>
+    <motion.div
+      data-reveal
+      whileHover={{ y: -5, borderColor: HEX.borderHi }}
+      transition={{ duration: 0.28, ease: EASE }}
+      className={`iso-bento-card iso-bento-span-${span}`}
+      style={{ position: 'relative', overflow: 'hidden', borderRadius: 6, border: `1px solid ${HEX.border}`, background: HEX.s1, opacity: 0 }}
+    >
       <div style={{ position: 'absolute', insetInline: 0, top: 0, height: 1, background: `linear-gradient(90deg, transparent, ${accent} 30%, ${accent} 70%, transparent)` }} />
       <div style={{ position: 'relative', padding: 24 }}>
         <div style={{ marginBottom: 20 }}>
@@ -427,7 +539,7 @@ function BentoCard({ span, index, title, tone = 'default', children }: {
         <h3 style={{ fontFamily: FD, marginBottom: 12, fontSize: 18, fontWeight: 500, letterSpacing: '-.01em', color: HEX.text }}>{title}</h3>
         {children}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -436,11 +548,25 @@ function BentoBody({ children }: { children: React.ReactNode }) {
 }
 
 function DriftChart() {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const inView = useInView(ref, { once: true, amount: 0.5 });
   const samples = [38, 40, 39, 41, 42, 41, 45, 48, 52, 58, 66, 76, 88, 95];
   const baseline = 42;
   const threshold = baseline + 2 * 4; // 50
+
+  useEffect(() => {
+    if (!inView || !ref.current || reduceMotion()) return;
+    animate(ref.current.querySelectorAll<SVGRectElement>('[data-bar]'), {
+      scaleY: [0, 1],
+      opacity: [0.2, 0.85],
+      duration: 620,
+      delay: stagger(28),
+      ease: 'outExpo',
+    });
+  }, [inView]);
+
   return (
-    <div style={{ position: 'relative', borderRadius: 4, border: `1px solid ${HEX.border}`, background: HEX.s2, padding: 16 }}>
+    <div ref={ref} style={{ position: 'relative', borderRadius: 4, border: `1px solid ${HEX.border}`, background: HEX.s2, padding: 16 }}>
       <div className="iso-mono-xs" style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between' }}>
         <span style={{ color: HEX.faint }}>R_θ · 14-sample window</span>
         <span style={{ color: HEX.rising }}>+38% drift</span>
@@ -451,7 +577,7 @@ function DriftChart() {
           <line x1="0" y1={80 - baseline} x2="280" y2={80 - baseline} stroke={HEX.healthy} strokeWidth="0.8" strokeDasharray="2 2" opacity="0.5" />
           {samples.map((v, i) => {
             const color = v > threshold + 30 ? HEX.critical : v > threshold ? HEX.rising : v > baseline + 6 ? HEX.caution : HEX.healthy;
-            return <rect key={i} x={4 + i * 20} y={80 - v} width={14} height={v} fill={color} fillOpacity={0.85} />;
+            return <rect data-bar key={i} x={4 + i * 20} y={80 - v} width={14} height={v} fill={color} fillOpacity={0.85} style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }} />;
           })}
         </svg>
       </div>
@@ -492,12 +618,15 @@ function StackRow({ vendor, path, tone, label }: { vendor: string; path: string;
 }
 
 function Bento() {
+  const ref = useAnimeSection<HTMLElement>('[data-reveal]');
   return (
-    <section id="features" style={{ position: 'relative', borderTop: `1px solid ${HEX.border}` }}>
+    <section ref={ref} id="features" style={{ position: 'relative', borderTop: `1px solid ${HEX.border}` }}>
       <div className="iso-bp-grid" style={{ position: 'absolute', inset: 0, opacity: 0.18, pointerEvents: 'none' }} />
       <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '96px 32px' }}>
-        <SectionHeader eyebrow="CAPABILITIES" title={<>Built for the fleets<br />NVIDIA won&apos;t serve.</>}
-          lede="Mission Control ships only on Blackwell DGX/GB200 systems. The long tail of mixed-vendor, mixed-generation neocloud fleets is structurally out of reach. That's the lane." />
+        <div data-reveal style={{ opacity: 0 }}>
+          <SectionHeader eyebrow="CAPABILITIES" title={<>Built for the fleets<br />NVIDIA won&apos;t serve.</>}
+            lede="Mission Control ships only on Blackwell DGX/GB200 systems. The long tail of mixed-vendor, mixed-generation neocloud fleets is structurally out of reach. That's the lane." />
+        </div>
         <div className="iso-bento-grid" style={{ marginTop: 64, display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: 16 }}>
           <BentoCard span={3} index="01" title="Drift detection, not thresholds">
             <BentoBody>
@@ -583,14 +712,17 @@ function Mark({ mark, emphasis }: { mark: MarkKind; emphasis?: boolean }) {
 }
 
 function CompetitorTable() {
+  const ref = useAnimeSection<HTMLElement>('[data-reveal]');
   const usTint = 'rgba(47,179,107,.05)';
   return (
-    <section id="gap" style={{ position: 'relative', borderTop: `1px solid ${HEX.border}` }}>
+    <section ref={ref} id="gap" style={{ position: 'relative', borderTop: `1px solid ${HEX.border}` }}>
       <div className="iso-bp-grid" style={{ position: 'absolute', inset: 0, opacity: 0.15, pointerEvents: 'none' }} />
       <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '96px 32px' }}>
-        <SectionHeader eyebrow="THE GAP" title={<>NVIDIA ships three telemetry products.<br />None compute R<sub>θ</sub>.</>}
-          lede="DCGM, Mission Control, and NVIDIA's newest opt-in fleet agent all expose T and P as separate fields. The ratio — the signal — is verifiably absent from every incumbent." />
-        <div style={{ marginTop: 56 }}>
+        <div data-reveal style={{ opacity: 0 }}>
+          <SectionHeader eyebrow="THE GAP" title={<>NVIDIA ships three telemetry products.<br />None compute R<sub>θ</sub>.</>}
+            lede="DCGM, Mission Control, and NVIDIA's newest opt-in fleet agent all expose T and P as separate fields. The ratio — the signal — is verifiably absent from every incumbent." />
+        </div>
+        <div data-reveal style={{ marginTop: 56, opacity: 0 }}>
           <CalloutBox label="CAPABILITY MATRIX · 2026-06">
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -607,7 +739,7 @@ function CompetitorTable() {
                 </thead>
                 <tbody>
                   {CMP_ROWS.map((row) => (
-                    <tr key={row.cap}>
+                    <motion.tr key={row.cap} whileHover={{ backgroundColor: 'rgba(110,145,200,.035)' }}>
                       <td style={{ borderBottom: `1px solid ${HEX.border}`, padding: '14px 24px', fontFamily: FM, color: HEX.text, fontSize: 12.5 }}>{row.cap}</td>
                       {row.cells.map((m, ci) => {
                         const isUs = ci === row.cells.length - 1;
@@ -617,7 +749,7 @@ function CompetitorTable() {
                           </td>
                         );
                       })}
-                    </tr>
+                    </motion.tr>
                   ))}
                 </tbody>
               </table>
@@ -639,6 +771,7 @@ function CompetitorTable() {
 const PRICING_FEATURES = ['Fleet R_θ dashboard', 'Drift alerts + incident log', 'Cross-node correlation', 'Power-cap optimization', 'Opt-in telemetry dataset', 'Priority Slack support'];
 
 function Pricing() {
+  const ref = useAnimeSection<HTMLElement>('[data-reveal]');
   const [annual, setAnnual] = useState(true);
   const [gpus, setGpus] = useState(80);
   const { price, period, saved } = useMemo(() => {
@@ -649,14 +782,18 @@ function Pricing() {
     }
     return { price: mo, period: 'month', saved: 0 };
   }, [annual, gpus]);
+  const formatPrice = useMemo(() => (n: number) => `$${Math.round(n).toLocaleString()}`, []);
+  const priceRef = useAnimatedNumber(price, formatPrice);
 
   return (
-    <section id="pricing" style={{ position: 'relative', borderTop: `1px solid ${HEX.border}` }}>
+    <section ref={ref} id="pricing" style={{ position: 'relative', borderTop: `1px solid ${HEX.border}` }}>
       <div className="iso-bp-grid" style={{ position: 'absolute', inset: 0, opacity: 0.15, pointerEvents: 'none' }} />
       <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '96px 32px' }}>
-        <SectionHeader center eyebrow="PRICING" title={<>Free forever for one node.</>}
-          lede="Fleet dashboard and team alerting for operators managing multiple GPUs. No procurement, no signup until you scale." />
-        <div style={{ maxWidth: 480, margin: '56px auto 0' }}>
+        <div data-reveal style={{ opacity: 0 }}>
+          <SectionHeader center eyebrow="PRICING" title={<>Free forever for one node.</>}
+            lede="Fleet dashboard and team alerting for operators managing multiple GPUs. No procurement, no signup until you scale." />
+        </div>
+        <div data-reveal style={{ maxWidth: 480, margin: '56px auto 0', opacity: 0 }}>
           <CalloutBox label="FLEET TIER · INTERACTIVE">
             <div style={{ padding: 24 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
@@ -666,9 +803,9 @@ function Pricing() {
                 </div>
                 <div style={{ display: 'flex', borderRadius: 4, border: `1px solid ${HEX.border}`, background: HEX.s2, padding: 2 }}>
                   {[{ l: 'monthly', v: false }, { l: 'annual', v: true }].map((o) => (
-                    <button key={o.l} onClick={() => setAnnual(o.v)} style={{ borderRadius: 3, padding: '5px 10px', border: 'none', cursor: 'pointer', transition: 'all .15s', background: annual === o.v ? HEX.s1 : 'transparent', color: annual === o.v ? HEX.text : HEX.muted, fontFamily: FM, fontSize: 10, letterSpacing: '.02em' }}>
+                    <motion.button key={o.l} whileTap={{ scale: 0.96 }} onClick={() => setAnnual(o.v)} style={{ borderRadius: 3, padding: '5px 10px', border: 'none', cursor: 'pointer', transition: 'all .15s', background: annual === o.v ? HEX.s1 : 'transparent', color: annual === o.v ? HEX.text : HEX.muted, fontFamily: FM, fontSize: 10, letterSpacing: '.02em' }}>
                       {o.l}{o.v && <span style={{ color: HEX.healthy, marginLeft: 4 }}>−25%</span>}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </div>
@@ -685,7 +822,7 @@ function Pricing() {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginBottom: 24 }}>
-                <div style={{ fontFamily: FD, fontSize: 52, fontWeight: 500, letterSpacing: '-.035em', lineHeight: 1 }}>${price.toLocaleString()}</div>
+                <div ref={priceRef} style={{ fontFamily: FD, fontSize: 52, fontWeight: 500, letterSpacing: '-.035em', lineHeight: 1 }}>${price.toLocaleString()}</div>
                 <div style={{ paddingBottom: 6 }}>
                   <div className="iso-mono-xs" style={{ color: HEX.muted }}>/ {period}</div>
                   {annual && saved > 0 && <div className="iso-mono-xs" style={{ color: HEX.healthy }}>saves ${saved.toLocaleString()}/yr</div>}
@@ -699,7 +836,7 @@ function Pricing() {
                   </div>
                 ))}
               </div>
-              <a href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access" className="iso-cta"
+              <a href="mailto:asomisetty27@gmail.com?subject=Isotherm early access" className="iso-cta"
                 style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 11, borderRadius: 5, background: HEX.healthy, color: '#06150C', fontFamily: FD, fontSize: 14, fontWeight: 500 }}>
                 Get early access <ArrowRight />
               </a>
@@ -719,14 +856,15 @@ const FOOTER_COLS = [
 ];
 
 function Footer() {
+  const ref = useAnimeSection<HTMLElement>('[data-reveal]', 0.1);
   return (
-    <footer style={{ borderTop: `1px solid ${HEX.border}`, background: HEX.s0 }}>
+    <footer ref={ref} style={{ borderTop: `1px solid ${HEX.border}`, background: HEX.s0 }}>
       <div style={{ maxWidth: 1240, margin: '0 auto', padding: '64px 32px' }}>
         <div className="iso-footer-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: 40 }}>
-          <div>
+          <div data-reveal style={{ opacity: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <IsothermMark size={16} />
-              <span style={{ fontFamily: FD, fontSize: 14, fontWeight: 500 }}>thermalos</span>
+              <span style={{ fontFamily: FD, fontSize: 14, fontWeight: 500 }}>isotherm</span>
             </div>
             <p style={{ fontFamily: FM, fontSize: 11, color: HEX.faint, lineHeight: 1.7, marginBottom: 20 }}>GPU thermal-power forensics.<br />Built at Cal Poly · MIT License.</p>
             <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', border: `1px solid ${HEX.border}`, borderRadius: 4, overflow: 'hidden', maxWidth: 280 }}>
@@ -735,7 +873,7 @@ function Footer() {
             </form>
           </div>
           {FOOTER_COLS.map((col) => (
-            <div key={col.t}>
+            <div data-reveal key={col.t} style={{ opacity: 0 }}>
               <div className="iso-eyebrow" style={{ color: HEX.text, marginBottom: 16 }}>{col.t}</div>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10, padding: 0, margin: 0 }}>
                 {col.ls.map((link) => (
@@ -753,7 +891,7 @@ function Footer() {
           ))}
         </div>
         <div style={{ borderTop: `1px solid ${HEX.border}`, marginTop: 48, paddingTop: 20, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <span className="iso-mono-xs" style={{ color: HEX.faint }}>© 2026 ThermalOS · open-source agent · MIT License</span>
+          <span className="iso-mono-xs" style={{ color: HEX.faint }}>© 2026 Isotherm · built on the open-source thermalos engine · MIT License</span>
           <span className="iso-mono-xs" style={{ color: HEX.faint }}>R_θ = ΔT / P  —  the one ratio nobody else ships.</span>
         </div>
       </div>
@@ -807,7 +945,7 @@ const STYLES = `
   .iso-nav-links{display:none!important}
 }
 @media (prefers-reduced-motion:reduce){
-  .iso-fadein,.iso-fadein-d,.iso-blip{animation:none!important}
+  .iso-fadein,.iso-fadein-d,.iso-blip,[data-field-ring], [data-hero-reveal], [data-reveal], [data-gpu-card]{animation:none!important;opacity:1!important;transform:none!important}
 }
 `;
 
