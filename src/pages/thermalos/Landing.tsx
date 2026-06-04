@@ -280,7 +280,7 @@ function Nav() {
       <div style={{ maxWidth: 1240, margin: '0 auto', display: 'flex', alignItems: 'center', height: 56, padding: '0 32px', gap: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
           <IsothermMark size={18} />
-          <span style={{ fontFamily: FD, fontSize: 14, fontWeight: 500, letterSpacing: '-.01em' }}>isotherm</span>
+          <span style={{ fontFamily: FD, fontSize: 14, fontWeight: 500, letterSpacing: '-.01em' }}>ThermalOS</span>
           <span className="iso-mono-xs" style={{ color: HEX.bp, background: 'rgba(110,145,200,.08)', border: `1px solid rgba(110,145,200,.2)`, borderRadius: 3, padding: '2px 6px' }}>v0 · beta</span>
         </div>
         <div className="iso-nav-links" style={{ display: 'flex', gap: 28 }}>
@@ -864,7 +864,7 @@ function Footer() {
           <div data-reveal style={{ opacity: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <IsothermMark size={16} />
-              <span style={{ fontFamily: FD, fontSize: 14, fontWeight: 500 }}>isotherm</span>
+              <span style={{ fontFamily: FD, fontSize: 14, fontWeight: 500 }}>ThermalOS</span>
             </div>
             <p style={{ fontFamily: FM, fontSize: 11, color: HEX.faint, lineHeight: 1.7, marginBottom: 20 }}>GPU thermal-power forensics.<br />Built at Cal Poly · MIT License.</p>
             <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', border: `1px solid ${HEX.border}`, borderRadius: 4, overflow: 'hidden', maxWidth: 280 }}>
@@ -891,7 +891,7 @@ function Footer() {
           ))}
         </div>
         <div style={{ borderTop: `1px solid ${HEX.border}`, marginTop: 48, paddingTop: 20, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <span className="iso-mono-xs" style={{ color: HEX.faint }}>© 2026 Isotherm · built on the open-source thermalos engine · MIT License</span>
+          <span className="iso-mono-xs" style={{ color: HEX.faint }}>© 2026 ThermalOS · MIT License</span>
           <span className="iso-mono-xs" style={{ color: HEX.faint }}>R_θ = ΔT / P  —  the one ratio nobody else ships.</span>
         </div>
       </div>
