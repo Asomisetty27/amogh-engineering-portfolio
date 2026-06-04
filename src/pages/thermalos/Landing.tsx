@@ -1070,6 +1070,17 @@ const STYLES = `
 @keyframes tos-trace-breathe { 0%, 100% { opacity: 1 } 50% { opacity: .94 } }
 .tos-trace-live { animation: tos-trace-breathe 5s ease-in-out infinite; }
 
+/* CRT scanline — barely visible horizontal lines for realism, never pulses */
+.tos-scanline {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 2px,
+    rgba(150, 200, 255, 0.04) 2px,
+    rgba(150, 200, 255, 0.04) 3px
+  );
+}
+
 /* Scrolling row — for the live readout marquee */
 @keyframes tos-scroll-up {
   0%   { transform: translateY(0) }
@@ -1114,6 +1125,245 @@ const STYLES = `
 }
 `;
 
+/* ─── Terminal demo ──────────────────────────────────────────────────────────
+ *
+ * Realistic typewriter terminal showing the actual onboarding flow.
+ * Loop: pip install → thermalos setup → GPU inventory → first R_theta readout.
+ * Pauses on hover, restarts after ~3s idle. Respects prefers-reduced-motion.
+ *
+ * Lines are typed character-by-character at variable speed (with brief jitter
+ * so it doesn't feel mechanical). Output blocks render instantly with a brief
+ * fade. Re-entry into viewport restarts the sequence.
+ */
+
+type TermLine =
+  | { kind: 'cmd';    text: string; delay?: number }        // typed at user speed
+  | { kind: 'out';    text: string; color?: string }        // instant output
+  | { kind: 'wait';   ms: number }                          // pause
+  | { kind: 'clear' };                                      // wipe screen
+
+const DEMO_SCRIPT: TermLine[] = [
+  { kind: 'cmd', text: 'pip install thermalos' },
+  { kind: 'wait', ms: 400 },
+  { kind: 'out', text: 'Collecting thermalos', color: T.muted },
+  { kind: 'out', text: '  Downloading thermalos-0.1.0-py3-none-any.whl (50.3 kB)', color: T.faint },
+  { kind: 'out', text: '  Installing collected packages: thermalos', color: T.faint },
+  { kind: 'out', text: 'Successfully installed thermalos-0.1.0', color: T.healthy },
+  { kind: 'wait', ms: 700 },
+  { kind: 'cmd', text: 'thermalos setup' },
+  { kind: 'wait', ms: 500 },
+  { kind: 'out', text: '  ✓  Python 3.12.1', color: T.healthy },
+  { kind: 'out', text: '  ✓  pynvml  ·  driver 535.183.06  ·  4 GPUs detected', color: T.healthy },
+  { kind: 'out', text: '  ✓  prometheus_client — metrics export available', color: T.healthy },
+  { kind: 'wait', ms: 600 },
+  { kind: 'out', text: '  ━━━━━━  step 2/6  GPU inventory', color: T.bp },
+  { kind: 'out', text: '  GPU 0  Tesla T4    16 GB   42°C    11.4W   P8   ● online', color: T.muted },
+  { kind: 'out', text: '  GPU 1  Tesla T4    16 GB   70°C    68.0W   P0   ● online', color: T.muted },
+  { kind: 'out', text: '  GPU 2  Tesla T4    16 GB   67°C    31.2W   P0   ● online', color: T.muted },
+  { kind: 'out', text: '  GPU 3  Tesla T4    16 GB   55°C    12.6W   P8   ● online', color: T.muted },
+  { kind: 'wait', ms: 700 },
+  { kind: 'out', text: '  ━━━━━━  step 4/6  First R_θ reading', color: T.bp },
+  { kind: 'wait', ms: 500 },
+  { kind: 'out', text: '  GPU 0  R_θ=1.281 C/W  ● clean_idle           conf=1.00', color: T.bp },
+  { kind: 'out', text: '  GPU 1  R_θ=0.724 C/W  ● under_load           conf=0.99', color: T.healthy },
+  { kind: 'out', text: '  GPU 2  R_θ=1.541 C/W  ● zombie_recovery      conf=1.00', color: T.critical },
+  { kind: 'out', text: '  GPU 3  R_θ=2.104 C/W  ● child_exit_recovery  conf=0.98', color: T.caution },
+  { kind: 'wait', ms: 900 },
+  { kind: 'out', text: '  ! GPU 2 — CUDA context retained at 31W. Release stale context.', color: T.critical },
+  { kind: 'wait', ms: 2200 },
+];
+
+function TerminalDemo() {
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const inView  = useInView(wrapRef, { amount: 0.3 });
+  const [lines, setLines] = useState<{ text: string; color?: string; cmd?: boolean }[]>([]);
+  const [typing, setTyping] = useState<{ text: string; color?: string; cmd?: boolean } | null>(null);
+  const [paused, setPaused] = useState(false);
+  const cancelRef = useRef(false);
+
+  useEffect(() => {
+    if (!inView || rm()) {
+      // Reduced motion: render the script as instant output, no animation
+      if (rm()) {
+        setLines(DEMO_SCRIPT
+          .filter(l => l.kind === 'cmd' || l.kind === 'out')
+          .map(l => l.kind === 'cmd'
+            ? { text: (l as { text: string }).text, cmd: true }
+            : { text: (l as { text: string; color?: string }).text, color: (l as { color?: string }).color }
+          ));
+      }
+      return;
+    }
+
+    cancelRef.current = false;
+
+    async function run() {
+      while (!cancelRef.current) {
+        setLines([]);
+        setTyping(null);
+
+        for (const step of DEMO_SCRIPT) {
+          if (cancelRef.current) return;
+
+          // Wait while paused
+          while (paused && !cancelRef.current) await sleep(120);
+
+          if (step.kind === 'clear') {
+            setLines([]);
+            continue;
+          }
+          if (step.kind === 'wait') {
+            await sleep(step.ms);
+            continue;
+          }
+          if (step.kind === 'cmd') {
+            // Typewriter
+            const full = step.text;
+            for (let i = 1; i <= full.length; i++) {
+              if (cancelRef.current) return;
+              setTyping({ text: full.slice(0, i), cmd: true });
+              // Variable speed for natural feel
+              const ch     = full[i - 1];
+              const jitter = ch === ' ' ? 25 : ch === '-' ? 55 : 32 + Math.random() * 38;
+              await sleep(jitter);
+            }
+            await sleep(280);
+            setLines(prev => [...prev, { text: full, cmd: true }]);
+            setTyping(null);
+            continue;
+          }
+          if (step.kind === 'out') {
+            setLines(prev => [...prev, { text: step.text, color: step.color }]);
+            await sleep(70);
+            continue;
+          }
+        }
+
+        // Idle pause then loop
+        await sleep(2000);
+      }
+    }
+
+    run();
+    return () => { cancelRef.current = true; };
+  }, [inView, paused]);
+
+  return (
+    <section style={{ borderTop: `1px solid ${T.border}`, position: 'relative' }}>
+      <div className="tos-grid-bg" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.35 }} />
+      <div ref={wrapRef} style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '88px 32px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 72, alignItems: 'center' }} className="tos-two-col">
+          <div>
+            <SectionHead eyebrow="See it run" title={<>90 seconds from<br />pip install to first<br />R_θ reading.</>}
+              body={<>The setup wizard walks you through GPU detection, virtual ambient locking, and first classification — all from your terminal. Run <span style={{ fontFamily: FM, color: T.text }}>thermalos setup</span> after install.</>} />
+            <div style={{ marginTop: 28, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <a href="https://pypi.org/project/thermalos/" target="_blank" rel="noreferrer"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '9px 16px', borderRadius: 4, border: `1px solid ${T.borderHi}`, background: T.s1, color: T.text, fontFamily: FD, fontSize: 13, fontWeight: 500, textDecoration: 'none', transition: 'border-color .15s' }}
+                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.borderColor = T.healthy)}
+                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.borderColor = T.borderHi)}>
+                <Pulse />&nbsp;view on PyPI
+              </a>
+              <a href="https://github.com/Asomisetty27/thermalos#quick-start" target="_blank" rel="noreferrer"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '9px 16px', borderRadius: 4, border: `1px solid ${T.border}`, background: 'transparent', color: T.muted, fontFamily: FD, fontSize: 13, fontWeight: 500, textDecoration: 'none', transition: 'color .15s, border-color .15s' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = T.borderHi; (e.currentTarget as HTMLAnchorElement).style.color = T.text; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = T.border; (e.currentTarget as HTMLAnchorElement).style.color = T.muted; }}>
+                docs <ChevronRight />
+              </a>
+            </div>
+          </div>
+
+          {/* Terminal window */}
+          <div
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+            style={{
+              borderRadius: 8,
+              border: `1px solid ${T.border}`,
+              background: '#08080C',
+              boxShadow: '0 24px 60px -20px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.02)',
+              overflow: 'hidden',
+              fontFamily: FM,
+              fontSize: 12.5,
+              lineHeight: 1.7,
+            }}
+          >
+            {/* Window chrome */}
+            <div style={{
+              display: 'flex', alignItems: 'center',
+              padding: '10px 14px',
+              borderBottom: `1px solid ${T.border}`,
+              background: '#0E0E14',
+              gap: 8,
+            }}>
+              <span style={{ width: 11, height: 11, borderRadius: '50%', background: '#E1554F', border: '0.5px solid rgba(0,0,0,0.3)' }} />
+              <span style={{ width: 11, height: 11, borderRadius: '50%', background: '#E1A446', border: '0.5px solid rgba(0,0,0,0.3)' }} />
+              <span style={{ width: 11, height: 11, borderRadius: '50%', background: '#56C156', border: '0.5px solid rgba(0,0,0,0.3)' }} />
+              <span style={{ flex: 1, textAlign: 'center', fontFamily: FM, fontSize: 10.5, color: T.faint, letterSpacing: '.04em' }}>
+                amogh@thermalos · zsh — 84×26
+              </span>
+              <span style={{ fontFamily: FM, fontSize: 9.5, color: paused ? T.caution : T.healthy, letterSpacing: '.1em' }}>
+                {paused ? 'PAUSED' : '● REC'}
+              </span>
+            </div>
+
+            {/* Terminal body */}
+            <div style={{
+              padding: '18px 22px 22px',
+              minHeight: 380,
+              maxHeight: 440,
+              overflow: 'hidden',
+              position: 'relative',
+              background: 'linear-gradient(180deg, #08080C 0%, #0A0A0F 100%)',
+            }}>
+              {/* CRT scanline texture — extremely subtle */}
+              <div className="tos-scanline" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.08 }} />
+
+              {lines.map((l, i) => (
+                <div key={i} style={{
+                  whiteSpace: 'pre',
+                  color: l.cmd ? T.text : (l.color || T.muted),
+                  fontFamily: FM,
+                  fontSize: 12.5,
+                  letterSpacing: '0.005em',
+                }}>
+                  {l.cmd && <span style={{ color: T.healthy, marginRight: 8, userSelect: 'none' }}>$</span>}
+                  {l.text}
+                </div>
+              ))}
+              {typing && (
+                <div style={{
+                  whiteSpace: 'pre',
+                  color: T.text,
+                  fontFamily: FM,
+                  fontSize: 12.5,
+                  letterSpacing: '0.005em',
+                }}>
+                  <span style={{ color: T.healthy, marginRight: 8, userSelect: 'none' }}>$</span>
+                  {typing.text}
+                  <span className="tos-caret" style={{
+                    display: 'inline-block', width: 7, height: 13, background: T.healthy,
+                    marginLeft: 1, verticalAlign: 'text-top', marginTop: 2,
+                  }} />
+                </div>
+              )}
+              {!typing && lines.length === DEMO_SCRIPT.filter(l => l.kind === 'cmd' || l.kind === 'out').length && (
+                <div style={{ color: T.healthy, marginTop: 8 }}>
+                  <span style={{ color: T.healthy, marginRight: 8, userSelect: 'none' }}>$</span>
+                  <span className="tos-caret" style={{ display: 'inline-block', width: 7, height: 13, background: T.healthy, verticalAlign: 'text-top', marginTop: 2 }} />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(r => setTimeout(r, ms));
+}
+
 /* ─── Root ────────────────────────────────────────────────────────────────── */
 export default function ThermalOSLanding() {
   return (
@@ -1121,6 +1371,7 @@ export default function ThermalOSLanding() {
       <style>{STYLES}</style>
       <Nav />
       <Hero />
+      <TerminalDemo />
       <Signal />
       <Evidence />
       <FeaturesGrid />
