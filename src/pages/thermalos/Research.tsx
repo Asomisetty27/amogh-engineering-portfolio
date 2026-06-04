@@ -35,28 +35,28 @@ const STAGE_2_QUESTIONS = [
 
 const STAGE_1_FINDINGS = [
   {
-    title: "Rθ_eff captures thermal history utilization cannot",
-    body: "R_theta cleanly separates GPU states: clean idle ~1.28 C/W, under load ~0.72 C/W, post-load recovery (same-process) ~1.54 C/W, child-exit recovery ~2.04-2.29 C/W. Recovery R_theta exceeds clean idle because junction temperature lags the power drop. Idle vs load differ by ~77.9%. This thermal history is invisible to utilization and power alone.",
+    title: "Rθ_eff captures thermal memory directly observable across 7 trials",
+    body: "E004 v1 rerun (2026-06-03) produced the cleanest demonstration of thermal memory possible: trials 1–2 started at 39–43°C → load R_theta ≈ 0.43, recovery ≈ 2.5. Trials 3–7 started at 48–49°C → load R_theta ≈ 0.59, recovery ≈ 3.1. Same workload, same hardware, ~35% R_theta delta from starting temperature alone. Utilization and raw power miss this entirely. v2 protocol (T_GPU < 35°C thermal gate) will replicate under controlled conditions.",
   },
   {
     title: "Same-process termination leaves GPU in P0",
-    body: "After killing a load process in-place, the GPU stayed at P-state P0 (~30-31W, ~74°C) for the full 10-minute observation window, never returning to clean idle. The CUDA context held by the still-alive notebook process prevented recovery.",
+    body: "After killing a load process in-place (E002), the GPU stayed at P-state P0 (~30–31W, ~74°C) for the full 10-minute observation window, never returning to clean idle. The CUDA context held by the still-alive notebook process prevented recovery. R_theta during this zombie state ~1.54 C/W vs ~1.28 C/W clean idle — invisible to utilization monitoring (both show 0%).",
   },
   {
-    title: "Child-process exit recovers cleanly",
-    body: "Child-process exit releases the CUDA context automatically. GPU returned to clean idle in ~141s (E003). The asymmetry between same-process and child-process termination is sharp and invisible to utilization-only monitoring.",
+    title: "Child-process exit recovers cleanly · P-state to P8 in 5–6s",
+    body: "Across all 7 E004 trials, P-state recovered to P8 in 5.1–6.1 seconds regardless of starting temperature — the cleanest recovery metric available. Temperature recovery scales with starting temp: cool start reaches T<55°C in 45s, warm start needs 116–160s. The asymmetry between same-process zombie and clean child-exit recovery is sharp and reproducible.",
   },
   {
-    title: "~447MB NVML memory is CUDA context overhead, not noise",
-    body: "The ~447MB baseline memory reading with no running process is consistent and stable across all idle and recovery phases, jumping to ~840MB under load. It is a clean binary state indicator — context loaded vs not loaded. Resolved.",
+    title: "Reproducibility holds within thermal regime (F5 conditional)",
+    body: "Within thermally-consistent trials (E004 trials 3–7, all starting at 48–49°C), cross-trial CV is 2.0% — matching the original ~1.68% claim. Across mixed thermal regimes, CV is 14%. The 14% is not measurement noise — it is the F1 thermal-memory signature. Methodology lesson: reproducibility claims must condition on starting thermal state.",
   },
   {
-    title: "Rθ_eff is fragile at low power loads",
-    body: "A 5°C ambient error causes a 35.3% R_theta swing at idle (~11W) but only 10.2% at load (~68W). The metric is least reliable exactly where power is lowest. Stage 2 hardware with ambient sensors addresses this directly.",
+    title: "Classifier achieves 100% with steady-state filter",
+    body: "Naive Bayes (Gaussian) on raw 3,880-sample dataset: 87.0% accuracy. With a 15-second steady-state window (σ(R_theta) < 0.05 C/W): 99.9%. Random Forest: 100%. Steady-state filtering is the single highest-leverage preprocessing step — Kundu's hypothesis validated. Four classes: clean_idle, under_load, zombie_recovery, child_exit_recovery. Naive Bayes is preferred for publication (interpretable, model equation extractable).",
   },
   {
-    title: "Power smoothing is a null result",
-    body: "Rolling average and median filter barely change R_theta variance (3.5% max improvement). The dominant error source is the ambient temperature assumption, not power noise. Filtering adds complexity without addressing root cause.",
+    title: "Rθ_eff fragility at low power: quantified sensitivity",
+    body: "dR_theta/dT_amb = -1/P. At idle (~11W): 7.1% R_theta error per °C ambient error, 120% swing across realistic 18–35°C room range. At load (~68W): 2.0% per °C, 34.8% swing. Idle is 3.5× more sensitive than load. Publication framing options: (A) claim validity ≥30W only, or (B) present R_theta as a function of T_amb with confidence bands. Sensitivity analysis approach is Kundu-vetted.",
   },
 ];
 
@@ -111,37 +111,67 @@ function ClassificationTab() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <SectionLabel>Rule-based vs probabilistic state classification</SectionLabel>
+        <SectionLabel>Probabilistic state classifier — fitted on Stage 1 data</SectionLabel>
         <Card className="p-5">
           <p className="text-[13px] text-[#a8a89f] leading-relaxed mb-3">
-            GPU thermal state (idle / ramp / load) must be inferred from telemetry to anchor Rθ_eff baselines. A rule-based classifier using hard thresholds fails during state transitions.
+            GPU thermal state must be inferred from telemetry to anchor Rθ_eff baselines. Following Kundu&apos;s direction, we replaced rule-based thresholds with a probabilistic classifier and compared Naive Bayes against Random Forest on the 3,880-sample expanded dataset.
           </p>
           <div className="bg-[#0D0D0B] border border-white/[0.1] rounded p-4 mb-3">
-            <div className="font-mono text-[11px] text-[#9FE1CB] mb-2">Stage 1 rule-based classifier (F004)</div>
+            <div className="font-mono text-[11px] text-[#9FE1CB] mb-2">5-fold CV accuracy · 4 classes</div>
             <ul className="space-y-1.5 text-[12px] text-[#a8a89f]">
-              <li>• Rules: util &lt; 5%, power &lt; 15W, temp &lt; 55°C (all idle)</li>
-              <li>• Stable state accuracy: 100% (idle and load endpoints)</li>
-              <li>• Transitional phase accuracy: 2–53% (47–98% misclassified)</li>
-              <li>• Error mode: false positives in temp ramp (classified as load when still ramping)</li>
+              <li>• Naive Bayes (Gaussian) · raw: <span className="text-[#9FE1CB]">87.0% ± 1.2%</span></li>
+              <li>• Naive Bayes (Gaussian) · w/ 15s steady-state filter: <span className="text-[#9FE1CB]">99.9% ± 0.1%</span></li>
+              <li>• Random Forest · raw: 99.3% ± 0.2%</li>
+              <li>• Random Forest · w/ steady-state filter: <span className="text-[#9FE1CB]">100.0% ± 0.0%</span></li>
             </ul>
           </div>
-          <p className="text-[13px] text-[#a8a89f] leading-relaxed mt-3">
-            Solution: Bayesian classifier (Naive Bayes or Random Forest via Orange Data Mining) assigns probabilities rather than hard states. Outputs a model equation (not a black box), enabling audit trails for critical infrastructure decisions.
+          <p className="text-[12px] text-[#888780] leading-relaxed">
+            Classes: clean_idle · under_load · zombie_recovery · child_exit_recovery. Features: R_theta, power, util, P-state. Steady-state window (Kundu hypothesis) is the single highest-leverage preprocessing step — Naive Bayes gains 13 points of accuracy from it alone.
           </p>
         </Card>
       </div>
 
       <div>
-        <SectionLabel>Next step — Stage 2 validation</SectionLabel>
+        <SectionLabel>Naive Bayes model equation (class-conditional means)</SectionLabel>
         <Card className="p-5">
           <p className="text-[12px] text-[#a8a89f] leading-relaxed mb-3">
-            Probabilistic classifier requires training on labeled data from dedicated hardware (Stage 2). Current plan:
+            Naive Bayes is preferred for publication: the model is an equation, not a black box. Each class has a Gaussian conditional density per feature. Decision: argmax over classes of P(class) × ∏ P(feature | class).
           </p>
+          <div className="bg-[#0D0D0B] border border-white/[0.1] rounded p-4 mb-3">
+            <div className="font-mono text-[11px] text-[#9FE1CB] mb-2">μ ± σ per class</div>
+            <table className="text-[11px] font-mono text-[#a8a89f] w-full">
+              <thead>
+                <tr className="text-[#9FE1CB]">
+                  <th className="text-left pr-3">Class</th>
+                  <th className="text-right pr-3">Rθ (C/W)</th>
+                  <th className="text-right pr-3">Power (W)</th>
+                  <th className="text-right pr-3">Util (%)</th>
+                  <th className="text-right">P-state</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td className="pr-3">clean_idle</td><td className="text-right pr-3">1.28 ± 0.21</td><td className="text-right pr-3">11.4 ± 2.0</td><td className="text-right pr-3">0.0</td><td className="text-right">P8</td></tr>
+                <tr><td className="pr-3">under_load</td><td className="text-right pr-3">0.80 ± 0.37</td><td className="text-right pr-3">66.3 ± 8.2</td><td className="text-right pr-3">96.9</td><td className="text-right">P0</td></tr>
+                <tr><td className="pr-3">zombie_recovery</td><td className="text-right pr-3">1.54 ± 0.05</td><td className="text-right pr-3">31.6 ± 0.7</td><td className="text-right pr-3">0.1</td><td className="text-right">P0</td></tr>
+                <tr><td className="pr-3">child_exit_recovery</td><td className="text-right pr-3">2.04 ± 0.46</td><td className="text-right pr-3">12.6 ± 1.2</td><td className="text-right pr-3">0.0</td><td className="text-right">~P8</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="text-[12px] text-[#888780] leading-relaxed">
+            zombie_recovery is the tightest distribution (σ = 0.05 C/W) — the CUDA-context-retained state is remarkably consistent. child_exit_recovery is the noisiest (σ = 0.46) as expected for a thermal transient.
+          </p>
+        </Card>
+      </div>
+
+      <div>
+        <SectionLabel>Next — Stage 2 validation on DGX B200</SectionLabel>
+        <Card className="p-5">
           <ol className="space-y-1.5 text-[12px] text-[#a8a89f]">
-            <li><span className="text-[#9FE1CB]">1. Power-cap sweep (E005–E008)</span> — 6 power levels on Stage 2 hardware, measure state transitions in controlled conditions</li>
-            <li><span className="text-[#9FE1CB]">2. Label transitions</span> — hand-label each transition phase (idle → ramp → load → ramp → idle)</li>
-            <li><span className="text-[#9FE1CB]">3. Train classifier</span> — fit Bayesian model, evaluate on held-out test set</li>
-            <li><span className="text-[#9FE1CB]">4. Deploy</span> — use trained model on live telemetry for anomaly detection</li>
+            <li><span className="text-[#9FE1CB]">1. v2 thermal-gate rerun</span> — confirm F1 disappears under controlled T_GPU &lt; 35°C starts</li>
+            <li><span className="text-[#9FE1CB]">2. Power-cap sweep (E005–E008)</span> — 6 power levels on DGX B200, measured ambient</li>
+            <li><span className="text-[#9FE1CB]">3. Refit classifier</span> — confirm 100% accuracy transfers to new hardware</li>
+            <li><span className="text-[#9FE1CB]">4. Lead-time testbed (E-LT)</span> — Sam returns Fall 2026, simulate cooling degradation</li>
+            <li><span className="text-[#9FE1CB]">5. Conference submission</span> — Naive Bayes equation + sensitivity bands + thermal-memory demo</li>
           </ol>
         </Card>
       </div>
@@ -175,7 +205,7 @@ function MethodologyTab() {
 
       {/* Stage 1 findings */}
       <div>
-        <SectionLabel>Stage 1 findings — Tesla T4 / Colab / 2,280+ rows</SectionLabel>
+        <SectionLabel>Stage 1 findings — Tesla T4 / Colab / 4,570 rows / 9 child-exit trials</SectionLabel>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {STAGE_1_FINDINGS.map((f) => (
             <Card key={f.title} className="p-4">

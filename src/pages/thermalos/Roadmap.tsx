@@ -15,7 +15,7 @@ const STAGES: Stage[] = [
   {
     id: 1,
     title: "Colab baseline",
-    subtitle: "Tesla T4 · 2,280+ rows · E001-E003 complete · E004 replication pending",
+    subtitle: "Tesla T4 · 4,570 rows · E001–E004 complete · 9 child-exit trials · F1 thermal-memory validated",
     status: "complete",
     progress: 100,
   },

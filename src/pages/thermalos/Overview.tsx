@@ -74,7 +74,7 @@ function Hero({ rowCount, demo, syncedAt }: { rowCount: number; demo: boolean; s
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <Pill tone="complete">YC W27 target</Pill>
         <Pill tone="progress">Pre-seed · Pre-revenue</Pill>
-        <Pill tone="complete">Stage 1 complete · 2,280+ rows</Pill>
+        <Pill tone="complete">Stage 1 complete · 4,570 rows · 9 trials</Pill>
         {syncedAt && (
           <span className="text-[10px] font-mono" style={{ color: "var(--t-faint)" }}>synced {syncedAt}</span>
         )}
@@ -115,10 +115,12 @@ function HeadlineFinding() {
             Utilization alone does not define thermal state.
           </div>
           <p className="text-[13px] leading-relaxed" style={{ color: "var(--t-muted)" }}>
-            Across 2,280+ telemetry rows on a Tesla T4 under controlled load, we observed{" "}
+            Across 4,570 telemetry rows and 9 child-exit trials on a Tesla T4, we observed{" "}
             <span className="font-semibold" style={{ color: "var(--t-healthy)" }}>three distinct power regimes at 0% utilization</span>
             {" "}— a signal current monitoring tools collapse into a single &ldquo;idle&rdquo; state. The
-            invisible regime gap is where silent throttling and cooling-path degradation live.
+            invisible regime gap is where silent throttling and cooling-path degradation live. Same workload,
+            same hardware, different starting temperature: R_theta shifts by 35% — direct evidence of
+            thermal memory that utilization-based monitoring cannot detect.
           </p>
         </div>
       </div>
@@ -762,7 +764,7 @@ export default function Overview() {
   });
 
   const demo = isError && isDemoModeError(error);
-  const rowCount = demo ? 2280 : data?.length ?? 0;
+  const rowCount = demo ? 4570 : data?.length ?? 0;
   const summary = (summaryIsErr && isDemoModeError(summaryErr)) || !summaryData
     ? generateDemoWikiSummary()
     : summaryData;
