@@ -201,7 +201,7 @@ export function Hero() {
             className="t-body mb-10 max-w-md"
             style={{ color: 'var(--t-muted)', fontSize: 16, lineHeight: 1.6 }}
           >
-            Temperature alone is ambiguous — a hot GPU is either busy or failing. Isotherm
+            Temperature alone is ambiguous — a hot GPU is either busy or failing. ThermalOS
             computes <span className="t-font-mono" style={{ color: 'var(--t-text)' }}>R<sub>θ</sub> = ΔT / P</span> in real time
             from your existing DCGM telemetry. That ratio is the only signal that separates the two,
             and no incumbent ships it.
@@ -213,7 +213,7 @@ export function Hero() {
           <div className="mb-12 flex flex-wrap gap-3">
             <a
               data-anim="cta"
-              href="mailto:asomisetty27@gmail.com?subject=Isotherm early access"
+              href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access"
               className="inline-flex items-center gap-2 rounded-[5px] px-5 py-2.5 t-font-display text-[14px] font-medium transition-all"
               style={{ background: 'var(--t-healthy)', color: '#06150C' }}
               onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.08)')}
@@ -266,7 +266,7 @@ export function Hero() {
         <div data-anim="blueprint-card" className="flex items-center">
           <CalloutBox
             className="w-full"
-            label="ISOTHERM / FLEET-VIEW / LIVE"
+            label="THERMALOS / FLEET-VIEW / LIVE"
             rightLabel={
               <div className="flex items-center gap-2">
                 <motion.span

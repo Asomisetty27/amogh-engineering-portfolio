@@ -1,4 +1,4 @@
-// Isotherm — Landing page.
+// ThermalOS — Landing page.
 // Faithful React port of the Claude Design bundle landing UI kit
 // (project/ui_kits/landing/index.html). Self-contained: tokens, primitives,
 // and sections all live in this file. No anime.js / framer-motion — the kit
@@ -10,6 +10,7 @@
 import * as React from 'react';
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { FLEET_BASE, researchPath } from './config';
 
 /* ── Tokens ── */
 const HEX = {
@@ -224,7 +225,7 @@ function Nav() {
       <div style={{ maxWidth: 1240, margin: '0 auto', display: 'flex', alignItems: 'center', height: 56, padding: '0 32px', gap: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
           <IsothermMark size={18} />
-          <span style={{ fontFamily: FD, fontSize: 14, fontWeight: 500, letterSpacing: '-.01em' }}>isotherm</span>
+          <span style={{ fontFamily: FD, fontSize: 14, fontWeight: 500, letterSpacing: '-.01em' }}>thermalos</span>
           <span className="iso-mono-xs" style={{ color: HEX.bp, background: 'rgba(110,145,200,.08)', border: `1px solid rgba(110,145,200,.2)`, borderRadius: 3, padding: '2px 6px' }}>v0 · beta</span>
         </div>
         <div className="iso-nav-links" style={{ display: 'flex', gap: 28 }}>
@@ -237,7 +238,7 @@ function Nav() {
             className="iso-mono-sm iso-ghost-link" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 4, border: `1px solid ${HEX.border}`, color: HEX.muted }}>
             <GithubIcon s={13} /> github
           </a>
-          <a href="mailto:asomisetty27@gmail.com?subject=Isotherm early access"
+          <a href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access"
             className="iso-mono-sm iso-cta" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 4, background: HEX.healthy, color: '#06150C', fontWeight: 500 }}>
             early access <ArrowRight s={11} />
           </a>
@@ -277,7 +278,7 @@ function FleetPreview() {
   const healthy = GPU_NODES.filter((g) => g.s === 'healthy').length;
   const anomalies = GPU_NODES.filter((g) => g.s === 'critical').length;
   return (
-    <CalloutBox label="ISOTHERM / FLEET-VIEW / LIVE" tone="info" rightLabel={
+    <CalloutBox label="THERMALOS / FLEET-VIEW / LIVE" tone="info" rightLabel={
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <span className="iso-blip" style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: HEX.healthy }} />
         <span className="iso-mono-xs" style={{ color: HEX.healthy, fontWeight: 500 }}>MONITORING</span>
@@ -302,7 +303,7 @@ function FleetPreview() {
           ))}
         </div>
         <div style={{ borderTop: `1px solid ${HEX.border}`, marginTop: 8, paddingTop: 10 }}>
-          <Link to="/isotherm/fleet" className="iso-mono-sm iso-fleet-link" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: HEX.muted }}>
+          <Link to={FLEET_BASE} className="iso-mono-sm iso-fleet-link" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: HEX.muted }}>
             open live fleet dashboard <ChevronRight s={11} />
           </Link>
         </div>
@@ -333,12 +334,12 @@ function Hero() {
             Know <span style={{ color: HEX.healthy }}>why</span><br />your GPU is hot.
           </h1>
           <p style={{ fontFamily: FD, fontSize: 16, lineHeight: 1.6, color: HEX.muted, maxWidth: 440, marginBottom: 40 }}>
-            Temperature alone is ambiguous — a hot GPU is either busy or failing. Isotherm computes{' '}
+            Temperature alone is ambiguous — a hot GPU is either busy or failing. ThermalOS computes{' '}
             <span style={{ fontFamily: FM, color: HEX.text }}>R<sub>θ</sub> = ΔT / P</span>{' '}
             in real time from your existing DCGM telemetry. That ratio is the only signal that separates the two.
           </p>
           <div style={{ display: 'flex', gap: 12, marginBottom: 48, flexWrap: 'wrap' }}>
-            <a href="mailto:asomisetty27@gmail.com?subject=Isotherm early access"
+            <a href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access"
               className="iso-cta"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 5, background: HEX.healthy, color: '#06150C', fontFamily: FD, fontSize: 14, fontWeight: 500 }}>
               Get early access <ArrowRight />
@@ -510,7 +511,7 @@ function Bento() {
               T_reference derived from the GPU&apos;s own idle windows. No thermocouples, no rack mods, no MAX31856 deployment. Works on any cloud or on-prem fleet from day zero.
             </BentoBody>
             <CodeBlock lines={[
-              { p: '>', t: 'isotherm baseline --gpu 0' },
+              { p: '>', t: 'thermalos baseline --gpu 0' },
               { p: '·', t: 'sampling idle window… 10.0s' },
               { p: '·', t: 'T_ref locked @ 41.2 °C  σ=0.18' },
               { p: '✓', t: 'no thermocouple required', tone: 'healthy' },
@@ -539,7 +540,7 @@ function Bento() {
           </BentoCard>
           <BentoCard span={2} index="05" title="OSS agent — free single-node, forever" tone="healthy">
             <BentoBody>
-              <span style={{ fontFamily: FM, color: HEX.text }}>pip install isotherm</span>. 60 seconds to first R<sub>θ</sub> reading. Fleet dashboard + alerting as paid tier — same motion Grafana used to $400M ARR.
+              <span style={{ fontFamily: FM, color: HEX.text }}>pip install thermalos</span>. 60 seconds to first R<sub>θ</sub> reading. Fleet dashboard + alerting as paid tier — same motion Grafana used to $400M ARR.
             </BentoBody>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {['Free · single node · live readout', 'Paid · fleet dashboard, alerts', 'Paid · cross-node correlation'].map((f, i) => (
@@ -558,7 +559,7 @@ function Bento() {
 
 /* ── Gap / Competitor table ── */
 type MarkKind = 'yes' | 'no' | 'partial';
-const CMP_COLS = ['DCGM', 'Mission Control', 'Phaidra', 'In-house', 'Isotherm'];
+const CMP_COLS = ['DCGM', 'Mission Control', 'Phaidra', 'In-house', 'ThermalOS'];
 const CMP_ROWS: { cap: string; cells: MarkKind[] }[] = [
   { cap: 'Exposes T_junction + P_GPU', cells: ['yes', 'yes', 'partial', 'partial', 'yes'] },
   { cap: 'Computes R_θ (ΔT / P) metric', cells: ['no', 'no', 'no', 'no', 'yes'] },
@@ -698,7 +699,7 @@ function Pricing() {
                   </div>
                 ))}
               </div>
-              <a href="mailto:asomisetty27@gmail.com?subject=Isotherm early access" className="iso-cta"
+              <a href="mailto:asomisetty27@gmail.com?subject=ThermalOS early access" className="iso-cta"
                 style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 11, borderRadius: 5, background: HEX.healthy, color: '#06150C', fontFamily: FD, fontSize: 14, fontWeight: 500 }}>
                 Get early access <ArrowRight />
               </a>
@@ -712,8 +713,8 @@ function Pricing() {
 
 /* ── Footer ── */
 const FOOTER_COLS = [
-  { t: 'product', ls: [{ l: 'overview', h: '#hero' }, { l: 'github', h: 'https://github.com/asomisetty/thermalos' }, { l: 'live fleet demo', h: '/isotherm/fleet', internal: true }, { l: 'changelog', h: '#' }] },
-  { t: 'research', ls: [{ l: 'stage 1 findings', h: '/thermalos/findings', internal: true }, { l: 'R_θ metric', h: '#signal' }, { l: 'lead-time testbed', h: '/thermalos/lab', internal: true }, { l: 'publication', h: '/thermalos/publication', internal: true }] },
+  { t: 'product', ls: [{ l: 'overview', h: '#hero' }, { l: 'github', h: 'https://github.com/asomisetty/thermalos' }, { l: 'live fleet demo', h: FLEET_BASE, internal: true }, { l: 'changelog', h: '#' }] },
+  { t: 'research', ls: [{ l: 'stage 1 findings', h: researchPath('findings'), internal: true }, { l: 'R_θ metric', h: '#signal' }, { l: 'lead-time testbed', h: researchPath('lab'), internal: true }, { l: 'publication', h: researchPath('publication'), internal: true }] },
   { t: 'company', ls: [{ l: 'about', h: '#' }, { l: 'contact', h: 'mailto:asomisetty27@gmail.com' }, { l: 'privacy', h: '#' }, { l: 'license · MIT', h: '#' }] },
 ];
 
@@ -725,7 +726,7 @@ function Footer() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <IsothermMark size={16} />
-              <span style={{ fontFamily: FD, fontSize: 14, fontWeight: 500 }}>isotherm</span>
+              <span style={{ fontFamily: FD, fontSize: 14, fontWeight: 500 }}>thermalos</span>
             </div>
             <p style={{ fontFamily: FM, fontSize: 11, color: HEX.faint, lineHeight: 1.7, marginBottom: 20 }}>GPU thermal-power forensics.<br />Built at Cal Poly · MIT License.</p>
             <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', border: `1px solid ${HEX.border}`, borderRadius: 4, overflow: 'hidden', maxWidth: 280 }}>
@@ -752,7 +753,7 @@ function Footer() {
           ))}
         </div>
         <div style={{ borderTop: `1px solid ${HEX.border}`, marginTop: 48, paddingTop: 20, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <span className="iso-mono-xs" style={{ color: HEX.faint }}>© 2026 Isotherm · built on the open-source thermalos engine · MIT License</span>
+          <span className="iso-mono-xs" style={{ color: HEX.faint }}>© 2026 ThermalOS · open-source agent · MIT License</span>
           <span className="iso-mono-xs" style={{ color: HEX.faint }}>R_θ = ΔT / P  —  the one ratio nobody else ships.</span>
         </div>
       </div>
@@ -810,7 +811,7 @@ const STYLES = `
 }
 `;
 
-export default function IsothermLanding() {
+export default function ThermalOSLanding() {
   return (
     <main className="iso-root">
       <style>{STYLES}</style>

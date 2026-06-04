@@ -6,6 +6,7 @@ import { animate, stagger } from 'animejs';
 import { IsothermMark } from './primitives';
 import { DUR, STAGGER, EASE_OUT_EXPO } from './motion';
 import { useAnimeOnView } from './useAnimeOnView';
+import { researchPath } from '../config';
 
 const COLS = [
   {
@@ -13,17 +14,17 @@ const COLS = [
     links: [
       { l: 'overview', href: '#' },
       { l: 'github',   href: 'https://github.com/asomisetty/thermalos' },
-      { l: 'docs',     href: '#' },
+      { l: 'docs',     href: researchPath('findings') },
       { l: 'changelog', href: '#' },
     ],
   },
   {
     title: 'research',
     links: [
-      { l: 'stage 1 findings', href: '#' },
+      { l: 'stage 1 findings', href: researchPath('findings') },
       { l: 'R_θ metric',       href: '#signal' },
-      { l: 'lead-time testbed', href: '#' },
-      { l: 'publication',      href: '#' },
+      { l: 'lead-time testbed', href: researchPath('lab') },
+      { l: 'publication',      href: researchPath('publication') },
     ],
   },
   {
@@ -84,7 +85,7 @@ export function Footer() {
                 className="t-font-display text-[14px] font-medium"
                 style={{ color: 'var(--t-text)' }}
               >
-                isotherm
+                thermalos
               </span>
             </div>
             <p
@@ -165,7 +166,7 @@ export function Footer() {
           style={{ borderColor: 'var(--t-border)' }}
         >
           <div className="t-mono-xs" style={{ color: 'var(--t-faint)' }}>
-            © 2026 Isotherm · built on the open-source thermalos engine · MIT License
+            © 2026 ThermalOS · open-source agent · MIT License
           </div>
           <div className="t-mono-xs" style={{ color: 'var(--t-faint)' }}>
             R_θ = ΔT / P  —  the one ratio nobody else ships.

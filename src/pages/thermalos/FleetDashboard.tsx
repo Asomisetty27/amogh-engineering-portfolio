@@ -126,12 +126,12 @@ function Topbar() {
       background: 'rgba(10,14,20,.88)', borderBottom: `1px solid ${C.tborder}`, backdropFilter: 'blur(12px)', flexShrink: 0,
     }}>
       <Link to={sitePath()} className="mono" style={{ fontSize: 11, color: C.faint, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-        <ArrowLeft size={12} /> isotherm
+        <ArrowLeft size={12} /> thermalos
       </Link>
       <span style={{ width: 1, height: 18, background: C.tborder }} />
       <IsothermMark size={20} />
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-        <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 16, fontWeight: 600, letterSpacing: '-.02em' }}>isotherm</span>
+        <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 16, fontWeight: 600, letterSpacing: '-.02em' }}>thermalos</span>
         <span className="mono" style={{ fontSize: 10, color: C.healthy }}>/ fleet</span>
       </div>
       <div style={{ flex: 1 }} />
@@ -335,7 +335,7 @@ function TelemetryView() {
           ))}
         </Card>
         <div style={{ background: C.s1, border: `1px solid rgba(255,255,255,.07)`, borderLeft: `3px solid ${C.stable}`, borderRadius: 8, padding: 14 }}>
-          <div className="mono" style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.15em', color: C.healthy, marginBottom: 8 }}>Isotherm Recommendation</div>
+          <div className="mono" style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.15em', color: C.healthy, marginBottom: 8 }}>ThermalOS Recommendation</div>
           <p className="mono" style={{ fontSize: 11, color: '#E6F7F1', lineHeight: 1.65 }}>Thermal resistance elevated at 2.1000 °C/W. Cooling path degrading — verify TIM and mounting pressure on G-03-B.</p>
           <div className="mono" style={{ marginTop: 10, padding: '8px 10px', background: 'rgba(10,10,8,.8)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 4, fontSize: 10, color: '#9FE1CB', lineHeight: 1.8 }}>
             <div>Rθ_eff(t) = 2.1000 °C/W</div>
@@ -417,7 +417,7 @@ export default function FleetDashboard() {
           </div>
           {content}
           <div className="mono" style={{ marginTop: 32, paddingTop: 14, borderTop: `1px solid ${C.tborder}`, fontSize: 9, textAlign: 'center', color: C.faint }}>
-            Isotherm · fleet dashboard · Amogh (EE · Cal Poly) + Sam (ME · Cal Poly) · YC W27
+            ThermalOS · fleet dashboard · Amogh (EE · Cal Poly) + Sam (ME · Cal Poly) · YC W27
           </div>
         </main>
       </div>

@@ -1,30 +1,29 @@
-// Routing — single source of truth for the two INDEPENDENT brands.
+// Routing — single source of truth for the ThermalOS surfaces.
 //
-//   ISOTHERM  — the startup / company. Customer-facing product.
-//     /isotherm          -> Landing (marketing)
-//     /isotherm/fleet    -> Fleet Dashboard (the product)
+//   THERMALOS PUBLIC — customer-facing product surface.
+//     /thermalos          -> Landing (marketing)
+//     /thermalos/fleet    -> Fleet Dashboard (product demo)
 //
-//   THERMALOS — the research & academic project. The science.
-//     /thermalos          -> research hub (Overview)
-//     /thermalos/<page>   -> findings, lab, advisor, publication, yc, roadmap…
+//   THERMALOS APP — research/admin/advisor workspace.
+//     /thermalos/app          -> research hub (Overview)
+//     /thermalos/app/<page>   -> findings, lab, advisor, publication, yc, roadmap…
 //
-// Two names, two faces of the same work: Isotherm sells the product, ThermalOS
-// is the research identity (papers, advisors, Stage-1 findings). Each zone has
-// its own base constant so either can move to a dedicated domain (isotherm.io /
-// thermalos.org) by editing one line. No other file hardcodes these paths.
+// Isotherm is the design-system name, not the product name shown to users.
+// Each zone has its own base constant so the public surface can move to a
+// dedicated domain later by editing one line. No other file hardcodes app paths.
 
-// ── Brand 1: ISOTHERM (startup) ──────────────────────────────────────────────
-export const SITE_BASE = '/isotherm';
-export const FLEET_BASE = '/isotherm/fleet';
+// ── Public product surface ──────────────────────────────────────────────────
+export const SITE_BASE = '/thermalos';
+export const FLEET_BASE = '/thermalos/fleet';
 
-// ── Brand 2: THERMALOS (research) ────────────────────────────────────────────
-export const RESEARCH_BASE = '/thermalos';
+// ── Research/admin workspace ────────────────────────────────────────────────
+export const RESEARCH_BASE = '/thermalos/app';
 
-/** Isotherm (startup) path, e.g. sitePath() -> '/isotherm'. */
+/** Public ThermalOS path, e.g. sitePath() -> '/thermalos'. */
 export const sitePath = (p = ''): string =>
   p ? `${SITE_BASE}/${p.replace(/^\/+/, '')}` : SITE_BASE;
 
-/** ThermalOS (research) path, e.g. researchPath('lab') -> '/thermalos/lab'. */
+/** ThermalOS app path, e.g. researchPath('lab') -> '/thermalos/app/lab'. */
 export const researchPath = (p = ''): string =>
   p ? `${RESEARCH_BASE}/${p.replace(/^\/+/, '')}` : RESEARCH_BASE;
 
@@ -36,10 +35,18 @@ export const RESEARCH_SEGMENTS = [
 
 // Redirects from superseded URLs to their new home.
 export const LEGACY_REDIRECTS: Record<string, string> = {
-  // old marketing/product URLs → Isotherm
+  // old marketing/product URLs
   '/landing': sitePath(),
-  '/thermalos/fleet': `${SITE_BASE}/fleet`,
-  // old app shell + flat methodology link → ThermalOS research hub
-  '/thermalos/app': researchPath(),
+  '/isotherm': sitePath(),
+  '/isotherm/fleet': FLEET_BASE,
+  // old flat research/app URLs → ThermalOS app hub
   '/thermalos/research': researchPath('findings'),
+  '/thermalos/findings': researchPath('findings'),
+  '/thermalos/lab': researchPath('lab'),
+  '/thermalos/roadmap': researchPath('roadmap'),
+  '/thermalos/advisor': researchPath('advisor'),
+  '/thermalos/publication': researchPath('publication'),
+  '/thermalos/yc': researchPath('yc'),
+  '/thermalos/command': researchPath('command'),
+  '/thermalos/dashboard': researchPath('dashboard'),
 };
