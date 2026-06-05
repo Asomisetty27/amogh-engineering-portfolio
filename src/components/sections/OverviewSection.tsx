@@ -42,58 +42,87 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
   return (
     <section className="max-w-4xl mx-auto">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        {/* Hero */}
-        <div className="mb-8">
-          <h1 className="font-display text-3xl md:text-4xl tracking-wider text-primary neon-text-cyan mb-2">
+        {/* Hero — gradient text fill on name, layered subtle backdrop */}
+        <div className="mb-8 relative">
+          <div className="absolute -inset-6 -z-10 pointer-events-none opacity-50"
+            style={{
+              background:
+                "radial-gradient(ellipse 60% 80% at 20% 50%, hsl(var(--primary) / 0.08), transparent)",
+            }}
+          />
+          <h1 className="font-display text-4xl md:text-5xl tracking-tight font-semibold mb-2 fx-grad-text-cyan"
+            style={{ letterSpacing: "-0.02em", lineHeight: 1.02 }}>
             {personalInfo.name}
           </h1>
           <p className="font-mono text-base md:text-lg text-foreground leading-snug max-w-2xl">
             Systems-Oriented Electrical Engineer
           </p>
           <p className="font-mono text-sm text-muted-foreground flex items-center gap-2 mt-1.5">
-            <GraduationCap size={14} className="text-primary/50" />
+            <GraduationCap size={14} className="text-primary/60" />
             {personalInfo.university}
           </p>
         </div>
 
-        {/* Value Proposition */}
-        <div className="panel-glass rounded-lg p-5 mb-8 border-l-2 border-l-primary">
-          <p className="text-sm leading-relaxed text-secondary-foreground">
+        {/* Value Proposition — glass + accent line */}
+        <div className="fx-glass rounded-lg p-5 mb-8 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-1 h-full"
+            style={{
+              background: "linear-gradient(180deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.2) 100%)",
+            }}
+          />
+          <p className="text-sm leading-relaxed text-secondary-foreground pl-1">
             I design, build, and validate integrated hardware systems — from analog signal chains and embedded control to electromechanical actuation and RF architecture. Every system on this site was debugged, tested, and documented with real evidence.
           </p>
         </div>
 
-        {/* 3 Core Strengths */}
+        {/* 3 Core Strengths — fx-card hover + top radial glow */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
           {strengths.map((s, i) => {
             const Icon = s.icon;
             return (
               <motion.div
                 key={s.title}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + i * 0.08 }}
-                className="panel-glass rounded-lg p-4 border-t-2"
-                style={{ borderTopColor: `hsl(var(--${s.color}))` }}
+                initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ delay: 0.1 + i * 0.08, duration: 0.5, ease: [0.22, 0.68, 0, 1.0] }}
+                className="fx-card fx-glass rounded-lg p-4 relative overflow-hidden cursor-default"
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <Icon size={16} style={{ color: `hsl(var(--${s.color}))` }} />
-                  <span className="text-sm font-semibold text-foreground">{s.title}</span>
+                {/* Top accent line */}
+                <div className="absolute top-0 left-0 right-0 h-px"
+                  style={{
+                    background: `linear-gradient(90deg, transparent, hsl(var(--${s.color})) 50%, transparent)`,
+                  }}
+                />
+                {/* Radial glow from top */}
+                <div className="absolute top-0 left-0 right-0 h-20 pointer-events-none"
+                  style={{
+                    background: `radial-gradient(ellipse 60% 100% at 50% 0%, hsl(var(--${s.color}) / 0.08), transparent)`,
+                  }}
+                />
+                <div className="relative">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon size={16} style={{ color: `hsl(var(--${s.color}))` }} />
+                    <span className="text-sm font-semibold text-foreground">{s.title}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{s.description}</p>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">{s.description}</p>
               </motion.div>
             );
           })}
         </div>
 
         {/* Active Project — ThermalOS */}
-        <h3 className="text-xs font-mono font-semibold tracking-wider text-[#35C792] uppercase mb-3">
-          Active Project
-        </h3>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="inline-block w-1.5 h-1.5 rounded-full animate-glow-pulse"
+            style={{ background: "#35C792", boxShadow: "0 0 8px #35C792" }} />
+          <h3 className="text-xs font-mono font-semibold tracking-wider uppercase fx-grad-text-green">
+            Active Project
+          </h3>
+        </div>
         <ThermalOSBanner />
 
-        {/* Flagship Systems */}
-        <h3 className="text-xs font-mono font-semibold tracking-wider text-primary uppercase mb-3">
+        {/* Flagship Systems — fx-card hover with shimmer */}
+        <h3 className="text-xs font-mono font-semibold tracking-wider uppercase mb-3 fx-grad-text-cyan">
           Flagship Systems
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
@@ -102,25 +131,33 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
             return (
               <motion.div
                 key={p.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + i * 0.08 }}
-                className="panel-glass rounded-lg p-4 hover:border-primary/30 transition-colors cursor-pointer group"
+                initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ delay: 0.2 + i * 0.08, duration: 0.5, ease: [0.22, 0.68, 0, 1.0] }}
+                className="fx-card fx-glass rounded-lg p-4 cursor-pointer group relative overflow-hidden"
                 onClick={() => onNavigateToProject?.(p.id)}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-mono text-muted-foreground">{p.course || p.domain.toUpperCase()}</span>
-                  <ArrowRight size={12} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                </div>
-                <h4 className="text-sm font-semibold text-foreground mb-1 leading-tight">{p.name}</h4>
-                <p className="text-xs text-muted-foreground mb-2 leading-relaxed line-clamp-2">
-                  {summary?.whatIsIt || p.heroSummary}
-                </p>
-                {summary && (
-                  <div className="text-xs text-secondary-foreground border-t border-panel-border pt-2 mt-auto">
-                    <span className="text-primary/60">▸</span> {summary.keyOutcomes[0]}
+                {/* Radial glow on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                  style={{
+                    background: "radial-gradient(ellipse 80% 60% at 50% 0%, hsl(var(--primary) / 0.08), transparent)",
+                  }}
+                />
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase">{p.course || p.domain.toUpperCase()}</span>
+                    <ArrowRight size={12} className="text-muted-foreground group-hover:text-primary transition-all duration-300 group-hover:translate-x-0.5" />
                   </div>
-                )}
+                  <h4 className="text-sm font-semibold text-foreground mb-1 leading-tight group-hover:fx-grad-text-cyan transition-all">{p.name}</h4>
+                  <p className="text-xs text-muted-foreground mb-2 leading-relaxed line-clamp-2">
+                    {summary?.whatIsIt || p.heroSummary}
+                  </p>
+                  {summary && (
+                    <div className="text-xs text-secondary-foreground border-t border-panel-border pt-2 mt-auto">
+                      <span className="text-primary/60">▸</span> {summary.keyOutcomes[0]}
+                    </div>
+                  )}
+                </div>
               </motion.div>
             );
           })}

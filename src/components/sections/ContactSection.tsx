@@ -18,15 +18,34 @@ export default function ContactSection() {
       <SectionTitle>Contact</SectionTitle>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="panel-glass rounded-lg p-6 space-y-4"
+        initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ duration: 0.5, ease: [0.22, 0.68, 0, 1.0] }}
+        className="fx-glass rounded-lg p-6 space-y-4 relative overflow-hidden"
       >
-        <div className="flex items-center justify-between">
+        {/* Subtle accent glow at top */}
+        <div className="absolute top-0 left-0 right-0 h-px"
+          style={{
+            background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.5), transparent)",
+          }}
+        />
+        <div className="absolute top-0 left-0 right-0 h-24 pointer-events-none opacity-40"
+          style={{
+            background: "radial-gradient(ellipse 60% 100% at 50% 0%, hsl(var(--primary) / 0.10), transparent)",
+          }}
+        />
+
+        <div className="flex items-center justify-between relative">
           <div className="flex items-center gap-3">
-            <Mail size={18} className="text-primary" />
+            <div className="p-2 rounded-md"
+              style={{
+                background: "linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--primary) / 0.04))",
+                border: "1px solid hsl(var(--primary) / 0.18)",
+              }}>
+              <Mail size={16} className="text-primary" />
+            </div>
             <div>
-              <p className="text-xs font-mono text-muted-foreground">Email</p>
+              <p className="text-xs font-mono text-muted-foreground tracking-wider uppercase">Email</p>
               <a
                 href={`mailto:${personalInfo.email}`}
                 className="text-sm text-foreground hover:text-primary transition-colors"
@@ -37,19 +56,25 @@ export default function ContactSection() {
           </div>
           <button
             onClick={() => copy(personalInfo.email, "email")}
-            className="p-1.5 rounded hover:bg-panel-highlight transition-colors text-muted-foreground"
+            className="p-2 rounded-md hover:bg-panel-highlight transition-all text-muted-foreground hover:text-foreground hover:scale-105"
           >
             {copied === "email" ? <Check size={14} className="text-neon-green" /> : <Copy size={14} />}
           </button>
         </div>
 
-        <div className="h-px bg-panel-border" />
+        <div className="h-px" style={{ background: "linear-gradient(90deg, transparent, hsl(var(--border)), transparent)" }} />
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between relative">
           <div className="flex items-center gap-3">
-            <Phone size={18} className="text-primary" />
+            <div className="p-2 rounded-md"
+              style={{
+                background: "linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--primary) / 0.04))",
+                border: "1px solid hsl(var(--primary) / 0.18)",
+              }}>
+              <Phone size={16} className="text-primary" />
+            </div>
             <div>
-              <p className="text-xs font-mono text-muted-foreground">Phone</p>
+              <p className="text-xs font-mono text-muted-foreground tracking-wider uppercase">Phone</p>
               <a
                 href={`tel:${personalInfo.phone}`}
                 className="text-sm text-foreground hover:text-primary transition-colors"
@@ -60,7 +85,7 @@ export default function ContactSection() {
           </div>
           <button
             onClick={() => copy(personalInfo.phone, "phone")}
-            className="p-1.5 rounded hover:bg-panel-highlight transition-colors text-muted-foreground"
+            className="p-2 rounded-md hover:bg-panel-highlight transition-all text-muted-foreground hover:text-foreground hover:scale-105"
           >
             {copied === "phone" ? <Check size={14} className="text-neon-green" /> : <Copy size={14} />}
           </button>

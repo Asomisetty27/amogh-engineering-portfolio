@@ -67,31 +67,46 @@ export default function SkillsSection() {
   const [expandedCategory, setExpandedCategory] = useState<string | null>("test");
 
   return (
-    <section className="max-w-3xl mx-auto">
+    <section className="max-w-3xl mx-auto fx-blur-reveal">
       <SectionTitle>Skills</SectionTitle>
 
       <div className="space-y-3">
         {skillCategories.map((cat) => {
           const isOpen = expandedCategory === cat.id;
           return (
-            <div key={cat.id} className="panel-glass rounded-lg overflow-hidden">
+            <div key={cat.id} className="fx-glass rounded-lg overflow-hidden relative">
+              {/* Top gradient accent — color-coded per category */}
+              <div className="absolute top-0 left-0 right-0 h-px"
+                style={{
+                  background: `linear-gradient(90deg, transparent, hsl(var(--${cat.color}) / ${isOpen ? 0.6 : 0.3}), transparent)`,
+                  transition: "all .3s",
+                }}
+              />
               <button
                 onClick={() => setExpandedCategory(isOpen ? null : cat.id)}
-                className="w-full flex items-center justify-between px-5 py-4 hover:bg-panel-highlight transition-colors"
+                className="w-full flex items-center justify-between px-5 py-4 hover:bg-panel-highlight/40 transition-all duration-200 relative group"
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: `hsl(var(--${cat.color}))` }}
+                    className="w-2 h-2 rounded-full transition-all"
+                    style={{
+                      backgroundColor: `hsl(var(--${cat.color}))`,
+                      boxShadow: isOpen ? `0 0 8px hsl(var(--${cat.color}) / 0.6)` : `0 0 4px hsl(var(--${cat.color}) / 0.3)`,
+                    }}
                   />
                   <span className="text-sm font-semibold text-foreground">{cat.title}</span>
-                  <span className="text-[10px] font-mono text-muted-foreground">
-                    {cat.skills.length} skills
+                  <span className="text-[10px] font-mono text-muted-foreground px-1.5 py-0.5 rounded"
+                    style={{
+                      background: `hsl(var(--${cat.color}) / 0.08)`,
+                      border: `1px solid hsl(var(--${cat.color}) / 0.2)`,
+                      color: `hsl(var(--${cat.color}))`,
+                    }}>
+                    {cat.skills.length}
                   </span>
                 </div>
                 <ChevronDown
                   size={14}
-                  className={`text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
+                  className={`text-muted-foreground transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
                 />
               </button>
 

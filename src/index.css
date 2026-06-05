@@ -361,6 +361,185 @@
   border: 1px solid hsl(var(--panel-border));
 }
 
+/* ════════════════════════════════════════════════════════════════════════════
+ * FX — Framer-style visual effects (shared across portfolio + ThermalOS).
+ *   .fx-orb-{a,b,c}   — drifting orb animations (use with GradientOrbs)
+ *   .fx-grain         — film grain texture overlay
+ *   .fx-glass         — heavier glassmorphism (vs. panel-glass which is lighter)
+ *   .fx-grad-text-*   — gradient-fill text in brand colors
+ *   .fx-shimmer       — animated diagonal shimmer sweep
+ *   .fx-card          — hover-lift card (border accent + shadow)
+ *   .fx-section-line  — gradient horizontal accent line at section top
+ *   .fx-blur-reveal   — blur-in scroll reveal animation
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+/* Orb drift cycles */
+@keyframes fx-orb-a {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33%     { transform: translate(5%,-7%) scale(1.07); }
+  66%     { transform: translate(-3%,4%) scale(.95); }
+}
+@keyframes fx-orb-b {
+  0%,100% { transform: translate(0,0) scale(1); }
+  40%     { transform: translate(-6%,5%) scale(1.05); }
+  75%     { transform: translate(4%,-3%) scale(.97); }
+}
+@keyframes fx-orb-c {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50%     { transform: translate(3%,6%) scale(1.04); }
+}
+.fx-orb-a { animation: fx-orb-a 20s ease-in-out infinite; }
+.fx-orb-b { animation: fx-orb-b 26s ease-in-out infinite; }
+.fx-orb-c { animation: fx-orb-c 32s ease-in-out infinite; }
+
+/* Heavier glass — for content cards that should float above the orb layer */
+.fx-glass {
+  background: rgba(12, 16, 24, 0.62);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.04),
+    0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* Gradient text fills (cyan, magenta, amber, green) */
+.fx-grad-text-cyan {
+  background: linear-gradient(120deg,
+    hsl(170 90% 60%) 0%,
+    hsl(170 80% 50%) 50%,
+    hsl(180 70% 55%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.fx-grad-text-magenta {
+  background: linear-gradient(120deg,
+    hsl(310 90% 70%) 0%,
+    hsl(310 80% 60%) 50%,
+    hsl(290 70% 60%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.fx-grad-text-green {
+  background: linear-gradient(120deg,
+    hsl(142 80% 60%) 0%,
+    hsl(142 70% 50%) 50%,
+    hsl(155 65% 55%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.fx-grad-text-amber {
+  background: linear-gradient(120deg,
+    hsl(38 100% 65%) 0%,
+    hsl(38 90% 55%) 50%,
+    hsl(28 85% 60%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.fx-grad-text-platinum {
+  background: linear-gradient(135deg,
+    hsl(210 20% 95%) 0%,
+    hsl(210 14% 70%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Shimmer sweep (diagonal moving highlight) */
+@keyframes fx-shimmer {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+.fx-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.fx-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.06) 50%,
+    transparent 70%
+  );
+  background-size: 200%;
+  animation: fx-shimmer 2.8s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+.fx-shimmer > * { position: relative; z-index: 2; }
+
+/* Card hover-lift — for project tiles, strength cards, anything clickable */
+.fx-card {
+  transition:
+    border-color .22s ease,
+    box-shadow .25s ease,
+    transform .22s ease;
+}
+.fx-card:hover {
+  border-color: hsl(var(--primary) / 0.3) !important;
+  box-shadow:
+    0 0 0 1px hsl(var(--primary) / 0.08),
+    0 12px 32px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 0.5px hsl(var(--primary) / 0.04);
+  transform: translateY(-2px);
+}
+
+/* Section accent line — gradient horizontal at top of section */
+.fx-section-line {
+  position: relative;
+}
+.fx-section-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 78%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--primary) / 0.35),
+    transparent
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Blur-in reveal (use on first paint or scroll trigger) */
+@keyframes fx-blur-in {
+  from {
+    filter: blur(6px);
+    opacity: 0;
+    transform: translateY(18px) scale(.99);
+  }
+  to {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.fx-blur-reveal {
+  animation: fx-blur-in .65s cubic-bezier(.22, .68, 0, 1.2) both;
+}
+
+/* Reduced motion — kill all FX animations */
+@media (prefers-reduced-motion: reduce) {
+  .fx-orb-a, .fx-orb-b, .fx-orb-c,
+  .fx-shimmer::after,
+  .fx-blur-reveal {
+    animation: none !important;
+  }
+  .fx-blur-reveal { filter: none; opacity: 1; transform: none; }
+}
+
 /* Print stylesheet for Quickview */
 @media print {
   body {

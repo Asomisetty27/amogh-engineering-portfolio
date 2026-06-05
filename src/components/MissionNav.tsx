@@ -33,9 +33,18 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
 
   return (
     <>
-      <nav className="no-print fixed top-0 left-0 right-0 z-40 panel-glass border-b border-panel-border">
+      <nav
+        className="no-print fixed top-0 left-0 right-0 z-40"
+        style={{
+          background: "rgba(8, 10, 14, 0.78)",
+          backdropFilter: "blur(20px) saturate(160%)",
+          WebkitBackdropFilter: "blur(20px) saturate(160%)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+          boxShadow: "0 1px 0 rgba(255, 255, 255, 0.04), 0 8px 24px rgba(0, 0, 0, 0.2)",
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-          <span className="font-display text-sm tracking-[0.2em] text-primary neon-text-cyan">
+          <span className="font-display text-sm tracking-[0.2em] fx-grad-text-cyan font-semibold">
             A.SOMISETTY
           </span>
 
@@ -48,11 +57,16 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
                 <button
                   key={item.id}
                   onClick={() => onNavigate(item.id)}
-                  className={`relative px-3 py-1.5 text-xs font-mono tracking-wide rounded transition-colors ${
+                  className={`relative px-3 py-1.5 text-xs font-mono tracking-wide rounded-md transition-all duration-200 ${
                     isActive
                       ? "text-primary"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
+                  style={{
+                    background: isActive
+                      ? "linear-gradient(180deg, hsl(var(--primary) / 0.10), hsl(var(--primary) / 0.02))"
+                      : "transparent",
+                  }}
                 >
                   <span className="flex items-center gap-1.5">
                     <Icon size={13} />
@@ -61,8 +75,12 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
                   {isActive && (
                     <motion.div
                       layoutId="nav-indicator"
-                      className="absolute bottom-0 left-1 right-1 h-px bg-primary"
-                      transition={{ duration: 0.2 }}
+                      className="absolute bottom-0 left-1 right-1 h-0.5 rounded-full"
+                      style={{
+                        background: "linear-gradient(90deg, transparent, hsl(var(--primary)), transparent)",
+                        boxShadow: "0 0 8px hsl(var(--primary) / 0.5)",
+                      }}
+                      transition={{ duration: 0.25, ease: [0.22, 0.68, 0, 1.0] }}
                     />
                   )}
                 </button>
