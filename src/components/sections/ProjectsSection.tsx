@@ -106,8 +106,8 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
   }
 
   return (
-    <section className="max-w-7xl mx-auto">
-      {/* Domain Selector */}
+    <section className="max-w-7xl mx-auto fx-blur-reveal">
+      {/* Domain Selector — fx-card hover + active gradient glow */}
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-2 mb-6">
         {systemDomains.map((domain) => {
           const Icon = domainIcons[domain.icon] || Zap;
@@ -124,22 +124,36 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
                   setDetailTab("brief");
                 }
               }}
-              className={`text-left p-3 rounded-lg border transition-all ${
-                isActive
-                  ? "border-primary/40 bg-primary/5"
-                  : "border-panel-border hover:border-panel-highlight"
+              className={`fx-card text-left p-3 rounded-lg border relative overflow-hidden ${
+                isActive ? "" : "border-panel-border hover:border-panel-highlight"
               }`}
               style={isActive ? {
-                borderColor: `hsl(var(--${domain.color}) / 0.4)`,
-                backgroundColor: `hsl(var(--${domain.color}) / 0.05)`,
+                borderColor: `hsl(var(--${domain.color}) / 0.45)`,
+                background: `linear-gradient(135deg, hsl(var(--${domain.color}) / 0.10) 0%, hsl(var(--${domain.color}) / 0.02) 100%)`,
+                boxShadow: `0 0 0 1px hsl(var(--${domain.color}) / 0.10), 0 8px 24px rgba(0,0,0,0.25), inset 0 0 0 0.5px hsl(var(--${domain.color}) / 0.05)`,
               } : {}}
             >
-              <div className="flex items-center gap-2 mb-1">
-                <Icon size={14} className={isActive ? "text-primary" : "text-muted-foreground"} style={isActive ? { color: `hsl(var(--${domain.color}))` } : {}} />
-                <span className="text-[10px] font-mono text-muted-foreground">{count} {count === 1 ? "system" : "systems"}</span>
+              {/* Active state: top accent line + radial glow */}
+              {isActive && (
+                <>
+                  <div className="absolute top-0 left-0 right-0 h-px"
+                    style={{ background: `linear-gradient(90deg, transparent, hsl(var(--${domain.color}) / 0.7), transparent)` }}
+                  />
+                  <div className="absolute top-0 left-0 right-0 h-16 pointer-events-none"
+                    style={{ background: `radial-gradient(ellipse 80% 100% at 50% 0%, hsl(var(--${domain.color}) / 0.12), transparent)` }}
+                  />
+                </>
+              )}
+              <div className="relative">
+                <div className="flex items-center gap-2 mb-1">
+                  <Icon size={14} className={isActive ? "" : "text-muted-foreground"}
+                    style={isActive ? { color: `hsl(var(--${domain.color}))`, filter: `drop-shadow(0 0 4px hsl(var(--${domain.color}) / 0.4))` } : {}}
+                  />
+                  <span className="text-[10px] font-mono text-muted-foreground">{count} {count === 1 ? "system" : "systems"}</span>
+                </div>
+                <div className="text-xs font-semibold text-foreground leading-tight">{domain.name}</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5 hidden sm:block">{domain.subtitle}</div>
               </div>
-              <div className="text-xs font-semibold text-foreground leading-tight">{domain.name}</div>
-              <div className="text-[10px] text-muted-foreground mt-0.5 hidden sm:block">{domain.subtitle}</div>
             </button>
           );
         })}
@@ -147,30 +161,45 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
 
       {/* Three-panel layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Left: Project Navigator */}
-        <div className="lg:col-span-2 panel-glass rounded-lg overflow-hidden">
+        {/* Left: Project Navigator — fx-glass + active gradient state */}
+        <div className="lg:col-span-2 fx-glass rounded-lg overflow-hidden">
           <PanelHeader>
             {systemDomains.find((d) => d.id === activeDomain)?.name || "Projects"}
           </PanelHeader>
           <div className="p-2 space-y-0.5 max-h-[80vh] overflow-y-auto">
-            {domainProjects.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => { setSelectedProject(p); setDetailTab("brief"); setExpandedSubsystems(new Set()); }}
-                className={`w-full flex items-center gap-2 px-2 py-2 rounded text-left transition-colors ${
-                  selectedProject.id === p.id
-                    ? "bg-primary/10 border border-primary/20"
-                    : "hover:bg-panel-highlight border border-transparent"
-                }`}
-              >
-                <StatusLight color={p.statusColor} />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[10px] font-mono font-semibold text-foreground truncate">{p.codename}</div>
-                  <div className="text-[9px] text-muted-foreground truncate">{p.name}</div>
-                </div>
-                {p.has3D && <Box size={9} className="text-primary/50 flex-shrink-0" />}
-              </button>
-            ))}
+            {domainProjects.map((p) => {
+              const isSelected = selectedProject.id === p.id;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => { setSelectedProject(p); setDetailTab("brief"); setExpandedSubsystems(new Set()); }}
+                  className={`w-full flex items-center gap-2 px-2 py-2 rounded text-left transition-all duration-200 relative ${
+                    isSelected
+                      ? "border border-primary/30"
+                      : "hover:bg-panel-highlight border border-transparent"
+                  }`}
+                  style={isSelected ? {
+                    background: "linear-gradient(90deg, hsl(var(--primary) / 0.12) 0%, hsl(var(--primary) / 0.04) 100%)",
+                  } : {}}
+                >
+                  {/* Active left accent rail */}
+                  {isSelected && (
+                    <div className="absolute left-0 top-1 bottom-1 w-0.5 rounded-r"
+                      style={{
+                        background: "linear-gradient(180deg, hsl(var(--primary)), hsl(var(--primary) / 0.3))",
+                        boxShadow: "0 0 6px hsl(var(--primary) / 0.5)",
+                      }}
+                    />
+                  )}
+                  <StatusLight color={p.statusColor} />
+                  <div className="flex-1 min-w-0">
+                    <div className={`text-[10px] font-mono font-semibold truncate ${isSelected ? "fx-grad-text-cyan" : "text-foreground"}`}>{p.codename}</div>
+                    <div className="text-[9px] text-muted-foreground truncate">{p.name}</div>
+                  </div>
+                  {p.has3D && <Box size={9} className={`flex-shrink-0 transition-colors ${isSelected ? "text-primary" : "text-primary/50"}`} />}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -196,20 +225,56 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
             </AnimatePresence>
           )}
 
-          {/* RGM full view button */}
+          {/* RGM full view button — shimmer + gradient */}
           {selectedProject.id === "rgm-machine" && (
-            <button onClick={() => setRgmFullView(true)} className="px-3 py-1.5 text-xs font-mono rounded border border-neon-green/30 text-neon-green hover:bg-neon-green/10 transition-colors">
-              FULL SYSTEM VIEW →
+            <button
+              onClick={() => setRgmFullView(true)}
+              className="fx-shimmer group relative px-4 py-2 text-xs font-mono rounded-md transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                border: "1px solid hsl(var(--neon-green) / 0.4)",
+                background: "linear-gradient(135deg, hsl(var(--neon-green) / 0.12) 0%, hsl(var(--neon-green) / 0.03) 100%)",
+                color: "hsl(var(--neon-green))",
+                boxShadow: "0 0 0 0.5px hsl(var(--neon-green) / 0.08) inset, 0 4px 16px hsl(var(--neon-green) / 0.08)",
+              }}
+            >
+              <span className="relative flex items-center gap-2">
+                FULL SYSTEM VIEW
+                <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+              </span>
             </button>
           )}
 
-          {/* Detail tabs */}
+          {/* Detail tabs — gradient active state */}
           <div className="flex items-center gap-2">
-            <button onClick={() => setDetailTab("brief")} className={`px-3 py-1.5 text-xs font-mono rounded border transition-colors ${detailTab === "brief" ? "border-primary/40 bg-primary/10 text-primary" : "border-panel-border text-muted-foreground hover:text-foreground"}`}>
+            <button
+              onClick={() => setDetailTab("brief")}
+              className={`px-3 py-1.5 text-xs font-mono rounded-md border transition-all duration-200 relative ${
+                detailTab === "brief"
+                  ? "text-primary"
+                  : "border-panel-border text-muted-foreground hover:text-foreground"
+              }`}
+              style={detailTab === "brief" ? {
+                borderColor: "hsl(var(--primary) / 0.4)",
+                background: "linear-gradient(135deg, hsl(var(--primary) / 0.14) 0%, hsl(var(--primary) / 0.03) 100%)",
+                boxShadow: "0 0 0 0.5px hsl(var(--primary) / 0.08) inset",
+              } : {}}
+            >
               SYSTEM BRIEF
             </button>
             {selectedProject.module.subsystems && selectedProject.module.subsystems.length > 0 && (
-              <button onClick={() => setDetailTab("subsystems")} className={`px-3 py-1.5 text-xs font-mono rounded border transition-colors ${detailTab === "subsystems" ? "border-primary/40 bg-primary/10 text-primary" : "border-panel-border text-muted-foreground hover:text-foreground"}`}>
+              <button
+                onClick={() => setDetailTab("subsystems")}
+                className={`px-3 py-1.5 text-xs font-mono rounded-md border transition-all duration-200 ${
+                  detailTab === "subsystems"
+                    ? "text-primary"
+                    : "border-panel-border text-muted-foreground hover:text-foreground"
+                }`}
+                style={detailTab === "subsystems" ? {
+                  borderColor: "hsl(var(--primary) / 0.4)",
+                  background: "linear-gradient(135deg, hsl(var(--primary) / 0.14) 0%, hsl(var(--primary) / 0.03) 100%)",
+                  boxShadow: "0 0 0 0.5px hsl(var(--primary) / 0.08) inset",
+                } : {}}
+              >
                 SUBSYSTEMS
               </button>
             )}
@@ -227,9 +292,13 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
                 />
               </motion.div>
             ) : (
-              <motion.div key={selectedProject.id + "-brief"} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <motion.div key={selectedProject.id + "-brief"} initial={{ opacity: 0, filter: "blur(4px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(4px)" }} transition={{ duration: 0.32, ease: [0.22, 0.68, 0, 1.0] }}>
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-                  <div className="lg:col-span-3 panel-glass rounded-lg overflow-hidden">
+                  <div className="lg:col-span-3 fx-glass rounded-lg overflow-hidden relative">
+                    {/* Top accent line */}
+                    <div className="absolute top-0 left-0 right-0 h-px"
+                      style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.4), transparent)" }}
+                    />
                     <PanelHeader>System Brief — {selectedProject.codename}</PanelHeader>
                     <div className="p-4 space-y-5 max-h-[60vh] overflow-y-auto">
                       {/* Hero */}
@@ -384,8 +453,11 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
                     </div>
                   </div>
 
-                  {/* Right: Evidence */}
-                  <div className="lg:col-span-2 panel-glass rounded-lg overflow-hidden">
+                  {/* Right: Evidence — fx-glass + accent */}
+                  <div className="lg:col-span-2 fx-glass rounded-lg overflow-hidden relative">
+                    <div className="absolute top-0 left-0 right-0 h-px"
+                      style={{ background: "linear-gradient(90deg, transparent, hsl(var(--neon-green) / 0.4), transparent)" }}
+                    />
                     <PanelHeader>Evidence</PanelHeader>
                     <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
                       {selectedProject.status === "EVIDENCE_PENDING" && (
@@ -423,16 +495,25 @@ function SubsystemsPanel({ subsystems, expanded, onToggle, mode }: {
   mode: string;
 }) {
   return (
-    <div className="panel-glass rounded-lg overflow-hidden">
+    <div className="fx-glass rounded-lg overflow-hidden relative">
+      <div className="absolute top-0 left-0 right-0 h-px"
+        style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.4), transparent)" }}
+      />
       <PanelHeader>Subsystem Modules</PanelHeader>
       <div className="p-4 space-y-2 max-h-[70vh] overflow-y-auto">
         {subsystems.map((sub) => {
           const isOpen = expanded.has(sub.id);
           return (
-            <div key={sub.id} className="border border-panel-border rounded-lg overflow-hidden">
+            <div key={sub.id}
+              className="rounded-lg overflow-hidden transition-all duration-200"
+              style={{
+                border: isOpen ? "1px solid hsl(var(--primary) / 0.3)" : "1px solid hsl(var(--panel-border))",
+                background: isOpen ? "linear-gradient(135deg, hsl(var(--primary) / 0.04) 0%, transparent 100%)" : "transparent",
+              }}
+            >
               <button
                 onClick={() => onToggle(sub.id)}
-                className="w-full flex items-center justify-between px-4 py-3 hover:bg-panel-highlight transition-colors"
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-panel-highlight/40 transition-all"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <ConfidenceBadgeTag confidence={sub.confidence} />

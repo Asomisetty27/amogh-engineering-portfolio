@@ -8,7 +8,7 @@ export default function ExperienceSection() {
   const { mode } = useViewMode();
 
   return (
-    <section className="max-w-3xl mx-auto">
+    <section className="max-w-3xl mx-auto fx-blur-reveal">
       <SectionTitle>Experience</SectionTitle>
       <p className="text-xs text-muted-foreground mb-6 -mt-2">Roles emphasizing process improvement, operational rigor, and regulated environments.</p>
 
@@ -16,21 +16,39 @@ export default function ExperienceSection() {
         {experiences.map((exp, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="panel-glass rounded-lg p-5"
+            initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ delay: i * 0.12, duration: 0.5, ease: [0.22, 0.68, 0, 1.0] }}
+            className="fx-glass fx-card rounded-lg p-5 relative overflow-hidden"
           >
-            <div className="flex items-start justify-between mb-3">
+            {/* Top accent line */}
+            <div className="absolute top-0 left-0 right-0 h-px"
+              style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.35), transparent)" }}
+            />
+            {/* Subtle top glow */}
+            <div className="absolute top-0 left-0 right-0 h-20 pointer-events-none"
+              style={{ background: "radial-gradient(ellipse 60% 100% at 30% 0%, hsl(var(--primary) / 0.06), transparent)" }}
+            />
+            <div className="flex items-start justify-between mb-3 relative">
               <div>
                 <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
-                  <Building2 size={16} className="text-primary" />
+                  <div className="p-1.5 rounded"
+                    style={{
+                      background: "linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--primary) / 0.04))",
+                      border: "1px solid hsl(var(--primary) / 0.2)",
+                    }}>
+                    <Building2 size={14} className="text-primary" />
+                  </div>
                   {exp.company}
                 </h3>
-                <p className="text-sm text-muted-foreground">{exp.role} — {exp.location}</p>
+                <p className="text-sm text-muted-foreground mt-1">{exp.role} — {exp.location}</p>
               </div>
-              <span className="text-xs font-mono text-muted-foreground flex items-center gap-1">
-                <Calendar size={12} />
+              <span className="text-xs font-mono text-muted-foreground flex items-center gap-1 px-2 py-1 rounded"
+                style={{
+                  background: "rgba(255,255,255,.03)",
+                  border: "1px solid hsl(var(--border))",
+                }}>
+                <Calendar size={11} />
                 {exp.period}
               </span>
             </div>
