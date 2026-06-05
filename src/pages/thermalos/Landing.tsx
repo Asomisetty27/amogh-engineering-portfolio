@@ -45,6 +45,38 @@ function rm() {
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
+/* ─── Gradient orb background ────────────────────────────────────────────── */
+function GradientOrbs({ variant = 'green' }: { variant?: 'green' | 'blue' | 'mixed' }) {
+  const orbs = variant === 'green' ? [
+    { cls: 'tos-orb-a', color: 'rgba(39,160,90,.11)', w: 640, h: 520, top: '-18%', left: '60%', blur: 120 },
+    { cls: 'tos-orb-b', color: 'rgba(39,160,90,.06)', w: 380, h: 380, top: '55%',  left: '5%',  blur: 90  },
+  ] : variant === 'blue' ? [
+    { cls: 'tos-orb-a', color: 'rgba(88,120,168,.12)', w: 580, h: 460, top: '-15%', left: '55%', blur: 110 },
+    { cls: 'tos-orb-b', color: 'rgba(88,120,168,.07)', w: 340, h: 340, top: '60%',  left: '2%',  blur: 90  },
+  ] : [
+    { cls: 'tos-orb-a', color: 'rgba(39,160,90,.10)',  w: 580, h: 480, top: '-20%', left: '62%', blur: 130 },
+    { cls: 'tos-orb-b', color: 'rgba(88,120,168,.09)', w: 400, h: 400, top: '50%',  left: '3%',  blur: 100 },
+    { cls: 'tos-orb-c', color: 'rgba(39,160,90,.05)',  w: 280, h: 280, top: '80%',  left: '70%', blur: 80  },
+  ];
+
+  return (
+    <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }}>
+      {orbs.map((o, i) => (
+        <div key={i} className={o.cls} style={{
+          position: 'absolute',
+          top: o.top, left: o.left,
+          width: o.w, height: o.h,
+          borderRadius: '50%',
+          background: `radial-gradient(ellipse at center, ${o.color} 0%, transparent 70%)`,
+          filter: `blur(${o.blur}px)`,
+          mixBlendMode: 'screen',
+          willChange: 'transform',
+        }} />
+      ))}
+    </div>
+  );
+}
+
 /* ─── Primitive icons ─────────────────────────────────────────────────────── */
 const ArrowRight = ({ s = 13 }: { s?: number }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -81,16 +113,17 @@ function Pulse({ color = T.healthy }: { color?: string }) {
   );
 }
 
-function Panel({ children, label, corner, style }: {
+function Panel({ children, label, corner, style, glass }: {
   children: React.ReactNode;
   label?: string;
   corner?: React.ReactNode;
   style?: React.CSSProperties;
+  glass?: boolean;
 }) {
   return (
-    <div style={{ border: `1px solid ${T.border}`, borderRadius: 5, background: T.s1, overflow: 'hidden', ...style }}>
+    <div className={glass ? 'tos-glass' : ''} style={{ border: `1px solid ${glass ? 'rgba(255,255,255,.06)' : T.border}`, borderRadius: 6, background: glass ? undefined : T.s1, overflow: 'hidden', transition: 'border-color .2s', ...style }}>
       {(label || corner) && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 14px', borderBottom: `1px solid ${T.border}`, background: T.s0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 14px', borderBottom: `1px solid ${glass ? 'rgba(255,255,255,.05)' : T.border}`, background: glass ? 'rgba(0,0,0,.18)' : T.s0 }}>
           {label && <span style={{ fontFamily: FM, fontSize: 9.5, letterSpacing: '.16em', textTransform: 'uppercase', color: T.faint }}>{label}</span>}
           {corner}
         </div>
@@ -251,7 +284,7 @@ function Nav() {
     return () => window.removeEventListener('scroll', fn);
   }, []);
   return (
-    <nav className="tos-nav" style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: `1px solid ${scrolled ? T.border : 'transparent'}`, background: scrolled ? T.bg + 'E8' : 'transparent', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', transition: 'border-color .2s, background .2s' }}>
+    <nav className="tos-nav" style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: `1px solid ${scrolled ? 'rgba(255,255,255,.07)' : 'transparent'}`, background: scrolled ? 'rgba(9,9,13,.82)' : 'transparent', backdropFilter: scrolled ? 'blur(20px) saturate(160%)' : 'none', WebkitBackdropFilter: scrolled ? 'blur(20px) saturate(160%)' : 'none', transition: 'border-color .3s, background .3s, backdrop-filter .3s', boxShadow: scrolled ? '0 1px 0 rgba(255,255,255,.04)' : 'none' }}>
       <div style={{ maxWidth: 1240, margin: '0 auto', display: 'flex', alignItems: 'center', height: 54, padding: '0 32px', gap: 28 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -305,16 +338,21 @@ function InstallBlock() {
       onClick={copy}
       style={{
         display: 'flex', alignItems: 'center', width: '100%', maxWidth: 440,
-        padding: '12px 16px', borderRadius: 5,
-        border: `1px solid ${T.border}`, background: T.s0,
+        padding: '13px 17px', borderRadius: 6,
+        border: `1px solid rgba(39,160,90,.22)`,
+        background: 'linear-gradient(135deg, rgba(12,12,18,.9) 0%, rgba(9,9,13,.9) 100%)',
+        backdropFilter: 'blur(12px)',
         cursor: 'pointer', fontFamily: FM, fontSize: 13, color: T.text,
         position: 'relative', overflow: 'hidden', textAlign: 'left',
-        transition: 'border-color .2s, background .2s',
+        transition: 'border-color .2s, box-shadow .2s',
+        boxShadow: '0 0 0 0.5px rgba(39,160,90,.08) inset',
       }}
-      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = T.healthy + '66'; (e.currentTarget as HTMLButtonElement).style.background = T.s1; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = T.border; (e.currentTarget as HTMLButtonElement).style.background = T.s0; }}
+      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = T.healthy + '55'; (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 0 20px rgba(39,160,90,.12), 0 0 0 0.5px rgba(39,160,90,.12) inset`; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(39,160,90,.22)'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 0 0.5px rgba(39,160,90,.08) inset'; }}
       aria-label="Copy install command"
     >
+      {/* shimmer sweep */}
+      <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(105deg, transparent 30%, rgba(39,160,90,.06) 50%, transparent 70%)', backgroundSize: '200%', animation: 'tos-shimmer 3s linear infinite', pointerEvents: 'none' }} />
       <span style={{ color: T.healthy, marginRight: 12, userSelect: 'none' }}>$</span>
       <span style={{ flex: 1, color: T.text }}>{cmd}</span>
       <span className="tos-caret" style={{ display: 'inline-block', width: 7, height: 14, background: T.healthy, marginLeft: 4, verticalAlign: 'middle' }} />
@@ -355,17 +393,23 @@ function Hero() {
   }, []);
 
   return (
-    <motion.section ref={heroRef} id="hero" style={{ position: 'relative', paddingTop: 40, opacity: fadeOut }}>
-      {/* Fine blueprint grid — structural, not decorative */}
-      <div className="tos-grid-bg" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
-      <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: 64, padding: '72px 32px 96px', alignItems: 'start' }} className="tos-hero-layout">
+    <motion.section ref={heroRef} id="hero" className="tos-grain" style={{ position: 'relative', paddingTop: 40, opacity: fadeOut }}>
+      {/* Gradient orb depth layer */}
+      <GradientOrbs variant="mixed" />
+      {/* Blueprint grid sits above orbs */}
+      <div className="tos-grid-bg" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 1 }} />
+      {/* Bottom fade to bg */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 120, background: `linear-gradient(to bottom, transparent, ${T.bg})`, pointerEvents: 'none', zIndex: 1 }} />
+      <div style={{ position: 'relative', zIndex: 2, maxWidth: 1240, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: 64, padding: '72px 32px 96px', alignItems: 'start' }} className="tos-hero-layout">
         <div>
           <div data-h style={{ opacity: 0, marginBottom: 24, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <Tag accent><Pulse />&nbsp;v0.1.8 live on PyPI</Tag>
+            <span className="tos-shimmer-wrap" style={{ display: 'inline-flex', borderRadius: 3 }}>
+              <Tag accent><Pulse />&nbsp;v0.1.8 live on PyPI</Tag>
+            </span>
             <Tag>MIT licensed · single-node free forever</Tag>
           </div>
           <h1 data-h style={{ opacity: 0, fontFamily: FD, fontSize: 'clamp(44px,5.2vw,72px)', fontWeight: 500, letterSpacing: '-.035em', lineHeight: 0.97, marginBottom: 24 }}>
-            Know <span style={{ color: T.healthy }}>why</span><br />your GPU is hot.
+            Know <span className="tos-grad-text">why</span><br />your GPU is hot.
           </h1>
           <p data-h style={{ opacity: 0, fontFamily: FD, fontSize: 15.5, lineHeight: 1.65, color: T.muted, maxWidth: 440, marginBottom: 28 }}>
             Temperature alone is ambiguous — a hot GPU could be busy or failing.
@@ -390,15 +434,17 @@ function Hero() {
               pypi
             </a>
           </div>
-          {/* Stats row */}
-          <div data-h style={{ opacity: 0, borderTop: `1px solid ${T.border}`, paddingTop: 24, display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
-            {HERO_STATS.map(s => (
-              <div key={s.l}>
-                <div style={{ fontFamily: FD, fontSize: 24, fontWeight: 500, letterSpacing: '-.025em', color: T.text, fontVariantNumeric: 'tabular-nums' }}>{s.v}</div>
-                <div style={{ fontFamily: FM, fontSize: 9.5, color: T.text, marginTop: 4, letterSpacing: '.02em' }}>{s.l}</div>
-                <div style={{ fontFamily: FM, fontSize: 9.5, color: T.faint, letterSpacing: '.02em' }}>{s.s}</div>
-              </div>
-            ))}
+          {/* Stats row — glass + gradient border */}
+          <div data-h style={{ opacity: 0, paddingTop: 24 }}>
+            <div className="tos-glass" style={{ borderRadius: 8, padding: '16px 20px', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
+              {HERO_STATS.map((s, i) => (
+                <div key={s.l} style={{ borderLeft: i > 0 ? `1px solid rgba(255,255,255,.06)` : 'none', paddingLeft: i > 0 ? 16 : 0 }}>
+                  <div style={{ fontFamily: FD, fontSize: 26, fontWeight: 600, letterSpacing: '-.03em', color: T.text, fontVariantNumeric: 'tabular-nums', background: 'linear-gradient(135deg, #e8e8f0, #a0a0b0)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{s.v}</div>
+                  <div style={{ fontFamily: FM, fontSize: 9.5, color: T.text, marginTop: 4, letterSpacing: '.02em' }}>{s.l}</div>
+                  <div style={{ fontFamily: FM, fontSize: 9.5, color: T.faint, letterSpacing: '.02em' }}>{s.s}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         {/* Right: R_theta trace visualization */}
@@ -428,8 +474,9 @@ function Signal() {
   }, [inView]);
 
   return (
-    <section ref={ref} id="signal" style={{ borderTop: `1px solid ${T.border}` }}>
-      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '88px 32px' }}>
+    <section ref={ref} id="signal" className="tos-section-glow-blue" style={{ borderTop: `1px solid ${T.border}`, position: 'relative' }}>
+      <GradientOrbs variant="blue" />
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: 1240, margin: '0 auto', padding: '88px 32px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: 72, alignItems: 'start' }} className="tos-two-col">
           <div>
             <div data-r style={{ opacity: 0, marginBottom: 16 }}>
@@ -704,18 +751,19 @@ function Evidence() {
   }, [inView]);
 
   return (
-    <section ref={ref} id="evidence" style={{ borderTop: `1px solid ${T.border}`, position: 'relative' }}>
-      <div className="tos-grid-bg" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.3 }} />
-      <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '88px 32px' }}>
+    <section ref={ref} id="evidence" className="tos-section-glow-green" style={{ borderTop: `1px solid ${T.border}`, position: 'relative' }}>
+      <GradientOrbs variant="green" />
+      <div className="tos-grid-bg" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.3, zIndex: 1 }} />
+      <div style={{ position: 'relative', zIndex: 2, maxWidth: 1240, margin: '0 auto', padding: '88px 32px' }}>
         <div data-e style={{ opacity: 0, marginBottom: 48 }}>
-          <SectionHead eyebrow="Stage 1 Evidence · controlled-variable thermal memory" title={<>2°C ambient delta<br /><span style={{ color: '#27A05A' }}>3.5× recovery</span> time difference.<br />n=7 trials, single-variable design.</>}
+          <SectionHead eyebrow="Stage 1 Evidence · controlled-variable thermal memory" title={<>2°C ambient delta<br /><span className="tos-grad-text">3.5× recovery</span> time difference.<br />n=7 trials, single-variable design.</>}
             body="E004 v2 (2026-06-05, 7 successful trials at two thermal-start conditions): 1800s pre-trial wait + uniform start temperature within each cohort. Cold-start cohort (37°C, n=2): 4.2s power recovery. Warm-start cohort (39°C, n=5): 14.7s ± 1.1s. Within-condition reproducibility T<55°C CV 1.8%, T<42°C CV 1.6% — publication-grade. Same hardware, same workload. The thermal memory effect F1 hypothesized is now demonstrated with a designed experiment." />
         </div>
         {/* Evidence grid: custom named areas */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'auto auto', gap: 16 }} className="tos-evidence-grid">
           {/* Top left: load R_theta bars */}
           <div data-e style={{ opacity: 0 }}>
-            <Panel label="Under-load R_θ · E004 v1 · 7 trials">
+            <Panel glass label="Under-load R_θ · E004 v1 · 7 trials">
               <div style={{ padding: '16px 18px' }}>
                 <TrialChart metric="loadR" max={0.8} label="Load R_theta (C/W)" unit=" C/W" />
               </div>
@@ -723,39 +771,42 @@ function Evidence() {
           </div>
           {/* Top right: recovery R_theta bars */}
           <div data-e style={{ opacity: 0 }}>
-            <Panel label="Recovery R_θ · post child-exit · 7 trials">
+            <Panel glass label="Recovery R_θ · post child-exit · 7 trials">
               <div style={{ padding: '16px 18px' }}>
                 <TrialChart metric="recR" max={3.6} label="Recovery R_theta (C/W)" unit=" C/W" />
               </div>
             </Panel>
           </div>
-          {/* Middle row: v2 power-recovery comparison — F1 dimension 2 */}
+          {/* Middle row: v2 power-recovery comparison */}
           <div data-e style={{ opacity: 0, gridColumn: '1 / -1' }}>
-            <Panel label="F1 dim-2 · wait duration drives recovery time · v2 update 2026-06-04">
+            <Panel glass label="F1 dim-2 · controlled-variable: 2°C start-temp delta → 3.5× recovery time">
               <div style={{ padding: '18px 20px' }}>
                 <V2PowerRecoveryChart />
               </div>
             </Panel>
           </div>
-          {/* Bottom: interpretation + key numbers */}
+          {/* Bottom: key numbers — prominent glass card */}
           <div data-e style={{ opacity: 0, gridColumn: '1 / -1' }}>
-            <Panel label="Key numbers · thermal memory demonstration">
+            <div className="tos-glass" style={{ borderRadius: 6, border: '1px solid rgba(39,160,90,.15)', overflow: 'hidden' }}>
+              <div style={{ padding: '9px 14px', borderBottom: '1px solid rgba(39,160,90,.1)', background: 'rgba(39,160,90,.04)' }}>
+                <span style={{ fontFamily: FM, fontSize: 9.5, letterSpacing: '.16em', textTransform: 'uppercase', color: T.faint }}>Key numbers · thermal memory demonstration</span>
+              </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 0 }}>
                 {[
-                  { v: '35%',   l: 'R_θ delta',         s: 'cool vs warm start (F1 dim-1)' },
-                  { v: '10×',   l: 'recovery delta',    s: 'v1 24s → v2 4s (F1 dim-2)' },
-                  { v: '2.0%',  l: 'within-group CV',    s: 'trials 3–7, Group B' },
+                  { v: '3.5×',  l: 'recovery delta',    s: '2°C ambient · controlled (F1)' },
+                  { v: '1.8%',  l: 'within-group CV',   s: 'T<55°C · warm-start cohort n=5' },
+                  { v: '35%',   l: 'R_θ delta',         s: 'cool vs warm start temp (F1)' },
                   { v: '14',    l: 'child-exit trials',  s: 'v1 (7) + v2 (7 successful)' },
-                  { v: '5,987+', l: 'telemetry rows',   s: 'sheet · live, growing' },
+                  { v: '8,734', l: 'telemetry rows',    s: 'Stage 1 complete · Tesla T4' },
                 ].map((k, i) => (
-                  <div key={k.l} style={{ padding: '18px 20px', borderLeft: i > 0 ? `1px solid ${T.border}` : 'none' }}>
-                    <div style={{ fontFamily: FD, fontSize: 28, fontWeight: 500, letterSpacing: '-.025em', color: T.text, fontVariantNumeric: 'tabular-nums' }}>{k.v}</div>
+                  <div key={k.l} style={{ padding: '18px 20px', borderLeft: i > 0 ? `1px solid rgba(255,255,255,.05)` : 'none' }}>
+                    <div style={{ fontFamily: FD, fontSize: 30, fontWeight: 600, letterSpacing: '-.03em', fontVariantNumeric: 'tabular-nums', background: 'linear-gradient(135deg, #e8e8f0 0%, #27A05A 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{k.v}</div>
                     <div style={{ fontFamily: FM, fontSize: 10, color: T.text, marginTop: 5 }}>{k.l}</div>
                     <div style={{ fontFamily: FM, fontSize: 9.5, color: T.faint, marginTop: 2 }}>{k.s}</div>
                   </div>
                 ))}
               </div>
-            </Panel>
+            </div>
           </div>
         </div>
       </div>
@@ -774,8 +825,9 @@ function FeaturesGrid() {
   }, [inView]);
 
   return (
-    <section ref={ref} id="features" style={{ borderTop: `1px solid ${T.border}` }}>
-      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '88px 32px' }}>
+    <section ref={ref} id="features" className="tos-section-glow-blue" style={{ borderTop: `1px solid ${T.border}`, position: 'relative' }}>
+      <GradientOrbs variant="blue" />
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: 1240, margin: '0 auto', padding: '88px 32px' }}>
         <div data-f style={{ opacity: 0, marginBottom: 48 }}>
           <SectionHead eyebrow="Capabilities" title={<>Built for fleets<br />NVIDIA won&apos;t serve.</>}
             body="Mission Control ships only on Blackwell DGX/GB200 systems. The long tail of mixed-vendor, older-gen neocloud fleets is structurally out of reach. That's the lane." />
@@ -866,11 +918,19 @@ function FeatureCard({ title, index, tone, children }: {
 }) {
   const accent = tone === 'critical' ? T.critical : tone === 'healthy' ? T.healthy : T.bp;
   return (
-    <div style={{ height: '100%', border: `1px solid ${T.border}`, borderTop: `2px solid ${accent}`, borderRadius: 5, background: T.s1, overflow: 'hidden', transition: 'border-color .2s' }}
-      onMouseEnter={e => (e.currentTarget.style.borderColor = T.borderHi)}
-      onMouseLeave={e => (e.currentTarget.style.borderColor = T.border)}>
-      <div style={{ padding: 22 }}>
-        <div style={{ fontFamily: FM, fontSize: 9.5, color: accent, letterSpacing: '.12em', marginBottom: 10 }}>{index} · CAPABILITY</div>
+    <div className="tos-feat-card tos-shimmer-wrap" style={{
+      height: '100%',
+      border: `1px solid ${T.border}`,
+      borderTop: `1.5px solid ${accent}55`,
+      borderRadius: 6,
+      background: `linear-gradient(160deg, ${T.s1} 0%, ${T.s0} 100%)`,
+      overflow: 'hidden',
+      position: 'relative',
+    }}>
+      {/* Subtle gradient tint behind the top edge */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 80, background: `radial-gradient(ellipse 60% 60% at 50% -20%, ${accent}0D, transparent)`, pointerEvents: 'none' }} />
+      <div style={{ padding: 22, position: 'relative' }}>
+        <div className="tos-feat-index" style={{ fontFamily: FM, fontSize: 9.5, color: accent, letterSpacing: '.12em', marginBottom: 10, transition: 'color .2s' }}>{index} · CAPABILITY</div>
         <h3 style={{ fontFamily: FD, fontSize: 17, fontWeight: 500, letterSpacing: '-.01em', color: T.text, marginBottom: 14 }}>{title}</h3>
         {children}
       </div>
@@ -1175,7 +1235,7 @@ const STYLES = `
 .tos-root * { box-sizing: border-box; }
 .tos-root button { box-sizing: border-box; }
 
-/* Blueprint grid — structural reference lines, no decoration */
+/* ── Blueprint grid ─────────────────────────────────────────────────────── */
 .tos-grid-bg {
   background-image:
     linear-gradient(rgba(88,120,168,.07) 1px, transparent 1px),
@@ -1186,23 +1246,147 @@ const STYLES = `
   background-position: -1px -1px;
 }
 
-/* Pulse dot — no glow, just opacity cycle */
+/* ── Gradient orb animations (Framer mesh-gradient depth) ─────────────── */
+@keyframes tos-orb-a {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33%  { transform: translate(5%,-7%) scale(1.07); }
+  66%  { transform: translate(-3%,4%) scale(.95); }
+}
+@keyframes tos-orb-b {
+  0%,100% { transform: translate(0,0) scale(1); }
+  40%  { transform: translate(-6%,5%) scale(1.05); }
+  75%  { transform: translate(4%,-3%) scale(.97); }
+}
+@keyframes tos-orb-c {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50%  { transform: translate(3%,6%) scale(1.04); }
+}
+.tos-orb-a { animation: tos-orb-a 20s ease-in-out infinite; }
+.tos-orb-b { animation: tos-orb-b 26s ease-in-out infinite; }
+.tos-orb-c { animation: tos-orb-c 32s ease-in-out infinite; }
+
+/* ── Film grain overlay ─────────────────────────────────────────────────── */
+.tos-grain {
+  position: relative;
+}
+.tos-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  opacity: .025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px;
+  mix-blend-mode: overlay;
+}
+
+/* ── Glassmorphism panels ───────────────────────────────────────────────── */
+.tos-glass {
+  background: rgba(12,12,18,.68) !important;
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(255,255,255,.055) !important;
+  box-shadow: 0 0 0 0.5px rgba(255,255,255,.04) inset, 0 8px 32px rgba(0,0,0,.35);
+}
+
+/* ── Gradient border via mask ───────────────────────────────────────────── */
+.tos-grad-border {
+  position: relative;
+  border: 1px solid transparent !important;
+  background-clip: padding-box;
+}
+.tos-grad-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(39,160,90,.45) 0%, rgba(88,120,168,.18) 50%, rgba(39,160,90,.08) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+.tos-grad-border > * { position: relative; z-index: 1; }
+
+/* ── Gradient text ──────────────────────────────────────────────────────── */
+.tos-grad-text {
+  background: linear-gradient(120deg, #34c578 0%, #27A05A 40%, #4dd693 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Shimmer sweep — for CTAs and install block ─────────────────────────── */
+@keyframes tos-shimmer {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+.tos-shimmer-wrap {
+  position: relative;
+  overflow: hidden;
+}
+.tos-shimmer-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,.07) 50%, transparent 70%);
+  background-size: 200%;
+  animation: tos-shimmer 2.8s linear infinite;
+  pointer-events: none;
+}
+
+/* ── Blur-in reveal (Framer scroll animation) ────────────────────────────── */
+@keyframes tos-blur-in {
+  from { filter: blur(6px); opacity: 0; transform: translateY(18px) scale(.99); }
+  to   { filter: blur(0);   opacity: 1; transform: translateY(0)    scale(1); }
+}
+.tos-blur-reveal { animation: tos-blur-in .65s cubic-bezier(.22,.68,0,1.2) both; }
+
+/* ── Section ambient glow (top-center radial) ────────────────────────────── */
+.tos-section-glow-green::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%; transform: translateX(-50%);
+  width: 80%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(39,160,90,.3), transparent);
+  pointer-events: none;
+}
+.tos-section-glow-blue::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%; transform: translateX(-50%);
+  width: 80%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(88,120,168,.3), transparent);
+  pointer-events: none;
+}
+
+/* ── Feature card hover glow ─────────────────────────────────────────────── */
+.tos-feat-card {
+  transition: border-color .2s, box-shadow .25s;
+}
+.tos-feat-card:hover {
+  border-color: rgba(39,160,90,.25) !important;
+  box-shadow: 0 0 0 1px rgba(39,160,90,.08), 0 8px 24px rgba(0,0,0,.28);
+}
+.tos-feat-card:hover .tos-feat-index { color: ${T.healthy} !important; }
+
+/* ── Pulse dot ───────────────────────────────────────────────────────────── */
 @keyframes tos-pulse { 0%,100% { opacity:.3 } 50% { opacity:.9 } }
 .tos-pulse { animation: tos-pulse 1.8s ease-in-out infinite; }
 
-/* Terminal caret blink — clean square block, no glow */
+/* ── Terminal caret blink ────────────────────────────────────────────────── */
 @keyframes tos-caret-blink { 0%, 49% { opacity: 1 } 50%, 100% { opacity: 0 } }
 .tos-caret { animation: tos-caret-blink 1.06s steps(1) infinite; }
 
-/* Trace live-data breathe — subtle 4% opacity oscillation to feel live */
+/* ── Trace live-data breathe ─────────────────────────────────────────────── */
 @keyframes tos-trace-breathe { 0%, 100% { opacity: 1 } 50% { opacity: .94 } }
 .tos-trace-live { animation: tos-trace-breathe 5s ease-in-out infinite; }
 
-/* Signal state table — hover lift */
+/* ── Signal state table ──────────────────────────────────────────────────── */
 .tos-state-row:hover { background: ${T.s2} !important; }
 .tos-state-row:hover td:first-child { color: ${T.healthy} !important; }
 
-/* CRT scanline — barely visible horizontal lines for realism, never pulses */
+/* ── CRT scanline ────────────────────────────────────────────────────────── */
 .tos-scanline {
   background-image: repeating-linear-gradient(
     0deg,
@@ -1213,7 +1397,7 @@ const STYLES = `
   );
 }
 
-/* Scrolling row — for the live readout marquee */
+/* ── Scrolling row ───────────────────────────────────────────────────────── */
 @keyframes tos-scroll-up {
   0%   { transform: translateY(0) }
   100% { transform: translateY(-50%) }
