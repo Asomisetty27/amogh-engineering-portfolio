@@ -404,7 +404,7 @@ function Hero() {
         <div>
           <div data-h style={{ opacity: 0, marginBottom: 24, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <span className="tos-shimmer-wrap" style={{ display: 'inline-flex', borderRadius: 3 }}>
-              <Tag accent><Pulse />&nbsp;v0.1.8 live on PyPI</Tag>
+              <Tag accent><Pulse />&nbsp;v0.1.9 live on PyPI</Tag>
             </span>
             <Tag>MIT licensed · single-node free forever</Tag>
           </div>
@@ -1462,9 +1462,9 @@ const DEMO_SCRIPT: TermLine[] = [
   { kind: 'cmd', text: 'pip install thermalos' },
   { kind: 'wait', ms: 400 },
   { kind: 'out', text: 'Collecting thermalos', color: T.muted },
-  { kind: 'out', text: '  Downloading thermalos-0.1.8-py3-none-any.whl (47.6 kB)', color: T.faint },
+  { kind: 'out', text: '  Downloading thermalos-0.1.9-py3-none-any.whl (49.8 kB)', color: T.faint },
   { kind: 'out', text: '  Installing collected packages: thermalos', color: T.faint },
-  { kind: 'out', text: 'Successfully installed thermalos-0.1.8', color: T.healthy },
+  { kind: 'out', text: 'Successfully installed thermalos-0.1.9', color: T.healthy },
   { kind: 'wait', ms: 700 },
   { kind: 'cmd', text: 'thermalos setup' },
   { kind: 'wait', ms: 500 },

@@ -171,14 +171,14 @@ export async function fetchOutreach(): Promise<OutreachRow[]> {
 
 export function generateDemoOutreach(): OutreachRow[] {
   return [
-    { name: "Prof. Souvik Kundu", org: "Cal Poly EE", role: "Assistant Professor", email: "sokundu@calpoly.edu", type: "Advisor", status: "Replied", date: "5/13/2026", priority: "P0 — Critical", notes: "Confirmed informal advising. EE 4400 in fall." },
-    { name: "Prof. Helen Yu", org: "Cal Poly EE", role: "Professor", email: "xhyu@calpoly.edu", type: "Advisor", status: "Replied", date: "5/13/2026", priority: "P0 — Critical", notes: "Meeting Tuesday 2:10pm." },
-    { name: "Marcus Webb", org: "Lambda Labs", role: "Head of Infra", email: "mwebb@lambdalabs.com", type: "GPU Cloud", status: "Contacted", date: "5/10/2026", priority: "P0 — Critical", notes: "Manages 800-GPU H100 cluster" },
-    { name: "Tom Okafor", org: "Voltage Park", role: "Ops Lead", email: "tokafor@voltagepark.com", type: "AI Inference", status: "Meeting Set", date: "5/9/2026", priority: "P0 — Critical", notes: "Call Thursday 2pm PT" },
-    { name: "Raj Mehta", org: "Crusoe Energy", role: "HPC Eng", email: "rmehta@crusoe.ai", type: "HPC Lab", status: "Positive Quote", date: "5/7/2026", priority: "P0 — Critical", notes: '"We have no idea if our GPUs are throttling silently"' },
-    { name: "Priya Nair", org: "CoreWeave", role: "Sr. SRE", email: "pnair@coreweave.com", type: "GPU Cloud", status: "Replied", date: "5/8/2026", priority: "P0 — Critical", notes: "Follow up by 5/17" },
-    { name: "Alex Rivera", org: "Vast.ai", role: "CEO", email: "arivera@vast.ai", type: "GPU Cloud", status: "No Response", date: "5/5/2026", priority: "P1 — High", notes: "Re-try after demo video" },
-    { name: "Lin Chen", org: "Together AI", role: "Platform Eng", email: "lchen@together.ai", type: "AI Inference", status: "Not Contacted", date: "", priority: "P1 — High", notes: "" },
+    { name: "Prof. Souvik Kundu", org: "Cal Poly EE", role: "Assistant Professor", email: "sokundu@calpoly.edu", type: "Advisor", status: "Active", date: "6/3/2026", priority: "P0 — Critical", notes: "Last session 2026-06-03: 3 mandates (sensitivity analysis, Bayesian, E003/E004 rerun). Conference publication confirmed as primary output." },
+    { name: "Prof. Christopher Lupo", org: "Cal Poly Noyce School", role: "Founding Director, CS&SE Chair", email: "clupo@calpoly.edu", type: "Deployment Sponsor", status: "Proposal Ready", date: "6/5/2026", priority: "P0 — Critical", notes: "20-min meeting request. Pitch: extend Sandia HPC Resilience Testbed (2015) to thermal-power layer on B200. ICPE 2027 + TARUC integration angle." },
+    { name: "Prof. Helen Yu", org: "Cal Poly EE", role: "Professor", email: "xhyu@calpoly.edu", type: "Advisor", status: "First meeting pending", date: "5/13/2026", priority: "P1 — High", notes: "Signal processing angle for adaptive control." },
+    { name: "Ryan Xu", org: "Redbrick (student VC)", role: "Partner", email: "—", type: "Pitch Comp + Mentorship", status: "First meeting done", date: "6/2/2026", priority: "P1 — High", notes: "Not a funder — pitch competition + connections to local VCs. Reconnect for follow-up." },
+    { name: "RunPod (infra team)", org: "RunPod", role: "Infrastructure", email: "X / Discord #infrastructure", type: "Neocloud (discovery)", status: "Awaiting reply", date: "6/2/2026", priority: "P0 — Critical", notes: "Sent X/Discord message 2026-06-02. Ask: how do you separate hot-because-busy from hot-because-failing?" },
+    { name: "Vast.ai (community)", org: "Vast.ai", role: "Ops / Community", email: "support@vast.ai", type: "Neocloud (discovery)", status: "Awaiting reply", date: "6/2/2026", priority: "P0 — Critical", notes: "Sent email 2026-06-02. Marketplace reliability angle — bad-node detection." },
+    { name: "Lambda Labs (eng)", org: "Lambda Labs", role: "Infra Engineer", email: "X DM / replies", type: "Neocloud (discovery)", status: "Awaiting reply", date: "6/2/2026", priority: "P0 — Critical", notes: "Sent X DM 2026-06-02. Already a Lambda customer; peer framing." },
+    { name: "Cal Poly Campus IT", org: "Cal Poly", role: "Cluster Ops", email: "TBD", type: "Deployment", status: "Blocked on Lupo", date: "", priority: "P1 — High", notes: "Campus IT one-pager ready. Routes through Lupo first — sequenced after AI Factory greenlight." },
   ];
 }
 
@@ -197,14 +197,18 @@ export async function fetchEvidence(): Promise<EvidenceRow[]> {
 
 export function generateDemoEvidence(): EvidenceRow[] {
   return [
-    { claim: "Utilization is a broken thermal state signal", proof: "E002: GPU held 74°C / 31W for 10 min at 0% util after workload exit", location: "GitHub — /experiments/E002_same_process_cooldown.csv", status: "Evidence collected" },
-    { claim: "Process-exit cooldown is consistent and measurable", proof: "E003/E004: Mean 202s ± 14.8s across 3 trials (141s, 209s, 212s, 185s)", location: "GitHub — /experiments/E003_E004_cooldown_replication.csv", status: "Evidence collected" },
-    { claim: "Idle Rθ baseline established on T4", proof: "E001: 40.4°C, 9.47W, Rθ = 1.623 °C/W stable over 60s", location: "GitHub — /experiments/E001_idle_baseline.csv", status: "Evidence collected" },
-    { claim: "Power-cap sweep: compute/watt improvement at sub-TDP cap", proof: "E005 pending — 6 power levels, throughput + watts + temp", location: "GitHub — /experiments/E005_power_cap_sweep/ (planned)", status: "No proof yet" },
-    { claim: "Anomaly detector flags Rθ deviation from baseline", proof: "Validation CSV: each condition × detected(y/n) × latency", location: "GitHub — /model/validation_results.csv (planned)", status: "No proof yet" },
-    { claim: "GPU cluster operators confirm the problem exists", proof: "Discovery call notes with org, role, exact quotes", location: "Private notes doc", status: "In progress" },
-    { claim: "ENGR 400 advisor confirmed (fall)", proof: "Email from Prof. Kundu confirming informal summer + EE 4400 fall", location: "Email thread — keep it", status: "Evidence collected" },
-    { claim: "1 design partner running pilot audit", proof: "Email/Slack confirmation from partner", location: "Email thread", status: "No proof yet" },
+    { claim: "Controlled-variable F1: 2°C ambient → 3.5× recovery time", proof: "E004 v2 (2026-06-04): 7-trial controlled study, within-condition CV 1.8%. 1800s pre-trial wait → 3-5s recovery vs 10-37s without.", location: "vault/wiki/experiments/E004.md + vault/raw/code/E004v2_COLAB_FINAL.py", status: "Evidence collected" },
+    { claim: "Utilization is a broken thermal state signal", proof: "E002: GPU held 74°C / 31W for 10 min at 0% util after same-process workload exit (zombie state)", location: "vault/wiki/experiments/E002.md", status: "Evidence collected" },
+    { claim: "Child-exit recovery is consistent (P-state → P8 in 5-6s)", proof: "E004: all 7 trials recovered P-state in 5.1-6.1s regardless of starting temperature", location: "vault/wiki/experiments/E004.md", status: "Evidence collected" },
+    { claim: "Rθ sensitivity quantified: dRθ/dT_amb = -1/P", proof: "F2: idle 7.1% / °C, load 2.0% / °C. Idle is 3.5× more sensitive than load. Kundu mandate 2026-06-03: present R_θ with confidence bands.", location: "vault/wiki/findings/F2.md", status: "Evidence collected" },
+    { claim: "Classifier reaches 100% with steady-state filter", proof: "Naive Bayes raw 87.0%, with 15s steady-state filter 99.9%. Random Forest with filter 100%. Steady-state filter is the highest-leverage preprocessing step.", location: "vault/wiki/synthesis/classifier_comparison_orange.md", status: "Evidence collected" },
+    { claim: "Fault curve classifier shipped — 6 failure modes from R_θ(P) shape", proof: "v0.1.9 (2026-06-05): dust, TIM, fan, blockage, mounting, HBM. Causal diagnosis with remediation, not just anomaly flags.", location: "thermalos-agent/thermalos/agent/fault_classifier.py + vault/wiki/concepts/rtheta_fault_taxonomy.md", status: "Evidence collected" },
+    { claim: "Cal Poly AI Factory deployment proposal ready", proof: "Lupo one-pager + Campus IT brief written, PDFs generated. TARUC integration angle → ICPE 2027 co-authorship.", location: "vault/raw/strategy/pdfs/thermalos_lupo_proposal.pdf", status: "Awaiting Lupo meeting" },
+    { claim: "Neocloud discovery outreach in flight", proof: "RunPod, Vast.ai, Lambda Labs — outreach sent 2026-06-02 via X/email/Discord. Discovery (not pitch).", location: "vault/wiki/sources/outreach_messages_2026_06_02.md", status: "Awaiting replies" },
+    { claim: "Kundu informal advising active; EE 4400 fall confirmed", proof: "2026-06-03 session: 3 mandates filed (sensitivity, Bayesian, E003/E004 rerun). AI Factory access via informal advising.", location: "vault/wiki/sources/kundu_session_2026_06_03.md", status: "Evidence collected" },
+    { claim: "Power-cap sweep on dedicated hardware", proof: "E005 planned — 6 power levels on DGX B200, BMC-measured ambient", location: "vault/wiki/experiments/E005.md (planned)", status: "No proof yet" },
+    { claim: "Lead-time validation (E-LT testbed)", proof: "Controlled induction of 5 failure modes on Sam's heater-block rig, fall 2026", location: "vault/wiki/experiments/E-LT.md (Fall 2026)", status: "No proof yet" },
+    { claim: "Cal Poly AI Factory live deployment", proof: "Canary install on 1 of 4 DGX B200 nodes after Lupo greenlight", location: "vault/wiki/synthesis/cal_poly_deployment_strategy.md", status: "Pending Lupo response" },
   ];
 }
 
@@ -296,9 +300,9 @@ export function generateDemoAdvisorQuestions(): AdvisorQuestion[] {
       date_raised: "2026-05-20",
       question: "Is the rule-based state classifier statistically valid, or should it be probabilistic? Current thresholds misclassify 47-98% of transitional phases.",
       what_i_tried: "Implemented thresholds: util < 5%, power < 15W, temp < 55C. Works on stable endpoints but fails transitional phases (F004). Reviewed Orange Data Mining -- Naive Bayes and Random Forest both viable. Goal is a model equation, not a black box.",
-      status: "in_discussion",
-      answer: "",
-      answered_date: "",
+      status: "answered",
+      answer: "Apply other classification techniques -- Random Forest, RL, or Bayesian. Best one I think is Bayesian. Try Python packages or Orange Data Mining for best visualization -- it will give you classification rules you can compare and find a model equation. Compare classifiers and find which fits best.",
+      answered_date: "2026-06-03",
       priority: "high",
     },
     {
@@ -316,10 +320,30 @@ export function generateDemoAdvisorQuestions(): AdvisorQuestion[] {
       date_raised: "2026-05-20",
       question: "t-test vs Mann-Whitney U for small-sample recovery comparison -- given n=3 trials, which is appropriate?",
       what_i_tried: "n=3 cross-trial CV is low (1.68% load, 0.64% recovery). t-test requires normality at n=3 which is hard to justify. Mann-Whitney U is non-parametric but loses power at small n. Standard recommendation is n >= 10 before reporting p-values.",
-      status: "open",
-      answer: "",
-      answered_date: "",
+      status: "answered",
+      answer: "Hold t-test and p-value comparisons until we have a lot more data, or when we are presenting findings. Sample sizes need to be larger before formal statistical tests are publication-grade.",
+      answered_date: "2026-06-03",
       priority: "normal",
+    },
+    {
+      id: "q6",
+      date_raised: "2026-06-03",
+      question: "How should we treat T_reference uncertainty in publication? Currently presenting R_theta as a point estimate at T_amb = 25C is not defensible.",
+      what_i_tried: "Stage 1 used a fixed T_ref = 25C from literature. F002 sensitivity analysis showed 35% R_theta swing at idle with +/-5C ambient error. Reviewers will ask 'what was ambient?' and the assumed-constant answer is not enough at conference level.",
+      status: "answered",
+      answer: "Do the sensitivity analysis -- change in response with respect to temperature. We are saying a static ambient temperature, but per degree. From a research perspective, sensitivity analysis in factors you do not know is very important. Either claim it only works at higher power, or do dR_theta/dT_amb at each power level.",
+      answered_date: "2026-06-03",
+      priority: "high",
+    },
+    {
+      id: "q7",
+      date_raised: "2026-06-03",
+      question: "Should we rerun E003 and E004 on Stage 2 hardware before publication, or trust Stage 1 data?",
+      what_i_tried: "E004 v2 (controlled-variable) already completed 2026-06-04 with 7 trials, CV 1.8% within thermal regime. E003 has same-process zombie state finding (F6) but only n=3.",
+      status: "answered",
+      answer: "Let us redo E003 and E004. Both need fresh runs with the steady-state window and Bayesian classifier in place. E004 rerun script is ready; plan E003 rerun next.",
+      answered_date: "2026-06-03",
+      priority: "high",
     },
   ];
 }
@@ -354,6 +378,34 @@ export async function fetchDecisionLog(): Promise<DecisionLogRow[]> {
 export function generateDemoDecisionLog(): DecisionLogRow[] {
   return [
     {
+      date: "2026-06-03",
+      decision: "Compute dR_theta/dT_amb sensitivity at every power tier; present R_theta with confidence bands, not as a point estimate",
+      rationale: "Kundu (2026-06-03): sensitivity analysis in factors we do not know is a research priority. Required for publication.",
+      source_question_id: "q6",
+      status: "active",
+    },
+    {
+      date: "2026-06-03",
+      decision: "Apply Bayesian classifier and compare to Random Forest using Orange Data Mining; extract model equation",
+      rationale: "Kundu (2026-06-03): Bayesian is the best fit, but compare against RF in Orange to find which rules emerge. The goal is a model equation, not a black box. Already implemented v0.1.9; supersedes 2026-05-27 in-discussion entry.",
+      source_question_id: "q3",
+      status: "active",
+    },
+    {
+      date: "2026-06-03",
+      decision: "Rerun E003 and E004 with steady-state filter and classifier in place",
+      rationale: "Kundu (2026-06-03): redo both experiments. E004 rerun script ready; E003 rerun protocol to plan next.",
+      source_question_id: "q7",
+      status: "active",
+    },
+    {
+      date: "2026-06-05",
+      decision: "Ship fault curve classifier v0.1.9 — 6 failure modes from R_theta(P) shape",
+      rationale: "Dust, TIM, fan, blockage, mounting, HBM thermal — each has a distinct R_theta curve signature. Classifier ships causal diagnosis with remediation, not just anomaly flags. Validation path: E-LT controlled induction.",
+      source_question_id: "",
+      status: "active",
+    },
+    {
       date: "2026-05-27",
       decision: "Use steady-state window for R_theta computation",
       rationale: "Rolling avg and median filter both showed negligible improvement (3.5% max). Dominant error source is T_reference uncertainty, not power noise. Simpler is better.",
@@ -365,14 +417,14 @@ export function generateDemoDecisionLog(): DecisionLogRow[] {
       decision: "Pursue Bayesian classification over hardcoded thresholds",
       rationale: "Rule-based classifier fails 47-98% of transitional phases. Bayesian approach via Orange Data Mining allows probabilistic state assignment and produces a model equation rather than a black box.",
       source_question_id: "q3",
-      status: "active",
+      status: "superseded",
     },
     {
       date: "2026-05-27",
       decision: "Redo E003 and E004 with 10+ trials on Stage 2 hardware",
       rationale: "n=3 is insufficient for statistical testing. Need n >= 10 before reporting confidence intervals. Repeat on dedicated hardware where ambient is controlled.",
       source_question_id: "q5",
-      status: "active",
+      status: "superseded",
     },
     {
       date: "2026-05-27",
@@ -416,8 +468,10 @@ export async function fetchAdvisorAsks(): Promise<AdvisorAsk[]> {
 
 export function generateDemoAdvisorAsks(): AdvisorAsk[] {
   return [
-    { id: "a1", ask: "Confirm conference target venue and submission deadline", status: "open" },
-    { id: "a2", ask: "Confirm whether informal summer advising suffices to support an AI Factory cluster access request to the Noyce School", status: "open" },
+    { id: "a1", ask: "Confirm conference target venue and submission deadline (ICPE 2027 is the working target — please verify)", status: "open" },
+    { id: "a2", ask: "Intro Amogh to Prof. Lupo (Noyce founding director) to deliver the AI Factory deployment proposal", status: "open" },
+    { id: "a3", ask: "Cal Poly email confirmation for Supabase advisor-questions sign-in (currently sokundu@calpoly.edu)", status: "open" },
+    { id: "a4", ask: "Confirm whether informal summer advising suffices to support an AI Factory cluster access request to the Noyce School", status: "resolved" },
   ];
 }
 

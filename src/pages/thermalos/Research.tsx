@@ -183,6 +183,156 @@ function ClassificationTab() {
   );
 }
 
+const FAULT_TAXONOMY = [
+  {
+    cause: "Dust accumulation",
+    signature: "Intercept drifts up uniformly, gap (low_P − high_P) stable",
+    timescale: "Weeks to months",
+    detection: "drift_rate > 0.001 C/W per day, gap_trend < 0.015 C/W per day",
+    remediation: "Clean heatsink fins and air filters",
+    color: "#EF9F27",
+  },
+  {
+    cause: "TIM pump-out / dry-out",
+    signature: "Gap narrows over months — slope rotates around low-power anchor",
+    timescale: "Months, accelerated by heavy thermal cycling",
+    detection: "gap_trend < −0.025 C/W per day, fan RPM stable",
+    remediation: "Schedule TIM replacement (repaste)",
+    color: "#F87171",
+  },
+  {
+    cause: "Fan bearing wear",
+    signature: "Gap narrows + fan RPM declining at high power",
+    timescale: "Weeks to months",
+    detection: "gap_trend < −0.025 C/W per day, fan RPM slope < −0.005 %/s",
+    remediation: "Replace cooling fan before failure",
+    color: "#F87171",
+  },
+  {
+    cause: "Airflow blockage",
+    signature: "Sudden intra-session intercept step-change, gap stable",
+    timescale: "Instant onset (cable, rack, HVAC)",
+    detection: "intra_session_delta > 0.07 C/W within hours",
+    remediation: "Check cable routing, rack clearance, HVAC",
+    color: "#60A5FA",
+  },
+  {
+    cause: "Mounting event",
+    signature: "Inter-session intercept jump (contact pressure changed)",
+    timescale: "Event-driven (maintenance, shipping)",
+    detection: "session_delta > 0.08 C/W between consecutive power-on sessions",
+    remediation: "Verify mounting hardware after last maintenance",
+    color: "#60A5FA",
+  },
+  {
+    cause: "HBM / VRAM thermal",
+    signature: "R_θ elevated only under high memory-bandwidth load",
+    timescale: "Workload-correlated, not monotonic over time",
+    detection: "rtheta(mem_util > 70%) − rtheta(mem_util < 30%) > 0.06 C/W",
+    remediation: "Reduce memory-intensive workload or check VRAM cooling",
+    color: "#9FE1CB",
+  },
+];
+
+function FaultTaxonomyTab() {
+  return (
+    <div className="space-y-6 max-w-5xl">
+      <div>
+        <SectionLabel>Curve-shape classification · 6 failure modes · v0.1.9 (shipped 2026-06-05)</SectionLabel>
+        <Card className="p-5">
+          <p className="text-[13px] text-[#a8a89f] leading-relaxed mb-3">
+            R_θ at a single power level tells you that something is wrong. The <em>shape</em> of the R_θ-vs-power curve, and how that shape changes over time, tells you <em>what</em> is wrong. The curve has two independently variable degrees of freedom:
+          </p>
+          <ul className="space-y-1.5 text-[12px] text-[#a8a89f] mb-3 pl-4">
+            <li>• <span className="text-[#9FE1CB] font-mono">Intercept</span> — R_θ at low power (5–25W), dominated by conduction</li>
+            <li>• <span className="text-[#9FE1CB] font-mono">Gap</span> — intercept minus R_θ at high power (55W+), reflects active cooling efficiency</li>
+          </ul>
+          <p className="text-[12px] text-[#888780] leading-relaxed">
+            Each failure mode deforms one or both in a characteristic way. The fault_classifier module (<span className="font-mono text-[#9FE1CB]">thermalos/agent/fault_classifier.py</span>) tracks both per GPU, computes drift rates over a 30-day rolling window, and emits causal diagnosis with remediation guidance — not just &quot;something is wrong&quot;.
+          </p>
+        </Card>
+      </div>
+
+      <div>
+        <SectionLabel>The 6 failure signatures</SectionLabel>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {FAULT_TAXONOMY.map((f) => (
+            <Card key={f.cause} className="p-4">
+              <div className="flex items-start gap-2 mb-2">
+                <div
+                  className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
+                  style={{ background: f.color }}
+                />
+                <div className="text-[13px] font-semibold text-[#E6F7F1] leading-snug">{f.cause}</div>
+              </div>
+              <div className="space-y-1.5 text-[11px] text-[#a8a89f] leading-relaxed">
+                <div>
+                  <span className="text-[#5a5a55] font-mono">Signature:</span> {f.signature}
+                </div>
+                <div>
+                  <span className="text-[#5a5a55] font-mono">Timescale:</span> {f.timescale}
+                </div>
+                <div>
+                  <span className="text-[#5a5a55] font-mono">Detection rule:</span>{" "}
+                  <span className="font-mono text-[10px] text-[#9FE1CB]">{f.detection}</span>
+                </div>
+                <div className="pt-1.5 border-t border-white/[0.05] mt-2">
+                  <span className="text-[#5a5a55] font-mono">Remediation:</span>{" "}
+                  <span className="text-[#E6F7F1]">{f.remediation}</span>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <SectionLabel>Discriminating matrix</SectionLabel>
+        <Card className="p-5">
+          <table className="text-[11px] font-mono text-[#a8a89f] w-full">
+            <thead>
+              <tr className="text-[#9FE1CB] border-b border-white/[0.1]">
+                <th className="text-left pr-3 py-2">Cause</th>
+                <th className="text-left pr-3 py-2">Intercept</th>
+                <th className="text-left pr-3 py-2">Slope</th>
+                <th className="text-left pr-3 py-2">Time scale</th>
+                <th className="text-left py-2">Step vs drift</th>
+              </tr>
+            </thead>
+            <tbody className="text-[10px]">
+              <tr className="border-b border-white/[0.03]"><td className="pr-3 py-1.5">Dust</td><td className="pr-3">↑ uniform</td><td className="pr-3">flat</td><td className="pr-3">weeks</td><td>drift</td></tr>
+              <tr className="border-b border-white/[0.03]"><td className="pr-3 py-1.5">TIM pump-out</td><td className="pr-3">minimal</td><td className="pr-3">↑ steepens</td><td className="pr-3">months</td><td>drift</td></tr>
+              <tr className="border-b border-white/[0.03]"><td className="pr-3 py-1.5">Fan bearing</td><td className="pr-3">none low-P</td><td className="pr-3">↑ above thresh</td><td className="pr-3">weeks-months</td><td>drift</td></tr>
+              <tr className="border-b border-white/[0.03]"><td className="pr-3 py-1.5">Airflow blockage</td><td className="pr-3">↑ uniform</td><td className="pr-3">flat</td><td className="pr-3">instant</td><td>step</td></tr>
+              <tr className="border-b border-white/[0.03]"><td className="pr-3 py-1.5">Mounting event</td><td className="pr-3">↑ uniform</td><td className="pr-3">flat</td><td className="pr-3">event</td><td>inter-session step</td></tr>
+              <tr><td className="pr-3 py-1.5">HBM thermal</td><td className="pr-3">workload-gated</td><td className="pr-3">workload-gated</td><td className="pr-3">correlated</td><td>neither</td></tr>
+            </tbody>
+          </table>
+        </Card>
+      </div>
+
+      <div>
+        <SectionLabel>Validation path</SectionLabel>
+        <Card className="p-5">
+          <p className="text-[13px] text-[#a8a89f] leading-relaxed mb-3">
+            The classifier ships in v0.1.9 but ground-truth labels come from controlled induction on the E-LT testbed (Sam, Fall 2026). Each failure mode gets its own induction protocol:
+          </p>
+          <ol className="space-y-1.5 text-[12px] text-[#a8a89f] pl-4">
+            <li>1. <span className="text-[#9FE1CB]">Dust</span> — tape over heatsink fins, measure R_θ(P) before/after</li>
+            <li>2. <span className="text-[#9FE1CB]">TIM</span> — bake cycles to accelerate pump-out, measure slope change</li>
+            <li>3. <span className="text-[#9FE1CB]">Fan</span> — reduce fan RPM via PWM, confirm power-threshold signature</li>
+            <li>4. <span className="text-[#9FE1CB]">Airflow</span> — restrict inlet with cardboard, confirm step-change + T_ref correlation</li>
+            <li>5. <span className="text-[#9FE1CB]">Mounting</span> — reduce heatsink contact pressure, confirm intercept step</li>
+          </ol>
+          <p className="text-[12px] text-[#888780] leading-relaxed mt-3">
+            No published paper has demonstrated this taxonomy from software telemetry alone. These five experiments are the E-LT paper&apos;s most novel contribution beyond the lead-time finding.
+          </p>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 function MethodologyTab() {
   return (
     <div className="space-y-6 max-w-4xl">
@@ -266,10 +416,11 @@ function MethodologyTab() {
 /* ------------------------------------------------------------------ */
 
 const TABS = [
-  { value: "methodology",  label: "Methodology",      sub: "Framing & findings",     Component: MethodologyTab },
-  { value: "sensitivity",  label: "Sensitivity",      sub: "T_ref & power smoothing", Component: SensitivityTab },
-  { value: "classification", label: "Classification", sub: "Rule-based vs Bayesian",  Component: ClassificationTab },
-  { value: "rtheta",       label: "Rθ vs Pressure",  sub: "Regression model",       Component: RthetaModel    },
+  { value: "methodology",    label: "Methodology",     sub: "Framing & findings",      Component: MethodologyTab },
+  { value: "sensitivity",    label: "Sensitivity",     sub: "T_ref & power smoothing", Component: SensitivityTab },
+  { value: "classification", label: "Classification",  sub: "Rule-based vs Bayesian",  Component: ClassificationTab },
+  { value: "faults",         label: "Fault Taxonomy",  sub: "6 modes · v0.1.9",        Component: FaultTaxonomyTab },
+  { value: "rtheta",         label: "Rθ vs Pressure",  sub: "Regression model",        Component: RthetaModel },
 ] as const;
 
 type TabValue = (typeof TABS)[number]["value"];
