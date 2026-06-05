@@ -1,6 +1,16 @@
 {
   "advisor_questions": [
     {
+      "id": "Does installing Ther",
+      "date_raised": "2026-06-05T00:00:00.000Z",
+      "question": "Q: Does installing ThermalOS on Cal Poly infrastructure create a university IP claim?",
+      "what_i_tried": "\n# Q: Does installing ThermalOS on Cal Poly infrastructure create a university IP claim?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
       "id": "Thermodynamics Advis",
       "date_raised": "2026-06-03T00:00:00.000Z",
       "question": "Thermodynamics Advisor Questions — Prof. Stephen Peuker",
@@ -274,8 +284,370 @@
       "status": "Evidence collected"
     }
   ],
-  "decision_log": [],
-  "timeline": [],
-  "generated_at": "2026-06-05T21:07:01.802Z",
+  "decision_log": [
+    {
+      "date": "2026-06-05",
+      "decision": "sync",
+      "rationale": "Site updated to reflect today's work (v0.1.9 fault_classifier, Kundu 2026-06-03 mandates, Lupo proposal ready).",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-05",
+      "decision": "query",
+      "rationale": "Analyzed FinceptTerminal (25K stars, $10.2K/yr commercial, no VC, AGPL+commercial dual license) as a GTM comp for ThermalOS. Filed full VC positioning playbook covering: the one-sentence positioning, three-layer value prop, what Redbrick wants NOW vs. what YC wants in September, the narrative arc for investor meetings, FinceptTerminal license model adapted for ThermalOS, and the 12-week path to YC-ready.",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-05",
+      "decision": "ingest",
+      "rationale": "Sources ingested:",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-05",
+      "decision": "implementation",
+      "rationale": "Implemented `thermalos/agent/fault_classifier.py` (340 lines). Tracks R_theta at two power tiers per GPU (LOW_P: 5–25W, HIGH_P: 55+W) and classifies the 6 failure modes from the taxonomy:",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-05",
+      "decision": "query",
+      "rationale": "Created `wiki/concepts/rtheta_fault_taxonomy.md`. Maps dust accumulation, TIM pump-out, fan bearing wear, airflow blockage, mounting hardware loosening, and HBM thermal degradation to distinct R_theta(P) curve deformations (parallel shift, slope steepening, power-threshold gating, step change, inter-session jump, workload gating). Includes v0.2 classifier design and E-LT validation path.",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-05",
+      "decision": "query",
+      "rationale": "Applied 5 AI agent characteristics (Autonomy, Reasoning, Tool-Use, Memory, Adaptability) to ThermalOS. Created:",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-04",
+      "decision": "ingest",
+      "rationale": "Session built four agent releases from the E004 v2 Colab session. Key facts:",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-04",
+      "decision": "experiment",
+      "rationale": "- Ran v2 in Colab. Tesla T4 idle floor ~37°C → 35°C thermal gate UNREACHABLE.",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-05-31",
+      "decision": "init",
+      "rationale": "- Source summary: [[thermalos_project_state_2026_05]]",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-01",
+      "decision": "ingest",
+      "rationale": "- Source summary: [[thermalos_project_state_2026_05]]",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-01",
+      "decision": "ingest",
+      "rationale": "- New source page: [[ThermalOS_Measurements_Raw]]",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-01",
+      "decision": "ingest",
+      "rationale": "- [[01_leadtime_testbed_protocol]] — feeds [[E-LT]] complete protocol",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-01",
+      "decision": "lint",
+      "rationale": "- 1 orphan: [[Q_conference_venue]] (resolved — inbound from [[overview]] confirmed)",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-01",
+      "decision": "query",
+      "rationale": "1. [[confidence_map_rtheta]] — What we know vs assume about R_theta (high/medium/low/speculation tiers)",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-01",
+      "decision": "ingest",
+      "rationale": "- New source page: [[thermalos_sync_architecture]]",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-01",
+      "decision": "sync",
+      "rationale": "- Row count \"~5,700\" → fixed to \"2,280+\" in Overview.tsx and Roadmap.tsx (E004 data missing from CSV)",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-01",
+      "decision": "build",
+      "rationale": "- `.claude/skills/sync-to-sheets/sync_vault_to_sheets.py` — reads vault wiki pages, runs contradiction check, builds Wiki Summary row structure",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-02",
+      "decision": "ingest",
+      "rationale": "- New source page: [[command_center_spec.md]]",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-02",
+      "decision": "ingest",
+      "rationale": "- Source inspected: local repo `/Users/amogh/funck-event-pass` (github.com/Asomisetty27/funck-event-pass)",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-02",
+      "decision": "ingest",
+      "rationale": "- Raw files copied: `raw/strategy/brand_spec.md`, `raw/assets/thermal_identity.png`",
+      "source_question_id": "",
+      "status": "active"
+    }
+  ],
+  "timeline": [
+    {
+      "phase": "Stage 1 — Colab baseline",
+      "week": "W1–W4",
+      "dates": "—",
+      "milestone": "E001–E004: idle, same-process, cross-process, controlled-variable cooldown",
+      "owner": "Amogh",
+      "status": "Done ✓",
+      "priority": "P1 — High",
+      "layer": "Research",
+      "notes": ""
+    },
+    {
+      "phase": "",
+      "week": "W3",
+      "dates": "—",
+      "milestone": "F1 confirmed: 2°C ambient → 3.5× recovery time (n=7, CV 1.8%)",
+      "owner": "Amogh",
+      "status": "Done ✓",
+      "priority": "P1 — High",
+      "layer": "Research",
+      "notes": ""
+    },
+    {
+      "phase": "Stage 1 — Colab baseline",
+      "week": "W4",
+      "dates": "—",
+      "milestone": "Classifier: Naive Bayes 87% → Decision Tree 100% with steady-state filter",
+      "owner": "Amogh",
+      "status": "Done ✓",
+      "priority": "P1 — High",
+      "layer": "SW",
+      "notes": ""
+    },
+    {
+      "phase": "",
+      "week": "W4",
+      "dates": "—",
+      "milestone": "Kundu advisor confirmed · 3 mandates filed (sensitivity, Bayesian, E003/E004 rerun)",
+      "owner": "Amogh",
+      "status": "Done ✓",
+      "priority": "P1 — High",
+      "layer": "Comms",
+      "notes": ""
+    },
+    {
+      "phase": "Stage 2 — Agent v0.1.9",
+      "week": "W5",
+      "dates": "—",
+      "milestone": "pip install thermalos · pynvml + Redfish + DCGM telemetry collector",
+      "owner": "Amogh",
+      "status": "Done ✓",
+      "priority": "P1 — High",
+      "layer": "SW",
+      "notes": ""
+    },
+    {
+      "phase": "",
+      "week": "W5",
+      "dates": "—",
+      "milestone": "Fault curve classifier: 6 failure modes from R_θ(P) shape",
+      "owner": "Amogh",
+      "status": "Done ✓",
+      "priority": "P1 — High",
+      "layer": "SW",
+      "notes": ""
+    },
+    {
+      "phase": "Stage 2 — Agent v0.1.9",
+      "week": "W5",
+      "dates": "—",
+      "milestone": "Discovery outreach: RunPod, Vast.ai, Lambda Labs — awaiting replies",
+      "owner": "Amogh",
+      "status": "In Progress",
+      "priority": "P2 — Normal",
+      "layer": "Comms",
+      "notes": ""
+    },
+    {
+      "phase": "",
+      "week": "W5",
+      "dates": "—",
+      "milestone": "Lupo proposal + Campus IT one-pager ready to send",
+      "owner": "Amogh",
+      "status": "In Progress",
+      "priority": "P2 — Normal",
+      "layer": "Comms",
+      "notes": ""
+    },
+    {
+      "phase": "Stage 3 — Cal Poly AI Factory deployment",
+      "week": "W6",
+      "dates": "—",
+      "milestone": "Lupo meeting · deliver AI Factory proposal · get greenlight",
+      "owner": "Amogh",
+      "status": "Not Started",
+      "priority": "P2 — Normal",
+      "layer": "Comms",
+      "notes": ""
+    },
+    {
+      "phase": "",
+      "week": "W7",
+      "dates": "—",
+      "milestone": "Canary install on 1 of 4 DGX B200 nodes · BMC-measured ambient",
+      "owner": "Amogh",
+      "status": "Not Started",
+      "priority": "P2 — Normal",
+      "layer": "SW",
+      "notes": ""
+    },
+    {
+      "phase": "Stage 3 — Cal Poly AI Factory deployment",
+      "week": "W8",
+      "dates": "—",
+      "milestone": "E005: power-cap sweep at 6 levels on DGX B200 · compare to T4 baseline",
+      "owner": "Amogh",
+      "status": "Not Started",
+      "priority": "P2 — Normal",
+      "layer": "Research",
+      "notes": ""
+    },
+    {
+      "phase": "",
+      "week": "W8",
+      "dates": "—",
+      "milestone": "TARUC integration angle confirmed with Lupo · ICPE 2027 co-authorship scoped",
+      "owner": "Both",
+      "status": "Not Started",
+      "priority": "P2 — Normal",
+      "layer": "Comms",
+      "notes": ""
+    },
+    {
+      "phase": "Stage 4 — Anomaly detector v2 + sensitivity analysis",
+      "week": "W9",
+      "dates": "—",
+      "milestone": "dR_θ/dT_amb sensitivity analysis at each power tier (Kundu mandate)",
+      "owner": "Amogh",
+      "status": "Not Started",
+      "priority": "P2 — Normal",
+      "layer": "Research",
+      "notes": ""
+    },
+    {
+      "phase": "",
+      "week": "W9",
+      "dates": "—",
+      "milestone": "E003 + E004 rerun on DGX B200 · n ≥ 10 · steady-state + Bayesian",
+      "owner": "Amogh",
+      "status": "Not Started",
+      "priority": "P2 — Normal",
+      "layer": "Research",
+      "notes": ""
+    },
+    {
+      "phase": "Stage 4 — Anomaly detector v2 + sensitivity analysis",
+      "week": "W10",
+      "dates": "—",
+      "milestone": "Bayesian classifier refit on DGX data · model equation extracted",
+      "owner": "Amogh",
+      "status": "Not Started",
+      "priority": "P2 — Normal",
+      "layer": "SW",
+      "notes": ""
+    },
+    {
+      "phase": "",
+      "week": "W10",
+      "dates": "—",
+      "milestone": "Lead-time prediction (E-LT testbed · Sam · fall 2026)",
+      "owner": "Sam",
+      "status": "Not Started",
+      "priority": "P2 — Normal",
+      "layer": "EE",
+      "notes": ""
+    },
+    {
+      "phase": "Stage 5 — Multi-GPU validation + publication",
+      "week": "W11",
+      "dates": "—",
+      "milestone": "A100 / H100 / RTX generalization experiments",
+      "owner": "Amogh",
+      "status": "Not Started",
+      "priority": "P2 — Normal",
+      "layer": "Research",
+      "notes": ""
+    },
+    {
+      "phase": "",
+      "week": "W12",
+      "dates": "—",
+      "milestone": "EE 4400 project: formal course credit for Stage 2–4 experiments",
+      "owner": "Amogh",
+      "status": "Not Started",
+      "priority": "P2 — Normal",
+      "layer": "Research",
+      "notes": ""
+    },
+    {
+      "phase": "Stage 5 — Multi-GPU validation + publication",
+      "week": "W13",
+      "dates": "—",
+      "milestone": "Conference paper draft · two-dim F1 finding · sensitivity confidence bands",
+      "owner": "Both",
+      "status": "Not Started",
+      "priority": "P2 — Normal",
+      "layer": "Research",
+      "notes": ""
+    },
+    {
+      "phase": "",
+      "week": "W14",
+      "dates": "—",
+      "milestone": "YC W27 application · submit by September deadline",
+      "owner": "Amogh",
+      "status": "Not Started",
+      "priority": "P2 — Normal",
+      "layer": "Comms",
+      "notes": ""
+    }
+  ],
+  "generated_at": "2026-06-05T21:40:25.058Z",
   "vault_root": "/Users/amogh/thermalos-vault"
 }

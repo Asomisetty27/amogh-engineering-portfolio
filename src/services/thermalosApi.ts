@@ -162,32 +162,37 @@ export function generateDemoMeasurements(count = 60): MeasurementRow[] {
 }
 
 export function generateDemoTimeline(): TimelineRow[] {
-  const phases = [
-    { name: "Phase 0 — Foundation", items: ["GPU access + first telemetry run", "Kundu advisor confirmed", "Yu meeting + 2nd advisor", "Power-cap sweep E005", "Baseline Rθ characterization", "GitHub repo structure locked"] },
-    { name: "Phase 1 — Experiments", items: ["Idle vs load Rθ comparison", "Utilization signal validation", "Process-exit cooldown study", "Power-cap sweep (6 levels)", "Compute/watt curve plotted", "Optimal power cap identified"] },
-    { name: "Phase 2 — Anomaly Detection", items: ["Rolling baseline algorithm", "Anomaly threshold calibration", "False-positive rate testing", "Throttle predictor v1", "Kundu check-in #3", "EE 4400 proposal submitted"] },
-    { name: "Phase 3 — Validation", items: ["Sam rig fault signatures", "Cross-validate rig vs telemetry", "Operator audit dry run", "Design partner outreach"] },
-    { name: "Phase 4 — YC Application", items: ["Write application draft", "Founder video", "Submit W27"] },
+  return [
+    // Stage 1 — Colab baseline (complete)
+    { phase: "Stage 1 — Colab baseline", week: "W1–W4", dates: "May 2026", milestone: "E001–E004: idle, same-process, cross-process, controlled-variable cooldown trials", owner: "Amogh", status: "Done ✓", priority: "P0 — Critical", layer: "Research", notes: "8,734 rows · 14 trials · Tesla T4" },
+    { phase: "", week: "W3", dates: "May 2026", milestone: "F1 confirmed: 2°C ambient → 3.5× recovery time (n=7, CV 1.8%)", owner: "Amogh", status: "Done ✓", priority: "P0 — Critical", layer: "Research", notes: "Controlled-variable study E004 v2" },
+    { phase: "", week: "W4", dates: "May 2026", milestone: "Classifier: Naive Bayes 87% → Decision Tree 100% with steady-state filter", owner: "Amogh", status: "Done ✓", priority: "P1 — High", layer: "SW", notes: "Orange Data Mining + sklearn" },
+    { phase: "", week: "W4", dates: "May 2026", milestone: "Kundu advisor confirmed · 3 mandates filed (sensitivity, Bayesian, E003/E004 rerun)", owner: "Amogh", status: "Done ✓", priority: "P0 — Critical", layer: "Comms", notes: "2026-06-03 session" },
+
+    // Stage 2 — Agent v0.1.9 (complete)
+    { phase: "Stage 2 — Agent v0.1.9", week: "W5", dates: "Jun 2026", milestone: "pip install thermalos · pynvml + Redfish + DCGM telemetry collector", owner: "Amogh", status: "Done ✓", priority: "P0 — Critical", layer: "SW", notes: "v0.1.8" },
+    { phase: "", week: "W5", dates: "Jun 2026", milestone: "Fault curve classifier: 6 failure modes from R_θ(P) shape (dust, TIM, fan, blockage, mounting, HBM)", owner: "Amogh", status: "Done ✓", priority: "P0 — Critical", layer: "SW", notes: "v0.1.9 · fault_classifier.py" },
+    { phase: "", week: "W5", dates: "Jun 2026", milestone: "Discovery outreach: RunPod, Vast.ai, Lambda Labs — awaiting replies", owner: "Amogh", status: "In Progress", priority: "P0 — Critical", layer: "Comms", notes: "Sent 2026-06-02" },
+    { phase: "", week: "W5", dates: "Jun 2026", milestone: "Lupo proposal + Campus IT one-pager ready to send", owner: "Amogh", status: "In Progress", priority: "P0 — Critical", layer: "Comms", notes: "Gated on Lupo meeting" },
+
+    // Stage 3 — AI Factory deployment (in progress)
+    { phase: "Stage 3 — AI Factory deployment", week: "W6", dates: "Jun–Jul 2026", milestone: "Lupo meeting · deliver AI Factory proposal · get greenlight", owner: "Amogh", status: "Not Started", priority: "P0 — Critical", layer: "Comms", notes: "Gating milestone for Stage 3" },
+    { phase: "", week: "W7", dates: "Jul 2026", milestone: "Canary install on 1 of 4 DGX B200 nodes · BMC-measured ambient", owner: "Amogh", status: "Not Started", priority: "P0 — Critical", layer: "SW", notes: "Needs Lupo greenlight first" },
+    { phase: "", week: "W8", dates: "Jul 2026", milestone: "E005: power-cap sweep at 6 levels on DGX B200 · compare to T4 baseline", owner: "Amogh", status: "Not Started", priority: "P1 — High", layer: "Research", notes: "First dedicated-hardware experiment" },
+    { phase: "", week: "W8", dates: "Jul 2026", milestone: "TARUC integration angle confirmed with Lupo · ICPE 2027 co-authorship scoped", owner: "Both", status: "Not Started", priority: "P1 — High", layer: "Comms", notes: "" },
+
+    // Stage 4 — Anomaly detector v2 (locked)
+    { phase: "Stage 4 — Anomaly detector v2 + sensitivity", week: "W9", dates: "Aug 2026", milestone: "dR_θ/dT_amb sensitivity analysis at each power tier (Kundu mandate)", owner: "Amogh", status: "Not Started", priority: "P0 — Critical", layer: "Research", notes: "Q_sensitivity_analysis" },
+    { phase: "", week: "W9", dates: "Aug 2026", milestone: "E003 + E004 rerun on DGX B200 · n ≥ 10 trials · steady-state window + Bayesian", owner: "Amogh", status: "Not Started", priority: "P0 — Critical", layer: "Research", notes: "Kundu mandate 2026-06-03" },
+    { phase: "", week: "W10", dates: "Aug 2026", milestone: "Bayesian classifier refit on DGX data · model equation extracted · compare vs RF", owner: "Amogh", status: "Not Started", priority: "P1 — High", layer: "SW", notes: "" },
+    { phase: "", week: "W10", dates: "Aug–Sep 2026", milestone: "Lead-time prediction (E-LT testbed with Sam · fault induction · fall 2026)", owner: "Sam", status: "Not Started", priority: "P1 — High", layer: "EE", notes: "Sam returns fall 2026" },
+
+    // Stage 5 — Publication (locked)
+    { phase: "Stage 5 — Multi-GPU validation + publication", week: "W11", dates: "Sep–Dec 2026", milestone: "A100 / H100 / RTX generalization experiments", owner: "Amogh", status: "Not Started", priority: "P1 — High", layer: "Research", notes: "" },
+    { phase: "", week: "W12", dates: "Oct 2026", milestone: "EE 4400 project: formal course credit for Stage 2–4 experiments", owner: "Amogh", status: "Not Started", priority: "P1 — High", layer: "Research", notes: "Fall 2026 semester" },
+    { phase: "", week: "W13", dates: "Nov 2026", milestone: "Conference paper draft · two-dim F1 finding · sensitivity confidence bands", owner: "Both", status: "Not Started", priority: "P0 — Critical", layer: "Research", notes: "ICPE 2027 target" },
+    { phase: "", week: "W14", dates: "Sep 2026", milestone: "YC W27 application · submit by September deadline", owner: "Amogh", status: "Not Started", priority: "P0 — Critical", layer: "Comms", notes: "Cal Poly student window" },
   ];
-  const out: TimelineRow[] = [];
-  let week = 1;
-  phases.forEach((p, pi) => {
-    p.items.forEach((item, ii) => {
-      out.push({
-        phase: pi === 0 || ii === 0 ? p.name : "",
-        week: `W${week}`,
-        dates: "—",
-        milestone: item,
-        owner: ["Amogh", "Both", "Sam", "Amogh", "Both", "Amogh"][ii % 6],
-        status: pi === 0 && ii < 3 ? "Done ✓" : "Not Started",
-        priority: ii === 0 ? "P0 — Critical" : ii < 2 ? "P1 — High" : "P2 — Normal",
-        layer: ["SW", "EE", "Both", "EE", "Comms", "EE"][ii % 6],
-        notes: "",
-      });
-      if (ii % 2 === 1) week++;
-    });
-  });
-  return out;
 }
 
 export function isDemoModeError(err: unknown): boolean {
