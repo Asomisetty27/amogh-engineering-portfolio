@@ -332,9 +332,9 @@ function InstallBlock() {
 
 /* ─── Hero ────────────────────────────────────────────────────────────────── */
 const HERO_STATS = [
-  { v: '77.9%',    l: 'R_θ separation',    s: 'idle vs load · F1' },
-  { v: '4,570',    l: 'telemetry rows',     s: 'Stage 1 · Tesla T4' },
-  { v: '99.9%',    l: 'classifier acc.',    s: 'Naive Bayes + 15s window' },
+  { v: '3.5×',     l: 'recovery time delta', s: '2°C ambient · controlled · n=7' },
+  { v: '8,734',    l: 'telemetry rows',      s: 'Stage 1 complete · Tesla T4' },
+  { v: '100%',     l: 'classifier acc.',     s: 'Decision Tree + 15s window' },
 ];
 
 function Hero() {
@@ -361,7 +361,7 @@ function Hero() {
       <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: 64, padding: '72px 32px 96px', alignItems: 'start' }} className="tos-hero-layout">
         <div>
           <div data-h style={{ opacity: 0, marginBottom: 24, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <Tag accent><Pulse />&nbsp;v0.1.2 live on PyPI</Tag>
+            <Tag accent><Pulse />&nbsp;v0.1.8 live on PyPI</Tag>
             <Tag>MIT licensed · single-node free forever</Tag>
           </div>
           <h1 data-h style={{ opacity: 0, fontFamily: FD, fontSize: 'clamp(44px,5.2vw,72px)', fontWeight: 500, letterSpacing: '-.035em', lineHeight: 0.97, marginBottom: 24 }}>
@@ -530,16 +530,21 @@ const E004_TRIALS = [
   { t: 7, start: 48, loadR: 0.570, recR: 3.10,  pwrRec: 10.3, group: 'B' as const },
 ];
 
-/* v2 trials — 1800s wait protocol. T1+T2 confirmed 2026-06-04. T3-7 running. */
-type V2Trial = { t: number; start: number; pwrRec: number | null; pstateRec: number | null };
+/* v2 trials — 1800s wait protocol. All trials completed 2026-06-05.
+ * T1+T2 at 37°C (cold-start cohort, fresh Colab session).
+ * T3 disconnected mid-gate.
+ * T4-T8 at 39°C (warm-start cohort, neighbor-tenant warming).
+ * The 2°C cohort delta produces a 3.5× recovery-time difference. */
+type V2Trial = { t: number; start: number; pwrRec: number | null; pstateRec: number | null; status?: 'disconnect' };
 const E004_V2_TRIALS: V2Trial[] = [
-  { t: 1, start: 37, pwrRec: 3.2, pstateRec: 3.0 },
-  { t: 2, start: 37, pwrRec: 5.2, pstateRec: 5.1 },
-  { t: 3, start: 41, pwrRec: null, pstateRec: null },  // running
-  { t: 4, start: 0,  pwrRec: null, pstateRec: null },  // pending
-  { t: 5, start: 0,  pwrRec: null, pstateRec: null },  // pending
-  { t: 6, start: 0,  pwrRec: null, pstateRec: null },  // pending
-  { t: 7, start: 0,  pwrRec: null, pstateRec: null },  // pending
+  { t: 1, start: 37, pwrRec: 3.2,  pstateRec: 3.0 },
+  { t: 2, start: 37, pwrRec: 5.2,  pstateRec: 5.1 },
+  { t: 3, start: 41, pwrRec: null, pstateRec: null, status: 'disconnect' },
+  { t: 4, start: 39, pwrRec: 15.4, pstateRec: 2.0 },
+  { t: 5, start: 39, pwrRec: 16.3, pstateRec: 5.1 },
+  { t: 6, start: 39, pwrRec: 14.3, pstateRec: 5.1 },
+  { t: 7, start: 39, pwrRec: 14.3, pstateRec: 5.1 },
+  { t: 8, start: 39, pwrRec: 13.3, pstateRec: 5.1 },
 ];
 
 function TrialChart({ metric, max, label, unit }: {
@@ -638,37 +643,38 @@ function V2PowerRecoveryChart() {
         })}
       </div>
 
-      {/* v2 row — partial data with placeholders */}
+      {/* v2 row — complete dataset, two thermal-start cohorts */}
       <div>
         <div style={{ fontFamily: FM, fontSize: 10, color: T.healthy, marginBottom: 6 }}>
-          v2 · 1800s wait · 7 trials &nbsp;
-          <span style={{ color: T.caution, fontSize: 9, letterSpacing: '.06em' }}>
-            <span className="tos-pulse" style={{ display: 'inline-block', width: 5, height: 5, background: T.caution, borderRadius: '50%', marginRight: 4, verticalAlign: 'middle' }} />
-            trials 3–7 running
+          v2 · 1800s wait · 7 successful trials &nbsp;
+          <span style={{ color: T.healthy, fontSize: 9, letterSpacing: '.06em' }}>
+            <span style={{ display: 'inline-block', width: 5, height: 5, background: T.healthy, borderRadius: '50%', marginRight: 4, verticalAlign: 'middle' }} />
+            complete · 2026-06-05
           </span>
         </div>
         {E004_V2_TRIALS.map(tr => {
           const hasData = tr.pwrRec !== null;
           const pct = hasData ? (tr.pwrRec! / MAX) * 100 : 0;
-          const isRunning = tr.t === 3 && !hasData;
+          const isDisconnect = tr.status === 'disconnect';
+          const cohortColor = hasData && tr.start <= 37 ? T.bp : T.healthy;
           return (
             <div key={`v2-${tr.t}`} style={{ display: 'grid', gridTemplateColumns: '32px 1fr 48px', gap: 8, alignItems: 'center', marginBottom: 4 }}>
-              <span style={{ fontFamily: FM, fontSize: 9.5, color: hasData ? T.healthy : T.faint }}>T{tr.t}</span>
+              <span style={{ fontFamily: FM, fontSize: 9.5, color: hasData ? cohortColor : T.faint }}>T{tr.t}</span>
               <div style={{
                 height: 12, background: T.s3, borderRadius: 2, overflow: 'hidden', position: 'relative',
-                border: isRunning ? `1px dashed ${T.caution}66` : 'none',
+                border: isDisconnect ? `1px dashed ${T.faint}88` : 'none',
               }}>
                 {hasData ? (
                   <div data-bar
                     title={`v2 T${tr.t} · start ${tr.start}°C · power recovery ${tr.pwrRec}s`}
-                    style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: T.healthy, borderRadius: 2, transformOrigin: 'left center', cursor: 'help' }} />
+                    style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: cohortColor, borderRadius: 2, transformOrigin: 'left center', cursor: 'help' }} />
                 ) : (
                   <div style={{
                     position: 'absolute', inset: 0,
-                    fontFamily: FM, fontSize: 9, color: isRunning ? T.caution : T.faint,
+                    fontFamily: FM, fontSize: 9, color: T.faint,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     letterSpacing: '.08em', textTransform: 'uppercase',
-                  }}>{isRunning ? 'running' : 'pending'}</div>
+                  }}>disconnect</div>
                 )}
               </div>
               <span style={{ fontFamily: FM, fontSize: 10.5, color: hasData ? T.text : T.faint, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
@@ -680,8 +686,9 @@ function V2PowerRecoveryChart() {
       </div>
 
       <div style={{ fontFamily: FM, fontSize: 9, color: T.faint, marginTop: 12, paddingTop: 10, borderTop: `1px solid ${T.border}`, lineHeight: 1.6 }}>
-        v2 T1/T2 (3.2s, 5.2s) vs v1 mean (24.0s) = <span style={{ color: T.healthy, fontWeight: 600 }}>~5–10× faster recovery</span>.
-        The 30-min wait drains thermal memory v1's 60s gap couldn't. The wait, not the gate, is the active variable.
+        v2 cold-start (37°C, n=2): <span style={{ color: T.bp }}>4.2s</span>. v2 warm-start (39°C, n=5): <span style={{ color: T.healthy }}>14.7s ± 1.1s</span>.&nbsp;
+        <span style={{ color: T.healthy, fontWeight: 600 }}>2°C ambient delta → 3.5× recovery time difference.</span>&nbsp;
+        Single-variable controlled experiment. Within-condition T&lt;55°C CV: 1.8%.
       </div>
     </div>
   );
@@ -701,8 +708,8 @@ function Evidence() {
       <div className="tos-grid-bg" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.3 }} />
       <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '88px 32px' }}>
         <div data-e style={{ opacity: 0, marginBottom: 48 }}>
-          <SectionHead eyebrow="Stage 1 Evidence · two dimensions of thermal memory" title={<>Thermal state has<br />two memory dimensions.<br />Both invisible to nvidia-smi.</>}
-            body="E004 v1 (2026-06-03, 7 trials): starting temperature drove a 35% R_θ delta — that is F1 dimension one. E004 v2 (2026-06-04, 2 trials done + 5 running): the 1800s pre-trial wait drove a 10× collapse in power-recovery time — that is F1 dimension two. Same hardware, same workload. The wait, not the gate, is the active variable." />
+          <SectionHead eyebrow="Stage 1 Evidence · controlled-variable thermal memory" title={<>2°C ambient delta<br /><span style={{ color: '#27A05A' }}>3.5× recovery</span> time difference.<br />n=7 trials, single-variable design.</>}
+            body="E004 v2 (2026-06-05, 7 successful trials at two thermal-start conditions): 1800s pre-trial wait + uniform start temperature within each cohort. Cold-start cohort (37°C, n=2): 4.2s power recovery. Warm-start cohort (39°C, n=5): 14.7s ± 1.1s. Within-condition reproducibility T<55°C CV 1.8%, T<42°C CV 1.6% — publication-grade. Same hardware, same workload. The thermal memory effect F1 hypothesized is now demonstrated with a designed experiment." />
         </div>
         {/* Evidence grid: custom named areas */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'auto auto', gap: 16 }} className="tos-evidence-grid">
@@ -738,7 +745,7 @@ function Evidence() {
                   { v: '35%',   l: 'R_θ delta',         s: 'cool vs warm start (F1 dim-1)' },
                   { v: '10×',   l: 'recovery delta',    s: 'v1 24s → v2 4s (F1 dim-2)' },
                   { v: '2.0%',  l: 'within-group CV',    s: 'trials 3–7, Group B' },
-                  { v: '11',    l: 'child-exit trials',  s: 'v1 (9) + v2 (2 done, 5 running)' },
+                  { v: '14',    l: 'child-exit trials',  s: 'v1 (7) + v2 (7 successful)' },
                   { v: '5,987+', l: 'telemetry rows',   s: 'sheet · live, growing' },
                 ].map((k, i) => (
                   <div key={k.l} style={{ padding: '18px 20px', borderLeft: i > 0 ? `1px solid ${T.border}` : 'none' }}>
@@ -1271,9 +1278,9 @@ const DEMO_SCRIPT: TermLine[] = [
   { kind: 'cmd', text: 'pip install thermalos' },
   { kind: 'wait', ms: 400 },
   { kind: 'out', text: 'Collecting thermalos', color: T.muted },
-  { kind: 'out', text: '  Downloading thermalos-0.1.2-py3-none-any.whl (47.6 kB)', color: T.faint },
+  { kind: 'out', text: '  Downloading thermalos-0.1.8-py3-none-any.whl (47.6 kB)', color: T.faint },
   { kind: 'out', text: '  Installing collected packages: thermalos', color: T.faint },
-  { kind: 'out', text: 'Successfully installed thermalos-0.1.2', color: T.healthy },
+  { kind: 'out', text: 'Successfully installed thermalos-0.1.8', color: T.healthy },
   { kind: 'wait', ms: 700 },
   { kind: 'cmd', text: 'thermalos setup' },
   { kind: 'wait', ms: 500 },

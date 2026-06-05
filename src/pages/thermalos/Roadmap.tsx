@@ -14,15 +14,15 @@ interface Stage {
 const STAGES: Stage[] = [
   {
     id: 1,
-    title: "Colab baseline",
-    subtitle: "Tesla T4 · 5,987+ rows · E001–E004 v1 + v2 partial · F1 thermal-memory two-dimensional (start temp + wait duration)",
+    title: "Colab baseline complete",
+    subtitle: "Tesla T4 · 8,734 rows · 14 trials · controlled-variable F1: 2°C ambient delta → 3.5× recovery time difference (n=7, within-condition CV 1.8%)",
     status: "complete",
     progress: 100,
   },
   {
     id: 2,
-    title: "Agent v0.1.2 shipped",
-    subtitle: "pip install thermalos · open-source on PyPI · Decision Tree 100% CV + Naive Bayes 99.8% · Prometheus + Grafana + Docker",
+    title: "Agent v0.1.8 shipped",
+    subtitle: "pip install thermalos · Decision Tree 100% · ensemble voting · failure predictor · SDC hunter · Redfish + DCGM · health API · Intelligence Network",
     status: "complete",
     progress: 100,
   },

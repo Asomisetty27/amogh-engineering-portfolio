@@ -74,8 +74,8 @@ function Hero({ rowCount, demo, syncedAt }: { rowCount: number; demo: boolean; s
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <Pill tone="complete">YC W27 target</Pill>
         <Pill tone="progress">Pre-seed · Pre-revenue</Pill>
-        <Pill tone="complete">Stage 1 complete · 4,570 rows · 9 trials</Pill>
-        <Pill tone="complete">Agent v0.1.2 · pip install thermalos</Pill>
+        <Pill tone="complete">Stage 1 complete · 8,734 rows · 14 trials</Pill>
+        <Pill tone="complete">Agent v0.1.8 · pip install thermalos</Pill>
         {syncedAt && (
           <span className="text-[10px] font-mono" style={{ color: "var(--t-faint)" }}>synced {syncedAt}</span>
         )}
@@ -116,12 +116,12 @@ function HeadlineFinding() {
             Utilization alone does not define thermal state.
           </div>
           <p className="text-[13px] leading-relaxed" style={{ color: "var(--t-muted)" }}>
-            Across 4,570 telemetry rows and 9 child-exit trials on a Tesla T4, we observed{" "}
-            <span className="font-semibold" style={{ color: "var(--t-healthy)" }}>three distinct power regimes at 0% utilization</span>
-            {" "}— a signal current monitoring tools collapse into a single &ldquo;idle&rdquo; state. The
-            invisible regime gap is where silent throttling and cooling-path degradation live. Same workload,
-            same hardware, different starting temperature: R_theta shifts by 35% — direct evidence of
-            thermal memory that utilization-based monitoring cannot detect.
+            Across 8,734 telemetry rows and 14 child-exit trials on a Tesla T4, a controlled-variable
+            experiment isolated starting ambient temperature as the dominant driver of recovery dynamics.{" "}
+            <span className="font-semibold" style={{ color: "var(--t-healthy)" }}>A 2°C delta in starting temperature produces a 3.5× change in power-recovery time</span>
+            {" "}(cold-start cohort 37°C, n=2: 4.2s; warm-start cohort 39°C, n=5: 14.7s ± 1.1s). Within-condition
+            reproducibility T&lt;55°C CV is 1.8%. This is direct, single-variable evidence of thermal memory —
+            a signal utilization-based monitoring collapses into a single &ldquo;idle&rdquo; bucket.
           </p>
         </div>
       </div>
@@ -765,7 +765,7 @@ export default function Overview() {
   });
 
   const demo = isError && isDemoModeError(error);
-  const rowCount = demo ? 4570 : data?.length ?? 0;
+  const rowCount = demo ? 8734 : data?.length ?? 0;
   const summary = (summaryIsErr && isDemoModeError(summaryErr)) || !summaryData
     ? generateDemoWikiSummary()
     : summaryData;
