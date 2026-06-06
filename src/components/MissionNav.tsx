@@ -5,6 +5,7 @@ import {
   Compass, Rocket, Briefcase, Cpu, Mail, FileText,
   Eye, Wrench, Menu, X, Link2, Check,
 } from "lucide-react";
+import { useMagneticHover } from "@/hooks/useMagneticHover";
 
 const navItems = [
   { id: "overview", label: "Overview", icon: Compass },
@@ -14,6 +15,63 @@ const navItems = [
   { id: "contact", label: "Contact", icon: Mail },
   { id: "quickview", label: "Quickview", icon: FileText },
 ];
+
+interface NavItem {
+  id: string;
+  label: string;
+  icon: React.ElementType;
+}
+
+function MagneticNavButton({
+  item,
+  isActive,
+  onNavigate,
+  Icon,
+}: {
+  item: NavItem;
+  isActive: boolean;
+  onNavigate: (id: string) => void;
+  Icon: React.ElementType;
+}) {
+  const { ref, x, y, onMouseMove, onMouseLeave } = useMagneticHover(0.35);
+
+  return (
+    <motion.button
+      ref={ref as React.RefObject<HTMLButtonElement>}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      onClick={() => onNavigate(item.id)}
+      className={`relative px-3 py-1.5 text-xs font-mono tracking-wide rounded-md transition-colors duration-200 ${
+        isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+      }`}
+      whileTap={{ scale: 0.94 }}
+      style={{
+        x,
+        y,
+        background: isActive
+          ? "linear-gradient(180deg, hsl(var(--primary) / 0.10), hsl(var(--primary) / 0.02))"
+          : "transparent",
+        position: "relative",
+      }}
+    >
+      <span className="flex items-center gap-1.5">
+        <Icon size={13} />
+        {item.label.toUpperCase()}
+      </span>
+      {isActive && (
+        <motion.div
+          layoutId="nav-indicator"
+          className="absolute bottom-0 left-1 right-1 h-0.5 rounded-full"
+          style={{
+            background: "linear-gradient(90deg, transparent, hsl(var(--primary)), transparent)",
+            boxShadow: "0 0 8px hsl(var(--primary) / 0.5)",
+          }}
+          transition={{ duration: 0.25, ease: [0.22, 0.68, 0, 1.0] }}
+        />
+      )}
+    </motion.button>
+  );
+}
 
 interface MissionNavProps {
   activeSection: string;
@@ -54,36 +112,13 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
               const Icon = item.icon;
               const isActive = activeSection === item.id;
               return (
-                <button
+                <MagneticNavButton
                   key={item.id}
-                  onClick={() => onNavigate(item.id)}
-                  className={`relative px-3 py-1.5 text-xs font-mono tracking-wide rounded-md transition-all duration-200 ${
-                    isActive
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                  style={{
-                    background: isActive
-                      ? "linear-gradient(180deg, hsl(var(--primary) / 0.10), hsl(var(--primary) / 0.02))"
-                      : "transparent",
-                  }}
-                >
-                  <span className="flex items-center gap-1.5">
-                    <Icon size={13} />
-                    {item.label.toUpperCase()}
-                  </span>
-                  {isActive && (
-                    <motion.div
-                      layoutId="nav-indicator"
-                      className="absolute bottom-0 left-1 right-1 h-0.5 rounded-full"
-                      style={{
-                        background: "linear-gradient(90deg, transparent, hsl(var(--primary)), transparent)",
-                        boxShadow: "0 0 8px hsl(var(--primary) / 0.5)",
-                      }}
-                      transition={{ duration: 0.25, ease: [0.22, 0.68, 0, 1.0] }}
-                    />
-                  )}
-                </button>
+                  item={item}
+                  isActive={isActive}
+                  onNavigate={onNavigate}
+                  Icon={Icon}
+                />
               );
             })}
           </div>

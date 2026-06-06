@@ -2,8 +2,11 @@ import { motion } from "framer-motion";
 import { personalInfo, projects } from "@/data/portfolioData";
 import { recruiterSummaries } from "@/data/interviewData";
 import { useViewMode } from "@/contexts/ViewModeContext";
-import { GraduationCap, Cpu, Radio, Zap, ArrowRight, Shield } from "lucide-react";
+import { Cpu, Radio, Zap, ArrowRight, Shield } from "lucide-react";
 import ThermalOSBanner from "@/components/ThermalOSBanner";
+import HeroHeader from "@/components/sections/HeroHeader";
+import TiltCard from "@/components/ui/TiltCard";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const strengths = [
   {
@@ -42,26 +45,8 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
   return (
     <section className="max-w-4xl mx-auto">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        {/* Hero — gradient text fill on name, layered subtle backdrop */}
-        <div className="mb-8 relative">
-          <div className="absolute -inset-6 -z-10 pointer-events-none opacity-50"
-            style={{
-              background:
-                "radial-gradient(ellipse 60% 80% at 20% 50%, hsl(var(--primary) / 0.08), transparent)",
-            }}
-          />
-          <h1 className="font-display text-4xl md:text-5xl tracking-tight font-semibold mb-2 fx-grad-text-cyan"
-            style={{ letterSpacing: "-0.02em", lineHeight: 1.02 }}>
-            {personalInfo.name}
-          </h1>
-          <p className="font-mono text-base md:text-lg text-foreground leading-snug max-w-2xl">
-            Systems-Oriented Electrical Engineer
-          </p>
-          <p className="font-mono text-sm text-muted-foreground flex items-center gap-2 mt-1.5">
-            <GraduationCap size={14} className="text-primary/60" />
-            {personalInfo.university}
-          </p>
-        </div>
+        {/* Hero */}
+        <HeroHeader />
 
         {/* Value Proposition — glass + accent line */}
         <div className="fx-glass rounded-lg p-5 mb-8 relative overflow-hidden">
@@ -134,30 +119,36 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
                 initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ delay: 0.2 + i * 0.08, duration: 0.5, ease: [0.22, 0.68, 0, 1.0] }}
-                className="fx-card fx-glass rounded-lg p-4 cursor-pointer group relative overflow-hidden"
-                onClick={() => onNavigateToProject?.(p.id)}
               >
-                {/* Radial glow on hover */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  style={{
-                    background: "radial-gradient(ellipse 80% 60% at 50% 0%, hsl(var(--primary) / 0.08), transparent)",
-                  }}
-                />
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase">{p.course || p.domain.toUpperCase()}</span>
-                    <ArrowRight size={12} className="text-muted-foreground group-hover:text-primary transition-all duration-300 group-hover:translate-x-0.5" />
-                  </div>
-                  <h4 className="text-sm font-semibold text-foreground mb-1 leading-tight group-hover:fx-grad-text-cyan transition-all">{p.name}</h4>
-                  <p className="text-xs text-muted-foreground mb-2 leading-relaxed line-clamp-2">
-                    {summary?.whatIsIt || p.heroSummary}
-                  </p>
-                  {summary && (
-                    <div className="text-xs text-secondary-foreground border-t border-panel-border pt-2 mt-auto">
-                      <span className="text-primary/60">▸</span> {summary.keyOutcomes[0]}
+                <TiltCard
+                  className="fx-glass rounded-lg p-4 cursor-pointer group relative overflow-hidden h-full"
+                  onClick={() => onNavigateToProject?.(p.id)}
+                  maxDeg={8}
+                >
+                  {/* Top accent line */}
+                  <div className="absolute top-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.5) 50%, transparent)" }}
+                  />
+                  {/* Radial glow on hover */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                    style={{ background: "radial-gradient(ellipse 80% 60% at 50% 0%, hsl(var(--primary) / 0.07), transparent)" }}
+                  />
+                  <div className="relative">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase">{p.course || p.domain.toUpperCase()}</span>
+                      <ArrowRight size={12} className="text-muted-foreground group-hover:text-primary transition-all duration-300 group-hover:translate-x-0.5" />
                     </div>
-                  )}
-                </div>
+                    <h4 className="text-sm font-semibold text-foreground mb-1 leading-tight group-hover:text-primary transition-colors duration-200">{p.name}</h4>
+                    <p className="text-xs text-muted-foreground mb-2 leading-relaxed line-clamp-2">
+                      {summary?.whatIsIt || p.heroSummary}
+                    </p>
+                    {summary && (
+                      <div className="text-xs text-secondary-foreground border-t border-panel-border pt-2 mt-auto">
+                        <span className="text-primary/60">▸</span> {summary.keyOutcomes[0]}
+                      </div>
+                    )}
+                  </div>
+                </TiltCard>
               </motion.div>
             );
           })}

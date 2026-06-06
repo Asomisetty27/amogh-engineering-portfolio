@@ -11,6 +11,8 @@ import ContactSection from "@/components/sections/ContactSection";
 import QuickviewSection from "@/components/sections/QuickviewSection";
 import GradientOrbs from "@/components/visual/GradientOrbs";
 import FilmGrain from "@/components/visual/FilmGrain";
+import CustomCursor from "@/components/visual/CustomCursor";
+import ParticleField from "@/components/visual/ParticleField";
 
 export default function Index() {
   const [booted, setBooted] = useState(false);
@@ -45,11 +47,13 @@ export default function Index() {
 
   return (
     <ViewModeProvider>
+      <CustomCursor />
       {!booted && <BootAnimation onComplete={handleBootComplete} />}
 
       {booted && (
         <div className="min-h-screen bg-background relative">
-          {/* Framer-style depth layers — fixed to viewport so they stay in place on scroll */}
+          {/* Ambient layers */}
+          <ParticleField count={48} />
           <GradientOrbs variant="mixed" fixed />
           <FilmGrain fixed opacity={0.02} />
 

@@ -66,6 +66,13 @@
   }
 }
 
+/* Hide system cursor on pointer devices — custom cursor takes over */
+@media (pointer: fine) {
+  *, *::before, *::after {
+    cursor: none !important;
+  }
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
