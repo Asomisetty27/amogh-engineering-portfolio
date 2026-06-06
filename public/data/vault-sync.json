@@ -1,6 +1,16 @@
 {
   "advisor_questions": [
     {
+      "id": "What operator workfl",
+      "date_raised": "2026-06-05T00:00:00.000Z",
+      "question": "Q: What operator workflows should ThermalOS integrate with first?",
+      "what_i_tried": "\n# Q: What operator workflows should ThermalOS integrate with first?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
       "id": "Does installing Ther",
       "date_raised": "2026-06-05T00:00:00.000Z",
       "question": "Q: Does installing ThermalOS on Cal Poly infrastructure create a university IP claim?",
@@ -41,6 +51,16 @@
       "priority": "normal"
     },
     {
+      "id": "How should ThermalOS",
+      "date_raised": "2026-06-05T00:00:00.000Z",
+      "question": "Q: How should ThermalOS store and use per-GPU baseline history?",
+      "what_i_tried": "\n# Q: How should ThermalOS store and use per-GPU baseline history?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
       "id": "What is the right pe",
       "date_raised": "2026-06-05T00:00:00.000Z",
       "question": "Q: What is the right persistent storage for thermal fingerprints?",
@@ -65,6 +85,16 @@
       "date_raised": "2026-06-01T00:00:00.000Z",
       "question": "Q_discovery_progress — Have Discovery Calls Started?",
       "what_i_tried": "\n# Q_discovery_progress — Have Discovery Calls Started?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "How does ThermalOS c",
+      "date_raised": "2026-06-05T00:00:00.000Z",
+      "question": "Q: How does ThermalOS calibrate R_theta thresholds across GPU vendors and models?",
+      "what_i_tried": "\n# Q: How does ThermalOS calibrate R_theta thresholds across GPU vendors and models?",
       "status": "open",
       "answer": "",
       "answered_date": "",
@@ -131,7 +161,41 @@
       "priority": "normal"
     }
   ],
-  "outreach": [],
+  "outreach": [
+    {
+      "name": "RunPod",
+      "org": "",
+      "role": "X reply / Discord #infrastructure",
+      "email": "",
+      "type": "Neocloud (discovery)",
+      "status": "Confirmed",
+      "date": "2026-06-05T00:00:00.000Z",
+      "priority": "P0 — Critical",
+      "notes": "Technical peer, short format"
+    },
+    {
+      "name": "Vast.ai",
+      "org": "",
+      "role": "Email / Discord community",
+      "email": "",
+      "type": "Neocloud (discovery)",
+      "status": "Confirmed",
+      "date": "2026-06-05T00:00:00.000Z",
+      "priority": "P0 — Critical",
+      "notes": "Marketplace reliability angle"
+    },
+    {
+      "name": "Lambda Labs",
+      "org": "",
+      "role": "X DM / reply to engineering posts",
+      "email": "",
+      "type": "Neocloud (discovery)",
+      "status": "Confirmed",
+      "date": "2026-06-05T00:00:00.000Z",
+      "priority": "P0 — Critical",
+      "notes": "Customer relationship + shared problem"
+    }
+  ],
   "evidence": [
     {
       "claim": "Question",
@@ -648,6 +712,86 @@
       "notes": ""
     }
   ],
-  "generated_at": "2026-06-05T21:40:25.058Z",
+  "moat_dimensions": [
+    {
+      "name": "Validated lead-time data",
+      "current": "Unproven — E-LT planned for fall 2026",
+      "target": "Minutes-to-hours of R_theta rise before throttle, on real hardware, with n ≥ 10 fault inductions",
+      "status": "unproven"
+    },
+    {
+      "name": "Per-GPU baseline history",
+      "current": "Not implemented — agent computes R_theta live but does not store fingerprints",
+      "target": "Each GPU has a unique R_theta(P) fingerprint stored persistently; drift is detected against that GPU's own history, not a fleet average",
+      "status": "not_built"
+    },
+    {
+      "name": "Operator workflow integration",
+      "current": "Not implemented — agent emits alerts and Prometheus metrics",
+      "target": "SLURM job annotations, Grafana incident panels, k8s node taints, PagerDuty escalation with thermal context",
+      "status": "not_built"
+    },
+    {
+      "name": "Cross-vendor support",
+      "current": "T4 only (Colab Stage 1) — no A100, H100, MI300X data",
+      "target": "Calibration mode that learns per-GPU-model idle floor and thermal resistance baseline automatically",
+      "status": "gap"
+    },
+    {
+      "name": "Failure/degradation dataset",
+      "current": "Planned (E-LT), not collected",
+      "target": "Ground-truth fault signatures: dust, TIM, fan, blockage, mounting — each with a labeled R_theta(P) curve",
+      "status": "planned"
+    },
+    {
+      "name": "Trusted alert calibration",
+      "current": "Naive thresholds from T4 experiments",
+      "target": "Per-GPU model, per-rack alert thresholds learned from operator feedback; false-positive rate tracked and minimized",
+      "status": "partial"
+    },
+    {
+      "name": "What to build",
+      "current": "Why",
+      "target": "When",
+      "status": "gap"
+    },
+    {
+      "name": "Per-GPU baseline history (persistent fingerprinting)",
+      "current": "Moat dimension 2 — can't be copied without the data",
+      "target": "Stage 2 (DGX B200 install)",
+      "status": "gap"
+    },
+    {
+      "name": "Calibration mode (learn idle floor per GPU model)",
+      "current": "Moat dimension 4 — prerequisite for any operator install",
+      "target": "Before first live install",
+      "status": "gap"
+    },
+    {
+      "name": "SLURM job annotation",
+      "current": "Moat dimension 3 — SLURM is the scheduler at Cal Poly AI Factory",
+      "target": "Stage 3 (AI Factory deployment)",
+      "status": "gap"
+    },
+    {
+      "name": "Grafana panel / annotation hook",
+      "current": "Moat dimension 3 — where operators already look",
+      "target": "Stage 2–3",
+      "status": "gap"
+    },
+    {
+      "name": "E-LT lead-time experiment",
+      "current": "Moat dimension 1 — make-or-break scientific validation",
+      "target": "Fall 2026 with Sam",
+      "status": "gap"
+    },
+    {
+      "name": "Labeled fault dataset",
+      "current": "Moat dimension 5 — requires physical testbed",
+      "target": "Fall 2026 with Sam",
+      "status": "gap"
+    }
+  ],
+  "generated_at": "2026-06-06T05:52:34.635Z",
   "vault_root": "/Users/amogh/thermalos-vault"
 }

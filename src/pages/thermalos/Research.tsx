@@ -415,11 +415,156 @@ function MethodologyTab() {
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 
+const MOAT_DIMENSIONS = [
+  {
+    id: 1,
+    name: "Validated lead-time data",
+    status: "unproven" as const,
+    current: "Stage 1 confirms R_θ separates thermal states. Lead-time (does R_θ rise before throttle?) is unvalidated.",
+    target: "E-LT: n ≥ 10 controlled fault inductions showing R_θ rise minutes before throttle event.",
+    timeline: "Fall 2026 · Sam's heater-block testbed",
+    why: "If lead-time is real → predictive maintenance product. If not → diagnostic tool. Different business.",
+  },
+  {
+    id: 2,
+    name: "Per-GPU baseline history",
+    status: "not_built" as const,
+    current: "Agent computes R_θ live but does not persist anything. Every restart starts cold. No concept of 'this GPU's normal.'",
+    target: "thermalos calibrate writes ~/.thermalos/baselines/<gpu_uuid>.json. Anomaly detection drifts against per-GPU history, not fleet average.",
+    timeline: "P1 — implement before first operator install",
+    why: "Accumulated fingerprints can't be copied. Each install makes the model smarter for that GPU.",
+  },
+  {
+    id: 3,
+    name: "Operator workflow integration",
+    status: "not_built" as const,
+    current: "Agent emits Prometheus metrics and webhook alerts. That's a feature, not a product.",
+    target: "SLURM job annotation (Cal Poly AI Factory first), Grafana annotation hook, PagerDuty thermal context.",
+    timeline: "Stage 3 · AI Factory deployment · Grafana hook is low-effort",
+    why: "Operators already drown in alerts. Sticky when it integrates into workflows they open at 2am.",
+  },
+  {
+    id: 4,
+    name: "Cross-vendor support",
+    status: "gap" as const,
+    current: "All calibration data from Colab T4. T4 thresholds will misfire on A100, H100, H200, B200, MI300X.",
+    target: "Calibration mode learns per-GPU-model idle floor automatically. Ships with NVIDIA defaults derived from Stage 2 experiments.",
+    timeline: "Required before any external operator install",
+    why: "Real operators run mixed racks. A tool that only works on T4 is a science fair entry.",
+  },
+  {
+    id: 5,
+    name: "Failure/degradation dataset",
+    status: "planned" as const,
+    current: "Fault taxonomy defined (6 modes, v0.1.9). No ground-truth labeled fault signatures collected yet.",
+    target: "E-LT testbed: controlled induction of dust, TIM, fan, blockage, mounting, HBM faults. Each with labeled R_θ(P) curve.",
+    timeline: "Fall 2026 · Sam's heater-block testbed",
+    why: "Labeled fault dataset enables supervised training. No competitor has this without running the same experiments.",
+  },
+  {
+    id: 6,
+    name: "Trusted alert calibration",
+    status: "partial" as const,
+    current: "Thresholds set from T4 Stage 1 data. Ensemble voting (NB+DT) reduces false positives. No per-operator feedback loop.",
+    target: "Per-GPU-model alert thresholds learned from operator feedback. False-positive rate tracked and minimized over time.",
+    timeline: "Requires live installs to collect feedback",
+    why: "Each install that doesn't cry wolf builds trust. Trust is the prerequisite for operators to pay.",
+  },
+];
+
+const MOAT_STATUS = {
+  unproven:  { label: "Unproven",   color: "#F87171" },
+  not_built: { label: "Not built",  color: "#E8B23A" },
+  gap:       { label: "Gap",        color: "#E8B23A" },
+  partial:   { label: "Partial",    color: "#60A5FA" },
+  planned:   { label: "Planned",    color: "#888780" },
+  built:     { label: "Built",      color: "#2FB36B" },
+};
+
+function MoatTab() {
+  return (
+    <div className="space-y-6 max-w-5xl">
+      <div>
+        <SectionLabel>The defensibility problem</SectionLabel>
+        <Card className="p-5">
+          <p className="text-[13px] text-[#a8a89f] leading-relaxed mb-3">
+            The R_θ = ΔT/P equation is physics. A bigger company can copy it in one sprint. The moat cannot be the equation — it has to be built on top of it, in data, workflow integration, and calibration that takes time and operator access to accumulate.
+          </p>
+          <div className="font-mono text-[11px] text-[#5a5a55] border-t border-white/[0.05] pt-3 mt-3">
+            Current stage: technical wedge is credible. Market timing is real. Missing proof: customer/operator validation.
+          </div>
+        </Card>
+      </div>
+
+      <div>
+        <SectionLabel>Six moat dimensions — build status</SectionLabel>
+        <div className="space-y-3">
+          {MOAT_DIMENSIONS.map((m) => {
+            const s = MOAT_STATUS[m.status];
+            return (
+              <Card key={m.id} className="p-4">
+                <div className="flex items-start gap-3 mb-3">
+                  <span className="text-[10px] font-mono text-[#5a5a55] pt-0.5 w-4 flex-shrink-0">{m.id}.</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="text-[13px] font-semibold text-[#E6F7F1]">{m.name}</span>
+                      <span
+                        className="text-[9px] font-mono px-1.5 py-0.5 rounded-full"
+                        style={{ color: s.color, background: `${s.color}18`, border: `0.5px solid ${s.color}40` }}
+                      >
+                        {s.label}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[#888780] leading-relaxed italic mb-2">
+                      {m.why}
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <div className="bg-[#0D0D0B] rounded p-2.5">
+                        <div className="text-[9px] font-mono text-[#5a5a55] uppercase tracking-wider mb-1">Now</div>
+                        <p className="text-[11px] text-[#888780] leading-relaxed">{m.current}</p>
+                      </div>
+                      <div className="bg-[#0D0D0B] rounded p-2.5">
+                        <div className="text-[9px] font-mono text-[#9FE1CB] uppercase tracking-wider mb-1">Target</div>
+                        <p className="text-[11px] text-[#a8a89f] leading-relaxed">{m.target}</p>
+                        <div className="text-[9px] font-mono text-[#5a5a55] mt-1.5">{m.timeline}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <SectionLabel>The highest-leverage next move</SectionLabel>
+        <Card className="p-5">
+          <div className="text-[13px] font-semibold text-[#E6F7F1] mb-3">
+            Get one real operator to install ThermalOS and react to what it shows.
+          </div>
+          <p className="text-[12px] text-[#888780] leading-relaxed mb-4">
+            Not "take a meeting." Not "validate interest." Install it. Then collect: what did it detect, was it useful, did it match their intuition, would they keep it running, what would they pay for, what workflow should it integrate with.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            {["RunPod (awaiting reply)", "Vast.ai (awaiting reply)", "Lambda Labs (awaiting reply)", "Cal Poly AI Factory (Lupo proposal ready)", "thermalos calibrate (P1 — build this week)", "Grafana annotation hook (low effort)"].map((item) => (
+              <div key={item} className="bg-[#0D0D0B] rounded p-2 text-[11px] font-mono text-[#888780]">
+                {item}
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 const TABS = [
   { value: "methodology",    label: "Methodology",     sub: "Framing & findings",      Component: MethodologyTab },
   { value: "sensitivity",    label: "Sensitivity",     sub: "T_ref & power smoothing", Component: SensitivityTab },
   { value: "classification", label: "Classification",  sub: "Rule-based vs Bayesian",  Component: ClassificationTab },
   { value: "faults",         label: "Fault Taxonomy",  sub: "6 modes · v0.1.9",        Component: FaultTaxonomyTab },
+  { value: "moat",           label: "Moat",            sub: "6 dimensions · status",   Component: MoatTab },
   { value: "rtheta",         label: "Rθ vs Pressure",  sub: "Regression model",        Component: RthetaModel },
 ] as const;
 

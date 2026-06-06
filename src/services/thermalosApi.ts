@@ -566,12 +566,13 @@ export function generateDemoAdvisorAsks(): AdvisorAsk[] {
 
 export function generateDemoTodayPlan(): TodayRow[] {
   return [
-    { priority: "P0 — Critical", phase: "Phase 0 — Foundation", milestone: "Run E005 power-cap sweep (6 levels, PyTorch matmul)", owner: "Amogh", track: "Software", notes: "Use Colab T4, 30min per level, log to sheet" },
-    { priority: "P0 — Critical", phase: "Phase 0 — Foundation", milestone: "Yu meeting Tuesday 2:10pm — bring E001-E004 findings + GitHub", owner: "Amogh", track: "Comms", notes: "Have dashboard live on phone" },
-    { priority: "P0 — Critical", phase: "Phase 0 — Foundation", milestone: "Push E001-E004 notebooks + CSVs to GitHub repo", owner: "Amogh", track: "Software", notes: "Name: E001_idle_baseline, E002_same_process, E003_E004_cooldown" },
-    { priority: "P1 — High", phase: "Phase 0 — Foundation", milestone: "Send Kundu follow-up with first experiment summary", owner: "Amogh", track: "Comms", notes: "Keep it short — specific findings, one question" },
-    { priority: "P1 — High", phase: "Phase 0 — Foundation", milestone: "Sam: review ThermalOS direction, plan fall rig build", owner: "Sam", track: "Hardware", notes: "Rig pushed to fall — focus on internship" },
-    { priority: "P2 — Normal", phase: "Phase 0 — Foundation", milestone: "Reach out to 3 GPU cluster operators from outreach list", owner: "Amogh", track: "Comms", notes: "Lambda Labs, Voltage Park, Crusoe" },
+    { priority: "P0 — Critical", phase: "Stage 3 — AI Factory", milestone: "Draft and send Lupo email (warm via Kundu CC, or cold) — 20-min meeting request", owner: "Amogh", track: "Comms", notes: "Proposal PDF + Campus IT one-pager ready. Deadline: Fri Jun 12" },
+    { priority: "P0 — Critical", phase: "Stage 3 — AI Factory", milestone: "Follow up with Kundu: brief him on Lupo outreach strategy, get blessing or intro", owner: "Amogh", track: "Comms", notes: "Email Monday. Keep short — one paragraph, one ask" },
+    { priority: "P0 — Critical", phase: "Discovery", milestone: "Monitor RunPod / Vast.ai / Lambda replies — respond within 24h if they reply", owner: "Amogh", track: "Comms", notes: "Outreach sent 2026-06-02. First reply unlocks first discovery call." },
+    { priority: "P1 — High", phase: "Stage 4 — Research", milestone: "Run dR_θ/dT_amb sensitivity analysis (Kundu mandate) on Stage 1 CSV data", owner: "Amogh", track: "Research", notes: "Vary T_ref 20–30°C, compute R_theta at each power tier, plot sensitivity curve" },
+    { priority: "P1 — High", phase: "Stage 4 — Research", milestone: "Plan E003 rerun protocol — n ≥ 10 trials, steady-state window, Bayesian classifier", owner: "Amogh", track: "Research", notes: "E004 rerun script already ready; E003 needs same treatment" },
+    { priority: "P1 — High", phase: "Product", milestone: "Implement thermalos calibrate — per-GPU baseline fingerprint stored to ~/.thermalos/baselines/", owner: "Amogh", track: "Software", notes: "Prerequisite for any live operator install. Moat dimension 2." },
+    { priority: "P2 — Normal", phase: "Product", milestone: "Add Grafana annotation hook to agent — emit R_theta anomaly events as Grafana annotations", owner: "Amogh", track: "Software", notes: "Low effort, high operator value. Operators already have Grafana." },
   ];
 }
 
@@ -631,30 +632,32 @@ export async function fetchCommandCenter(): Promise<CommandCenter> {
 export function generateDemoCommandCenter(): CommandCenter {
   return {
     the_one_thing: {
-      action: "Send 10 discovery cold messages to neocloud infra leads",
-      why: "This is the #1 YC blocker — no customer evidence yet. Kundu access is pending. Discovery calls are the highest-leverage thing you can do right now.",
+      action: "Get one real operator to install ThermalOS and react to what it shows",
+      why: "Outreach is in flight (RunPod/Vast/Lambda sent 2026-06-02). The next unlock is a live install — not a strategy doc, not a deck. One install with a reaction beats ten conversations. This is the difference between a GitHub repo and a company.",
       how_steps: [
-        "Open wiki/synthesis/neocloud_discovery.md for the framework",
-        "Open raw/strategy/03_discovery_call_script.md for the opener",
-        "Pick first target: Lambda Labs (you're already a customer — warm context)",
-        "Search LinkedIn: 'Lambda Labs infrastructure' or 'Lambda Labs platform'",
-        "Send the opener message from the script",
-        "Log each response with: ingest meeting:[date]-[org]-discovery",
+        "Monitor replies from RunPod, Vast.ai, Lambda Labs",
+        "When a reply comes: offer to join their Slack/Discord and walk through install live",
+        "During install: ask 'does this match what you see in your Grafana?' and 'what would make this actionable?'",
+        "Collect: what did it detect, was it useful, what workflow should it integrate with",
+        "File notes: ingest meeting:[date]-[org]-discovery",
+        "Parallel track: Lupo AI Factory install — canary on 1 DGX B200 node",
       ],
-      effort: "~2 hours for first 3 outreaches",
-      source: "wiki/synthesis/neocloud_discovery.md",
+      effort: "~3 hours per install including async follow-up",
+      source: "wiki/synthesis/moat_analysis_2026_06_05.md",
     },
     on_deck: [
-      { title: "Confirm AI Factory access with Kundu", why: "Unlocks Stage 2 hardware experiments (E005–E008) and publication timeline" },
-      { title: "Run classifiers on Stage 1 data (Orange Data Mining)", why: "MVX-4: Bayesian + Random Forest — no new hardware, does not require DGX access" },
-      { title: "Push E001–E003 notebooks + CSVs to GitHub", why: "Required for Kundu review, YC evidence board, and any co-author share" },
+      { title: "Send Lupo email by June 12", why: "AI Factory install is a live production install — counts as customer evidence even if Cal Poly. Lupo is the gating decision-maker." },
+      { title: "Implement thermalos calibrate", why: "Per-GPU baseline fingerprint is moat dimension 2. Prerequisite before any operator install — current T4 thresholds will misfire on A100/H100." },
+      { title: "Sensitivity analysis: dR_θ/dT_amb at each power tier", why: "Kundu mandate. Required for publication. Can compute from Stage 1 CSV now — no new hardware needed." },
     ],
     blockers: [
-      { what: "DGX B200 AI Factory access — waiting on Kundu confirmation", type: "external_dependency", how_to_unblock: "Email Kundu asking if informal summer advising is sufficient for cluster access request to Noyce School. Draft in escalation zone.", owner: "Kundu", days_open: 2 },
-      { what: "Sam returns to campus — fall 2026 hardware work blocked until then", type: "waiting_on_sam", how_to_unblock: "Continue software-only work. Sam picks up E-LT testbed and TIM characterization in fall.", owner: "Sam", days_open: 0 },
+      { what: "No live operator install yet — discovery outreach awaiting replies", type: "external_dependency", how_to_unblock: "Replies from RunPod/Vast/Lambda. Follow up if no reply in 5 business days (Jun 9). Parallel track: Lupo AI Factory.", owner: "Amogh", days_open: 3 },
+      { what: "Calibration mode not implemented — T4 thresholds wrong on A100/H100/B200", type: "code_gap", how_to_unblock: "Implement thermalos calibrate command. Estimated: 1 day. Moat prerequisite.", owner: "Amogh", days_open: 0 },
+      { what: "Sam returns to campus — E-LT lead-time testbed blocked until fall 2026", type: "waiting_on_sam", how_to_unblock: "Continue software-only work. Sam picks up E-LT + TIM characterization in fall.", owner: "Sam", days_open: 0 },
     ],
     escalations: [
-      { question: "How do we handle T_reference uncertainty at low power loads? 5°C ambient error = 35% R_theta swing at idle.", route_to: "Kundu", why: "Open 13 days, research methodology — beyond web search resolution", draft_ask: "Hi Prof. Kundu,\n\nQuick question as I'm working through the ThermalOS analysis:\n\nHow do we handle T_reference uncertainty at low power loads? At 9.5W idle, a 5°C ambient error causes a ~35% R_theta swing — the metric is most sensitive exactly where we need it most.\n\nI've tried reviewing the sensitivity analysis in F002 and comparing rolling average vs median filter (F003 null result), but the root cause remains T_reference uncertainty. Given your background in silicon validation and research methodology, I'd really value your input.\n\nHappy to discuss at our next meeting or async.\n\nThanks,\nAmogh" },
+      { question: "Does CalPoly AI Factory install create a university IP claim on ThermalOS?", route_to: "Kundu", why: "YC will do IP due diligence. Need written confirmation before the canary install.", draft_ask: "Hi Prof. Kundu,\n\nBefore I proceed with the AI Factory canary install, I want to do a quick IP check: does running ThermalOS on Cal Poly infrastructure under your informal advising create any university IP claim on the software? The code was written entirely on personal hardware (Colab T4), so my read is we're clean — but I want to confirm before we plug in.\n\nHappy to discuss at our next meeting or over email.\n\nThanks,\nAmogh" },
+      { question: "What is the ICPE 2027 submission deadline and required paper format?", route_to: "Kundu", why: "Publication timeline determines when E-LT experiments must complete. Need the deadline to reverse-plan the fall semester.", draft_ask: "Hi Prof. Kundu,\n\nTo plan the fall experiment schedule: what is the ICPE 2027 submission deadline and paper format (page limit, IEEE style)? I want to make sure E003/E004 reruns and the lead-time validation are done with enough time to write and revise.\n\nThanks,\nAmogh" },
     ],
   };
 }
@@ -697,16 +700,16 @@ export async function fetchWikiSummary(): Promise<WikiSummary> {
 export function generateDemoWikiSummary(): WikiSummary {
   return {
     sync_timestamp: new Date().toISOString(),
-    overview_stage: "Stage 1 complete (Colab T4, 2,280+ rows, E001–E003). Stage 2 pending DGX B200 access confirmation.",
-    open_questions_count: "7",
-    open_questions_list: "Q_AI_Factory_access; Q_E004_data; Q_Kundu_email; Q_ambient_measurement; Q_conference_venue; Q_lead_time; Q_discovery_progress",
-    experiments_complete: "E001, E002, E003, E004",
-    experiments_planned: "E-LT, E005, E006, E007, E008",
+    overview_stage: "Stage 1 complete (Colab T4, 8,734 rows, E001–E004 v2). Agent v0.1.9 live on PyPI. Stage 3 (AI Factory) in progress — gated on Lupo meeting.",
+    open_questions_count: "13",
+    open_questions_list: "Q_lead_time; Q_conference_venue; Q_cross_vendor_calibration; Q_workflow_integration; Q_per_gpu_baseline; Q_university_ip_risk; Q_sensitivity_analysis; Q_ambient_measurement; Q_AI_Factory_access; Q_discovery_progress; Q_slurm_integration; Q_Kundu_email; Q_memory_store",
+    experiments_complete: "E001, E002, E003, E004 (v1 + v2 controlled-variable)",
+    experiments_planned: "E005, E006, E007, E008 (Stage 2, DGX B200), E-LT (Fall 2026, Sam's testbed)",
     findings_current: "6",
-    next_action: "Confirm AI Factory access with Kundu. Run discovery calls (10 target). Build anomaly detector code (MVX-4).",
+    next_action: "Get first live operator install. Send Lupo email by Jun 12. Implement thermalos calibrate (per-GPU baseline). Run sensitivity analysis on Stage 1 data.",
     conflicts_found: "1",
-    conflicts_detail: "E004 replication data not found in CSV. Row count should be 2,280+ not 5,700.",
-    vault_last_updated: "2026-06-01",
+    conflicts_detail: "campus_it_one_pager references v0.1.8; agent is now v0.1.9. Update before sending to Campus IT.",
+    vault_last_updated: "2026-06-05",
   };
 }
 
