@@ -43,6 +43,8 @@ export default function CustomCursor() {
   useEffect(() => {
     // Hide on touch devices
     if ("ontouchstart" in window) return;
+    document.body.classList.add("custom-cursor-active");
+
 
     window.addEventListener("mousemove", handleMove, { passive: true });
     window.addEventListener("mouseover", handleOver, { passive: true });
