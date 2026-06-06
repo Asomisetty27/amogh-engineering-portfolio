@@ -60,6 +60,7 @@ export default function CustomCursor() {
       window.removeEventListener("mouseup", handleUp);
       document.documentElement.removeEventListener("mouseleave", handleLeave);
       document.documentElement.removeEventListener("mouseenter", handleEnter);
+      document.body.classList.remove("custom-cursor-active");
     };
   }, [handleMove, handleOver, handleDown, handleUp, handleLeave, handleEnter]);
 
