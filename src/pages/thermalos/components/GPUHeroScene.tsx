@@ -1,569 +1,792 @@
-/**
- * GPUHeroScene — Hyperrealistic procedural GPU with sandwiching assembly animation.
- *
- * Layers (Y, separated → assembled):
- *   backplate  –5   → −0.12
- *   pcb        −2.5 → 0
- *   vram       +3   → +0.165
- *   die        +6   → +0.25
- *   power      x+10 → in-place
- *
- * Phase timeline (looping ~14s after assembly):
- *   idle (0-3s) → load (3-6.5s) → anomaly (6.5-10s) → critical (10-12s) → recovery (12-14s)
- */
-
+import * as React from 'react';
+import { useRef, useMemo, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Environment, OrbitControls, ContactShadows } from '@react-three/drei';
-import { useRef, useMemo, useState, useEffect, Suspense, forwardRef } from 'react';
+import { RoundedBox, Environment, ContactShadows } from '@react-three/drei';
+import {
+  EffectComposer,
+  Bloom,
+  ChromaticAberration,
+  Noise,
+  Vignette,
+} from '@react-three/postprocessing';
+import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
+import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
 
-/* ─── Thermal color palette (maps 0→1 to cold→critical) ───────────────────── */
+RectAreaLightUniformsLib.init();
+
+const T = {
+  bg: '#09090D',
+  s1: '#111117',
+  border: '#232330',
+  text: '#E8E8F0',
+  muted: '#818190',
+  healthy: '#27A05A',
+  caution: '#C8942A',
+  rising: '#C85F2A',
+  critical: '#B83030',
+  bp: '#5878A8',
+};
+const FM = "'JetBrains Mono', ui-monospace, monospace";
+
+type Phase = 'assembling' | 'idle' | 'load' | 'anomaly' | 'critical' | 'recovery';
+
+const PHASE_SEQUENCE: { phase: Phase; dur: number; level: number }[] = [
+  { phase: 'idle', dur: 3.0, level: 0.12 },
+  { phase: 'load', dur: 3.2, level: 0.45 },
+  { phase: 'anomaly', dur: 2.6, level: 0.72 },
+  { phase: 'critical', dur: 2.4, level: 1.0 },
+  { phase: 'recovery', dur: 2.8, level: 0.3 },
+];
+
+const _c0 = new THREE.Color('#1c6b3a');
+const _c1 = new THREE.Color('#c8942a');
+const _c2 = new THREE.Color('#c85f2a');
+const _c3 = new THREE.Color('#e0392f');
+const _out = new THREE.Color();
+
 function thermalHex(t: number): THREE.Color {
-  const stops: [number, number, number, number][] = [
-    [0.00, 0x00, 0x11, 0x33],
-    [0.25, 0x00, 0x33, 0x22],
-    [0.50, 0x1D, 0x9E, 0x75],
-    [0.70, 0xE8, 0xB2, 0x3A],
-    [0.85, 0xE8, 0x74, 0x3A],
-    [1.00, 0xD6, 0x3D, 0x3D],
-  ];
-  for (let i = 0; i < stops.length - 1; i++) {
-    const [t0, r0, g0, b0] = stops[i];
-    const [t1, r1, g1, b1] = stops[i + 1];
-    if (t <= t1) {
-      const u = (t - t0) / (t1 - t0);
-      return new THREE.Color(
-        ((r0 + u * (r1 - r0)) / 255),
-        ((g0 + u * (g1 - g0)) / 255),
-        ((b0 + u * (b1 - b0)) / 255),
-      );
-    }
+  const x = THREE.MathUtils.clamp(t, 0, 1);
+  if (x < 0.4) return _out.copy(_c0).lerp(_c1, x / 0.4);
+  if (x < 0.7) return _out.copy(_c1).lerp(_c2, (x - 0.4) / 0.3);
+  return _out.copy(_c2).lerp(_c3, (x - 0.7) / 0.3);
+}
+
+function spring(cur: number, target: number, delta: number, k: number): number {
+  const t = 1 - Math.exp(-k * delta);
+  return cur + (target - cur) * t;
+}
+
+function makePCBTexture(): THREE.CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = 512;
+  c.height = 256;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = '#0e1f0e';
+  ctx.fillRect(0, 0, 512, 256);
+  ctx.strokeStyle = '#1a3a1a';
+  ctx.lineWidth = 0.8;
+  for (let y = 0; y < 256; y += 12) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(512, y);
+    ctx.stroke();
   }
-  return new THREE.Color(0xD6 / 255, 0x3D / 255, 0x3D / 255);
+  for (let x = 0; x < 512; x += 16) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, 256);
+    ctx.stroke();
+  }
+  ctx.strokeStyle = '#16301a';
+  ctx.lineWidth = 1.4;
+  for (let i = 0; i < 40; i++) {
+    const sx = Math.random() * 512;
+    const sy = Math.random() * 256;
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(sx + (Math.random() - 0.5) * 90, sy);
+    ctx.lineTo(sx + (Math.random() - 0.5) * 90, sy + (Math.random() - 0.5) * 60);
+    ctx.stroke();
+  }
+  ctx.fillStyle = '#b8860b';
+  for (let i = 0; i < 280; i++) {
+    ctx.beginPath();
+    ctx.arc(Math.random() * 512, Math.random() * 256, 1.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(3, 1.5);
+  t.anisotropy = 8;
+  return t;
 }
 
-/* ─── Spring interpolation ─────────────────────────────────────────────────── */
-function spring(cur: number, target: number, delta: number, stiffness = 5) {
-  return cur + (target - cur) * (1 - Math.exp(-stiffness * delta));
+function makeRoughnessMap(): THREE.CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 128;
+  const ctx = c.getContext('2d')!;
+  const img = ctx.createImageData(256, 128);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const v = 160 + Math.random() * 40;
+    img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+    img.data[i + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  return t;
 }
 
-/* ─── Heat particles (rise from anomaly cell) ─────────────────────────────── */
-function HeatParticles({ active }: { active: boolean }) {
-  const pointsRef = useRef<THREE.Points>(null!);
-  const N = 60;
-  const pos = useMemo(() => {
-    const a = new Float32Array(N * 3);
-    for (let i = 0; i < N; i++) {
-      a[i * 3] = (Math.random() - 0.5) * 2.5;
-      a[i * 3 + 1] = Math.random() * 3.5;
-      a[i * 3 + 2] = (Math.random() - 0.5) * 2.5;
-    }
-    return a;
+function SceneLights({ thermalLevelRef }: { thermalLevelRef: React.MutableRefObject<number> }) {
+  const keyRef = useRef<THREE.RectAreaLight>(null!);
+  const fillRef = useRef<THREE.RectAreaLight>(null!);
+  const thermalRef = useRef<THREE.PointLight>(null!);
+
+  useEffect(() => {
+    keyRef.current?.lookAt(0, 0, 0);
+    fillRef.current?.lookAt(0, 0, 0);
   }, []);
 
-  useFrame((_, delta) => {
-    if (!pointsRef.current) return;
-    const arr = pointsRef.current.geometry.attributes.position.array as Float32Array;
-    for (let i = 0; i < N; i++) {
-      arr[i * 3 + 1] += delta * (0.4 + Math.random() * 0.8);
-      arr[i * 3] += (Math.random() - 0.5) * 0.02;
-      if (arr[i * 3 + 1] > 3.5) {
-        arr[i * 3 + 1] = 0;
-        arr[i * 3] = (Math.random() - 0.5) * 2.5;
-        arr[i * 3 + 2] = (Math.random() - 0.5) * 2.5;
-      }
+  useFrame(() => {
+    if (thermalRef.current) {
+      const t = thermalLevelRef.current;
+      thermalRef.current.color.copy(thermalHex(t));
+      thermalRef.current.intensity = t * 5;
     }
-    pointsRef.current.geometry.attributes.position.needsUpdate = true;
-    (pointsRef.current.material as THREE.PointsMaterial).opacity = spring(
-      (pointsRef.current.material as THREE.PointsMaterial).opacity,
-      active ? 0.55 : 0,
-      delta, 3
-    );
   });
 
   return (
-    <points ref={pointsRef} position={[-0.2, 0.28, 0.1]}>
+    <>
+      <rectAreaLight
+        ref={keyRef}
+        position={[7, 14, 8]}
+        width={10}
+        height={8}
+        intensity={12}
+        color="#fff8f0"
+      />
+      <rectAreaLight
+        ref={fillRef}
+        position={[-8, 8, 4]}
+        width={8}
+        height={6}
+        intensity={4}
+        color="#c0d8ff"
+      />
+      <pointLight position={[-2, 3, -7]} intensity={2} color="#8ab4e0" />
+      <pointLight ref={thermalRef} position={[0, 3, 0]} distance={8} decay={2} />
+      <ambientLight intensity={0.06} />
+    </>
+  );
+}
+
+function HeatParticles({ activeRef }: { activeRef: React.MutableRefObject<number> }) {
+  const COUNT = 80;
+  const pointsRef = useRef<THREE.Points>(null!);
+  const matRef = useRef<THREE.PointsMaterial>(null!);
+
+  const { positions, speeds, offsets } = useMemo(() => {
+    const positions = new Float32Array(COUNT * 3);
+    const speeds = new Float32Array(COUNT);
+    const offsets = new Float32Array(COUNT);
+    for (let i = 0; i < COUNT; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 2.4;
+      positions[i * 3 + 1] = Math.random() * 3;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 2.4;
+      speeds[i] = 0.4 + Math.random() * 0.9;
+      offsets[i] = Math.random() * 100;
+    }
+    return { positions, speeds, offsets };
+  }, []);
+
+  useFrame((state, delta) => {
+    const active = activeRef.current;
+    const geo = pointsRef.current?.geometry;
+    if (!geo) return;
+    const arr = geo.attributes.position.array as Float32Array;
+    for (let i = 0; i < COUNT; i++) {
+      arr[i * 3 + 1] += speeds[i] * delta * (0.4 + active * 1.4);
+      const drift = Math.sin(state.clock.elapsedTime * 0.8 + offsets[i]) * 0.0025;
+      arr[i * 3] += drift;
+      arr[i * 3 + 2] += drift * 0.7;
+      if (arr[i * 3 + 1] > 5) {
+        arr[i * 3] = (Math.random() - 0.5) * 2.4;
+        arr[i * 3 + 1] = 0.3;
+        arr[i * 3 + 2] = (Math.random() - 0.5) * 2.4;
+      }
+    }
+    geo.attributes.position.needsUpdate = true;
+    if (matRef.current) {
+      matRef.current.opacity = THREE.MathUtils.lerp(matRef.current.opacity, active * 0.55, 0.08);
+      matRef.current.color.copy(thermalHex(active));
+    }
+  });
+
+  return (
+    <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={N} array={pos} itemSize={3} />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
-      <pointsMaterial size={0.04} color="#E8743A" transparent opacity={0} sizeAttenuation />
+      <pointsMaterial
+        ref={matRef}
+        size={0.045}
+        transparent
+        opacity={0}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+        sizeAttenuation
+      />
     </points>
   );
 }
 
-/* ─── VRAM bank (16 GDDR6X chips, 8 per side of die) ─────────────────────── */
-function VRAMBank({
-  groupRef, anomalyIdx, thermalLevel,
-}: {
-  groupRef: React.RefObject<THREE.Group>;
-  anomalyIdx: number;
-  thermalLevel: number;
-}) {
-  const matsRef = useRef<THREE.MeshStandardMaterial[]>([]);
-
-  // Create materials once
-  const mats = useMemo(() =>
-    Array.from({ length: 16 }, (_, i) => new THREE.MeshStandardMaterial({
-      color: '#0A0A14',
-      roughness: 0.55,
-      metalness: 0.4,
-    })), []);
-
-  useEffect(() => {
-    matsRef.current = mats;
-    return () => mats.forEach(m => m.dispose());
-  }, [mats]);
-
-  useFrame(() => {
-    matsRef.current.forEach((mat, i) => {
-      const isAnomaly = i === anomalyIdx;
-      const t = isAnomaly ? thermalLevel : thermalLevel * 0.35;
-      mat.emissive = thermalHex(t);
-      mat.emissiveIntensity = isAnomaly ? thermalLevel * 2.5 : thermalLevel * 0.3;
-    });
-  });
-
-  // 16 chips: left column (indices 0-7 at -Z side) and right column (8-15 at +Z side)
-  const chips: { pos: [number, number, number]; idx: number }[] = [];
-  const xStart = -2.8;
-  const xStep = 0.9;
-  // Z offsets: two rows per side, positive and negative Z
-  [1.55, 1.55, 1.55, 1.55, 1.55, 1.55, 1.55, 1.55].forEach((z, i) => {
-    chips.push({ pos: [xStart + i * xStep, 0, z], idx: i });         // +Z side
-    chips.push({ pos: [xStart + i * xStep, 0, -z], idx: i + 8 });    // -Z side
-  });
-
-  return (
-    <group ref={groupRef}>
-      {chips.map(({ pos, idx }) => (
-        <mesh key={idx} position={pos} material={mats[idx]}>
-          <boxGeometry args={[0.78, 0.18, 0.58]} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-/* ─── GPU Die (thermal emissive core) ─────────────────────────────────────── */
-const GPUDie = forwardRef<THREE.Group, { thermalLevel: number }>(
-  function GPUDie({ thermalLevel }, ref) {
-    const dieMat = useMemo(() => new THREE.MeshStandardMaterial({
-      color: '#1C1C28',
-      roughness: 0.32,
-      metalness: 0.88,
-    }), []);
-    const ihsMat = useMemo(() => new THREE.MeshStandardMaterial({
-      color: '#7A6C64',
-      roughness: 0.25,
-      metalness: 0.92,
-    }), []);
-
-    useFrame(() => {
-      dieMat.emissive = thermalHex(thermalLevel);
-      dieMat.emissiveIntensity = thermalLevel * 1.8;
-      ihsMat.emissive = thermalHex(thermalLevel * 0.6);
-      ihsMat.emissiveIntensity = thermalLevel * 0.9;
-    });
-
-    useEffect(() => () => { dieMat.dispose(); ihsMat.dispose(); }, [dieMat, ihsMat]);
-
-    return (
-      <group ref={ref as React.RefObject<THREE.Group>}>
-        {/* Silicon die substrate */}
-        <mesh position={[0, 0, 0]} material={dieMat}>
-          <boxGeometry args={[2.6, 0.12, 2.6]} />
-        </mesh>
-        {/* IHS (integrated heat spreader) — brushed copper/nickel */}
-        <mesh position={[0, 0.14, 0]} material={ihsMat}>
-          <boxGeometry args={[2.75, 0.12, 2.75]} />
-        </mesh>
-        {/* Die markings (thin lines) */}
-        <mesh position={[0, 0.25, 0]}>
-          <boxGeometry args={[2.74, 0.002, 0.01]} />
-          <meshStandardMaterial color="#4A4A5A" roughness={1} />
-        </mesh>
-        <mesh position={[0, 0.25, 0]}>
-          <boxGeometry args={[0.01, 0.002, 2.74]} />
-          <meshStandardMaterial color="#4A4A5A" roughness={1} />
-        </mesh>
-      </group>
-    );
-  }
-);
-
-/* ─── PCB substrate ────────────────────────────────────────────────────────── */
-function PCBBoard({ groupRef }: { groupRef: React.RefObject<THREE.Group> }) {
-  const mat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#080E09',
-    roughness: 0.88,
-    metalness: 0.06,
-  }), []);
-  const goldMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#B8930A',
-    roughness: 0.14,
-    metalness: 1.0,
-  }), []);
-  const capacitorMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#1A1A1A',
-    roughness: 0.5,
-    metalness: 0.4,
-  }), []);
-
-  useEffect(() => () => { mat.dispose(); goldMat.dispose(); capacitorMat.dispose(); }, [mat, goldMat, capacitorMat]);
-
-  return (
-    <group ref={groupRef}>
-      {/* Main PCB */}
-      <mesh material={mat}>
-        <boxGeometry args={[11, 0.14, 4.6]} />
-      </mesh>
-      {/* PCIe gold fingers (bottom edge) */}
-      <mesh position={[-4.9, 0.07, 0]} material={goldMat}>
-        <boxGeometry args={[1.2, 0.04, 3.6]} />
-      </mesh>
-      {/* Gold finger detail lines */}
-      {Array.from({ length: 10 }, (_, i) => (
-        <mesh key={i} position={[-4.9, 0.09, -1.6 + i * 0.36]} material={goldMat}>
-          <boxGeometry args={[1.15, 0.015, 0.12]} />
-        </mesh>
-      ))}
-      {/* VRM capacitors cluster (right of die) */}
-      {Array.from({ length: 8 }, (_, i) => (
-        <mesh
-          key={i}
-          position={[2.8 + (i % 4) * 0.55, 0.2, -0.8 + Math.floor(i / 4) * 0.55]}
-          material={capacitorMat}
-        >
-          <cylinderGeometry args={[0.12, 0.12, 0.38, 8]} />
-        </mesh>
-      ))}
-      {/* Small SMD components scattered */}
-      {Array.from({ length: 20 }, (_, i) => (
-        <mesh
-          key={i}
-          position={[
-            -5 + Math.random() * 10,
-            0.09,
-            -2 + Math.random() * 4,
-          ]}
-          material={i % 3 === 0 ? goldMat : mat}
-        >
-          <boxGeometry args={[0.1, 0.04, 0.06]} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-/* ─── Backplate ────────────────────────────────────────────────────────────── */
-function Backplate({ groupRef }: { groupRef: React.RefObject<THREE.Group> }) {
-  const mat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#141414',
-    roughness: 0.52,
-    metalness: 0.85,
-  }), []);
-  useEffect(() => () => mat.dispose(), [mat]);
-  return (
-    <group ref={groupRef}>
-      <mesh material={mat}>
-        <boxGeometry args={[11, 0.1, 4.6]} />
-      </mesh>
-      {/* Backplate cutouts visual (darker strips) */}
-      {Array.from({ length: 6 }, (_, i) => (
-        <mesh key={i} position={[-3 + i * 1.1, -0.04, 0]}>
-          <boxGeometry args={[0.6, 0.04, 3.8]} />
-          <meshStandardMaterial color="#0A0A0A" roughness={0.7} metalness={0.6} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-/* ─── 8-pin power connector ────────────────────────────────────────────────── */
-function PowerConnector({ groupRef }: { groupRef: React.RefObject<THREE.Group> }) {
-  return (
-    <group ref={groupRef}>
-      {/* Connector body */}
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[1.4, 0.65, 1.0]} />
-        <meshStandardMaterial color="#1A0C00" roughness={0.85} metalness={0.05} />
-      </mesh>
-      {/* Orange PCIe power cable stub */}
-      <mesh position={[0, 0.4, 0]}>
-        <boxGeometry args={[1.2, 0.3, 0.9]} />
-        <meshStandardMaterial color="#CC5500" roughness={0.7} metalness={0.0} />
-      </mesh>
-      {/* Gold pins */}
-      {Array.from({ length: 8 }, (_, i) => (
-        <mesh key={i} position={[-0.5 + (i % 4) * 0.33, -0.1, -0.2 + Math.floor(i / 4) * 0.4]}>
-          <cylinderGeometry args={[0.04, 0.04, 0.4, 6]} />
-          <meshStandardMaterial color="#B8930A" roughness={0.1} metalness={1.0} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-/* ─── Heat light that intensifies with thermal level ──────────────────────── */
-function HeatLight({ thermalLevel }: { thermalLevel: number }) {
-  const lightRef = useRef<THREE.PointLight>(null!);
-  useFrame(() => {
-    if (!lightRef.current) return;
-    lightRef.current.intensity = spring(lightRef.current.intensity, thermalLevel * 6, 0.016, 3);
-    lightRef.current.color.copy(thermalHex(thermalLevel));
-  });
-  return <pointLight ref={lightRef} position={[0, 1.5, 0]} intensity={0} distance={12} decay={2} />;
-}
-
-/* ─── Main GPU Assembly ────────────────────────────────────────────────────── */
-type PhaseType = 'assembly' | 'idle' | 'load' | 'anomaly' | 'critical' | 'recovery';
-
-interface AssemblyState {
-  backY: number; pcbY: number; vramY: number; dieY: number; powerX: number;
-}
-
-function GPUAssembly({ onPhaseChange }: { onPhaseChange: (p: PhaseType, t: number) => void }) {
-  const gpuGroupRef = useRef<THREE.Group>(null!);
-  const backRef = useRef<THREE.Group>(null!);
-  const pcbRef = useRef<THREE.Group>(null!);
-  const vramRef = useRef<THREE.Group>(null!);
-  const dieRef = useRef<THREE.Group>(null!);
-  const powerRef = useRef<THREE.Group>(null!);
-
-  const assemblyRef = useRef<AssemblyState>({
-    backY: -5, pcbY: -2.5, vramY: 3, dieY: 6, powerX: 10,
-  });
-  const phaseRef = useRef<PhaseType>('assembly');
-  const thermalRef = useRef(0);
-  const anomalyRef = useRef(false);
-
-  useFrame((state, delta) => {
-    const s = assemblyRef.current;
-    const k = 1 - Math.exp(-4.5 * delta);
-
-    // Sandwich animation
-    s.backY  = spring(s.backY,  -0.12, delta, 3.5);
-    s.pcbY   = spring(s.pcbY,   0,    delta, 3.5);
-    s.vramY  = spring(s.vramY,  0.165,delta, 4.0);
-    s.dieY   = spring(s.dieY,   0.25, delta, 4.5);
-    s.powerX = spring(s.powerX, 4.0,  delta, 3.0);
-
-    if (backRef.current) backRef.current.position.y = s.backY;
-    if (pcbRef.current)  pcbRef.current.position.y  = s.pcbY;
-    if (vramRef.current) vramRef.current.position.y = s.vramY;
-    if (dieRef.current)  dieRef.current.position.y  = s.dieY;
-    if (powerRef.current) powerRef.current.position.x = s.powerX;
-
-    // Slow auto-rotation of whole GPU
-    if (gpuGroupRef.current) {
-      gpuGroupRef.current.rotation.y += delta * 0.18;
-      gpuGroupRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.25) * 0.06;
+function PCBBoard({ textures }: { textures: { pcb: THREE.CanvasTexture; rough: THREE.CanvasTexture } }) {
+  const smds = useMemo(() => {
+    const out: { pos: [number, number, number]; size: [number, number, number]; gold: boolean }[] = [];
+    for (let i = 0; i < 60; i++) {
+      const x = (Math.random() - 0.5) * 7.4;
+      const z = (Math.random() - 0.5) * 6.2;
+      if (Math.abs(x) < 1.4 && Math.abs(z) < 1.4) continue;
+      out.push({
+        pos: [x, 0.12, z],
+        size: [0.06 + Math.random() * 0.1, 0.05, 0.04 + Math.random() * 0.05],
+        gold: Math.random() > 0.7,
+      });
     }
+    return out;
+  }, []);
 
-    // Phase timing (starts after assembly ~2.5s)
-    const elapsed = state.clock.elapsedTime;
-    let phase: PhaseType = 'assembly';
-    let thermalTarget = 0.05;
+  return (
+    <group>
+      <RoundedBox args={[8, 0.2, 6.6]} radius={0.05} smoothness={4} position={[0, 0, 0]} castShadow receiveShadow>
+        <meshStandardMaterial
+          color="#0e1f0e"
+          roughness={0.85}
+          metalness={0.05}
+          map={textures.pcb}
+          envMapIntensity={1.0}
+        />
+      </RoundedBox>
 
-    if (elapsed > 2.5) {
-      const loopT = (elapsed - 2.5) % 14;
-      if (loopT < 3) {
-        phase = 'idle';
-        thermalTarget = 0.1;
-      } else if (loopT < 6.5) {
-        phase = 'load';
-        thermalTarget = 0.5 + (loopT - 3) / 3.5 * 0.2;
-      } else if (loopT < 10) {
-        phase = 'anomaly';
-        thermalTarget = 0.7 + (loopT - 6.5) / 3.5 * 0.25;
-        anomalyRef.current = true;
-      } else if (loopT < 12) {
-        phase = 'critical';
-        thermalTarget = 0.95;
-        anomalyRef.current = true;
-      } else {
-        phase = 'recovery';
-        thermalTarget = 0.5 - (loopT - 12) / 2 * 0.4;
-        anomalyRef.current = false;
+      <mesh position={[0, -0.04, 3.5]} castShadow>
+        <boxGeometry args={[6.4, 0.16, 0.5]} />
+        <meshStandardMaterial color="#d4a017" roughness={0.02} metalness={1.0} envMapIntensity={1.4} />
+      </mesh>
+      {Array.from({ length: 22 }).map((_, i) => (
+        <mesh key={i} position={[-3.0 + i * 0.29, -0.03, 3.62]}>
+          <boxGeometry args={[0.18, 0.18, 0.3]} />
+          <meshStandardMaterial color="#e0b430" roughness={0.04} metalness={1.0} envMapIntensity={1.5} />
+        </mesh>
+      ))}
+
+      {smds.map((s, i) => (
+        <mesh key={i} position={s.pos} castShadow>
+          <boxGeometry args={s.size} />
+          <meshStandardMaterial
+            color={s.gold ? '#c8a838' : '#1a1a1e'}
+            roughness={s.gold ? 0.3 : 0.6}
+            metalness={s.gold ? 0.8 : 0.3}
+            roughnessMap={textures.rough}
+            envMapIntensity={1.0}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function VRMSection({ textures }: { textures: { rough: THREE.CanvasTexture } }) {
+  const inductorPositions = useMemo(() => {
+    const out: [number, number, number][] = [];
+    for (let row = 0; row < 2; row++) {
+      for (let i = 0; i < 4; i++) {
+        out.push([-2.4 + i * 1.05, 0.26, -2.0 - row * 0.7]);
       }
     }
+    return out;
+  }, []);
 
-    phaseRef.current = phase;
-    thermalRef.current = spring(thermalRef.current, thermalTarget, delta, 1.5);
-    onPhaseChange(phase, thermalRef.current);
-  });
-
-  const [thermalLevel, setThermalLevel] = useState(0.05);
-  const [anomaly, setAnomaly] = useState(false);
-
-  useFrame(() => {
-    setThermalLevel(thermalRef.current);
-    setAnomaly(anomalyRef.current);
-  });
+  const capPositions = useMemo(() => {
+    const out: [number, number, number][] = [];
+    for (let i = 0; i < 28; i++) {
+      let x = (Math.random() - 0.5) * 6.4;
+      const z = (Math.random() - 0.5) * 5.0;
+      if (Math.abs(x) < 1.2 && Math.abs(z) < 1.2) {
+        x += x >= 0 ? 1.4 : -1.4;
+      }
+      out.push([x, 0.22, z]);
+    }
+    return out;
+  }, []);
 
   return (
-    <group ref={gpuGroupRef}>
-      <Backplate groupRef={backRef} />
-      <PCBBoard groupRef={pcbRef} />
-      <VRAMBank groupRef={vramRef} anomalyIdx={5} thermalLevel={thermalLevel} />
-      <GPUDie ref={dieRef} thermalLevel={thermalLevel} />
-      <group ref={powerRef} position={[4, 0.4, -1.2]}>
-        <PowerConnector groupRef={{ current: null! } as React.RefObject<THREE.Group>} />
-      </group>
-      <HeatParticles active={anomaly} />
-      <HeatLight thermalLevel={thermalLevel} />
+    <group>
+      {inductorPositions.map((p, i) => (
+        <RoundedBox key={`ind-${i}`} args={[0.35, 0.28, 0.35]} radius={0.04} smoothness={3} position={p} castShadow receiveShadow>
+          <meshStandardMaterial color="#333333" roughness={0.7} metalness={0.2} roughnessMap={textures.rough} envMapIntensity={0.8} />
+        </RoundedBox>
+      ))}
+
+      {capPositions.map((p, i) => (
+        <group key={`cap-${i}`} position={p}>
+          <mesh castShadow>
+            <cylinderGeometry args={[0.06, 0.06, 0.22, 10]} />
+            <meshStandardMaterial color="#222222" roughness={0.6} metalness={0.4} envMapIntensity={1.0} />
+          </mesh>
+          <mesh position={[0, 0.115, 0]}>
+            <cylinderGeometry args={[0.061, 0.061, 0.012, 10]} />
+            <meshStandardMaterial color="#c8c8c8" roughness={0.15} metalness={0.85} envMapIntensity={1.3} />
+          </mesh>
+        </group>
+      ))}
     </group>
   );
 }
 
-/* ─── Camera setup ─────────────────────────────────────────────────────────── */
-function CameraRig({ phase }: { phase: PhaseType }) {
-  const { camera } = useThree();
-  useFrame((_, delta) => {
-    const targetX = phase === 'critical' ? 1.5 : -1;
-    const targetY = phase === 'assembly' ? 4 : 2.2;
-    const targetZ = phase === 'assembly' ? 14 : 9;
-    camera.position.x = spring(camera.position.x, targetX, delta, 1.2);
-    camera.position.y = spring(camera.position.y, targetY, delta, 1.2);
-    camera.position.z = spring(camera.position.z, targetZ, delta, 1.2);
-    camera.lookAt(1.5, 0, 0);
+function VRAMChips({ chipsRef }: { chipsRef: React.MutableRefObject<THREE.Group | null> }) {
+  const positions = useMemo<[number, number, number][]>(() => {
+    const out: [number, number, number][] = [];
+    for (let i = 0; i < 4; i++) {
+      out.push([-1.6 + i * 1.05, 0.24, 1.35]);
+      out.push([-1.6 + i * 1.05, 0.24, -1.35]);
+    }
+    return out;
+  }, []);
+
+  return (
+    <group ref={chipsRef}>
+      {positions.map((p, i) => (
+        <RoundedBox key={i} args={[0.62, 0.16, 0.5]} radius={0.015} smoothness={3} position={p} castShadow receiveShadow>
+          <meshStandardMaterial color="#141418" roughness={0.55} metalness={0.25} envMapIntensity={0.9} />
+        </RoundedBox>
+      ))}
+    </group>
+  );
+}
+
+function GPUDie({ thermalLevelRef, dieRef }: { thermalLevelRef: React.MutableRefObject<number>; dieRef: React.MutableRefObject<THREE.Mesh | null> }) {
+  const matRef = useRef<THREE.MeshStandardMaterial>(null!);
+
+  useFrame(() => {
+    if (matRef.current) {
+      const t = thermalLevelRef.current;
+      matRef.current.emissive.copy(thermalHex(t));
+      matRef.current.emissiveIntensity = t * t * 1.6;
+    }
   });
+
+  return (
+    <RoundedBox
+      ref={dieRef as React.Ref<THREE.Mesh>}
+      args={[1.6, 0.12, 1.6]}
+      radius={0.02}
+      smoothness={3}
+      position={[0, 0.2, 0]}
+      castShadow
+    >
+      <meshStandardMaterial ref={matRef} color="#111114" roughness={0.9} metalness={0.02} envMapIntensity={0.6} />
+    </RoundedBox>
+  );
+}
+
+function IHSPlate({
+  thermalLevelRef,
+  lockRef,
+  textures,
+}: {
+  thermalLevelRef: React.MutableRefObject<number>;
+  lockRef: React.MutableRefObject<number>;
+  textures: { rough: THREE.CanvasTexture };
+}) {
+  const matRef = useRef<THREE.MeshStandardMaterial>(null!);
+
+  useFrame(() => {
+    if (matRef.current) {
+      const t = thermalLevelRef.current;
+      const lock = lockRef.current;
+      matRef.current.emissive.copy(thermalHex(t)).multiplyScalar(0.4).addScalar(lock);
+      matRef.current.emissiveIntensity = t * 0.35 + lock * 1.2;
+    }
+  });
+
+  return (
+    <RoundedBox args={[4.8, 0.18, 4.2]} radius={0.04} smoothness={4} position={[0, 0.34, 0]} castShadow receiveShadow>
+      <meshStandardMaterial
+        ref={matRef}
+        color="#c0c0c0"
+        roughness={0.08}
+        metalness={0.98}
+        roughnessMap={textures.rough}
+        envMapIntensity={1.4}
+        emissive="#000000"
+      />
+    </RoundedBox>
+  );
+}
+
+function Backplate({ textures }: { textures: { rough: THREE.CanvasTexture } }) {
+  return (
+    <group position={[0, -0.2, 0]}>
+      <RoundedBox args={[8.1, 0.12, 6.7]} radius={0.05} smoothness={3} position={[0, -0.06, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color="#1a1a1a" roughness={0.2} metalness={0.9} roughnessMap={textures.rough} envMapIntensity={1.2} />
+      </RoundedBox>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <mesh key={i} position={[-2.8 + i * 1.4, -0.13, 0]} receiveShadow>
+          <boxGeometry args={[0.5, 0.04, 5.6]} />
+          <meshStandardMaterial color="#0c0c0c" roughness={0.35} metalness={0.85} envMapIntensity={0.8} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function PowerConnector() {
+  return (
+    <group position={[3.0, 0.28, -2.6]}>
+      <RoundedBox args={[1.5, 0.42, 0.7]} radius={0.04} smoothness={3} castShadow>
+        <meshStandardMaterial color="#0a0a0a" roughness={0.5} metalness={0.3} envMapIntensity={0.8} />
+      </RoundedBox>
+      {Array.from({ length: 8 }).map((_, i) => {
+        const col = i % 4;
+        const row = i < 4 ? 0 : 1;
+        return (
+          <mesh key={i} position={[-0.5 + col * 0.33, 0.0, 0.36 - row * 0.28]}>
+            <boxGeometry args={[0.16, 0.16, 0.1]} />
+            <meshStandardMaterial color="#caa840" roughness={0.1} metalness={1.0} envMapIntensity={1.4} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
+function GPUAssembly({
+  thermalLevelRef,
+  bloomRef,
+  assembledRef,
+  textures,
+}: {
+  thermalLevelRef: React.MutableRefObject<number>;
+  bloomRef: React.MutableRefObject<number>;
+  assembledRef: React.MutableRefObject<boolean>;
+  textures: { pcb: THREE.CanvasTexture; rough: THREE.CanvasTexture };
+}) {
+  const groupRef = useRef<THREE.Group>(null!);
+  const ihsGroup = useRef<THREE.Group>(null!);
+  const dieGroup = useRef<THREE.Group>(null!);
+  const vramGroup = useRef<THREE.Group>(null!);
+  const backGroup = useRef<THREE.Group>(null!);
+  const dieRef = useRef<THREE.Mesh | null>(null);
+  const chipsRef = useRef<THREE.Group | null>(null);
+  const lockRef = useRef(0);
+  const assemblyT = useRef(0);
+
+  useFrame((state, delta) => {
+    assemblyT.current = Math.min(assemblyT.current + delta, 5);
+    const a = assemblyT.current;
+
+    const overshoot = (target: number, offset: number) => {
+      const p = THREE.MathUtils.clamp(a / 2.5, 0, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const bounce = Math.sin(p * Math.PI) * 0.12 * (1 - p);
+      return target + offset * (1 - eased) + (p > 0.05 && p < 1 ? bounce : 0);
+    };
+
+    if (ihsGroup.current) ihsGroup.current.position.y = overshoot(0, 6);
+    if (dieGroup.current) dieGroup.current.position.y = overshoot(0, 3.5);
+    if (vramGroup.current) vramGroup.current.position.y = overshoot(0, 2);
+    if (backGroup.current) backGroup.current.position.y = overshoot(0, -3);
+
+    const wasAssembled = assembledRef.current;
+    assembledRef.current = a >= 2.4;
+    if (assembledRef.current && !wasAssembled) {
+      lockRef.current = 1;
+    }
+    lockRef.current = spring(lockRef.current, 0, delta, 3.5);
+
+    if (groupRef.current) {
+      const drift = assembledRef.current ? 1 : 0;
+      groupRef.current.rotation.y = spring(
+        groupRef.current.rotation.y,
+        Math.sin(state.clock.elapsedTime * 0.12) * 0.08 * drift,
+        delta,
+        5.5,
+      );
+    }
+
+    bloomRef.current = 0.4 + thermalLevelRef.current * 1.4;
+  });
+
+  return (
+    <group ref={groupRef} position={[0, 0.5, 0]}>
+      <group ref={backGroup}>
+        <Backplate textures={textures} />
+      </group>
+      <PCBBoard textures={textures} />
+      <VRMSection textures={textures} />
+      <PowerConnector />
+      <group ref={vramGroup}>
+        <VRAMChips chipsRef={chipsRef} />
+      </group>
+      <group ref={dieGroup}>
+        <GPUDie thermalLevelRef={thermalLevelRef} dieRef={dieRef} />
+      </group>
+      <group ref={ihsGroup}>
+        <IHSPlate thermalLevelRef={thermalLevelRef} lockRef={lockRef} textures={textures} />
+      </group>
+      <HeatParticles activeRef={thermalLevelRef} />
+    </group>
+  );
+}
+
+function CameraRig({
+  phaseRef,
+  assembledRef,
+}: {
+  phaseRef: React.MutableRefObject<Phase>;
+  assembledRef: React.MutableRefObject<boolean>;
+}) {
+  const { camera } = useThree();
+  const clock = useRef(0);
+
+  const targets: Record<Phase, [number, number, number]> = {
+    assembling: [-2, 8, 16],
+    idle: [-1.5, 5.5, 13],
+    load: [-0.5, 4.5, 11],
+    anomaly: [1, 3.5, 9],
+    critical: [0.5, 3, 8],
+    recovery: [-1, 5, 12],
+  };
+
+  const camPos = useRef(new THREE.Vector3(-2, 8, 16));
+  const camTarget = useRef(new THREE.Vector3(0, 0.5, 0));
+
+  useFrame((_, delta) => {
+    clock.current += delta;
+    const key = assembledRef.current ? phaseRef.current : 'assembling';
+    const target = targets[key] ?? targets.idle;
+
+    camPos.current.x = spring(camPos.current.x, target[0], delta, 1.2);
+    camPos.current.y = spring(camPos.current.y, target[1], delta, 1.2);
+    camPos.current.z = spring(camPos.current.z, target[2], delta, 1.2);
+
+    const drift = assembledRef.current ? 0.018 : 0;
+    camera.position.set(
+      camPos.current.x + Math.sin(clock.current * 0.23) * drift,
+      camPos.current.y + Math.sin(clock.current * 0.17) * drift * 0.6,
+      camPos.current.z + Math.sin(clock.current * 0.31) * drift * 0.5,
+    );
+    camera.lookAt(camTarget.current);
+  });
+
   return null;
 }
 
-/* ─── HUD overlay readouts ─────────────────────────────────────────────────── */
-const PHASE_LABELS: Record<PhaseType, { label: string; color: string; sub: string }> = {
-  assembly: { label: 'ASSEMBLING',   color: '#6E91C8', sub: 'initializing components' },
-  idle:     { label: 'IDLE · P8',    color: '#525a55', sub: 'thermal baseline' },
-  load:     { label: 'UNDER LOAD',   color: '#2FB36B', sub: 'pynvml polling active' },
-  anomaly:  { label: 'DRIFT DETECTED', color: '#E8B23A', sub: 'R_θ rising on SM-5' },
-  critical: { label: '⚠ CRITICAL',   color: '#D63D3D', sub: 'ThermalOS alert triggered' },
-  recovery: { label: 'RECOVERY',     color: '#9FCB3B', sub: 'CUDA context released' },
-};
+const _caOffset = new THREE.Vector2(0.0014, 0.0014);
 
-function PhaseHUD({ phase, thermalLevel }: { phase: PhaseType; thermalLevel: number }) {
-  const info = PHASE_LABELS[phase];
-  const tC = Math.round(37 + thermalLevel * 58);
-  const rTheta = (2.1 - thermalLevel * 1.4).toFixed(2);
-  const FM = "'JetBrains Mono', ui-monospace, monospace";
-  const FD = "'Space Grotesk', system-ui, sans-serif";
+function PostFX({ bloomRef }: { bloomRef: React.MutableRefObject<number> }) {
+  const bloomEffectRef = useRef<any>(null);
+
+  useFrame(() => {
+    if (bloomEffectRef.current) {
+      bloomEffectRef.current.intensity = bloomRef.current;
+    }
+  });
 
   return (
-    <div style={{
-      position: 'absolute', right: 32, top: '50%', transform: 'translateY(-50%)',
-      display: 'flex', flexDirection: 'column', gap: 12, zIndex: 10,
-    }}>
-      {/* Phase label */}
-      <div style={{
-        padding: '8px 14px', borderRadius: 5,
-        background: 'rgba(8,10,14,.80)',
-        border: `1px solid ${info.color}40`,
-        backdropFilter: 'blur(12px)',
-      }}>
-        <div style={{ fontFamily: FM, fontSize: 10, letterSpacing: '.14em', color: info.color, marginBottom: 3 }}>
-          {info.label}
-        </div>
-        <div style={{ fontFamily: FM, fontSize: 9, color: '#404050' }}>{info.sub}</div>
+    <EffectComposer multisampling={0}>
+      <Bloom
+        ref={bloomEffectRef}
+        luminanceThreshold={0.12}
+        luminanceSmoothing={0.25}
+        intensity={0.5}
+        radius={0.55}
+        mipmapBlur
+      />
+      <ChromaticAberration
+        offset={_caOffset}
+        blendFunction={BlendFunction.NORMAL}
+        radialModulation={false}
+        modulationOffset={0.15}
+      />
+      <Noise opacity={0.045} premultiply={false} blendFunction={BlendFunction.SCREEN} />
+      <Vignette offset={0.28} darkness={0.6} eskil={false} blendFunction={BlendFunction.NORMAL} />
+    </EffectComposer>
+  );
+}
+
+function PhaseHUD({
+  phaseRef,
+  valuesRef,
+}: {
+  phaseRef: React.MutableRefObject<Phase>;
+  valuesRef: React.MutableRefObject<{ level: number; progress: number }>;
+}) {
+  const [, force] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => force((n) => n + 1), 120);
+    return () => clearInterval(id);
+  }, []);
+
+  const phase = phaseRef.current;
+  const { level, progress } = valuesRef.current;
+  const isCritical = phase === 'critical';
+  const tColor = thermalHex(level).getStyle();
+
+  const Tj = (38 + level * 56).toFixed(1);
+  const Rtheta = (0.22 + level * 0.41).toFixed(3);
+  const pState = level < 0.2 ? 'P8 · idle' : level < 0.55 ? 'P2 · active' : level < 0.85 ? 'P0 · boost' : 'P0 · throttle';
+  const now = new Date();
+  const ts = `${now.toTimeString().slice(0, 8)}.${String(now.getMilliseconds()).padStart(3, '0')}`;
+
+  const labelMap: Record<Phase, string> = {
+    assembling: 'INITIALIZING',
+    idle: 'IDLE',
+    load: 'UNDER LOAD',
+    anomaly: 'ANOMALY DETECTED',
+    critical: 'THERMAL CRITICAL',
+    recovery: 'RECOVERING',
+  };
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: 18,
+        left: 18,
+        width: 268,
+        padding: '12px 14px',
+        background: 'rgba(9,9,13,0.82)',
+        backdropFilter: 'blur(6px)',
+        border: `1px solid ${isCritical ? T.critical : T.border}`,
+        borderRadius: 8,
+        fontFamily: FM,
+        color: T.text,
+        fontSize: 11,
+        lineHeight: 1.7,
+        boxShadow: isCritical
+          ? `0 0 0 1px ${T.critical}, 0 0 22px rgba(184,48,48,0.45)`
+          : '0 6px 24px rgba(0,0,0,0.5)',
+        transition: 'border-color 0.3s, box-shadow 0.3s',
+        pointerEvents: 'none',
+        overflow: 'hidden',
+        animation: isCritical ? 'tos-hud-pulse 1s ease-in-out infinite' : undefined,
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: 'repeating-linear-gradient(0deg, transparent 0 2px, rgba(255,255,255,0.018) 2px 3px)',
+          pointerEvents: 'none',
+        }}
+      />
+      <style>{`@keyframes tos-hud-pulse{0%,100%{box-shadow:0 0 0 1px ${T.critical},0 0 16px rgba(184,48,48,0.35)}50%{box-shadow:0 0 0 1px ${T.critical},0 0 30px rgba(184,48,48,0.6)}}`}</style>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <span style={{ color: T.muted, fontSize: 9, letterSpacing: '0.14em' }}>THERMALOS · DAQ</span>
+        <span style={{ color: T.muted, fontSize: 9 }}>{ts}</span>
       </div>
 
-      {/* Live readouts */}
-      {[
-        { label: 'T_junction', value: `${tC}°C`, highlight: thermalLevel > 0.75 },
-        { label: 'R_θ_eff',   value: `${rTheta} C/W`, highlight: thermalLevel > 0.65 },
-        { label: 'P_state',   value: thermalLevel < 0.15 ? 'P8' : 'P0', highlight: false },
-      ].map(({ label, value, highlight }) => (
-        <div key={label} style={{
-          padding: '6px 14px', borderRadius: 4,
-          background: 'rgba(8,10,14,.72)',
-          border: `1px solid ${highlight ? '#D63D3D40' : '#232330'}`,
-          backdropFilter: 'blur(8px)',
-          transition: 'border-color .4s',
-        }}>
-          <div style={{ fontFamily: FM, fontSize: 9, color: '#404050', marginBottom: 2 }}>{label}</div>
-          <div style={{
-            fontFamily: FM, fontSize: 14, fontVariantNumeric: 'tabular-nums',
-            color: highlight ? '#D63D3D' : '#E8E8F0',
-            transition: 'color .4s',
-          }}>
-            {value}
-          </div>
-        </div>
-      ))}
+      <div
+        style={{
+          color: isCritical ? T.critical : tColor,
+          fontWeight: 700,
+          fontSize: 12,
+          letterSpacing: '0.08em',
+          marginBottom: 8,
+          textShadow: isCritical ? `0 0 8px ${T.critical}` : 'none',
+        }}
+      >
+        ● {labelMap[phase]}
+      </div>
 
-      {/* ThermalOS attribution */}
-      <div style={{ fontFamily: FM, fontSize: 8.5, color: '#232330', letterSpacing: '.12em', textAlign: 'right' }}>
-        thermalos · v0.1.9
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span style={{ color: T.muted }}>T_junction</span>
+        <span style={{ color: tColor }}>{Tj} °C</span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span style={{ color: T.muted }}>R_θ_eff</span>
+        <span style={{ color: T.text }}>{Rtheta} °C/W</span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+        <span style={{ color: T.muted }}>P_state</span>
+        <span style={{ color: T.bp }}>{pState}</span>
+      </div>
+
+      <div style={{ height: 4, background: T.s1, borderRadius: 2, overflow: 'hidden' }}>
+        <div
+          style={{
+            height: '100%',
+            width: `${Math.round(progress * 100)}%`,
+            background: tColor,
+            transition: 'width 0.12s linear',
+          }}
+        />
       </div>
     </div>
   );
 }
 
-/* ─── Main exported component ──────────────────────────────────────────────── */
 export default function GPUHeroScene() {
-  const [phase, setPhase] = useState<PhaseType>('assembly');
-  const [thermalLevel, setThermalLevel] = useState(0.05);
+  const thermalLevelRef = useRef(0.12);
+  const bloomRef = useRef(0.5);
+  const phaseRef = useRef<Phase>('idle');
+  const assembledRef = useRef(false);
+  const valuesRef = useRef({ level: 0.12, progress: 0 });
 
-  const handlePhaseChange = (p: PhaseType, t: number) => {
-    setPhase(prev => prev !== p ? p : prev);
-    setThermalLevel(t);
-  };
+  useEffect(() => {
+    let raf = 0;
+    const start = performance.now();
+    let idx = 0;
+    let phaseStart = 0;
+
+    const tick = (now: number) => {
+      const elapsed = (now - start) / 1000;
+
+      if (assembledRef.current) {
+        const cur = PHASE_SEQUENCE[idx];
+        const pElapsed = elapsed - phaseStart;
+        const progress = THREE.MathUtils.clamp(pElapsed / cur.dur, 0, 1);
+
+        phaseRef.current = cur.phase;
+        const nextLevel = idx + 1 < PHASE_SEQUENCE.length ? PHASE_SEQUENCE[idx + 1].level : PHASE_SEQUENCE[0].level;
+        thermalLevelRef.current = THREE.MathUtils.lerp(cur.level, nextLevel, progress * progress);
+        valuesRef.current = { level: thermalLevelRef.current, progress };
+
+        if (pElapsed >= cur.dur) {
+          idx = (idx + 1) % PHASE_SEQUENCE.length;
+          phaseStart = elapsed;
+        }
+      } else {
+        phaseStart = elapsed;
+        idx = 0;
+      }
+
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const textures = useMemo(() => ({ pcb: makePCBTexture(), rough: makeRoughnessMap() }), []);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '78vh', maxHeight: 760, minHeight: 520 }}>
-      {/* 3D Canvas */}
+    <div style={{ position: 'relative', width: '100%', height: '78vh', background: T.bg }}>
       <Canvas
-        style={{ position: 'absolute', inset: 0 }}
-        camera={{ position: [-1, 4, 14], fov: 42 }}
-        dpr={[1, 1.5]}
-        gl={{ antialias: true, alpha: true }}
+        shadows
+        gl={{
+          antialias: false,
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.1,
+          outputColorSpace: THREE.SRGBColorSpace,
+        }}
+        dpr={[1, 2]}
+        camera={{ position: [-2, 6, 14], fov: 38 }}
       >
-        <Suspense fallback={null}>
-          <ambientLight intensity={0.18} />
-          <pointLight position={[6, 10, 6]}  intensity={3.5} color="#FFFFFF" />
-          <pointLight position={[-10, 4, -5]} intensity={1.2} color="#4466CC" />
-          <pointLight position={[0, -3, 6]}  intensity={0.5} color="#002244" />
+        <color attach="background" args={[T.bg]} />
+        <fog attach="fog" args={[T.bg, 18, 40]} />
 
-          <Environment preset="city" />
+        <SceneLights thermalLevelRef={thermalLevelRef} />
 
-          <group position={[1.5, -0.3, 0]}>
-            <GPUAssembly onPhaseChange={handlePhaseChange} />
-            <ContactShadows
-              position={[0, -0.5, 0]}
-              opacity={0.5}
-              scale={18}
-              blur={2.5}
-              far={4}
-              color="#000814"
-            />
-          </group>
+        <GPUAssembly
+          thermalLevelRef={thermalLevelRef}
+          bloomRef={bloomRef}
+          assembledRef={assembledRef}
+          textures={textures}
+        />
 
-          <CameraRig phase={phase} />
-          <OrbitControls
-            enableZoom={false}
-            enablePan={false}
-            enableRotate
-            maxPolarAngle={Math.PI / 1.8}
-            minPolarAngle={Math.PI / 4}
-          />
-        </Suspense>
+        <ContactShadows position={[0, -0.3, 0]} opacity={0.55} scale={18} blur={2.5} far={6} resolution={1024} color="#000000" />
+
+        <Environment preset="studio" environmentIntensity={0.6} />
+
+        <CameraRig phaseRef={phaseRef} assembledRef={assembledRef} />
+        <PostFX bloomRef={bloomRef} />
       </Canvas>
 
-      {/* HUD overlays */}
-      <PhaseHUD phase={phase} thermalLevel={thermalLevel} />
-
-      {/* Bottom-center phase strip */}
-      <div style={{
-        position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)',
-        display: 'flex', gap: 6, zIndex: 10,
-      }}>
-        {(Object.keys(PHASE_LABELS) as PhaseType[]).filter(p => p !== 'assembly').map(p => (
-          <div key={p} style={{
-            width: p === phase ? 24 : 6, height: 4, borderRadius: 2,
-            background: p === phase ? PHASE_LABELS[p].color : '#232330',
-            transition: 'width .4s ease, background .4s ease',
-          }} />
-        ))}
-      </div>
+      <PhaseHUD phaseRef={phaseRef} valuesRef={valuesRef} />
     </div>
   );
 }
