@@ -66,9 +66,12 @@
   }
 }
 
-/* Hide system cursor on pointer devices — custom cursor takes over */
+/* Hide system cursor only when custom cursor is mounted (set via body class) */
 @media (pointer: fine) {
-  *, *::before, *::after {
+  body.custom-cursor-active,
+  body.custom-cursor-active *,
+  body.custom-cursor-active *::before,
+  body.custom-cursor-active *::after {
     cursor: none !important;
   }
 }

@@ -43,6 +43,8 @@ export default function CustomCursor() {
   useEffect(() => {
     // Hide on touch devices
     if ("ontouchstart" in window) return;
+    document.body.classList.add("custom-cursor-active");
+
 
     window.addEventListener("mousemove", handleMove, { passive: true });
     window.addEventListener("mouseover", handleOver, { passive: true });
@@ -58,6 +60,7 @@ export default function CustomCursor() {
       window.removeEventListener("mouseup", handleUp);
       document.documentElement.removeEventListener("mouseleave", handleLeave);
       document.documentElement.removeEventListener("mouseenter", handleEnter);
+      document.body.classList.remove("custom-cursor-active");
     };
   }, [handleMove, handleOver, handleDown, handleUp, handleLeave, handleEnter]);
 
