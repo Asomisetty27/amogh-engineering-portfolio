@@ -1,5 +1,5 @@
 /**
- * ThermalOS — Landing page (v2)
+ * Theta — Landing page (v2)
  *
  * Design principles:
  *   · No neon glows. Color encodes information only.
@@ -17,6 +17,7 @@ import { ChevronRight } from 'lucide-react';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { animate, stagger } from 'animejs';
 import GPUHeroScene from './components/GPUHeroScene';
+import ThetaLogo from '../../components/ThetaLogo';
 
 /* ─── Design tokens ───────────────────────────────────────────────────────── */
 const T = {
@@ -288,12 +289,7 @@ function Nav() {
     <nav className="tos-nav" style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: `1px solid ${scrolled ? 'rgba(255,255,255,.07)' : 'transparent'}`, background: scrolled ? 'rgba(9,9,13,.82)' : 'transparent', backdropFilter: scrolled ? 'blur(20px) saturate(160%)' : 'none', WebkitBackdropFilter: scrolled ? 'blur(20px) saturate(160%)' : 'none', transition: 'border-color .3s, background .3s, backdrop-filter .3s', boxShadow: scrolled ? '0 1px 0 rgba(255,255,255,.04)' : 'none' }}>
       <div style={{ maxWidth: 1240, margin: '0 auto', display: 'flex', alignItems: 'center', height: 54, padding: '0 32px', gap: 28 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <circle cx="8" cy="8" r="2" fill={T.healthy} />
-            <circle cx="8" cy="8" r="5" stroke={T.healthy} strokeWidth="0.8" opacity="0.45" />
-            <circle cx="8" cy="8" r="7.5" stroke={T.healthy} strokeWidth="0.5" opacity="0.18" />
-          </svg>
-          <span style={{ fontFamily: FD, fontSize: 13.5, fontWeight: 500, letterSpacing: '-.01em', color: T.text }}>ThermalOS</span>
+          <ThetaLogo size={22} variant="full" color={T.healthy} />
           <span style={{ fontFamily: FM, fontSize: 9.5, color: T.bp, border: `1px solid ${T.border}`, borderRadius: 3, padding: '2px 5px' }}>v0</span>
         </div>
         <div className="tos-nav-links" style={{ display: 'flex', gap: 26 }}>
@@ -440,7 +436,7 @@ function Hero() {
             textShadow: '0 1px 16px rgba(0,0,0,.9)',
           }}>
             Temperature alone is ambiguous — a hot GPU could be busy or failing.
-            ThermalOS computes{' '}
+            Theta computes{' '}
             <span style={{ fontFamily: FM, color: T.text, fontSize: 13.5 }}>R_θ = ΔT / P</span>{' '}
             in real time from your DCGM telemetry.
           </p>
@@ -1025,7 +1021,7 @@ function Codeblock({ lines }: { lines: Array<{ p: string; t: string; tone?: stri
 
 /* ─── Competitor table ────────────────────────────────────────────────────── */
 type Mark = 'yes' | 'no' | 'partial';
-const CMP_COLS = ['DCGM', 'Mission Control', 'Phaidra', 'In-house', 'ThermalOS'];
+const CMP_COLS = ['DCGM', 'Mission Control', 'Phaidra', 'In-house', 'Theta'];
 const CMP_ROWS: { cap: string; cells: Mark[] }[] = [
   { cap: 'Exposes T_junction + P_GPU',         cells: ['yes', 'yes', 'partial', 'partial', 'yes'] },
   { cap: 'Computes R_θ (ΔT / P)',              cells: ['no', 'no', 'no', 'no', 'yes'] },
@@ -1191,7 +1187,7 @@ function Pricing() {
                   </div>
                 ))}
               </div>
-              <a href="mailto:asomisetty27@gmail.com?subject=ThermalOS fleet tier"
+              <a href="mailto:asomisetty27@gmail.com?subject=Theta fleet tier"
                 style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 11, borderRadius: 4, background: T.healthy, color: '#051A0D', fontFamily: FD, fontSize: 14, fontWeight: 500, textDecoration: 'none', transition: 'opacity .15s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.87')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
@@ -1217,12 +1213,8 @@ function Footer() {
       <div style={{ maxWidth: 1240, margin: '0 auto', padding: '56px 32px' }}>
         <div className="tos-footer-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: 36 }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                <circle cx="8" cy="8" r="2" fill={T.healthy} />
-                <circle cx="8" cy="8" r="5" stroke={T.healthy} strokeWidth="0.8" opacity="0.4" />
-              </svg>
-              <span style={{ fontFamily: FD, fontSize: 13, fontWeight: 500, color: T.text }}>ThermalOS</span>
+            <div style={{ marginBottom: 10 }}>
+              <ThetaLogo size={20} variant="full" color={T.healthy} />
             </div>
             <p style={{ fontFamily: FM, fontSize: 10.5, color: T.faint, lineHeight: 1.7, marginBottom: 18 }}>GPU thermal-power forensics.<br />Built at Cal Poly · MIT License.</p>
             <form onSubmit={e => e.preventDefault()} style={{ display: 'flex', border: `1px solid ${T.border}`, borderRadius: 4, overflow: 'hidden', maxWidth: 260 }}>
@@ -1257,7 +1249,7 @@ function Footer() {
           ))}
         </div>
         <div style={{ borderTop: `1px solid ${T.border}`, marginTop: 44, paddingTop: 18, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-          <span style={{ fontFamily: FM, fontSize: 10, color: T.faint }}>© 2026 ThermalOS · MIT License</span>
+          <span style={{ fontFamily: FM, fontSize: 10, color: T.faint }}>© 2026 Theta · MIT License</span>
           <span style={{ fontFamily: FM, fontSize: 10, color: T.faint }}>R_θ = ΔT / P — the one ratio nobody else ships.</span>
         </div>
       </div>
