@@ -16,6 +16,7 @@ import { FLEET_BASE, researchPath } from './config';
 import { ChevronRight } from 'lucide-react';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { animate, stagger } from 'animejs';
+import ThermalGPUMap from './components/ThermalGPUMap';
 
 /* ─── Design tokens ───────────────────────────────────────────────────────── */
 const T = {
@@ -408,15 +409,27 @@ function Hero() {
             </span>
             <Tag>MIT licensed · single-node free forever</Tag>
           </div>
-          <h1 data-h style={{ opacity: 0, fontFamily: FD, fontSize: 'clamp(44px,5.2vw,72px)', fontWeight: 500, letterSpacing: '-.035em', lineHeight: 0.97, marginBottom: 24 }}>
-            Know <span className="tos-grad-text">why</span><br />your GPU is hot.
+          <h1 data-h style={{ opacity: 0, fontFamily: FD, fontSize: 'clamp(40px,5.2vw,68px)', fontWeight: 500, letterSpacing: '-.035em', lineHeight: 0.97, marginBottom: 24 }}>
+            Thermal forensics<br />for <span className="tos-grad-text">GPU clusters.</span>
           </h1>
           <p data-h style={{ opacity: 0, fontFamily: FD, fontSize: 15.5, lineHeight: 1.65, color: T.muted, maxWidth: 440, marginBottom: 28 }}>
             Temperature alone is ambiguous — a hot GPU could be busy or failing.
             ThermalOS computes{' '}
             <span style={{ fontFamily: FM, color: T.text, fontSize: 14 }}>R_θ = ΔT / P</span>{' '}
-            in real time from your existing DCGM telemetry. The only signal that cleanly separates the two states.
+            in real time from your DCGM telemetry. The only signal that cleanly separates the two.
           </p>
+          {/* Evidence claim beneath headline */}
+          <div data-h style={{ opacity: 0, marginBottom: 20 }}>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              fontFamily: FM, fontSize: 10.5, letterSpacing: '.04em',
+              color: T.healthy, padding: '4px 10px', borderRadius: 4,
+              border: `1px solid ${T.healthy}30`,
+              background: `${T.healthy}0A`,
+            }}>
+              ● Stage 1 complete · 3.5× recovery delta · n=7 trials · Tesla T4
+            </span>
+          </div>
           <div data-h style={{ opacity: 0, marginBottom: 14 }}>
             <InstallBlock />
           </div>
@@ -449,7 +462,8 @@ function Hero() {
         </div>
         {/* Right: R_theta trace visualization */}
         <div data-h style={{ opacity: 0 }}>
-          <RthetaTrace />
+          {/* Live thermal visualization — the product's core value in motion */}
+          <ThermalGPUMap />
         </div>
       </div>
     </motion.section>
