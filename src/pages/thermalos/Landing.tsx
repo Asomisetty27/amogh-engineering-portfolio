@@ -398,14 +398,21 @@ function Hero() {
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 80, background: `linear-gradient(to bottom, ${T.bg}, transparent)`, pointerEvents: 'none', zIndex: 5 }} />
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 140, background: `linear-gradient(to bottom, transparent, ${T.bg})`, pointerEvents: 'none', zIndex: 5 }} />
 
+        {/* ── Left gradient — locks text legibility over any 3D content ── */}
+        <div aria-hidden style={{
+          position: 'absolute', top: 0, bottom: 0, left: 0,
+          width: '58%', pointerEvents: 'none', zIndex: 8,
+          background: 'linear-gradient(to right, rgba(6,6,10,1) 0%, rgba(6,6,10,0.92) 38%, rgba(6,6,10,0.5) 62%, transparent 100%)',
+        }} />
+
         {/* ── LEFT TEXT PANEL overlaid on canvas ── */}
         <div style={{
           position: 'absolute',
           top: '50%',
-          left: 'clamp(24px, 5%, 72px)',
+          left: 'clamp(40px, 5.5%, 84px)',
           transform: 'translateY(-50%)',
           zIndex: 10,
-          maxWidth: 460,
+          maxWidth: 490,
         }}>
           <div data-h style={{ opacity: 0, marginBottom: 16, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <span className="tos-shimmer-wrap" style={{ display: 'inline-flex', borderRadius: 3 }}>
@@ -417,23 +424,21 @@ function Hero() {
             opacity: 0,
             fontFamily: FD,
             fontSize: 'clamp(34px,4.4vw,60px)',
-            fontWeight: 500,
-            letterSpacing: '-.035em',
-            lineHeight: 0.97,
-            marginBottom: 16,
-            textShadow: '0 2px 32px rgba(0,0,0,.85)',
+            fontWeight: 700,
+            letterSpacing: '-.04em',
+            lineHeight: 0.95,
+            marginBottom: 18,
           }}>
             Thermal forensics<br />for <span className="tos-grad-text">GPU clusters.</span>
           </h1>
           <p data-h style={{
             opacity: 0,
             fontFamily: FD,
-            fontSize: 14.5,
-            lineHeight: 1.65,
-            color: T.muted,
-            maxWidth: 400,
-            marginBottom: 16,
-            textShadow: '0 1px 16px rgba(0,0,0,.9)',
+            fontSize: 15,
+            lineHeight: 1.62,
+            color: '#9a9aaa',
+            maxWidth: 420,
+            marginBottom: 18,
           }}>
             Temperature alone is ambiguous — a hot GPU could be busy or failing.
             Theta computes{' '}
@@ -474,12 +479,12 @@ function Hero() {
       {/* ── STATS ROW — sits below canvas ── */}
       <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 32px 80px' }}>
         <div data-h style={{ opacity: 0 }}>
-          <div className="tos-glass" style={{ borderRadius: 8, padding: '16px 20px', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
-            {HERO_STATS.map((s, i) => (
-              <div key={s.l} style={{ borderLeft: i > 0 ? `1px solid rgba(255,255,255,.06)` : 'none', paddingLeft: i > 0 ? 16 : 0 }}>
-                <div style={{ fontFamily: FD, fontSize: 26, fontWeight: 600, letterSpacing: '-.03em', color: T.text, fontVariantNumeric: 'tabular-nums', background: 'linear-gradient(135deg, #e8e8f0, #a0a0b0)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{s.v}</div>
-                <div style={{ fontFamily: FM, fontSize: 9.5, color: T.text, marginTop: 4, letterSpacing: '.02em' }}>{s.l}</div>
-                <div style={{ fontFamily: FM, fontSize: 9.5, color: T.faint, letterSpacing: '.02em' }}>{s.s}</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 1, border: `1px solid ${T.border}`, borderRadius: 6, overflow: 'hidden', background: T.border }}>
+            {HERO_STATS.map((s) => (
+              <div key={s.l} style={{ background: T.s1, padding: '20px 24px' }}>
+                <div style={{ fontFamily: FM, fontSize: 28, fontWeight: 600, letterSpacing: '-.02em', color: T.text, fontVariantNumeric: 'tabular-nums' }}>{s.v}</div>
+                <div style={{ fontFamily: FM, fontSize: 9, color: T.healthy, marginTop: 6, letterSpacing: '.08em', textTransform: 'uppercase' }}>{s.l}</div>
+                <div style={{ fontFamily: FM, fontSize: 9, color: T.faint, marginTop: 2, letterSpacing: '.02em' }}>{s.s}</div>
               </div>
             ))}
           </div>
