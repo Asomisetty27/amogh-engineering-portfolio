@@ -341,7 +341,7 @@ export default function OtterInteractive() {
                   opacity={active ? 0.9 : 0.25} />
                 {active && <line x1={40} y1={88} x2={84} y2={88}
                   stroke="#00d4aa" strokeWidth="2.5" opacity="0.1" filter="url(#og-tight)" />}
-                {active && mode !== "idle" && (
+                {active && (
                   <>
                     <circle cx={px} cy={88} r="1.8" fill="#00d4aa" opacity="0.9" filter="url(#og-tight)" />
                     <circle cx={Math.max(40, px - 10)} cy={88} r="0.9" fill="#00d4aa" opacity="0.35" />
