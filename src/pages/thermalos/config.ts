@@ -1,18 +1,23 @@
-// Routing — single source of truth for the ThermalOS surfaces.
+// Routing — single source of truth for all surfaces.
 //
-//   THERMALOS PUBLIC — customer-facing product surface.
-//     /thermalos          -> Landing (marketing)
-//     /thermalos/fleet    -> Fleet Dashboard (product demo)
+//   THETA — startup / commercial surface
+//     /theta              -> Landing.tsx  (product pitch, GPU animation)
 //
-//   THERMALOS APP — research/admin/advisor workspace.
+//   THERMALOS — research / OSS public surface
+//     /thermalos          -> ResearchLanding.tsx  (academic, findings, formula)
+//     /thermalos/fleet    -> FleetDashboard.tsx   (live data demo)
+//
+//   THERMALOS APP — research/admin workspace
 //     /thermalos/app          -> research hub (Overview)
 //     /thermalos/app/<page>   -> findings, lab, advisor, publication, yc, roadmap…
 //
-// Isotherm is the design-system name, not the product name shown to users.
-// Each zone has its own base constant so the public surface can move to a
-// dedicated domain later by editing one line. No other file hardcodes app paths.
+// Each zone has its own base constant so any surface can move to a dedicated
+// domain by editing one line here. No other file hardcodes app paths.
 
-// ── Public product surface ──────────────────────────────────────────────────
+// ── Startup / commercial surface (Theta) ────────────────────────────────────
+export const THETA_BASE = '/theta';
+
+// ── Research / OSS surface (ThermalOS) ──────────────────────────────────────
 export const SITE_BASE = '/thermalos';
 export const FLEET_BASE = '/thermalos/fleet';
 

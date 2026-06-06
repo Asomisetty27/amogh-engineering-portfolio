@@ -5,10 +5,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import ThermalOSLayout from "./pages/thermalos/ThermalOSLayout.tsx";
-import Landing        from "./pages/thermalos/Landing.tsx";
-import FleetDashboard from "./pages/thermalos/FleetDashboard.tsx";
-import { FLEET_BASE, LEGACY_REDIRECTS, RESEARCH_BASE, SITE_BASE } from "./pages/thermalos/config.ts";
+import ThermalOSLayout    from "./pages/thermalos/ThermalOSLayout.tsx";
+import Landing            from "./pages/thermalos/Landing.tsx";
+import ResearchLanding    from "./pages/thermalos/ResearchLanding.tsx";
+import FleetDashboard     from "./pages/thermalos/FleetDashboard.tsx";
+import { FLEET_BASE, LEGACY_REDIRECTS, RESEARCH_BASE, SITE_BASE, THETA_BASE } from "./pages/thermalos/config.ts";
 
 // ThermalOS pages
 import Overview      from "./pages/thermalos/Overview.tsx";
@@ -34,10 +35,13 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
 
-          {/* ══ THERMALOS PUBLIC — customer-facing product surface ════════
-              Domain-portable: /thermalos + /thermalos/fleet can become "/"
-              + "/fleet" on a dedicated domain by changing config.ts. */}
-          <Route path={SITE_BASE} element={<Landing />} />
+          {/* ══ THETA — startup / commercial surface ══════════════════════ */}
+          <Route path={THETA_BASE} element={<Landing />} />
+
+          {/* ══ THERMALOS — research / OSS public surface ═════════════════
+              /thermalos          -> ResearchLanding (academic)
+              /thermalos/fleet    -> FleetDashboard (live data demo) */}
+          <Route path={SITE_BASE} element={<ResearchLanding />} />
           <Route path={FLEET_BASE} element={<FleetDashboard />} />
 
           {/* ══ THERMALOS APP — research/admin/advisor workspace ══════════ */}
