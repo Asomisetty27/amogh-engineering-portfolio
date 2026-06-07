@@ -323,7 +323,7 @@ function Nav() {
 /* ─── Install command — copy-on-click with caret blink ──────────────────── */
 function InstallBlock() {
   const [copied, setCopied] = useState(false);
-  const cmd = 'pip install thermalos';
+  const cmd = 'pip install runtheta';
   const copy = useCallback(() => {
     navigator.clipboard?.writeText(cmd);
     setCopied(true);
@@ -930,7 +930,7 @@ function FeaturesGrid() {
           <div data-f className="tos-feat-oss" style={{ opacity: 0 }}>
             <FeatureCard title="OSS agent — single node free" index="05" tone="healthy">
               <p style={{ fontFamily: FD, fontSize: 13, lineHeight: 1.65, color: T.muted, marginBottom: 14 }}>
-                <span style={{ fontFamily: FM, color: T.text }}>pip install thermalos</span> — 60 seconds to first R_θ reading.
+                <span style={{ fontFamily: FM, color: T.text }}>pip install runtheta</span> — 60 seconds to first R_θ reading.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                 {['Free · single node · live readout', 'Paid · fleet dashboard + alerts', 'Paid · cross-node correlation'].map((f, i) => (
@@ -1478,7 +1478,7 @@ const STYLES = `
 /* ─── Terminal demo ──────────────────────────────────────────────────────────
  *
  * Realistic typewriter terminal showing the actual onboarding flow.
- * Loop: pip install → thermalos setup → GPU inventory → first R_theta readout.
+ * Loop: pip install → theta setup → GPU inventory → first R_theta readout.
  * Pauses on hover, restarts after ~3s idle. Respects prefers-reduced-motion.
  *
  * Lines are typed character-by-character at variable speed (with brief jitter
@@ -1493,14 +1493,14 @@ type TermLine =
   | { kind: 'clear' };                                      // wipe screen
 
 const DEMO_SCRIPT: TermLine[] = [
-  { kind: 'cmd', text: 'pip install thermalos' },
+  { kind: 'cmd', text: 'pip install runtheta' },
   { kind: 'wait', ms: 400 },
   { kind: 'out', text: 'Collecting thermalos', color: T.muted },
   { kind: 'out', text: '  Downloading thermalos-0.1.9-py3-none-any.whl (49.8 kB)', color: T.faint },
   { kind: 'out', text: '  Installing collected packages: thermalos', color: T.faint },
   { kind: 'out', text: 'Successfully installed thermalos-0.1.9', color: T.healthy },
   { kind: 'wait', ms: 700 },
-  { kind: 'cmd', text: 'thermalos setup' },
+  { kind: 'cmd', text: 'theta setup' },
   { kind: 'wait', ms: 500 },
   { kind: 'out', text: '  ✓  Python 3.12.1', color: T.healthy },
   { kind: 'out', text: '  ✓  pynvml  ·  driver 535.183.06  ·  4 GPUs detected', color: T.healthy },
@@ -1605,7 +1605,7 @@ function TerminalDemo() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 72, alignItems: 'center' }} className="tos-two-col">
           <div>
             <SectionHead eyebrow="See it run" title={<>90 seconds from<br />pip install to first<br />R_θ reading.</>}
-              body={<>The setup wizard walks you through GPU detection, virtual ambient locking, and first classification — all from your terminal. Run <span style={{ fontFamily: FM, color: T.text }}>thermalos setup</span> after install.</>} />
+              body={<>The setup wizard walks you through GPU detection, virtual ambient locking, and first classification — all from your terminal. Run <span style={{ fontFamily: FM, color: T.text }}>theta setup</span> after install.</>} />
             <div style={{ marginTop: 28, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <a href="https://pypi.org/project/thermalos/" target="_blank" rel="noreferrer"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '9px 16px', borderRadius: 4, border: `1px solid ${T.borderHi}`, background: T.s1, color: T.text, fontFamily: FD, fontSize: 13, fontWeight: 500, textDecoration: 'none', transition: 'border-color .15s' }}

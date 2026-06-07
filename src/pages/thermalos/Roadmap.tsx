@@ -22,7 +22,7 @@ const STAGES: Stage[] = [
   {
     id: 2,
     title: "Agent v0.1.9 shipped",
-    subtitle: "pip install thermalos · fault curve classifier (6 failure modes: dust, TIM, fan, blockage, mounting, HBM) · Decision Tree 100% · ensemble voting · failure predictor · SDC hunter · Redfish + DCGM · health API · Intelligence Network",
+    subtitle: "pip install runtheta · fault curve classifier (6 failure modes: dust, TIM, fan, blockage, mounting, HBM) · Decision Tree 100% · ensemble voting · failure predictor · SDC hunter · Redfish + DCGM · health API · Intelligence Network",
     status: "complete",
     progress: 100,
   },

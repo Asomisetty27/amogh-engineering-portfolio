@@ -170,7 +170,7 @@ export function generateDemoTimeline(): TimelineRow[] {
     { phase: "", week: "W4", dates: "May 2026", milestone: "Kundu advisor confirmed · 3 mandates filed (sensitivity, Bayesian, E003/E004 rerun)", owner: "Amogh", status: "Done ✓", priority: "P0 — Critical", layer: "Comms", notes: "2026-06-03 session" },
 
     // Stage 2 — Agent v0.1.9 (complete)
-    { phase: "Stage 2 — Agent v0.1.9", week: "W5", dates: "Jun 2026", milestone: "pip install thermalos · pynvml + Redfish + DCGM telemetry collector", owner: "Amogh", status: "Done ✓", priority: "P0 — Critical", layer: "SW", notes: "v0.1.8" },
+    { phase: "Stage 2 — Agent v0.1.9", week: "W5", dates: "Jun 2026", milestone: "pip install runtheta · pynvml + Redfish + DCGM telemetry collector", owner: "Amogh", status: "Done ✓", priority: "P0 — Critical", layer: "SW", notes: "v0.1.8" },
     { phase: "", week: "W5", dates: "Jun 2026", milestone: "Fault curve classifier: 6 failure modes from R_θ(P) shape (dust, TIM, fan, blockage, mounting, HBM)", owner: "Amogh", status: "Done ✓", priority: "P0 — Critical", layer: "SW", notes: "v0.1.9 · fault_classifier.py" },
     { phase: "", week: "W5", dates: "Jun 2026", milestone: "Discovery outreach: RunPod, Vast.ai, Lambda Labs — awaiting replies", owner: "Amogh", status: "In Progress", priority: "P0 — Critical", layer: "Comms", notes: "Sent 2026-06-02" },
     { phase: "", week: "W5", dates: "Jun 2026", milestone: "Lupo proposal + Campus IT one-pager ready to send", owner: "Amogh", status: "In Progress", priority: "P0 — Critical", layer: "Comms", notes: "Gated on Lupo meeting" },
@@ -571,7 +571,7 @@ export function generateDemoTodayPlan(): TodayRow[] {
     { priority: "P0 — Critical", phase: "Discovery", milestone: "Monitor RunPod / Vast.ai / Lambda replies — respond within 24h if they reply", owner: "Amogh", track: "Comms", notes: "Outreach sent 2026-06-02. First reply unlocks first discovery call." },
     { priority: "P1 — High", phase: "Stage 4 — Research", milestone: "Run dR_θ/dT_amb sensitivity analysis (Kundu mandate) on Stage 1 CSV data", owner: "Amogh", track: "Research", notes: "Vary T_ref 20–30°C, compute R_theta at each power tier, plot sensitivity curve" },
     { priority: "P1 — High", phase: "Stage 4 — Research", milestone: "Plan E003 rerun protocol — n ≥ 10 trials, steady-state window, Bayesian classifier", owner: "Amogh", track: "Research", notes: "E004 rerun script already ready; E003 needs same treatment" },
-    { priority: "P1 — High", phase: "Product", milestone: "Implement thermalos calibrate — per-GPU baseline fingerprint stored to ~/.thermalos/baselines/", owner: "Amogh", track: "Software", notes: "Prerequisite for any live operator install. Moat dimension 2." },
+    { priority: "P1 — High", phase: "Product", milestone: "Implement theta calibrate — per-GPU baseline fingerprint stored to ~/.theta/baselines/", owner: "Amogh", track: "Software", notes: "Prerequisite for any live operator install. Moat dimension 2." },
     { priority: "P2 — Normal", phase: "Product", milestone: "Add Grafana annotation hook to agent — emit R_theta anomaly events as Grafana annotations", owner: "Amogh", track: "Software", notes: "Low effort, high operator value. Operators already have Grafana." },
   ];
 }
@@ -647,12 +647,12 @@ export function generateDemoCommandCenter(): CommandCenter {
     },
     on_deck: [
       { title: "Send Lupo email by June 12", why: "AI Factory install is a live production install — counts as customer evidence even if Cal Poly. Lupo is the gating decision-maker." },
-      { title: "Implement thermalos calibrate", why: "Per-GPU baseline fingerprint is moat dimension 2. Prerequisite before any operator install — current T4 thresholds will misfire on A100/H100." },
+      { title: "Implement theta calibrate", why: "Per-GPU baseline fingerprint is moat dimension 2. Prerequisite before any operator install — current T4 thresholds will misfire on A100/H100." },
       { title: "Sensitivity analysis: dR_θ/dT_amb at each power tier", why: "Kundu mandate. Required for publication. Can compute from Stage 1 CSV now — no new hardware needed." },
     ],
     blockers: [
       { what: "No live operator install yet — discovery outreach awaiting replies", type: "external_dependency", how_to_unblock: "Replies from RunPod/Vast/Lambda. Follow up if no reply in 5 business days (Jun 9). Parallel track: Lupo AI Factory.", owner: "Amogh", days_open: 3 },
-      { what: "Calibration mode not implemented — T4 thresholds wrong on A100/H100/B200", type: "code_gap", how_to_unblock: "Implement thermalos calibrate command. Estimated: 1 day. Moat prerequisite.", owner: "Amogh", days_open: 0 },
+      { what: "Calibration mode not implemented — T4 thresholds wrong on A100/H100/B200", type: "code_gap", how_to_unblock: "Implement theta calibrate command. Estimated: 1 day. Moat prerequisite.", owner: "Amogh", days_open: 0 },
       { what: "Sam returns to campus — E-LT lead-time testbed blocked until fall 2026", type: "waiting_on_sam", how_to_unblock: "Continue software-only work. Sam picks up E-LT + TIM characterization in fall.", owner: "Sam", days_open: 0 },
     ],
     escalations: [
@@ -706,7 +706,7 @@ export function generateDemoWikiSummary(): WikiSummary {
     experiments_complete: "E001, E002, E003, E004 (v1 + v2 controlled-variable)",
     experiments_planned: "E005, E006, E007, E008 (Stage 2, DGX B200), E-LT (Fall 2026, Sam's testbed)",
     findings_current: "6",
-    next_action: "Get first live operator install. Send Lupo email by Jun 12. Implement thermalos calibrate (per-GPU baseline). Run sensitivity analysis on Stage 1 data.",
+    next_action: "Get first live operator install. Send Lupo email by Jun 12. Implement theta calibrate (per-GPU baseline). Run sensitivity analysis on Stage 1 data.",
     conflicts_found: "1",
     conflicts_detail: "campus_it_one_pager references v0.1.8; agent is now v0.1.9. Update before sending to Campus IT.",
     vault_last_updated: "2026-06-05",

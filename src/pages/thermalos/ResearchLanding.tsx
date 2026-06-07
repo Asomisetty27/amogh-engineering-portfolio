@@ -174,7 +174,7 @@ function NavBar() {
           </Link>
         ))}
         <a
-          href="https://github.com/Asomisetty27/thermalos"
+          href="https://github.com/Asomisetty27/theta"
           target="_blank" rel="noreferrer"
           style={{
             fontFamily: FM, fontSize: 12, color: T.muted,
@@ -296,15 +296,15 @@ function AgentBlock() {
           borderRadius: 4, padding: '10px 14px', marginBottom: 12,
           letterSpacing: '0.01em',
         }}>
-          pip install thermalos
+          pip install runtheta
         </div>
         <div style={{
           fontFamily: FM, fontSize: 13, color: T.muted,
           lineHeight: 1.8,
         }}>
-          <div style={{ color: T.faint }}>$ thermalos setup</div>
-          <div style={{ color: T.faint }}>$ thermalos monitor</div>
-          <div style={{ color: T.faint }}>$ thermalos calibrate   <span style={{ color: `${T.muted}66` }}># non-T4 GPUs</span></div>
+          <div style={{ color: T.faint }}>$ theta setup</div>
+          <div style={{ color: T.faint }}>$ theta monitor</div>
+          <div style={{ color: T.faint }}>$ theta calibrate   <span style={{ color: `${T.muted}66` }}># non-T4 GPUs</span></div>
         </div>
       </div>
 
@@ -353,8 +353,8 @@ function AgentBlock() {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {[
-            { label: 'GitHub', href: 'https://github.com/Asomisetty27/thermalos', badge: 'source' },
-            { label: 'PyPI',   href: 'https://pypi.org/project/thermalos', badge: 'v0.1.9' },
+            { label: 'GitHub', href: 'https://github.com/Asomisetty27/theta', badge: 'source' },
+            { label: 'PyPI',   href: 'https://pypi.org/project/runtheta', badge: 'v0.1.9' },
             { label: 'Research app', href: researchPath(), badge: 'internal', internal: true },
           ].map(({ label, href, badge, internal }) => (
             internal ? (
@@ -513,8 +513,8 @@ export default function ResearchLanding() {
             { label: 'Lab data',    href: researchPath('lab'),         internal: true },
             { label: 'Advisor',     href: researchPath('advisor'),     internal: true },
             { label: 'Publication', href: researchPath('publication'), internal: true },
-            { label: 'GitHub',      href: 'https://github.com/Asomisetty27/thermalos', internal: false },
-            { label: 'PyPI',        href: 'https://pypi.org/project/thermalos',        internal: false },
+            { label: 'GitHub',      href: 'https://github.com/Asomisetty27/theta', internal: false },
+            { label: 'PyPI',        href: 'https://pypi.org/project/runtheta',        internal: false },
           ].map(({ label, href, internal }) =>
             internal ? (
               <Link key={label} to={href} style={{

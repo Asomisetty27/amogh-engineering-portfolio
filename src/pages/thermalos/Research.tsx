@@ -430,7 +430,7 @@ const MOAT_DIMENSIONS = [
     name: "Per-GPU baseline history",
     status: "not_built" as const,
     current: "Agent computes R_θ live but does not persist anything. Every restart starts cold. No concept of 'this GPU's normal.'",
-    target: "thermalos calibrate writes ~/.thermalos/baselines/<gpu_uuid>.json. Anomaly detection drifts against per-GPU history, not fleet average.",
+    target: "theta calibrate writes ~/.theta/baselines/<gpu_uuid>.json. Anomaly detection drifts against per-GPU history, not fleet average.",
     timeline: "P1 — implement before first operator install",
     why: "Accumulated fingerprints can't be copied. Each install makes the model smarter for that GPU.",
   },
@@ -547,7 +547,7 @@ function MoatTab() {
             Not "take a meeting." Not "validate interest." Install it. Then collect: what did it detect, was it useful, did it match their intuition, would they keep it running, what would they pay for, what workflow should it integrate with.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            {["RunPod (awaiting reply)", "Vast.ai (awaiting reply)", "Lambda Labs (awaiting reply)", "Cal Poly AI Factory (Lupo proposal ready)", "thermalos calibrate (P1 — build this week)", "Grafana annotation hook (low effort)"].map((item) => (
+            {["RunPod (awaiting reply)", "Vast.ai (awaiting reply)", "Lambda Labs (awaiting reply)", "Cal Poly AI Factory (Lupo proposal ready)", "theta calibrate (P1 — build this week)", "Grafana annotation hook (low effort)"].map((item) => (
               <div key={item} className="bg-[#0D0D0B] rounded p-2 text-[11px] font-mono text-[#888780]">
                 {item}
               </div>
