@@ -16,7 +16,9 @@ import { FLEET_BASE, researchPath } from './config';
 import { ChevronRight } from 'lucide-react';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { animate, stagger } from 'animejs';
-import GPUHeroScene from './components/GPUHeroScene';
+// three.js / R3F is heavy (~600 kB) — lazy-load so the hero text paints first
+// and the 3D canvas streams in. A height-matched placeholder avoids layout shift.
+const GPUHeroScene = React.lazy(() => import('./components/GPUHeroScene'));
 import ThetaLogo from '../../components/ThetaLogo';
 
 /* ─── Design tokens ───────────────────────────────────────────────────────── */
@@ -391,9 +393,11 @@ function Hero() {
 
   return (
     <motion.section ref={heroRef} id="hero" style={{ position: 'relative', opacity: fadeOut }}>
-      {/* ── Full-width 3D GPU scene ── */}
+      {/* ── Full-width 3D GPU scene (lazy: streams in after first paint) ── */}
       <div style={{ position: 'relative' }}>
-        <GPUHeroScene />
+        <React.Suspense fallback={<div style={{ height: '90vh', background: T.bg }} aria-hidden />}>
+          <GPUHeroScene />
+        </React.Suspense>
         {/* Top/bottom fades blend canvas into page bg */}
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 80, background: `linear-gradient(to bottom, ${T.bg}, transparent)`, pointerEvents: 'none', zIndex: 5 }} />
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 140, background: `linear-gradient(to bottom, transparent, ${T.bg})`, pointerEvents: 'none', zIndex: 5 }} />
