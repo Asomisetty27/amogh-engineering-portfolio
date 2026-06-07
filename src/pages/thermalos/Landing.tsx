@@ -19,6 +19,7 @@ import { animate, stagger } from 'animejs';
 // three.js / R3F is heavy (~600 kB) — lazy-load so the hero text paints first
 // and the 3D canvas streams in. A height-matched placeholder avoids layout shift.
 const GPUHeroScene = React.lazy(() => import('./components/GPUHeroScene'));
+const DataCenterShowcase = React.lazy(() => import('./components/DataCenterShowcase'));
 import ThetaLogo from '../../components/ThetaLogo';
 
 /* ─── Design tokens ───────────────────────────────────────────────────────── */
@@ -1729,6 +1730,9 @@ export default function ThermalOSLanding() {
       <Signal />
       <Evidence />
       <FeaturesGrid />
+      <React.Suspense fallback={null}>
+        <DataCenterShowcase />
+      </React.Suspense>
       <CompetitorTable />
       <Pricing />
       <Footer />

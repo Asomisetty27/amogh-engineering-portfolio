@@ -26,6 +26,7 @@ const Publication      = lazy(() => import("./pages/thermalos/Publication.tsx"))
 const YC               = lazy(() => import("./pages/thermalos/YC.tsx"));
 const Plan             = lazy(() => import("./pages/thermalos/Plan.tsx"));
 const QuickEntry       = lazy(() => import("./pages/thermalos/QuickEntry.tsx"));
+const DataCenterKiosk  = lazy(() => import("./pages/thermalos/components/DataCenterKiosk.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,9 @@ const App = () => (
 
             {/* ══ THETA — startup / commercial surface ══════════════════════ */}
             <Route path={THETA_BASE} element={<Landing />} />
+            {/* Lab kiosk — fullscreen "living data center" loop, no chrome.
+                Same <DataCenterScene> as the website showcase section. */}
+            <Route path={`${THETA_BASE}/kiosk/datacenter`} element={<DataCenterKiosk />} />
 
             {/* ══ THERMALOS — research / OSS public surface ═════════════════
                 /thermalos          -> ResearchLanding (academic)
