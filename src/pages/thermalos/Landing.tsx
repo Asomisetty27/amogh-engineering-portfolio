@@ -20,6 +20,7 @@ import { animate, stagger } from 'animejs';
 // and the 3D canvas streams in. A height-matched placeholder avoids layout shift.
 const GPUHeroScene = React.lazy(() => import('./components/GPUHeroScene'));
 const DataCenterShowcase = React.lazy(() => import('./components/DataCenterShowcase'));
+const OperatorViewShowcase = React.lazy(() => import('./components/OperatorViewShowcase'));
 import ThetaLogo from '../../components/ThetaLogo';
 
 /* ─── Design tokens ───────────────────────────────────────────────────────── */
@@ -1732,6 +1733,9 @@ export default function ThermalOSLanding() {
       <FeaturesGrid />
       <React.Suspense fallback={null}>
         <DataCenterShowcase />
+      </React.Suspense>
+      <React.Suspense fallback={null}>
+        <OperatorViewShowcase />
       </React.Suspense>
       <CompetitorTable />
       <Pricing />
