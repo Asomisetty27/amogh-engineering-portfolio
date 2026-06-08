@@ -146,6 +146,35 @@ function ThermalDriver() {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
+// Service-sequence driver — plays once when the section scrolls into view:
+// front mesh door swings, hero sled extends on rails, lid hinges up,
+// exposing the HGX baseboard for the heatmap + shimmer to overlay.
+// Triggered from outside by setting _seqTriggered = true (intersection
+// observer in root component); driver latches the start time off the R3F
+// clock so timing is independent of React render cadence.
+// ──────────────────────────────────────────────────────────────────────────
+
+export const _doorOpen = { current: 0 };
+export const _sledOut = { current: 0 };
+export const _lidOpen = { current: 0 };
+export const _seqTriggered = { current: false };
+let _seqStart = -1;
+
+const easeOutCubic = (x: number) => 1 - Math.pow(1 - x, 3);
+
+function SequenceDriver() {
+  useFrame((state) => {
+    if (!_seqTriggered.current) return;
+    if (_seqStart < 0) _seqStart = state.clock.elapsedTime;
+    const dt = state.clock.elapsedTime - _seqStart;
+    _doorOpen.current = easeOutCubic(THREE.MathUtils.clamp(dt / 1.4, 0, 1));
+    _sledOut.current  = easeOutCubic(THREE.MathUtils.clamp((dt - 0.6) / 1.6, 0, 1));
+    _lidOpen.current  = easeOutCubic(THREE.MathUtils.clamp((dt - 2.0) / 1.1, 0, 1));
+  });
+  return null;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
 // PBR texture pipeline — every map procedurally generated to keep the
 // "no imported binary assets" convention, but pushed to the resolution and
 // detail density needed to read as a real machine instead of a diagram.
@@ -425,6 +454,84 @@ function makeFloorColor(): THREE.CanvasTexture {
   return t;
 }
 
+// Perforated mesh-door alpha — circular holes on a tight grid, like the
+// front bezel of a DGX/HGX rack. Used as an alphaMap on a thin door panel
+// so light + the interior glow visibly bleed through after the door opens.
+function makeDoorPerf(): THREE.CanvasTexture {
+  const SZ = 512;
+  const c = document.createElement('canvas');
+  c.width = c.height = SZ;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, SZ, SZ);
+  ctx.fillStyle = '#000000';
+  const pitch = 14;
+  const r = 5;
+  for (let y = pitch; y < SZ - pitch; y += pitch) {
+    const offset = (Math.floor((y - pitch) / pitch) % 2) * (pitch / 2);
+    for (let x = pitch + offset; x < SZ - pitch; x += pitch) {
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.anisotropy = 8;
+  return t;
+}
+
+// PCB color map — dark green solder mask with white silkscreen pads + traces.
+// Sits as the baseboard surface revealed under the lid; sized to fill the
+// sled-interior footprint.
+function makePCBColor(): THREE.CanvasTexture {
+  const SZ = 1024;
+  const c = document.createElement('canvas');
+  c.width = c.height = SZ;
+  const ctx = c.getContext('2d')!;
+  // Deep PCB green (FR-4 with HASL finish look)
+  const g = ctx.createLinearGradient(0, 0, SZ, SZ);
+  g.addColorStop(0, '#0a2418');
+  g.addColorStop(0.5, '#0d2e1c');
+  g.addColorStop(1, '#08201a');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, SZ, SZ);
+  // Subtle noise
+  ctx.globalAlpha = 0.08;
+  for (let i = 0; i < 4000; i++) {
+    ctx.fillStyle = Math.random() > 0.5 ? '#1a4030' : '#04140a';
+    ctx.fillRect(Math.random() * SZ, Math.random() * SZ, 1.5, 1.5);
+  }
+  ctx.globalAlpha = 1;
+  // Silkscreen traces — random orthogonal lines (BGA breakout look)
+  ctx.strokeStyle = 'rgba(220,210,180,0.35)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 120; i++) {
+    const x = Math.random() * SZ; const y = Math.random() * SZ;
+    const len = 40 + Math.random() * 180;
+    const horiz = Math.random() > 0.5;
+    ctx.beginPath(); ctx.moveTo(x, y);
+    ctx.lineTo(x + (horiz ? len : 0), y + (horiz ? 0 : len));
+    ctx.stroke();
+  }
+  // Component pad clusters
+  ctx.fillStyle = 'rgba(210,200,170,0.55)';
+  for (let i = 0; i < 60; i++) {
+    const x = Math.random() * SZ; const y = Math.random() * SZ;
+    const w = 4 + Math.random() * 18; const h = 4 + Math.random() * 12;
+    ctx.fillRect(x, y, w, h);
+  }
+  // Silkscreen reference designators
+  ctx.fillStyle = 'rgba(232,232,232,0.55)';
+  ctx.font = '10px monospace';
+  for (let i = 0; i < 40; i++) {
+    ctx.fillText(`U${10 + i}`, Math.random() * SZ, Math.random() * SZ);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.anisotropy = 16;
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
 type Textures = {
   chassisColor: THREE.CanvasTexture;
   chassisRough: THREE.CanvasTexture;
@@ -432,6 +539,8 @@ type Textures = {
   chassisAO: THREE.CanvasTexture;
   sledFace: THREE.CanvasTexture;
   floor: THREE.CanvasTexture;
+  doorPerf: THREE.CanvasTexture;
+  pcb: THREE.CanvasTexture;
 };
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -616,9 +725,344 @@ function Sled({
 }
 
 // ──────────────────────────────────────────────────────────────────────────
+// HeroOpenSled — the one sled in the demo that performs the service
+// sequence: rides on rails out of the rack (sled-slide), then its top lid
+// hinges up to expose an HGX-style 4-GPU baseboard. The baseboard surface
+// gets a per-die thermal heatmap + a refraction-shimmer plane driven by the
+// shared _towerLevel ref, so "live overheating" reads as a real thermal
+// event the moment the lid clears.
+//
+// Geometry budget kept tight: ~12 small meshes + one shader plane. Fits
+// inside the existing perf envelope and adds no new postprocess passes.
+// ──────────────────────────────────────────────────────────────────────────
+
+// Shader for heat-shimmer plane — additive, UV-warped scrolling noise.
+// No texture sample — pure procedural pseudo-noise for zero allocations.
+const ShimmerShader = {
+  uniforms: {
+    uTime: { value: 0 },
+    uIntensity: { value: 0 },
+    uColor: { value: new THREE.Color('#c85f2a') },
+  },
+  vertexShader: /* glsl */`
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: /* glsl */`
+    varying vec2 vUv;
+    uniform float uTime;
+    uniform float uIntensity;
+    uniform vec3 uColor;
+    // Cheap hash + value noise
+    float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
+    float noise(vec2 p){
+      vec2 i = floor(p); vec2 f = fract(p);
+      float a = hash(i);
+      float b = hash(i + vec2(1.0, 0.0));
+      float c = hash(i + vec2(0.0, 1.0));
+      float d = hash(i + vec2(1.0, 1.0));
+      vec2 u = f * f * (3.0 - 2.0 * f);
+      return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+    }
+    void main() {
+      vec2 uv = vUv;
+      // Vertical scroll + horizontal warp = rising heat haze
+      float n1 = noise(uv * vec2(6.0, 9.0) + vec2(0.0, -uTime * 0.6));
+      float n2 = noise(uv * vec2(11.0, 14.0) + vec2(uTime * 0.3, -uTime * 0.9));
+      float n  = mix(n1, n2, 0.5);
+      // Fade out toward top + sides (heat plume silhouette)
+      float fade = smoothstep(0.0, 0.25, uv.y) * (1.0 - smoothstep(0.65, 1.0, uv.y));
+      fade *= smoothstep(0.0, 0.18, uv.x) * (1.0 - smoothstep(0.82, 1.0, uv.x));
+      float a = n * fade * uIntensity * 0.55;
+      gl_FragColor = vec4(uColor * a * 1.8, a);
+    }
+  `,
+};
+
+function HeroOpenSled({
+  yBase, textures, sledChassisMat, ventMat,
+}: {
+  yBase: number;
+  textures: Textures;
+  sledChassisMat: THREE.Material;
+  ventMat: THREE.Material;
+}) {
+  const ledRef = useRef<THREE.MeshStandardMaterial>(null!);
+  const pipeRef = useRef<THREE.MeshStandardMaterial>(null!);
+  const slideRef = useRef<THREE.Group>(null!);
+  const lidRef = useRef<THREE.Group>(null!);
+  const dieMatRefs = useRef<THREE.MeshBasicMaterial[]>([]);
+  const shimmerRef = useRef<THREE.ShaderMaterial>(null!);
+
+  const Z_FACE = RACK_D * 0.49;
+  const SLED_HALF = SLED_H / 2;
+  const SLIDE_TRAVEL = RACK_D * 0.72;
+
+  // GPU baseboard layout — 4 SXM packages in a 2x2 grid, NVSwitch center.
+  const DIE_W = 0.18;
+  const DIE_HALF_OFFSET_X = 0.22;
+  const DIE_HALF_OFFSET_Z = 0.18;
+  const diePositions: [number, number][] = [
+    [-DIE_HALF_OFFSET_X,  DIE_HALF_OFFSET_Z],
+    [ DIE_HALF_OFFSET_X,  DIE_HALF_OFFSET_Z],
+    [-DIE_HALF_OFFSET_X, -DIE_HALF_OFFSET_Z],
+    [ DIE_HALF_OFFSET_X, -DIE_HALF_OFFSET_Z],
+  ];
+
+  useFrame((state) => {
+    const t = _towerLevel.current;
+    const phase = _towerPhase.current;
+    // LED blink behavior — same model as the regular Sled
+    let blink = 1;
+    if (phase === 'critical') {
+      blink = 0.35 + 0.65 * (Math.sin(state.clock.elapsedTime * 22) > 0 ? 1 : 0);
+    } else if (phase === 'anomaly') {
+      blink = 0.7 + 0.3 * (0.5 + 0.5 * Math.sin(state.clock.elapsedTime * 7.5));
+    }
+    if (ledRef.current) {
+      ledRef.current.emissive.copy(thermalHex(t));
+      ledRef.current.emissiveIntensity = (1.4 + t * t * 7.5) * blink;
+    }
+    if (pipeRef.current) {
+      pipeRef.current.emissive.copy(thermalHex(t));
+      pipeRef.current.emissiveIntensity = (0.5 + t * t * 5.0) * (0.7 + 0.3 * blink);
+    }
+
+    // Slide group — pushes the sled forward along +Z (out of the rack)
+    if (slideRef.current) {
+      slideRef.current.position.z = _sledOut.current * SLIDE_TRAVEL;
+    }
+    // Lid hinge — pivot at rear edge, rotate -X up to 80°
+    if (lidRef.current) {
+      lidRef.current.rotation.x = -_lidOpen.current * (80 * Math.PI / 180);
+    }
+    // Heatmap on dies — color + alpha track the live thermal level
+    const heatColor = thermalHex(t);
+    const heatAlpha = THREE.MathUtils.clamp(t * 0.95, 0, 0.95) * _lidOpen.current;
+    for (const mat of dieMatRefs.current) {
+      if (!mat) continue;
+      mat.color.copy(heatColor);
+      mat.opacity = heatAlpha;
+    }
+    // Shimmer plane — color, intensity, and time
+    if (shimmerRef.current) {
+      shimmerRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+      shimmerRef.current.uniforms.uIntensity.value = t * _lidOpen.current;
+      shimmerRef.current.uniforms.uColor.value.copy(heatColor);
+    }
+  });
+
+  return (
+    <group position={[0, yBase, 0]} ref={slideRef}>
+      {/* ─── Sled chassis (same parts as regular Sled, no duplication shortcut
+              because the materials are shared and the geometry primitives
+              are tiny) ───────────────────────────────────────────────────── */}
+      <RoundedBox args={[RACK_W * 0.86, SLED_H, RACK_D * 0.62]} radius={0.012} smoothness={3} position={[0, 0, RACK_D * 0.18]} castShadow receiveShadow material={sledChassisMat} />
+      <mesh position={[0, 0, Z_FACE + 0.002]} ref={ensureUv2} castShadow receiveShadow>
+        <planeGeometry args={[RACK_W * 0.84, SLED_H * 0.94]} />
+        <meshStandardMaterial map={textures.sledFace} roughness={0.62} metalness={0.55} side={THREE.FrontSide} />
+      </mesh>
+      {/* Vent grille */}
+      <group position={[-RACK_W * 0.16, 0, Z_FACE + 0.006]}>
+        {Array.from({ length: VENT_SLATS }).map((_, i) => {
+          const y = -((VENT_SLATS - 1) / 2) * VENT_SLAT_PITCH + i * VENT_SLAT_PITCH;
+          return (
+            <mesh key={i} position={[0, y, 0]} material={ventMat} castShadow receiveShadow>
+              <boxGeometry args={[VENT_SLAT_W, VENT_SLAT_H, 0.014]} />
+            </mesh>
+          );
+        })}
+        <mesh position={[0, 0, -0.008]}>
+          <planeGeometry args={[VENT_SLAT_W + 0.01, VENT_SLATS * VENT_SLAT_PITCH + 0.01]} />
+          <meshStandardMaterial color="#020203" roughness={0.95} metalness={0} />
+        </mesh>
+      </group>
+      {/* LED strip + bezel + status pip + heat-pipe disk */}
+      <mesh position={[RACK_W * 0.3, -SLED_H * 0.34, Z_FACE + 0.007]}>
+        <planeGeometry args={[RACK_W * 0.26, SLED_H * 0.13]} />
+        <meshStandardMaterial ref={ledRef} color="#020203" roughness={0.2} metalness={0.0} emissive="#1c6b3a" emissiveIntensity={1.8} toneMapped={false} />
+      </mesh>
+      <mesh position={[RACK_W * 0.3, -SLED_H * 0.34, Z_FACE + 0.005]}>
+        <planeGeometry args={[RACK_W * 0.28, SLED_H * 0.16]} />
+        <meshStandardMaterial color="#0a0a0d" roughness={0.45} metalness={0.7} />
+      </mesh>
+      <mesh position={[RACK_W * 0.08, -SLED_H * 0.34, Z_FACE + 0.007]}>
+        <circleGeometry args={[SLED_H * 0.045, 16]} />
+        <meshStandardMaterial color="#020203" emissive="#cfdcff" emissiveIntensity={0.9} roughness={0.3} toneMapped={false} />
+      </mesh>
+      <mesh position={[-RACK_W * 0.16, 0, Z_FACE - 0.004]}>
+        <circleGeometry args={[SLED_H * 0.12, 24]} />
+        <meshStandardMaterial ref={pipeRef} color="#020203" roughness={0.85} metalness={0.0} emissive="#1c6b3a" emissiveIntensity={0.5} toneMapped={false} />
+      </mesh>
+
+      {/* ─── Lid hinge group ─ pivots at the REAR edge of the sled, opens UP
+              (-X rotation, 80°). Built so all child positions are relative
+              to the pivot (no offset trickery during animation). ─────────── */}
+      <group ref={lidRef} position={[0, SLED_HALF + 0.008, RACK_D * 0.18 - RACK_D * 0.31]}>
+        {/* Lid cover — thin powder-coat panel, hinges at rear */}
+        <RoundedBox
+          args={[RACK_W * 0.86, 0.014, RACK_D * 0.62]}
+          radius={0.006}
+          smoothness={2}
+          position={[0, 0.007, RACK_D * 0.31]}
+          castShadow
+          receiveShadow
+          material={sledChassisMat}
+        />
+        {/* Lid handle — small inset pull near the front edge */}
+        <mesh position={[0, 0.016, RACK_D * 0.55]}>
+          <boxGeometry args={[RACK_W * 0.12, 0.004, 0.018]} />
+          <meshStandardMaterial color="#1c1c22" roughness={0.5} metalness={0.7} />
+        </mesh>
+        {/* Service-label decal on lid top — small white sticker w/ asset tag */}
+        <mesh position={[RACK_W * 0.32, 0.0145, RACK_D * 0.18]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.18, 0.06]} />
+          <meshStandardMaterial color="#d8d2c2" roughness={0.78} />
+        </mesh>
+      </group>
+
+      {/* ─── Exposed baseboard (under the lid) ──────────────────────────────
+              Sits at sled-interior top, slightly recessed so the lid sits
+              flush in closed state. PCB plane + 4 SXM packages + cold
+              plates + perimeter DIMM slots. ─────────────────────────────── */}
+      <group position={[0, SLED_HALF - 0.012, RACK_D * 0.18]}>
+        {/* PCB substrate */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} ref={ensureUv2} receiveShadow>
+          <planeGeometry args={[RACK_W * 0.82, RACK_D * 0.58]} />
+          <meshStandardMaterial map={textures.pcb} roughness={0.65} metalness={0.15} />
+        </mesh>
+        {/* NVSwitch / center hub — slightly taller chip in the middle */}
+        <RoundedBox args={[0.16, 0.022, 0.16]} radius={0.003} smoothness={2} position={[0, 0.011, 0]} castShadow>
+          <meshStandardMaterial color="#1a1a1d" roughness={0.45} metalness={0.55} />
+        </RoundedBox>
+        {/* 4 SXM packages — IHS on top, heatmap plane just above */}
+        {diePositions.map(([x, z], i) => (
+          <group key={i} position={[x, 0, z]}>
+            {/* Package substrate (PCB-green underneath) */}
+            <mesh position={[0, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+              <planeGeometry args={[DIE_W * 1.05, DIE_W * 1.05]} />
+              <meshStandardMaterial color="#102818" roughness={0.6} metalness={0.1} />
+            </mesh>
+            {/* Integrated heat spreader (IHS) — nickel-plated copper look */}
+            <RoundedBox args={[DIE_W, 0.016, DIE_W]} radius={0.003} smoothness={2} position={[0, 0.013, 0]} castShadow receiveShadow>
+              <meshStandardMaterial color="#9ea2a8" roughness={0.32} metalness={0.85} />
+            </RoundedBox>
+            {/* Thermal heatmap overlay — additive plane right above the IHS */}
+            <mesh position={[0, 0.023, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+              <planeGeometry args={[DIE_W * 0.92, DIE_W * 0.92]} />
+              <meshBasicMaterial
+                ref={(m) => { if (m) dieMatRefs.current[i] = m; }}
+                color="#1c6b3a"
+                transparent
+                opacity={0}
+                blending={THREE.AdditiveBlending}
+                depthWrite={false}
+                toneMapped={false}
+              />
+            </mesh>
+            {/* Cold-plate stub (brushed aluminum block bridging the IHS, with
+                a small copper heatpipe stub running toward the rear) */}
+            <RoundedBox args={[DIE_W * 0.6, 0.02, DIE_W * 0.6]} radius={0.003} smoothness={2} position={[0, 0.034, 0]} castShadow>
+              <meshStandardMaterial color="#c0c4c8" roughness={0.45} metalness={0.78} />
+            </RoundedBox>
+            {/* Copper heatpipe — small horizontal cylinder */}
+            <mesh position={[0, 0.034, -DIE_W * 0.4]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+              <cylinderGeometry args={[0.008, 0.008, DIE_W * 0.5, 10]} />
+              <meshStandardMaterial color="#b87333" roughness={0.4} metalness={0.85} />
+            </mesh>
+          </group>
+        ))}
+        {/* Perimeter DIMM slots — 8 thin tall standoffs along the long edges */}
+        {Array.from({ length: 8 }).map((_, i) => {
+          const side = i < 4 ? -1 : 1;
+          const k = i % 4;
+          const x = -0.36 + k * 0.24;
+          return (
+            <mesh key={i} position={[x, 0.018, side * RACK_D * 0.24]} castShadow>
+              <boxGeometry args={[0.16, 0.036, 0.012]} />
+              <meshStandardMaterial color="#0a0a0d" roughness={0.6} metalness={0.4} />
+            </mesh>
+          );
+        })}
+        {/* Heat-shimmer plane — hovers above the cold plates, faces +Y but
+            tilted slightly toward the camera so the haze reads when seen
+            from a low angle. Additive shader, opacity tracks live thermal. */}
+        <mesh position={[0, 0.18, 0]} rotation={[-Math.PI / 2.2, 0, 0]}>
+          <planeGeometry args={[RACK_W * 0.75, RACK_D * 0.5, 1, 1]} />
+          <shaderMaterial
+            ref={shimmerRef}
+            args={[{
+              uniforms: THREE.UniformsUtils.clone(ShimmerShader.uniforms),
+              vertexShader: ShimmerShader.vertexShader,
+              fragmentShader: ShimmerShader.fragmentShader,
+              transparent: true,
+              depthWrite: false,
+              blending: THREE.AdditiveBlending,
+              side: THREE.DoubleSide,
+              toneMapped: false,
+            }]}
+          />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────
 // Tower — chassis frame + faceplate + side cable bundle + sleds + screws.
 // All real geometry, all picks up HDRI light + contact shadows.
 // ──────────────────────────────────────────────────────────────────────────
+
+// DoorPanel — animated front bezel. Hero tower swings open on first
+// scroll-into-view trigger via _doorOpen; companion stays static.
+function DoorPanel({ tower, textures }: { tower: typeof TOWERS[number]; textures: Textures }) {
+  const hingeRef = useRef<THREE.Group>(null!);
+  useFrame(() => {
+    if (!tower.hero || !hingeRef.current) return;
+    hingeRef.current.rotation.y = -_doorOpen.current * (110 * Math.PI / 180);
+  });
+  const half = RACK_W * 0.48;
+  if (!tower.hero) {
+    return (
+      <mesh position={[0, RACK_H / 2, RACK_D / 2 + 0.001]} ref={ensureUv2} castShadow receiveShadow>
+        <planeGeometry args={[RACK_W * 0.96, RACK_H * 0.97]} />
+        <meshStandardMaterial
+          map={textures.chassisColor} roughnessMap={textures.chassisRough}
+          normalMap={textures.chassisNormal} aoMap={textures.chassisAO}
+          aoMapIntensity={0.9} roughness={1.0} metalness={0.85}
+          normalScale={new THREE.Vector2(0.7, 0.7)} envMapIntensity={1.2}
+          side={THREE.FrontSide}
+        />
+      </mesh>
+    );
+  }
+  // Hero: hinge group pivots at left edge (x = -half), door mesh offset to +half
+  return (
+    <group ref={hingeRef} position={[-half, RACK_H / 2, RACK_D / 2 + 0.001]}>
+      <mesh position={[half, 0, 0]} ref={ensureUv2} castShadow receiveShadow>
+        <planeGeometry args={[RACK_W * 0.96, RACK_H * 0.97]} />
+        <meshStandardMaterial
+          map={textures.chassisColor} roughnessMap={textures.chassisRough}
+          normalMap={textures.chassisNormal} aoMap={textures.chassisAO}
+          alphaMap={textures.doorPerf}
+          aoMapIntensity={0.9} roughness={1.0} metalness={0.85}
+          normalScale={new THREE.Vector2(0.7, 0.7)} envMapIntensity={1.2}
+          transparent
+          alphaTest={0.5}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+      {/* Door handle — vertical bar near opening edge */}
+      <mesh position={[2 * half - 0.06, 0, 0.012]} castShadow>
+        <boxGeometry args={[0.018, 0.22, 0.024]} />
+        <meshStandardMaterial color="#2a2a32" roughness={0.4} metalness={0.85} />
+      </mesh>
+    </group>
+  );
+}
 
 function TowerUnitMesh({
   tower, textures, screwGeo, screwMat, sledChassisMat, ventMat, frameMat,
@@ -676,24 +1120,12 @@ function TowerUnitMesh({
           machine" geometric tell. */}
       <RoundedBox args={[RACK_W, RACK_H, RACK_D]} radius={0.018} smoothness={3} position={[0, RACK_H / 2, 0]} castShadow receiveShadow material={frameMat} />
 
-      {/* Front faceplate — full PBR stack (color + roughness + normal + AO).
-          `ensureUv2` ref-callback copies uv→uv2 so the AO map actually
-          renders (Three.js does NOT auto-copy this). */}
-      <mesh position={[0, RACK_H / 2, RACK_D / 2 + 0.001]} ref={ensureUv2} castShadow receiveShadow>
-        <planeGeometry args={[RACK_W * 0.96, RACK_H * 0.97]} />
-        <meshStandardMaterial
-          map={textures.chassisColor}
-          roughnessMap={textures.chassisRough}
-          normalMap={textures.chassisNormal}
-          aoMap={textures.chassisAO}
-          aoMapIntensity={0.9}
-          roughness={1.0}
-          metalness={0.85}
-          normalScale={new THREE.Vector2(0.7, 0.7)}
-          envMapIntensity={1.2}
-          side={THREE.FrontSide}
-        />
-      </mesh>
+      {/* Front faceplate / door — for the hero tower this is wrapped in a
+          hinge group that pivots on the left edge and swings ~110° on the
+          service-sequence trigger; for the companion tower it stays a
+          static panel. `ensureUv2` keeps the AO map active. */}
+      <DoorPanel tower={tower} textures={textures} />
+
 
       {/* Top brand-plate strip — small bezel between the top edge and the
           first sled, gives a "rack header" silhouette */}
@@ -735,18 +1167,34 @@ function TowerUnitMesh({
         </mesh>
       ))}
 
-      {/* Sleds — fixed: tower-local y starts at SLED_BASE_Y, not below floor */}
-      {Array.from({ length: SLEDS_PER_RACK }).map((_, i) => (
-        <Sled
-          key={i}
-          index={i}
-          yBase={SLED_BASE_Y + i * (SLED_H + SLED_GAP) + SLED_H / 2}
-          isHero={tower.hero}
-          textures={textures}
-          sledChassisMat={sledChassisMat}
-          ventMat={ventMat}
-        />
-      ))}
+      {/* Sleds — fixed: tower-local y starts at SLED_BASE_Y, not below floor.
+          The hero sled in the hero tower is replaced by HeroOpenSled which
+          slides on rails + opens its lid + exposes the GPU baseboard. */}
+      {Array.from({ length: SLEDS_PER_RACK }).map((_, i) => {
+        const yBase = SLED_BASE_Y + i * (SLED_H + SLED_GAP) + SLED_H / 2;
+        if (tower.hero && i === HERO_SLED_INDEX) {
+          return (
+            <HeroOpenSled
+              key={i}
+              yBase={yBase}
+              textures={textures}
+              sledChassisMat={sledChassisMat}
+              ventMat={ventMat}
+            />
+          );
+        }
+        return (
+          <Sled
+            key={i}
+            index={i}
+            yBase={yBase}
+            isHero={tower.hero}
+            textures={textures}
+            sledChassisMat={sledChassisMat}
+            ventMat={ventMat}
+          />
+        );
+      })}
     </group>
     </>
   );
@@ -936,6 +1384,8 @@ export default function TowerUnit() {
     chassisAO: makeChassisAO(),
     sledFace: makeSledFaceColor(),
     floor: makeFloorColor(),
+    doorPerf: makeDoorPerf(),
+    pcb: makePCBColor(),
   }), []);
 
   // Shared geometries — instantiated once, reused across all instances.
@@ -970,14 +1420,26 @@ export default function TowerUnit() {
     envMapIntensity: 1.15,
   }), []);
 
+  const containerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     _towerLevel.current = 0.1;
     _towerPhase.current = 'idle';
     _towerProgress.current = 0;
+    // Scroll-into-view trigger — flips _seqTriggered once when the scene's
+    // container crosses 40% of the viewport. Sequence then plays once and
+    // stays open (matches the "On scroll into view" UX choice).
+    const el = containerRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) _seqTriggered.current = true; },
+      { threshold: 0.4 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', background: T.bg }}>
+    <div ref={containerRef} style={{ position: 'relative', width: '100%', height: '100%', background: T.bg }}>
       <Canvas
         shadows
         gl={{
@@ -1030,6 +1492,7 @@ export default function TowerUnit() {
 
         <CameraDrift />
         <ThermalDriver />
+        <SequenceDriver />
         <PostFX />
       </Canvas>
 
