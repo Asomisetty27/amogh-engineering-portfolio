@@ -252,7 +252,54 @@ function makeOrganicSubstrateTexture(): THREE.CanvasTexture {
   return t;
 }
 
-type Textures = { pcb: THREE.CanvasTexture; rough: THREE.CanvasTexture; brushed: THREE.CanvasTexture; organic: THREE.CanvasTexture };
+// Product-text decal — transparent canvas with crisp wordmark used as an
+// emissive/printed label on shroud tops and cold-plate lids. This is the
+// single biggest "real GPU vs generic 3D box" tell — every shipped accelerator
+// has its model name screen-printed or laser-etched on the exterior.
+function makeProductTextDecal(
+  primary: string,
+  secondary?: string,
+  opts: { color?: string; sub?: string; align?: 'center' | 'left'; tracking?: number } = {}
+): THREE.CanvasTexture {
+  const W = 1024, H = 256;
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d')!;
+  ctx.clearRect(0, 0, W, H);
+  const color = opts.color ?? '#E8E8EE';
+  const tracking = opts.tracking ?? 0.18;
+  ctx.fillStyle = color;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = opts.align ?? 'center';
+  const x = opts.align === 'left' ? 48 : W / 2;
+  // Primary wordmark — bold, wide-tracked
+  ctx.font = `700 96px "Helvetica Neue", "Arial Black", sans-serif`;
+  const tracked = primary.split('').join(String.fromCharCode(8201)); // thin-space tracking
+  ctx.shadowColor = 'rgba(0,0,0,0.35)';
+  ctx.shadowBlur = 4;
+  ctx.fillText(tracked, x, H / 2 - (secondary ? 28 : 0));
+  ctx.shadowBlur = 0;
+  if (secondary) {
+    ctx.font = `400 44px "JetBrains Mono", ui-monospace, monospace`;
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.72;
+    const trackedSub = secondary.split('').join(String.fromCharCode(8201));
+    ctx.fillText(trackedSub, x, H / 2 + 50);
+    ctx.globalAlpha = 1;
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
+}
+
+type Textures = {
+  pcb: THREE.CanvasTexture;
+  rough: THREE.CanvasTexture;
+  brushed: THREE.CanvasTexture;
+  organic: THREE.CanvasTexture;
+  decals: Record<string, THREE.CanvasTexture>;
+};
 
 // ──────────────────────────────────────────────────────────────────────────
 // Instanced helpers — keep draw calls flat across five simultaneous assemblies
@@ -518,6 +565,7 @@ function CoolerLayer({
   if (spec.cooler === 'cold-plate') {
     // Liquid-cooled module lid — flat nickel-plated copper plate, machined
     // micro-channel grooves visible on the underside when separated.
+    const decal = textures.decals[spec.id];
     return (
       <group>
         {/* Cold-plate lid — nickel-plated copper, lapped smooth for thermal contact
@@ -527,6 +575,15 @@ function CoolerLayer({
           <meshStandardMaterial ref={lidMatRef} color="#D8D6D2" roughness={0.18} metalness={0.97} envMapIntensity={1.25} emissive="#000" emissiveIntensity={0} map={maps?.nickelBrushed ?? undefined} />
         </RoundedBox>
         <InstancedBoxes positions={grooves} size={[0.05, 0.05, spec.depth - 0.5]} color="#CFCAC0" roughness={0.25} metalness={0.9} />
+        {/* Laser-etched product wordmark on the lid top face — every real
+            SXM/OAM module has this exact stamp ("NVIDIA H100", "AMD INSTINCT
+            MI300X", etc.) */}
+        {decal && (
+          <mesh position={[0, 0.082, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[(spec.width - 0.5) * 0.78, (spec.depth - 0.5) * 0.22]} />
+            <meshBasicMaterial map={decal} transparent toneMapped={false} opacity={0.85} depthWrite={false} />
+          </mesh>
+        )}
         <LayerLabel text="COLD PLATE · LIQUID I/F" sub="nickel-plated copper · micro-channel" opacityRef={labelOpacityRef} accent={spec.accent} />
       </group>
     );
@@ -618,6 +675,14 @@ function CoolerLayer({
           <boxGeometry args={[shellW * 0.45, 0.005, 0.5]} />
           <meshStandardMaterial color={spec.accent} roughness={0.3} metalness={0.4} emissive={spec.accent} emissiveIntensity={0.55} toneMapped={false} />
         </mesh>
+        {/* Screen-printed product wordmark on the top face — real L40S has
+            "NVIDIA L40S" silkscreened in green along the heatsink top. */}
+        {textures.decals.l40s && (
+          <mesh position={[0, shellH / 2 + 0.052, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[shellW * 0.62, ribLen * 0.18]} />
+            <meshBasicMaterial map={textures.decals.l40s} transparent toneMapped={false} opacity={0.9} depthWrite={false} />
+          </mesh>
+        )}
         <LayerLabel text="PASSIVE FIN STACK · 4× DP" sub="anodized aluminum extrusion · server airflow" opacityRef={labelOpacityRef} accent={spec.accent} />
       </group>
     );
@@ -626,8 +691,13 @@ function CoolerLayer({
 
 
   // Card archetypes: heatsink fin block (instanced) + shroud + fan(s)
-  const fanX = spec.cooler === 'triple-fan' ? [-2.0, 0, 2.0] : [0];
-  const fanRadius = spec.cooler === 'triple-fan' ? 0.95 : 1.6;
+  const isBlower = spec.cooler === 'blower';
+  // Triple-fan: 3 axial fans evenly across the shroud, fan radius matched to
+  // the slot height. Blower: ONE radial squirrel-cage at the END opposite the
+  // I/O bracket — the rest of the shroud top is a smooth lid stamped with the
+  // product wordmark (this is the visual signature of every server blower card).
+  const fanX = isBlower ? [-spec.width / 2 + 1.4] : [-2.0, 0, 2.0];
+  const fanRadius = isBlower ? 1.15 : 0.95;
 
   return (
     <group>
@@ -641,31 +711,62 @@ function CoolerLayer({
           <meshStandardMaterial ref={finMatRef} color="#CFCAC0" roughness={0.18} metalness={0.95} emissive="#c85f2a" emissiveIntensity={0} map={maps?.nickelBrushed ?? undefined} />
         </mesh>
       </group>
-      {/* Shroud — injection-molded plastic; matte, low reflectivity */}
+      {/* Shroud — injection-molded plastic; matte, low reflectivity. For
+          blower cards the shroud is a SEALED full-cover lid (no fan cutouts
+          on top); for triple-fan the shroud has fan openings cut into it. */}
       <RoundedBox args={[spec.width, 0.34, spec.depth]} radius={0.06} smoothness={4} position={[0, 0.5, 0]}>
-        <meshStandardMaterial color="#1A1A1F" roughness={0.65} metalness={0.0} />
+        <meshStandardMaterial color={isBlower ? '#0E0E11' : '#1A1A1F'} roughness={isBlower ? 0.5 : 0.65} metalness={isBlower ? 0.05 : 0.0} />
       </RoundedBox>
+      {/* Wordmark on top — centered on the smooth blower lid, or sub-strip
+          between fans on the triple-fan shroud. */}
+      {isBlower && textures.decals.a100 && (
+        <mesh position={[fanX[0] + fanRadius + 0.6, 0.68, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[spec.width * 0.55, spec.depth * 0.55]} />
+          <meshBasicMaterial map={textures.decals.a100} transparent toneMapped={false} opacity={0.92} depthWrite={false} />
+        </mesh>
+      )}
+      {/* Per-fan housings */}
       {fanX.map((x, i) => (
         <group key={`fan-grp-${i}`}>
+          {/* Fan bezel ring — recessed into the shroud */}
           <mesh position={[x, 0.7, 0]} rotation={[Math.PI / 2, 0, 0]}>
             <torusGeometry args={[fanRadius * 1.05, 0.05, 10, 48]} />
             <meshStandardMaterial color="#1c1c1e" roughness={0.4} metalness={0.4} />
           </mesh>
+          {isBlower && (
+            /* Blower intake guard — finger-grille rim, sealed mesh below */
+            <mesh position={[x, 0.69, 0]} rotation={[Math.PI / 2, 0, 0]}>
+              <ringGeometry args={[fanRadius * 0.18, fanRadius * 1.0, 48]} />
+              <meshStandardMaterial color="#08080a" roughness={0.85} metalness={0.1} side={THREE.DoubleSide} />
+            </mesh>
+          )}
           <group position={[x, 0.78, 0]}>
             <Fan fanRef={fanRefs[i]} radius={fanRadius} />
           </group>
         </group>
       ))}
-      {spec.cooler === 'blower' && (
-        <mesh position={[spec.width / 2 - 0.15, 0.5, 0]}>
-          <boxGeometry args={[0.12, 0.3, spec.depth - 1.2]} />
-          <meshStandardMaterial color="#0a0a0a" roughness={0.4} metalness={0.4} />
+      {/* PCIe bracket — full-height steel I/O end-plate at +z edge. Real
+          server cards have a vented bracket with screw notch + slot openings
+          for exhaust (blower) or display outputs (passive). */}
+      <group position={[0, 0.32, spec.depth / 2 + 0.04]}>
+        <mesh>
+          <boxGeometry args={[spec.width + 0.05, 1.3, 0.04]} />
+          <meshStandardMaterial color="#9a9aa0" roughness={0.55} metalness={0.85} />
         </mesh>
-      )}
-      <mesh position={[0, 0.34, spec.depth / 2 - 0.1]}>
-        <boxGeometry args={[spec.width - 0.4, 0.04, 0.06]} />
-        <meshStandardMaterial color={spec.accent} roughness={0.25} metalness={0.5} emissive={spec.accent} emissiveIntensity={0.6} toneMapped={false} />
-      </mesh>
+        {/* Screw-tab notch (top) */}
+        <mesh position={[spec.width / 2 - 0.2, 0.7, 0]}>
+          <boxGeometry args={[0.4, 0.08, 0.06]} />
+          <meshStandardMaterial color="#9a9aa0" roughness={0.55} metalness={0.85} />
+        </mesh>
+        {/* Exhaust vent slots for blower cards, DP cutouts for triple-fan
+            absent (triple-fans vent into the chassis, not out the bracket). */}
+        {isBlower && Array.from({ length: 8 }).map((_, i) => (
+          <mesh key={`vent-${i}`} position={[-spec.width / 2 + 1.2 + i * 0.5, -0.05, 0.01]}>
+            <boxGeometry args={[0.32, 0.55, 0.03]} />
+            <meshStandardMaterial color="#06060a" roughness={0.9} metalness={0.0} />
+          </mesh>
+        ))}
+      </group>
       <LayerLabel
         text={spec.cooler === 'blower' ? 'BLOWER + FIN STACK' : 'TRIPLE-FAN SHROUD'}
         sub={spec.cooler === 'blower' ? 'radial · single-slot exhaust' : '3 × 75mm axial · open shroud'}
@@ -1248,7 +1349,19 @@ export default function GPUHeroScene() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  const textures = useMemo(() => ({ pcb: makePCBTexture(), rough: makeRoughnessMap(), brushed: makeBrushedMetalTexture(), organic: makeOrganicSubstrateTexture() }), []);
+  const textures = useMemo(() => ({
+    pcb: makePCBTexture(),
+    rough: makeRoughnessMap(),
+    brushed: makeBrushedMetalTexture(),
+    organic: makeOrganicSubstrateTexture(),
+    decals: {
+      a100:   makeProductTextDecal('NVIDIA',  'A100',                { color: '#76b900' }),
+      l40s:   makeProductTextDecal('NVIDIA',  'L40S',                { color: '#76b900' }),
+      h100:   makeProductTextDecal('NVIDIA',  'H100 SXM5',           { color: '#d8d8de' }),
+      b200:   makeProductTextDecal('NVIDIA',  'B200 · BLACKWELL',    { color: '#d8d8de' }),
+      mi300x: makeProductTextDecal('AMD INSTINCT', 'MI300X · CDNA 3', { color: '#e8e8ee' }),
+    },
+  }), []);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '90vh', background: CINE.voidDeep }}>
