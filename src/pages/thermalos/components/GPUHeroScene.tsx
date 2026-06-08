@@ -675,6 +675,14 @@ function CoolerLayer({
           <boxGeometry args={[shellW * 0.45, 0.005, 0.5]} />
           <meshStandardMaterial color={spec.accent} roughness={0.3} metalness={0.4} emissive={spec.accent} emissiveIntensity={0.55} toneMapped={false} />
         </mesh>
+        {/* Screen-printed product wordmark on the top face — real L40S has
+            "NVIDIA L40S" silkscreened in green along the heatsink top. */}
+        {textures.decals.l40s && (
+          <mesh position={[0, shellH / 2 + 0.052, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[shellW * 0.62, ribLen * 0.18]} />
+            <meshBasicMaterial map={textures.decals.l40s} transparent toneMapped={false} opacity={0.9} depthWrite={false} />
+          </mesh>
+        )}
         <LayerLabel text="PASSIVE FIN STACK · 4× DP" sub="anodized aluminum extrusion · server airflow" opacityRef={labelOpacityRef} accent={spec.accent} />
       </group>
     );
