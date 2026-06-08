@@ -217,7 +217,7 @@ export default function ThermalGPUMap() {
             SM Core Thermal Map
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 9.5, color: '#404050' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 9.5, color: '#3A332A' }}>
           <span>Tesla T4 · 2560 CUDA</span>
           <span ref={timestampRef} style={{ color: '#525a55' }}>—</span>
         </div>
@@ -325,12 +325,12 @@ export default function ThermalGPUMap() {
         {/* Live readouts */}
         <div style={{ display: 'flex', gap: 20, fontSize: 9.5 }}>
           <div>
-            <span style={{ color: '#404050', marginRight: 5 }}>T_max</span>
-            <span ref={readTmaxRef} style={{ color: '#E8E8F0', fontVariantNumeric: 'tabular-nums' }}>—</span>
+            <span style={{ color: '#3A332A', marginRight: 5 }}>T_max</span>
+            <span ref={readTmaxRef} style={{ color: '#ECE6D8', fontVariantNumeric: 'tabular-nums' }}>—</span>
           </div>
           <div>
-            <span style={{ color: '#404050', marginRight: 5 }}>R_θ</span>
-            <span ref={readRthetaRef} style={{ color: '#E8E8F0', fontVariantNumeric: 'tabular-nums' }}>—</span>
+            <span style={{ color: '#3A332A', marginRight: 5 }}>R_θ</span>
+            <span ref={readRthetaRef} style={{ color: '#ECE6D8', fontVariantNumeric: 'tabular-nums' }}>—</span>
           </div>
           <div>
             <span ref={readStatusRef} style={{ fontVariantNumeric: 'tabular-nums' }}>—</span>

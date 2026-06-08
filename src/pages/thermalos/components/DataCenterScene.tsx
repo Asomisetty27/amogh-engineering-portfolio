@@ -18,13 +18,13 @@ const T = {
   bg: '#06060A',
   s1: '#111117',
   border: '#232330',
-  text: '#E8E8F0',
-  muted: '#818190',
-  healthy: '#27A05A',
+  text: '#ECE6D8',
+  muted: '#9A9285',
+  healthy: '#D4AF37',
   caution: '#C8942A',
   rising: '#C85F2A',
   critical: '#B83030',
-  bp: '#5878A8',
+  bp: '#C9A84C',
 };
 const FM = "'JetBrains Mono', ui-monospace, monospace";
 
@@ -104,7 +104,7 @@ function makeFaceplateTexture(): THREE.CanvasTexture {
     ctx.fillRect(12, y, 232, 6);
   }
   // Status LEDs — sparse, mostly green/amber dots near the left edge
-  const ledColors = ['#27A05A', '#27A05A', '#27A05A', '#C8942A', '#5878A8'];
+  const ledColors = ['#D4AF37', '#D4AF37', '#D4AF37', '#C8942A', '#C9A84C'];
   for (let i = 0; i < 28; i++) {
     ctx.fillStyle = ledColors[Math.floor(Math.random() * ledColors.length)];
     ctx.beginPath();
