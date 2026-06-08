@@ -45,7 +45,7 @@ type Tone = "complete" | "progress" | "queued" | "locked" | "amber" | "gray";
 
 const TONE: Record<Tone, { fg: string; bg: string; border: string }> = {
   complete: { fg: "#D4AF37", bg: "#D4AF3712", border: "#D4AF3738" },
-  progress: { fg: "#60a5fa", bg: "#3b82f615", border: "#3b82f640" },
+  progress: { fg: "#D89A5C", bg: "#B8733315", border: "#B8733340" },
   queued:   { fg: "#E8B23A", bg: "#E8B23A12", border: "#E8B23A38" },
   locked:   { fg: "#8A938F", bg: "#ffffff08", border: "#ffffff15" },
   amber:    { fg: "#E8B23A", bg: "#E8B23A12", border: "#E8B23A38" },

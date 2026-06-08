@@ -13,11 +13,11 @@ const TRACK_COLOR: Record<string, string> = {
   Hardware: "#a855f7",
   EE: "#1D9E75",
   ME: "#a855f7",
-  Comms: "#3b82f6",
+  Comms: "#B87333",
   Ops: "#EF9F27",
   Both: "#EF9F27",
   YC: "#D85A30",
-  Business: "#3b82f6",
+  Business: "#B87333",
 };
 
 function Pill({ text, colorMap }: { text: string; colorMap: Record<string, string> }) {

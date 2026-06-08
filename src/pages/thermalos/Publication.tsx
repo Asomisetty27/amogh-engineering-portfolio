@@ -51,8 +51,8 @@ const VENUES = [
 type SectionStatus = "done" | "in_progress" | "blocked" | "not_started";
 
 const STATUS_STYLE: Record<SectionStatus, { label: string; fg: string; bg: string }> = {
-  done:        { label: "Done",        fg: "#35C792", bg: "#0F6E5615" },
-  in_progress: { label: "In progress", fg: "#60a5fa", bg: "#3b82f615" },
+  done:        { label: "Done",        fg: "#D4AF37", bg: "#0F6E5615" },
+  in_progress: { label: "In progress", fg: "#D89A5C", bg: "#B8733315" },
   blocked:     { label: "Blocked",     fg: "#f87171", bg: "#f8717115" },
   not_started: { label: "Not started", fg: "#888780", bg: "#ffffff08" },
 };
@@ -197,7 +197,7 @@ export default function Publication() {
             </p>
           </div>
           <div className="flex items-center gap-3 text-[11px] font-mono">
-            <span style={{ color: "#35C792" }}>{done} done</span>
+            <span style={{ color: "#D4AF37" }}>{done} done</span>
             <span className="text-[#5a5a55]">/</span>
             <span style={{ color: "#f87171" }}>{blocked} blocked</span>
             <span className="text-[#5a5a55]">/ {SECTIONS.length} total</span>
@@ -214,7 +214,7 @@ export default function Publication() {
               <div
                 className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
                 style={{
-                  background: v.tone === "high" ? "#35C792" : v.tone === "medium" ? "#60a5fa" : "#888780",
+                  background: v.tone === "high" ? "#D4AF37" : v.tone === "medium" ? "#D89A5C" : "#888780",
                 }}
               />
               <div className="flex-1 min-w-0">

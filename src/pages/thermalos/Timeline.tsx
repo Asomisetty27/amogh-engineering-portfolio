@@ -90,8 +90,8 @@ export default function Timeline() {
         <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-[11px] font-mono">
           {phaseStats.map(([phase, s]) => (
             <span key={phase} className="text-[#a8a89f]">
-              <span className="text-[#9FE1CB]">{phase.replace(/^Phase /, "P")}:</span>{" "}
-              <span className="text-[#35C792]">{s.done}</span>
+              <span className="text-[#D8D2C2]">{phase.replace(/^Phase /, "P")}:</span>{" "}
+              <span className="text-[#D4AF37]">{s.done}</span>
               <span className="text-[#5a5a55]">/{s.total}</span>
             </span>
           ))}
@@ -106,7 +106,7 @@ export default function Timeline() {
             onClick={() => setFilter(f)}
             className={`px-2.5 py-1 rounded text-[11px] font-mono border transition-colors ${
               filter === f
-                ? "bg-[#0F6E56]/25 border-[#1D9E75]/60 text-[#35C792]"
+                ? "bg-[#0F6E56]/25 border-[#1D9E75]/60 text-[#D4AF37]"
                 : "bg-transparent border-white/[0.08] text-[#888780] hover:text-[#E6F7F1]"
             }`}
           >

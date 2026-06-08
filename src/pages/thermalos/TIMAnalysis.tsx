@@ -20,7 +20,7 @@ export default function TIMAnalysis() {
 
   return (
     <div className="space-y-4">
-      <div className="px-3 py-2 rounded-lg bg-[#9FE1CB]/10 border border-[#9FE1CB]/30 text-[12px] font-mono text-[#9FE1CB]">
+      <div className="px-3 py-2 rounded-lg bg-[#D8D2C2]/10 border border-[#D8D2C2]/30 text-[12px] font-mono text-[#D8D2C2]">
         Physical rig work — planned Fall 2026. Sam's heater-block testbed will generate ground-truth fault signatures for the anomaly detector calibration (E006).
       </div>
 

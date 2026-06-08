@@ -13,9 +13,9 @@ import {
 
 type Tone = "green" | "amber" | "blue" | "red" | "gray";
 const TONE: Record<Tone, { fg: string; bg: string; border: string }> = {
-  green: { fg: "#35C792", bg: "#0F6E5615", border: "#1D9E7540" },
+  green: { fg: "#D4AF37", bg: "#0F6E5615", border: "#1D9E7540" },
   amber: { fg: "#EF9F27", bg: "#EF9F2715", border: "#EF9F2740" },
-  blue:  { fg: "#60a5fa", bg: "#3b82f615", border: "#3b82f640" },
+  blue:  { fg: "#D89A5C", bg: "#B8733315", border: "#B8733340" },
   red:   { fg: "#D85A30", bg: "#D85A3015", border: "#D85A3040" },
   gray:  { fg: "#888780", bg: "#ffffff08", border: "#ffffff15" },
 };
@@ -316,7 +316,7 @@ export default function Dashboard() {
                       <Pill tone={m.tone}>{item.label}</Pill>
                       <Link
                         to={item.link}
-                        className="text-[11px] font-mono text-[#5a5a55] hover:text-[#9FE1CB] transition-colors"
+                        className="text-[11px] font-mono text-[#5a5a55] hover:text-[#D8D2C2] transition-colors"
                       >
                         {item.link.split("/").pop()} ↗
                       </Link>
@@ -346,12 +346,12 @@ export default function Dashboard() {
                 className="group flex items-center gap-2.5 px-3 py-2.5 rounded-md hover:bg-white/[0.03] transition-colors"
                 style={{ background: "#141412", border: "0.5px solid rgba(255,255,255,0.07)" }}
               >
-                <Icon size={13} className="text-[#5a5a55] group-hover:text-[#35C792] transition-colors flex-shrink-0" />
+                <Icon size={13} className="text-[#5a5a55] group-hover:text-[#D4AF37] transition-colors flex-shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-[12px] font-semibold text-[#E6F7F1] group-hover:text-[#9FE1CB] transition-colors">{l.label}</div>
+                  <div className="text-[12px] font-semibold text-[#E6F7F1] group-hover:text-[#D8D2C2] transition-colors">{l.label}</div>
                   <div className="text-[10px] font-mono text-[#5a5a55] truncate">{l.sub}</div>
                 </div>
-                <ArrowRight size={11} className="ml-auto text-[#5a5a55] group-hover:text-[#35C792] transition-colors" />
+                <ArrowRight size={11} className="ml-auto text-[#5a5a55] group-hover:text-[#D4AF37] transition-colors" />
               </Link>
             );
           })}

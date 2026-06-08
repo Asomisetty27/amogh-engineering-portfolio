@@ -50,8 +50,8 @@ const STAGES: Stage[] = [
 ];
 
 const STATUS_COLOR = {
-  complete:    { fg: "#35C792", dot: "#35C792" },
-  in_progress: { fg: "#60a5fa", dot: "#60a5fa" },
+  complete:    { fg: "#D4AF37", dot: "#D4AF37" },
+  in_progress: { fg: "#D89A5C", dot: "#D89A5C" },
   locked:      { fg: "#888780", dot: "#2C2C2A" },
 };
 
@@ -90,12 +90,12 @@ export default function Roadmap() {
 
   const getPriorityColor = (priority: string) => {
     if (priority.includes("Critical")) return "#f87171";
-    if (priority.includes("High")) return "#60a5fa";
+    if (priority.includes("High")) return "#D89A5C";
     return "#888780";
   };
 
   const getStatusColor = (status: string) => {
-    if (status.includes("Done")) return "#35C792";
+    if (status.includes("Done")) return "#D4AF37";
     if (status.includes("Not")) return "#888780";
     return "#EF9F27";
   };

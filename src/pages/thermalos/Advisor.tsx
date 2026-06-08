@@ -19,9 +19,9 @@ const ADVISOR_EMAIL = "sokundu@calpoly.edu";
 // ─── Style maps ──────────────────────────────────────────────────────────────
 
 const STATUS_STYLE: Record<AdvisorQuestion["status"], { label: string; fg: string; bg: string; border: string }> = {
-  open:          { label: "Open",          fg: "#60a5fa", bg: "#3b82f615", border: "#3b82f640" },
+  open:          { label: "Open",          fg: "#D89A5C", bg: "#B8733315", border: "#B8733340" },
   in_discussion: { label: "In discussion", fg: "#EF9F27", bg: "#EF9F2715", border: "#EF9F2740" },
-  answered:      { label: "Answered",      fg: "#35C792", bg: "#0F6E5615", border: "#1D9E7540" },
+  answered:      { label: "Answered",      fg: "#D4AF37", bg: "#0F6E5615", border: "#1D9E7540" },
 };
 
 // ─── Question card ────────────────────────────────────────────────────────────
@@ -112,7 +112,7 @@ function QuestionCard({
               <div className="text-[9px] font-mono uppercase tracking-[0.12em] text-[#1D9E75] mb-1">
                 Kundu -- {q.answered_date}
               </div>
-              <p className="text-[12px] text-[#9FE1CB] leading-relaxed">{q.answer}</p>
+              <p className="text-[12px] text-[#D8D2C2] leading-relaxed">{q.answer}</p>
             </div>
           )}
 
@@ -222,7 +222,7 @@ function MeetingPanel({
           disabled={selectedList.length === 0}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-mono border border-white/[0.1] text-[#a8a89f] hover:text-[#E6F7F1] hover:border-white/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {copied ? <Check size={11} className="text-[#35C792]" /> : <Copy size={11} />}
+          {copied ? <Check size={11} className="text-[#D4AF37]" /> : <Copy size={11} />}
           {copied ? "Copied" : `Copy ${selectedList.length} question${selectedList.length !== 1 ? "s" : ""}`}
         </button>
         <a
@@ -345,7 +345,7 @@ export default function Advisor() {
           {/* Auth status */}
           {isAdvisor ? (
             <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-[#0F6E56]/15 border border-[#1D9E75]/30">
-              <span className="text-[11px] font-mono text-[#9FE1CB]">
+              <span className="text-[11px] font-mono text-[#D8D2C2]">
                 Answering as Kundu
               </span>
               <button
@@ -442,7 +442,7 @@ export default function Advisor() {
         ) : (
           <button
             onClick={() => setShowBooking(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded border border-[#1D9E75]/40 bg-[#0F6E56]/10 text-[13px] font-mono text-[#35C792] hover:bg-[#0F6E56]/20 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded border border-[#1D9E75]/40 bg-[#0F6E56]/10 text-[13px] font-mono text-[#D4AF37] hover:bg-[#0F6E56]/20 transition-colors"
           >
             <Calendar size={14} />
             Request a meeting with Kundu
@@ -515,7 +515,7 @@ export default function Advisor() {
                   </p>
                   <span
                     className="text-[10px] font-mono flex-shrink-0 mt-0.5"
-                    style={{ color: a.status === "resolved" ? "#35C792" : "#EF9F27" }}
+                    style={{ color: a.status === "resolved" ? "#D4AF37" : "#EF9F27" }}
                   >
                     {a.status === "resolved" ? "Resolved" : "Open"}
                   </span>
