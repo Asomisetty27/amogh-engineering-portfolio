@@ -493,6 +493,82 @@ function CoolerLayer({
     );
   }
 
+  if (spec.cooler === 'passive-fin') {
+    // Passive single-slot server card (NVIDIA L4 / L40S server form). One
+    // continuous champagne-gold anodized aluminum extrusion with longitudinal
+    // ribs cut into the top surface. No fans — relies on chassis airflow
+    // through the end-cap vent grille. The ribs ARE the cooler.
+    const ribCount = 38;
+    const ribLen = spec.depth * 0.92;
+    const shellH = 0.62;            // single-slot height
+    const shellW = spec.width * 0.94;
+    const ribs = useMemo<[number, number, number][]>(() => {
+      const out: [number, number, number][] = [];
+      const pitch = shellW / (ribCount + 1);
+      for (let i = 0; i < ribCount; i++) {
+        out.push([-shellW / 2 + pitch * (i + 1), shellH / 2 + 0.015, 0]);
+      }
+      return out;
+    }, [shellW, ribCount, shellH]);
+
+    // End-cap exhaust grille — vertical slats at one end
+    const grille = useMemo<[number, number, number][]>(() => {
+      const n = 14;
+      const out: [number, number, number][] = [];
+      const w = shellW * 0.85;
+      for (let i = 0; i < n; i++) {
+        out.push([-w / 2 + (w / (n - 1)) * i, 0, 0]);
+      }
+      return out;
+    }, [shellW]);
+
+    return (
+      <group>
+        {/* Main shell — champagne-gold anodized aluminum; warm satin finish */}
+        <RoundedBox args={[shellW, shellH, ribLen]} radius={0.035} smoothness={4} position={[0, 0, 0]}>
+          <meshStandardMaterial
+            ref={lidMatRef}
+            color="#C9B58A"
+            roughness={0.42}
+            metalness={0.78}
+            envMapIntensity={1.2}
+            emissive="#000"
+            emissiveIntensity={0}
+          />
+        </RoundedBox>
+        {/* Longitudinal cooling ribs — the visual signature; thin extrusions
+            along the top, same anodized finish as shell. Catch HDRI specular
+            as parallel highlights — the "passive heatsink" tell. */}
+        <InstancedBoxes
+          positions={ribs}
+          size={[shellW / (ribCount + 1) * 0.55, 0.05, ribLen * 0.96]}
+          color="#C9B58A"
+          roughness={0.4}
+          metalness={0.8}
+        />
+        {/* End-cap exhaust grille — vertical slats at the bracket end */}
+        <group position={[0, 0, -ribLen / 2 - 0.008]}>
+          <mesh>
+            <planeGeometry args={[shellW * 0.88, shellH * 0.78]} />
+            <meshStandardMaterial color="#08080b" roughness={0.95} metalness={0} />
+          </mesh>
+          <InstancedBoxes
+            positions={grille}
+            size={[shellW / 22, shellH * 0.7, 0.018]}
+            color="#9A8B68"
+            roughness={0.5}
+            metalness={0.7}
+          />
+        </group>
+        {/* PCIe bracket end — small accent strip in vendor color */}
+        <mesh position={[0, -shellH / 2 + 0.02, ribLen / 2 - 0.04]}>
+          <boxGeometry args={[shellW * 0.5, 0.03, 0.04]} />
+          <meshStandardMaterial color={spec.accent} roughness={0.35} metalness={0.6} emissive={spec.accent} emissiveIntensity={0.4} toneMapped={false} />
+        </mesh>
+        <LayerLabel text="PASSIVE FIN STACK" sub="anodized aluminum extrusion · server airflow" opacityRef={labelOpacityRef} accent={spec.accent} />
+      </group>
+    );
+
   // Card archetypes: heatsink fin block (instanced) + shroud + fan(s)
   const fanX = spec.cooler === 'triple-fan' ? [-2.0, 0, 2.0] : [0];
   const fanRadius = spec.cooler === 'triple-fan' ? 0.95 : 1.6;
