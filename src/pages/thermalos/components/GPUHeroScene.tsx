@@ -897,37 +897,37 @@ function CardNamePlate({ spec, index }: { spec: GPUSpec; index: number }) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Cinematic palette — "Industrial Monolithic": Deep Teal Void + Brushed
-// Steel/Black Nickel + Clean White / Soft Cyan. No magenta, no noise.
+// Cinematic palette — "Liquid Gold": Champagne Gold + Obsidian Silver.
+// Luxury watch / premium automotive reveal aesthetic. Warm, not neon.
 // ──────────────────────────────────────────────────────────────────────────
 const CINE = {
-  void:        '#002533', // deep oceanic teal (atmosphere)
-  voidDeep:    '#00131C', // backdrop blackpoint (charcoal-teal, never pure black)
-  hot:         '#00E5FF', // electric cyan (accent emissive)
-  hotSoft:     '#7FD8E5', // soft cyan fill
-  rim:         '#F4FAFF', // clean white rim
-  floor:       '#04080A', // black nickel floor
+  void:        '#2A2620', // warm slate (atmosphere)
+  voidDeep:    '#0A0A0B', // deep obsidian (backdrop blackpoint)
+  hot:         '#FFE8BC', // champagne gold (accent emissive)
+  hotSoft:     '#D4AF37', // 18k champagne gold (desaturated, not brassy)
+  rim:         '#E2E8F0', // liquid platinum (white rim / softbox)
+  floor:       '#06060A', // black nickel mirror floor
 };
 
 // ──────────────────────────────────────────────────────────────────────────
-// The set — black-nickel reflective floor + smooth teal-void cyc backdrop
-// with a single clean cyan emissive strip. Linear falloff, zero noise.
+// The set — black-nickel mirror floor (0.01 roughness) + warm slate-to-
+// soft-champagne gradient cyc. Single champagne emissive ribbon for the
+// luxury "inner glow" — wide bloom, low intensity, no neon line.
 // ──────────────────────────────────────────────────────────────────────────
 
 function Backdrop() {
-  // Smooth vertical gradient: teal void with a soft cyan hotspot center.
-  // Linear falloff, no banding stops, no noise.
+  // Smooth warm-slate → soft-champagne gradient. Linear falloff, zero noise.
   const gradTex = useMemo(() => {
     const c = document.createElement('canvas');
     c.width = 8; c.height = 1024;
     const ctx = c.getContext('2d')!;
     const g = ctx.createLinearGradient(0, 0, 0, 1024);
     g.addColorStop(0.00, CINE.voidDeep);
-    g.addColorStop(0.35, '#002a3a');
-    g.addColorStop(0.52, '#004258');
-    g.addColorStop(0.60, '#0a6478');
-    g.addColorStop(0.66, '#1a8a9a');
-    g.addColorStop(0.74, '#054858');
+    g.addColorStop(0.32, '#1a1612');
+    g.addColorStop(0.50, '#3a2f22');
+    g.addColorStop(0.60, '#6a5236');
+    g.addColorStop(0.66, '#a8814a');
+    g.addColorStop(0.74, '#4a3a26');
     g.addColorStop(1.00, CINE.voidDeep);
     ctx.fillStyle = g; ctx.fillRect(0, 0, 8, 1024);
     const t = new THREE.CanvasTexture(c);
@@ -937,20 +937,20 @@ function Backdrop() {
 
   return (
     <group>
-      {/* Cyc backdrop — large, smooth gradient, behind everything */}
+      {/* Cyc backdrop — warm silk gradient, behind everything */}
       <mesh position={[0, 6, -18]}>
         <planeGeometry args={[120, 38]} />
         <meshBasicMaterial map={gradTex} toneMapped={false} />
       </mesh>
-      {/* Single clean cyan emissive strip — solid vector, not particles */}
+      {/* Champagne emissive ribbon — wide, soft, luxury "inner heat" glow */}
       <mesh position={[0, 4.6, -15]}>
-        <boxGeometry args={[26, 0.04, 0.04]} />
+        <boxGeometry args={[26, 0.06, 0.04]} />
         <meshBasicMaterial color={CINE.hot} toneMapped={false} />
       </mesh>
-      {/* Faint horizon under-strip — pushes eye toward the cards */}
+      {/* Faint horizon under-strip — desaturated gold whisper */}
       <mesh position={[0, -1.2, -15]}>
         <planeGeometry args={[60, 0.05]} />
-        <meshBasicMaterial color={CINE.hotSoft} toneMapped={false} opacity={0.35} transparent />
+        <meshBasicMaterial color={CINE.hotSoft} toneMapped={false} opacity={0.3} transparent />
       </mesh>
     </group>
   );
@@ -959,44 +959,44 @@ function Backdrop() {
 function Runway({ textures }: { textures: Textures }) {
   return (
     <group position={[0, -3.4, 0]}>
-      {/* Black nickel floor — mirror-polished, low roughness, sharp reflection */}
+      {/* Black nickel mirror floor — roughness pushed to glass minimum so
+          metallic surfaces cast long, unbroken vertical reflections. */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[GPU_SPECS.length * CARD_SPACING + 24, 26]} />
         <MeshReflectorMaterial
-          blur={[180, 60]}
+          blur={[120, 40]}
           resolution={1024}
-          mixBlur={0.8}
-          mixStrength={1.4}
-          mixContrast={1.05}
-          roughness={0.35}
-          depthScale={0.5}
+          mixBlur={0.5}
+          mixStrength={1.8}
+          mixContrast={1.1}
+          roughness={0.01}
+          depthScale={0.4}
           minDepthThreshold={0.4}
           maxDepthThreshold={1.2}
           color={CINE.floor}
-          metalness={0.95}
-          mirror={0.55}
+          metalness={0.98}
+          mirror={0.7}
         />
       </mesh>
       {GPU_SPECS.map((spec, i) => (
         <mesh key={spec.id} position={[cardX(i), 0.02, 0]} receiveShadow>
           <ringGeometry args={[2.55, 2.7, 48]} />
-          <meshStandardMaterial color={CINE.hot} emissive={CINE.hot} emissiveIntensity={0.3} roughness={0.4} metalness={0.3} toneMapped={false} transparent opacity={0.35} />
+          <meshStandardMaterial color={CINE.hotSoft} emissive={CINE.hotSoft} emissiveIntensity={0.28} roughness={0.4} metalness={0.5} toneMapped={false} transparent opacity={0.3} />
         </mesh>
       ))}
-      {/* Smooth teal atmosphere — linear-feel, low density, zero noise */}
-      <fogExp2 attach="fog" args={[CINE.void, 0.022]} />
+      {/* Warm slate atmosphere — soft falloff, low density */}
+      <fogExp2 attach="fog" args={[CINE.void, 0.02]} />
     </group>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Lighting — Industrial Monolithic:
-//   • Large overhead clean-white softbox → smooth, un-grainy reflection bands
-//   • Per-card traveling key spot (clean white, follows hero)
-//   • Soft cyan backdrop wash — sterile, single hue
-//   • Subtle white side fill from camera-left
-//   • Near-black teal ambient (blackpoint hover)
-// No violet rim, no magenta, no warm tints.
+// Lighting — Liquid Gold rig:
+//   • Overhead silver softbox (clean white, broad) → pure white linear bands
+//   • Traveling key spot — platinum white, follows hero
+//   • Champagne backdrop wash — warm cyc bleed onto rear of cards
+//   • Subtle platinum side fill from camera-left
+//   • Warm blackpoint ambient — never crushes to true black
 // ──────────────────────────────────────────────────────────────────────────
 
 function SceneLights({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
@@ -1021,16 +1021,16 @@ function SceneLights({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
 
   return (
     <>
-      {/* Overhead clean-white softbox — large, square-ish, broad smooth band */}
-      <rectAreaLight ref={stripRef} position={[0, 14, 2]} width={30} height={6} intensity={11} color={CINE.rim} />
-      {/* Subtle white side fill from camera-left */}
-      <rectAreaLight ref={fillRef} position={[-12, 6, 8]} width={8} height={6} intensity={2.2} color="#dceaf2" />
-      {/* Cyan cyc wash — sterile single-hue backdrop bleed */}
-      <rectAreaLight ref={cycRef} position={[0, 4, -10]} width={22} height={6} intensity={2.2} color={CINE.hot} />
-      {/* Per-card traveling key — clean white, follows hero */}
-      <spotLight ref={spotRef} position={[0, 12, 5]} angle={0.42} penumbra={0.75} intensity={20} color={CINE.rim} distance={26} decay={2} castShadow />
-      {/* Blackpoint ambient — teal-tinted, never pure black */}
-      <ambientLight intensity={0.03} color={CINE.void} />
+      {/* Overhead silver softbox — pure white, broad, mirror-sharp top band */}
+      <rectAreaLight ref={stripRef} position={[0, 14, 2]} width={30} height={6} intensity={12} color={CINE.rim} />
+      {/* Platinum side fill from camera-left */}
+      <rectAreaLight ref={fillRef} position={[-12, 6, 8]} width={8} height={6} intensity={2.4} color="#e8edf3" />
+      {/* Champagne cyc wash — warm bleed across rear of cards */}
+      <rectAreaLight ref={cycRef} position={[0, 4, -10]} width={22} height={6} intensity={2.4} color={CINE.hot} />
+      {/* Per-card traveling key — liquid platinum, follows hero */}
+      <spotLight ref={spotRef} position={[0, 12, 5]} angle={0.42} penumbra={0.78} intensity={22} color={CINE.rim} distance={26} decay={2} castShadow />
+      {/* Warm blackpoint ambient */}
+      <ambientLight intensity={0.035} color={CINE.void} />
     </>
   );
 }
@@ -1088,7 +1088,7 @@ function PostFX({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
   return (
     <EffectComposer multisampling={2}>
       <DepthOfField target={_dofTarget} focalLength={0.055} bokehScale={2.4} height={480} />
-      <Bloom luminanceThreshold={0.7} luminanceSmoothing={0.4} intensity={0.7} radius={0.9} mipmapBlur />
+      <Bloom luminanceThreshold={0.55} luminanceSmoothing={0.55} intensity={0.45} radius={1.1} mipmapBlur />
       <Vignette offset={0.32} darkness={0.55} eskil={false} blendFunction={BlendFunction.NORMAL} />
     </EffectComposer>
   );
@@ -1115,23 +1115,30 @@ function PhaseHUD({ phaseRef, valuesRef }: { phaseRef: React.MutableRefObject<Ph
     idle: 'IDLE', load: 'UNDER LOAD', anomaly: 'ANOMALY DETECTED', critical: 'THERMAL CRITICAL', recovery: 'RECOVERING',
   };
 
+  // Luxury palette overrides — platinum text, champagne accents, amber-gold
+  // for critical (instead of harsh red) to keep the warm color harmony.
+  const PLATINUM = '#E2E8F0';
+  const CHAMPAGNE = '#D4AF37';
+  const AMBER_WARN = '#F2B441';
+  const accentColor = isCritical ? AMBER_WARN : CHAMPAGNE;
+
   return (
     <div style={{
-      position: 'absolute', bottom: 24, right: 24, width: 224, padding: '10px 12px',
-      background: 'rgba(6,6,10,0.88)', backdropFilter: 'blur(8px)',
-      border: `1px solid ${isCritical ? T.critical : T.border}`, borderRadius: 6,
-      fontFamily: FM, color: T.text, fontSize: 9, lineHeight: 1.7,
-      boxShadow: '0 6px 24px rgba(0,0,0,0.6)', pointerEvents: 'none',
+      position: 'absolute', bottom: 24, right: 24, width: 232, padding: '12px 14px',
+      background: 'rgba(10,10,11,0.55)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+      border: `0.5px solid rgba(212,175,55,0.22)`, borderRadius: 4,
+      fontFamily: FM, color: PLATINUM, fontSize: 9, lineHeight: 1.8, fontWeight: 300,
+      boxShadow: '0 10px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,232,188,0.04)', pointerEvents: 'none',
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-        <span style={{ color: T.muted, fontSize: 8, letterSpacing: '0.14em' }}>THETA · DAQ · NODE H100-04</span>
-        <span style={{ color: isCritical ? T.critical : tColor, fontWeight: 700, fontSize: 9, letterSpacing: '0.06em' }}>● {labelMap[phase]}</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <span style={{ color: 'rgba(226,232,240,0.5)', fontSize: 8, letterSpacing: '0.18em', fontWeight: 400 }}>THETA · DAQ · H100-04</span>
+        <span style={{ color: accentColor, fontWeight: 500, fontSize: 9, letterSpacing: '0.08em' }}>{labelMap[phase]}</span>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: T.muted }}>T_junction</span><span style={{ color: tColor }}>{Tj} °C</span></div>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: T.muted }}>R_θ_eff</span><span style={{ color: T.text }}>{Rtheta} °C/W</span></div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}><span style={{ color: T.muted }}>Watching</span><span style={{ color: T.bp }}>5 / 5 nodes</span></div>
-      <div style={{ height: 2, background: T.s1, borderRadius: 1, overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: `${Math.round(progress * 100)}%`, background: tColor, transition: 'width 0.12s linear' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'rgba(226,232,240,0.45)' }}>T_junction</span><span style={{ color: PLATINUM }}>{Tj} °C</span></div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'rgba(226,232,240,0.45)' }}>R_θ_eff</span><span style={{ color: PLATINUM }}>{Rtheta} °C/W</span></div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 9 }}><span style={{ color: 'rgba(226,232,240,0.45)' }}>Watching</span><span style={{ color: CHAMPAGNE }}>5 / 5 nodes</span></div>
+      <div style={{ height: 1, background: 'rgba(226,232,240,0.08)', overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: `${Math.round(progress * 100)}%`, background: accentColor, transition: 'width 0.12s linear' }} />
       </div>
     </div>
   );
@@ -1139,8 +1146,8 @@ function PhaseHUD({ phaseRef, valuesRef }: { phaseRef: React.MutableRefObject<Ph
 
 function LineupLabel() {
   return (
-    <div style={{ position: 'absolute', bottom: 24, left: 24, fontFamily: FM, fontSize: 8.5, letterSpacing: '0.16em', color: T.muted, opacity: 0.7, pointerEvents: 'none' }}>
-      ▶ THE FLEET THETA WATCHES · A100 · L40S · H100 · B200 · MI300X
+    <div style={{ position: 'absolute', bottom: 24, left: 24, fontFamily: FM, fontSize: 8.5, letterSpacing: '0.22em', color: 'rgba(226,232,240,0.45)', fontWeight: 300, pointerEvents: 'none' }}>
+      THE FLEET THETA WATCHES · A100 · L40S · H100 · B200 · MI300X
     </div>
   );
 }
