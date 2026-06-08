@@ -578,6 +578,7 @@ function CoolerLayer({
             envMapIntensity={1.0}
             emissive="#000"
             emissiveIntensity={0}
+            map={maps?.anodizedDark ?? undefined}
           />
         </RoundedBox>
         {/* Longitudinal cooling ribs — same dark finish, slightly lighter to catch HDRI */}
