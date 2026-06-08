@@ -1522,6 +1522,40 @@ function TowerUnitMesh({
           />
         );
       })}
+
+      {/* Static rack rails for the hero sled — stay fixed in the chassis as
+          the sled slides out. Two brushed-aluminum L-profiles on the inner
+          walls at the hero sled's Y, full rack depth. Only added for the
+          hero tower; the companion's sleds are sealed. */}
+      {tower.hero && (() => {
+        const yHero = SLED_BASE_Y + HERO_SLED_INDEX * (SLED_H + SLED_GAP) + SLED_H / 2;
+        const yRail = yHero - SLED_H * 0.36;
+        return (
+          <group>
+            {[-1, 1].map((s) => (
+              <group key={s} position={[s * RACK_W * 0.46, yRail, 0]}>
+                {/* Horizontal flange */}
+                <mesh castShadow receiveShadow>
+                  <boxGeometry args={[0.018, 0.006, RACK_D * 0.96]} />
+                  <meshStandardMaterial color="#6d717a" roughness={0.42} metalness={0.85} />
+                </mesh>
+                {/* Vertical web */}
+                <mesh position={[s * 0.006, 0.012, 0]} castShadow>
+                  <boxGeometry args={[0.006, 0.022, RACK_D * 0.96]} />
+                  <meshStandardMaterial color="#5f636c" roughness={0.5} metalness={0.78} />
+                </mesh>
+              </group>
+            ))}
+            {/* Front rail-end plates (where the rail bolts to the chassis post) */}
+            {[-1, 1].map((s) => (
+              <mesh key={s} position={[s * RACK_W * 0.46, yRail + 0.005, RACK_D * 0.47]} castShadow>
+                <boxGeometry args={[0.024, 0.028, 0.01]} />
+                <meshStandardMaterial color="#2a2a32" roughness={0.45} metalness={0.8} />
+              </mesh>
+            ))}
+          </group>
+        );
+      })()}
     </group>
     </>
   );
