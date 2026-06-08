@@ -348,6 +348,12 @@
       "status": "Evidence collected"
     },
     {
+      "claim": "Addendum (2026-06-07)",
+      "proof": "** the `/yc` page is also where to land a \"how we build\" section — see [[ai_native_yc_narrative]]. It's a low-cost, fully-evidenced founder-credibility asset (public commit history showing one founder + AI agent shipping production infra at team-scale velocity) that complements the discovery-call traction story without depending on it.",
+      "location": "synthesis/yc_blockers.md",
+      "status": "Evidence collected"
+    },
+    {
       "claim": "Startup name",
       "proof": "Theta. Research project",
       "location": "synthesis/yc_blockers.md",
@@ -355,6 +361,27 @@
     }
   ],
   "decision_log": [
+    {
+      "date": "2026-06-07",
+      "decision": "schema",
+      "rationale": "Amogh asked to incorporate [qmd](https://github.com/tobi/qmd) (local hybrid",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-07",
+      "decision": "ingest",
+      "rationale": "Amogh asked the [[elt_simulation|E-LT lead-time simulation]] to be made \"1:1 with",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-06",
+      "decision": "rename",
+      "rationale": "**Naming model changed:** Theta is now the company + product + OSS agent. ThermalOS is now ONLY the research project + academic publication. (Supersedes the morning's split where the agent was ThermalOS.) `theta` is taken on PyPI → distribution is `runtheta`; CLI command + brand are `theta`/Theta.",
+      "source_question_id": "",
+      "status": "active"
+    },
     {
       "date": "2026-06-06",
       "decision": "build",
@@ -473,27 +500,6 @@
       "rationale": "1. [[confidence_map_rtheta]] — What we know vs assume about R_theta (high/medium/low/speculation tiers)",
       "source_question_id": "",
       "status": "active"
-    },
-    {
-      "date": "2026-06-01",
-      "decision": "ingest",
-      "rationale": "- New source page: [[thermalos_sync_architecture]]",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-01",
-      "decision": "sync",
-      "rationale": "- Row count \"~5,700\" → fixed to \"2,280+\" in Overview.tsx and Roadmap.tsx (E004 data missing from CSV)",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-01",
-      "decision": "build",
-      "rationale": "- `.claude/skills/sync-to-sheets/sync_vault_to_sheets.py` — reads vault wiki pages, runs contradiction check, builds Wiki Summary row structure",
-      "source_question_id": "",
-      "status": "active"
     }
   ],
   "timeline": [
@@ -545,7 +551,7 @@
       "phase": "Stage 2 — Agent v0.1.9",
       "week": "W5",
       "dates": "—",
-      "milestone": "pip install thermalos · pynvml + Redfish + DCGM telemetry collector",
+      "milestone": "pip install runtheta · pynvml + Redfish + DCGM telemetry collector",
       "owner": "Amogh",
       "status": "Done ✓",
       "priority": "P1 — High",
@@ -798,6 +804,6 @@
       "status": "gap"
     }
   ],
-  "generated_at": "2026-06-07T03:57:55.647Z",
+  "generated_at": "2026-06-07T20:27:21.980Z",
   "vault_root": "/Users/amogh/thermalos-vault"
 }

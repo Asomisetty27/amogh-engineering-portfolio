@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Activity, FlaskConical, Route,
-  Users, BookOpen, Menu, X, Loader2, Cpu, LogIn, Terminal,
+  Users, BookOpen, Menu, X, Loader2, Cpu, LogIn, Terminal, Zap,
 } from "lucide-react";
 import { useIsFetching } from "@tanstack/react-query";
 import { ThermalOSRoleProvider, useThermalOSRole } from "@/contexts/ThermalOSRole";
@@ -18,12 +18,14 @@ interface NavItem {
 
 const PUBLIC_NAV: NavItem[] = [
   { to: researchPath(),            label: "Overview",   sub: "What & where we are",    icon: LayoutDashboard, end: true },
+  { to: researchPath("agent"),     label: "Agent",      sub: "5-pillar command center", icon: Zap },
   { to: researchPath("findings"),  label: "Findings",   sub: "Methodology & findings", icon: FlaskConical },
   { to: researchPath("yc"),        label: "YC",         sub: "Evidence & milestones",  icon: Cpu },
 ];
 
 const ADMIN_NAV: NavItem[] = [
-  { to: researchPath("command"),    label: "Command",     sub: "The one thing",          icon: Terminal, end: true },
+  { to: researchPath("agent"),      label: "Agent",       sub: "5-pillar command center", icon: Zap, end: true },
+  { to: researchPath("command"),    label: "Command",     sub: "The one thing",          icon: Terminal },
   { to: researchPath("lab"),        label: "Lab",         sub: "Telemetry & runs",       icon: Activity },
   { to: researchPath("findings"),   label: "Findings",    sub: "Methodology & findings", icon: FlaskConical },
   { to: researchPath("advisor"),    label: "Advisor",     sub: "Questions & decisions",  icon: Users },

@@ -27,6 +27,7 @@ const YC               = lazy(() => import("./pages/thermalos/YC.tsx"));
 const Plan             = lazy(() => import("./pages/thermalos/Plan.tsx"));
 const QuickEntry       = lazy(() => import("./pages/thermalos/QuickEntry.tsx"));
 const DataCenterKiosk  = lazy(() => import("./pages/thermalos/components/DataCenterKiosk.tsx"));
+const AgentControlCenter = lazy(() => import("./pages/thermalos/AgentControlCenter.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,8 @@ const App = () => (
             <Route path={RESEARCH_BASE} element={<ThermalOSLayout />}>
               <Route index element={<Overview />} />
 
+              {/* Agent Control Center — 5-pillar command post */}
+              <Route path="agent"       element={<AgentControlCenter />} />
               {/* methodology page — segment is "findings" */}
               <Route path="findings"    element={<Research />} />
               <Route path="lab"         element={<Lab />} />

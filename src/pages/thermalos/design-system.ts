@@ -129,3 +129,29 @@ export const EASING = {
   snappy: [0.25, 0.46, 0.45, 0.94], // standard cubic
   scan: [0.16, 1, 0.3, 1],        // CRT refresh curve
 };
+
+// AGENT RISK & CONFIDENCE (5-pillar system visualization)
+export const RISK = {
+  safe: '#1D9E75',      // green — nominal
+  warning: '#EF9F27',   // amber — monitor
+  caution: '#D85A30',   // orange — escalating
+  critical: '#B83030',  // red — act now
+};
+
+export const CONFIDENCE = {
+  high: {
+    fg: RISK.safe,
+    bg: '#1D9E7515',
+    border: '#1D9E75',
+  },
+  medium: {
+    fg: RISK.warning,
+    bg: '#EF9F2715',
+    border: '#EF9F27',
+  },
+  low: {
+    fg: RISK.critical,
+    bg: '#B8303015',
+    border: '#B83030',
+  },
+};
