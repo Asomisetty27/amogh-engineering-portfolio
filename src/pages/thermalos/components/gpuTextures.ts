@@ -1,17 +1,10 @@
 /**
  * Centralized texture loader for the photoreal GPU scene.
  *
- * Phase 1 of the "near-photoreal" pass: we have generated three tileable PBR
- * textures and two logo decals. This module loads them once, configures
- * filtering/wrap/anisotropy/colorSpace correctly, and hands them to the per-
- * card components.
- *
- * Source assets (generated, in src/assets/textures/):
- *   - pcb-normal.jpg       — normal map for PCB solder mask micro-relief
- *   - nickel-brushed.jpg   — albedo for nickel-plated copper IHS / cold-plate
- *   - anodized-dark.jpg    — albedo for dark anodized aluminum heatsinks
- *   - nvidia-decal.png     — NVIDIA wordmark, green on black (use as alpha)
- *   - amd-decal.png        — AMD INSTINCT wordmark, white on black (use as alpha)
+ * Includes per-model top-down "product skin" textures generated from real
+ * NVIDIA / AMD reference photos. These are applied to the top face of each
+ * card's assembled exterior so the lineup reads as actual photographed
+ * hardware, not generic 3D boxes.
  */
 import { useTexture } from '@react-three/drei';
 import { useMemo } from 'react';
@@ -23,37 +16,56 @@ import anodizedDarkUrl from '@/assets/textures/anodized-dark.jpg';
 import nvidiaDecalUrl from '@/assets/textures/nvidia-decal.png';
 import amdDecalUrl from '@/assets/textures/amd-decal.png';
 
+import skinA100Url   from '@/assets/textures/skin-a100.jpg';
+import skinL40sUrl   from '@/assets/textures/skin-l40s.jpg';
+import skinH100Url   from '@/assets/textures/skin-h100.jpg';
+import skinB200Url   from '@/assets/textures/skin-b200.jpg';
+import skinMi300xUrl from '@/assets/textures/skin-mi300x.jpg';
+
 export interface GpuTextures {
   pcbNormal: THREE.Texture;
   nickelBrushed: THREE.Texture;
   anodizedDark: THREE.Texture;
   nvidiaDecal: THREE.Texture;
   amdDecal: THREE.Texture;
+  skins: Record<string, THREE.Texture>;
 }
 
 export function useGpuTextures(): GpuTextures {
-  const [pcbNormal, nickelBrushed, anodizedDark, nvidiaDecal, amdDecal] =
-    useTexture([pcbNormalUrl, nickelBrushedUrl, anodizedDarkUrl, nvidiaDecalUrl, amdDecalUrl]) as THREE.Texture[];
+  const [
+    pcbNormal, nickelBrushed, anodizedDark, nvidiaDecal, amdDecal,
+    skinA100, skinL40s, skinH100, skinB200, skinMi300x,
+  ] = useTexture([
+    pcbNormalUrl, nickelBrushedUrl, anodizedDarkUrl, nvidiaDecalUrl, amdDecalUrl,
+    skinA100Url, skinL40sUrl, skinH100Url, skinB200Url, skinMi300xUrl,
+  ]) as THREE.Texture[];
 
   return useMemo<GpuTextures>(() => {
-    // Tileable PBR maps: repeat-wrap, linear color (normal/data), anisotropy
     for (const t of [pcbNormal, nickelBrushed, anodizedDark]) {
       t.wrapS = t.wrapT = THREE.RepeatWrapping;
       t.anisotropy = 8;
     }
-    // PCB normal lives in linear space (it's data, not color)
     pcbNormal.colorSpace = THREE.NoColorSpace;
-    // Albedo maps render in sRGB
     nickelBrushed.colorSpace = THREE.SRGBColorSpace;
     anodizedDark.colorSpace = THREE.SRGBColorSpace;
 
-    // Decals are sampled as color, edges clamped (no tiling on a logo)
     for (const t of [nvidiaDecal, amdDecal]) {
       t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
       t.colorSpace = THREE.SRGBColorSpace;
       t.anisotropy = 8;
     }
 
-    return { pcbNormal, nickelBrushed, anodizedDark, nvidiaDecal, amdDecal };
-  }, [pcbNormal, nickelBrushed, anodizedDark, nvidiaDecal, amdDecal]);
+    const skins: Record<string, THREE.Texture> = {
+      a100: skinA100, l40s: skinL40s, h100: skinH100, b200: skinB200, mi300x: skinMi300x,
+    };
+    for (const t of Object.values(skins)) {
+      t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
+      t.colorSpace = THREE.SRGBColorSpace;
+      t.anisotropy = 16;
+      t.minFilter = THREE.LinearMipmapLinearFilter;
+      t.magFilter = THREE.LinearFilter;
+    }
+
+    return { pcbNormal, nickelBrushed, anodizedDark, nvidiaDecal, amdDecal, skins };
+  }, [pcbNormal, nickelBrushed, anodizedDark, nvidiaDecal, amdDecal, skinA100, skinL40s, skinH100, skinB200, skinMi300x]);
 }
