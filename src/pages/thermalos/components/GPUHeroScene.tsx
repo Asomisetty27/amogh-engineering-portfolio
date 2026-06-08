@@ -897,37 +897,37 @@ function CardNamePlate({ spec, index }: { spec: GPUSpec; index: number }) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Cinematic palette — "Industrial Monolithic": Deep Teal Void + Brushed
-// Steel/Black Nickel + Clean White / Soft Cyan. No magenta, no noise.
+// Cinematic palette — "Liquid Gold": Champagne Gold + Obsidian Silver.
+// Luxury watch / premium automotive reveal aesthetic. Warm, not neon.
 // ──────────────────────────────────────────────────────────────────────────
 const CINE = {
-  void:        '#002533', // deep oceanic teal (atmosphere)
-  voidDeep:    '#00131C', // backdrop blackpoint (charcoal-teal, never pure black)
-  hot:         '#00E5FF', // electric cyan (accent emissive)
-  hotSoft:     '#7FD8E5', // soft cyan fill
-  rim:         '#F4FAFF', // clean white rim
-  floor:       '#04080A', // black nickel floor
+  void:        '#2A2620', // warm slate (atmosphere)
+  voidDeep:    '#0A0A0B', // deep obsidian (backdrop blackpoint)
+  hot:         '#FFE8BC', // champagne gold (accent emissive)
+  hotSoft:     '#D4AF37', // 18k champagne gold (desaturated, not brassy)
+  rim:         '#E2E8F0', // liquid platinum (white rim / softbox)
+  floor:       '#06060A', // black nickel mirror floor
 };
 
 // ──────────────────────────────────────────────────────────────────────────
-// The set — black-nickel reflective floor + smooth teal-void cyc backdrop
-// with a single clean cyan emissive strip. Linear falloff, zero noise.
+// The set — black-nickel mirror floor (0.01 roughness) + warm slate-to-
+// soft-champagne gradient cyc. Single champagne emissive ribbon for the
+// luxury "inner glow" — wide bloom, low intensity, no neon line.
 // ──────────────────────────────────────────────────────────────────────────
 
 function Backdrop() {
-  // Smooth vertical gradient: teal void with a soft cyan hotspot center.
-  // Linear falloff, no banding stops, no noise.
+  // Smooth warm-slate → soft-champagne gradient. Linear falloff, zero noise.
   const gradTex = useMemo(() => {
     const c = document.createElement('canvas');
     c.width = 8; c.height = 1024;
     const ctx = c.getContext('2d')!;
     const g = ctx.createLinearGradient(0, 0, 0, 1024);
     g.addColorStop(0.00, CINE.voidDeep);
-    g.addColorStop(0.35, '#002a3a');
-    g.addColorStop(0.52, '#004258');
-    g.addColorStop(0.60, '#0a6478');
-    g.addColorStop(0.66, '#1a8a9a');
-    g.addColorStop(0.74, '#054858');
+    g.addColorStop(0.32, '#1a1612');
+    g.addColorStop(0.50, '#3a2f22');
+    g.addColorStop(0.60, '#6a5236');
+    g.addColorStop(0.66, '#a8814a');
+    g.addColorStop(0.74, '#4a3a26');
     g.addColorStop(1.00, CINE.voidDeep);
     ctx.fillStyle = g; ctx.fillRect(0, 0, 8, 1024);
     const t = new THREE.CanvasTexture(c);
@@ -937,20 +937,20 @@ function Backdrop() {
 
   return (
     <group>
-      {/* Cyc backdrop — large, smooth gradient, behind everything */}
+      {/* Cyc backdrop — warm silk gradient, behind everything */}
       <mesh position={[0, 6, -18]}>
         <planeGeometry args={[120, 38]} />
         <meshBasicMaterial map={gradTex} toneMapped={false} />
       </mesh>
-      {/* Single clean cyan emissive strip — solid vector, not particles */}
+      {/* Champagne emissive ribbon — wide, soft, luxury "inner heat" glow */}
       <mesh position={[0, 4.6, -15]}>
-        <boxGeometry args={[26, 0.04, 0.04]} />
+        <boxGeometry args={[26, 0.06, 0.04]} />
         <meshBasicMaterial color={CINE.hot} toneMapped={false} />
       </mesh>
-      {/* Faint horizon under-strip — pushes eye toward the cards */}
+      {/* Faint horizon under-strip — desaturated gold whisper */}
       <mesh position={[0, -1.2, -15]}>
         <planeGeometry args={[60, 0.05]} />
-        <meshBasicMaterial color={CINE.hotSoft} toneMapped={false} opacity={0.35} transparent />
+        <meshBasicMaterial color={CINE.hotSoft} toneMapped={false} opacity={0.3} transparent />
       </mesh>
     </group>
   );
@@ -959,44 +959,44 @@ function Backdrop() {
 function Runway({ textures }: { textures: Textures }) {
   return (
     <group position={[0, -3.4, 0]}>
-      {/* Black nickel floor — mirror-polished, low roughness, sharp reflection */}
+      {/* Black nickel mirror floor — roughness pushed to glass minimum so
+          metallic surfaces cast long, unbroken vertical reflections. */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[GPU_SPECS.length * CARD_SPACING + 24, 26]} />
         <MeshReflectorMaterial
-          blur={[180, 60]}
+          blur={[120, 40]}
           resolution={1024}
-          mixBlur={0.8}
-          mixStrength={1.4}
-          mixContrast={1.05}
-          roughness={0.35}
-          depthScale={0.5}
+          mixBlur={0.5}
+          mixStrength={1.8}
+          mixContrast={1.1}
+          roughness={0.01}
+          depthScale={0.4}
           minDepthThreshold={0.4}
           maxDepthThreshold={1.2}
           color={CINE.floor}
-          metalness={0.95}
-          mirror={0.55}
+          metalness={0.98}
+          mirror={0.7}
         />
       </mesh>
       {GPU_SPECS.map((spec, i) => (
         <mesh key={spec.id} position={[cardX(i), 0.02, 0]} receiveShadow>
           <ringGeometry args={[2.55, 2.7, 48]} />
-          <meshStandardMaterial color={CINE.hot} emissive={CINE.hot} emissiveIntensity={0.3} roughness={0.4} metalness={0.3} toneMapped={false} transparent opacity={0.35} />
+          <meshStandardMaterial color={CINE.hotSoft} emissive={CINE.hotSoft} emissiveIntensity={0.28} roughness={0.4} metalness={0.5} toneMapped={false} transparent opacity={0.3} />
         </mesh>
       ))}
-      {/* Smooth teal atmosphere — linear-feel, low density, zero noise */}
-      <fogExp2 attach="fog" args={[CINE.void, 0.022]} />
+      {/* Warm slate atmosphere — soft falloff, low density */}
+      <fogExp2 attach="fog" args={[CINE.void, 0.02]} />
     </group>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Lighting — Industrial Monolithic:
-//   • Large overhead clean-white softbox → smooth, un-grainy reflection bands
-//   • Per-card traveling key spot (clean white, follows hero)
-//   • Soft cyan backdrop wash — sterile, single hue
-//   • Subtle white side fill from camera-left
-//   • Near-black teal ambient (blackpoint hover)
-// No violet rim, no magenta, no warm tints.
+// Lighting — Liquid Gold rig:
+//   • Overhead silver softbox (clean white, broad) → pure white linear bands
+//   • Traveling key spot — platinum white, follows hero
+//   • Champagne backdrop wash — warm cyc bleed onto rear of cards
+//   • Subtle platinum side fill from camera-left
+//   • Warm blackpoint ambient — never crushes to true black
 // ──────────────────────────────────────────────────────────────────────────
 
 function SceneLights({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
@@ -1021,16 +1021,16 @@ function SceneLights({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
 
   return (
     <>
-      {/* Overhead clean-white softbox — large, square-ish, broad smooth band */}
-      <rectAreaLight ref={stripRef} position={[0, 14, 2]} width={30} height={6} intensity={11} color={CINE.rim} />
-      {/* Subtle white side fill from camera-left */}
-      <rectAreaLight ref={fillRef} position={[-12, 6, 8]} width={8} height={6} intensity={2.2} color="#dceaf2" />
-      {/* Cyan cyc wash — sterile single-hue backdrop bleed */}
-      <rectAreaLight ref={cycRef} position={[0, 4, -10]} width={22} height={6} intensity={2.2} color={CINE.hot} />
-      {/* Per-card traveling key — clean white, follows hero */}
-      <spotLight ref={spotRef} position={[0, 12, 5]} angle={0.42} penumbra={0.75} intensity={20} color={CINE.rim} distance={26} decay={2} castShadow />
-      {/* Blackpoint ambient — teal-tinted, never pure black */}
-      <ambientLight intensity={0.03} color={CINE.void} />
+      {/* Overhead silver softbox — pure white, broad, mirror-sharp top band */}
+      <rectAreaLight ref={stripRef} position={[0, 14, 2]} width={30} height={6} intensity={12} color={CINE.rim} />
+      {/* Platinum side fill from camera-left */}
+      <rectAreaLight ref={fillRef} position={[-12, 6, 8]} width={8} height={6} intensity={2.4} color="#e8edf3" />
+      {/* Champagne cyc wash — warm bleed across rear of cards */}
+      <rectAreaLight ref={cycRef} position={[0, 4, -10]} width={22} height={6} intensity={2.4} color={CINE.hot} />
+      {/* Per-card traveling key — liquid platinum, follows hero */}
+      <spotLight ref={spotRef} position={[0, 12, 5]} angle={0.42} penumbra={0.78} intensity={22} color={CINE.rim} distance={26} decay={2} castShadow />
+      {/* Warm blackpoint ambient */}
+      <ambientLight intensity={0.035} color={CINE.void} />
     </>
   );
 }
