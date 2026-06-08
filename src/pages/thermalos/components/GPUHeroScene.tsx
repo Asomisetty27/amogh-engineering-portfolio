@@ -528,31 +528,34 @@ function CoolerLayer({
       return out;
     }, [shellW]);
 
+    // L40S: dark gunmetal anodized aluminum (NOT champagne — that was wrong).
+    // Per research: charcoal heatsink with NVIDIA green logo only on top face,
+    // 4 DisplayPorts on bracket end. See .agents/research/l40s-spec.md.
+    const SHELL = '#3a3a42';       // dark anodized aluminum
+    const SHELL_RIB = '#42424a';   // slightly lighter for rib highlight catch
     return (
       <group>
-        {/* Main shell — champagne-gold anodized aluminum; warm satin finish */}
+        {/* Main shell — dark anodized aluminum, matte */}
         <RoundedBox args={[shellW, shellH, ribLen]} radius={0.035} smoothness={4} position={[0, 0, 0]}>
           <meshStandardMaterial
             ref={lidMatRef}
-            color="#C9B58A"
-            roughness={0.42}
-            metalness={0.78}
-            envMapIntensity={1.2}
+            color={SHELL}
+            roughness={0.55}
+            metalness={0.65}
+            envMapIntensity={1.0}
             emissive="#000"
             emissiveIntensity={0}
           />
         </RoundedBox>
-        {/* Longitudinal cooling ribs — the visual signature; thin extrusions
-            along the top, same anodized finish as shell. Catch HDRI specular
-            as parallel highlights — the "passive heatsink" tell. */}
+        {/* Longitudinal cooling ribs — same dark finish, slightly lighter to catch HDRI */}
         <InstancedBoxes
           positions={ribs}
           size={[shellW / (ribCount + 1) * 0.55, 0.05, ribLen * 0.96]}
-          color="#C9B58A"
-          roughness={0.4}
-          metalness={0.8}
+          color={SHELL_RIB}
+          roughness={0.5}
+          metalness={0.65}
         />
-        {/* End-cap exhaust grille — vertical slats at the bracket end */}
+        {/* End-cap exhaust grille */}
         <group position={[0, 0, -ribLen / 2 - 0.008]}>
           <mesh>
             <planeGeometry args={[shellW * 0.88, shellH * 0.78]} />
@@ -561,17 +564,27 @@ function CoolerLayer({
           <InstancedBoxes
             positions={grille}
             size={[shellW / 22, shellH * 0.7, 0.018]}
-            color="#9A8B68"
-            roughness={0.5}
-            metalness={0.7}
+            color="#2a2a30"
+            roughness={0.6}
+            metalness={0.5}
           />
         </group>
-        {/* PCIe bracket end — small accent strip in vendor color */}
-        <mesh position={[0, -shellH / 2 + 0.02, ribLen / 2 - 0.04]}>
-          <boxGeometry args={[shellW * 0.5, 0.03, 0.04]} />
-          <meshStandardMaterial color={spec.accent} roughness={0.35} metalness={0.6} emissive={spec.accent} emissiveIntensity={0.4} toneMapped={false} />
+        {/* I/O bracket end — 4× DisplayPort connectors (L40S signature: only
+            card in the lineup with display outputs). Stacked vertically. */}
+        <group position={[0, 0, ribLen / 2 + 0.012]}>
+          {[-0.27, -0.09, 0.09, 0.27].map((y, i) => (
+            <mesh key={`dp-${i}`} position={[0, y * shellH, 0]}>
+              <boxGeometry args={[shellW * 0.22, shellH * 0.14, 0.05]} />
+              <meshStandardMaterial color="#0a0a0c" roughness={0.7} metalness={0.3} />
+            </mesh>
+          ))}
+        </group>
+        {/* NVIDIA green accent strip — the only chromatic element on the card */}
+        <mesh position={[0, shellH / 2 + 0.045, ribLen / 2 - 0.6]}>
+          <boxGeometry args={[shellW * 0.45, 0.005, 0.5]} />
+          <meshStandardMaterial color={spec.accent} roughness={0.3} metalness={0.4} emissive={spec.accent} emissiveIntensity={0.55} toneMapped={false} />
         </mesh>
-        <LayerLabel text="PASSIVE FIN STACK" sub="anodized aluminum extrusion · server airflow" opacityRef={labelOpacityRef} accent={spec.accent} />
+        <LayerLabel text="PASSIVE FIN STACK · 4× DP" sub="anodized aluminum extrusion · server airflow" opacityRef={labelOpacityRef} accent={spec.accent} />
       </group>
     );
   }
