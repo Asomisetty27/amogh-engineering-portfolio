@@ -1088,16 +1088,16 @@ function SceneLights({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
 
   return (
     <>
-      {/* Overhead silver softbox — pure white, broad, mirror-sharp top band */}
-      <rectAreaLight ref={stripRef} position={[0, 14, 2]} width={30} height={6} intensity={12} color={CINE.rim} />
-      {/* Platinum side fill from camera-left */}
-      <rectAreaLight ref={fillRef} position={[-12, 6, 8]} width={8} height={6} intensity={2.4} color="#e8edf3" />
-      {/* Champagne cyc wash — warm bleed across rear of cards */}
-      <rectAreaLight ref={cycRef} position={[0, 4, -10]} width={22} height={6} intensity={2.4} color={CINE.hot} />
-      {/* Per-card traveling key — liquid platinum, follows hero */}
-      <spotLight ref={spotRef} position={[0, 12, 5]} angle={0.42} penumbra={0.78} intensity={22} color={CINE.rim} distance={26} decay={2} castShadow />
-      {/* Warm blackpoint ambient */}
-      <ambientLight intensity={0.035} color={CINE.void} />
+      {/* Overhead silver softbox — narrow, tight top band kiss only */}
+      <rectAreaLight ref={stripRef} position={[0, 13, 3]} width={16} height={3.5} intensity={4.5} color={CINE.rim} />
+      {/* Whisper platinum side fill from camera-left — just lifts shadow side */}
+      <rectAreaLight ref={fillRef} position={[-12, 5, 8]} width={7} height={5} intensity={0.85} color="#e8edf3" />
+      {/* Champagne cyc wash — warm bleed across rear of cards, very low */}
+      <rectAreaLight ref={cycRef} position={[0, 3.5, -10]} width={20} height={5} intensity={1.1} color={CINE.hot} />
+      {/* Per-card traveling key — tight liquid-platinum spot, deep falloff */}
+      <spotLight ref={spotRef} position={[0, 11, 6]} angle={0.32} penumbra={0.88} intensity={42} color={CINE.rim} distance={22} decay={2.2} castShadow />
+      {/* Warm blackpoint ambient — barely there */}
+      <ambientLight intensity={0.018} color={CINE.void} />
     </>
   );
 }
