@@ -661,7 +661,7 @@ function CoolerLayer({
         </mesh>
         {/* Exhaust vent slots for blower cards, DP cutouts for triple-fan
             absent (triple-fans vent into the chassis, not out the bracket). */}
-        {isBlower && Array.from({ length: 8 }).map((_, i) => (
+        {spec.cooler === 'blower' && Array.from({ length: 8 }).map((_, i) => (
           <mesh key={`vent-${i}`} position={[-spec.width / 2 + 1.2 + i * 0.5, -0.05, 0.01]}>
             <boxGeometry args={[0.32, 0.55, 0.03]} />
             <meshStandardMaterial color="#06060a" roughness={0.9} metalness={0.0} />
