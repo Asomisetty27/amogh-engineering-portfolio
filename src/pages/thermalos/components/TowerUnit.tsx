@@ -1016,6 +1016,54 @@ function HeroOpenSled({
 // All real geometry, all picks up HDRI light + contact shadows.
 // ──────────────────────────────────────────────────────────────────────────
 
+// DoorPanel — animated front bezel. Hero tower swings open on first
+// scroll-into-view trigger via _doorOpen; companion stays static.
+function DoorPanel({ tower, textures }: { tower: typeof TOWERS[number]; textures: Textures }) {
+  const hingeRef = useRef<THREE.Group>(null!);
+  useFrame(() => {
+    if (!tower.hero || !hingeRef.current) return;
+    hingeRef.current.rotation.y = -_doorOpen.current * (110 * Math.PI / 180);
+  });
+  const half = RACK_W * 0.48;
+  if (!tower.hero) {
+    return (
+      <mesh position={[0, RACK_H / 2, RACK_D / 2 + 0.001]} ref={ensureUv2} castShadow receiveShadow>
+        <planeGeometry args={[RACK_W * 0.96, RACK_H * 0.97]} />
+        <meshStandardMaterial
+          map={textures.chassisColor} roughnessMap={textures.chassisRough}
+          normalMap={textures.chassisNormal} aoMap={textures.chassisAO}
+          aoMapIntensity={0.9} roughness={1.0} metalness={0.85}
+          normalScale={new THREE.Vector2(0.7, 0.7)} envMapIntensity={1.2}
+          side={THREE.FrontSide}
+        />
+      </mesh>
+    );
+  }
+  // Hero: hinge group pivots at left edge (x = -half), door mesh offset to +half
+  return (
+    <group ref={hingeRef} position={[-half, RACK_H / 2, RACK_D / 2 + 0.001]}>
+      <mesh position={[half, 0, 0]} ref={ensureUv2} castShadow receiveShadow>
+        <planeGeometry args={[RACK_W * 0.96, RACK_H * 0.97]} />
+        <meshStandardMaterial
+          map={textures.chassisColor} roughnessMap={textures.chassisRough}
+          normalMap={textures.chassisNormal} aoMap={textures.chassisAO}
+          alphaMap={textures.doorPerf}
+          aoMapIntensity={0.9} roughness={1.0} metalness={0.85}
+          normalScale={new THREE.Vector2(0.7, 0.7)} envMapIntensity={1.2}
+          transparent
+          alphaTest={0.5}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+      {/* Door handle — vertical bar near opening edge */}
+      <mesh position={[2 * half - 0.06, 0, 0.012]} castShadow>
+        <boxGeometry args={[0.018, 0.22, 0.024]} />
+        <meshStandardMaterial color="#2a2a32" roughness={0.4} metalness={0.85} />
+      </mesh>
+    </group>
+  );
+}
+
 function TowerUnitMesh({
   tower, textures, screwGeo, screwMat, sledChassisMat, ventMat, frameMat,
 }: {
