@@ -770,21 +770,23 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
         }
       });
     } else {
-      // Chiplet grid (MI300X): ring HBM around the chiplet field.
-      const ringR = 2.3;
-      for (let i = 0; i < spec.memCount; i++) {
-        const a = (i / spec.memCount) * Math.PI * 2 + Math.PI / spec.memCount;
-        out.push({
-          pos: [Math.cos(a) * ringR, hbmH / 2, Math.sin(a) * (ringR * (spec.depth / spec.width))],
-          w: 0.6, d: 0.6, h: hbmH,
-        });
-      }
+      // MI300X: 8 HBM3 stacks in two parallel rows of 4, flanking the central
+      // chiplet complex along the long edges (reference: AMD MI300X die shot).
+      // NOT a decorative ring — real package geometry.
+      const perSide = Math.max(1, Math.floor(spec.memCount / 2));
+      const zSpan = 2.0;
+      [-1, 1].forEach((side) => {
+        for (let i = 0; i < perSide; i++) {
+          const z = perSide === 1 ? 0 : -zSpan / 2 + (i * zSpan) / (perSide - 1);
+          out.push({ pos: [side * 1.25, hbmH / 2, z], w: 0.42, d: 0.44, h: hbmH });
+        }
+      });
     }
     return out;
   }, [spec]);
 
-  const dieLabel = spec.dieLayout === 'dual-die' ? 'DUAL-DIE COMPLEX' : spec.dieLayout === 'chiplet-grid' ? 'CHIPLET ARRAY · 8×' : 'MONOLITHIC DIE';
-  const showIHS = spec.dieLayout !== 'chiplet-grid'; // dual-die + monolithic have metallic IHS caps
+  const dieLabel = spec.dieLayout === 'dual-die' ? 'DUAL-DIE COMPLEX' : spec.dieLayout === 'chiplet-grid' ? 'CHIPLET ARRAY · 8×XCD' : 'MONOLITHIC DIE';
+  const showIHS = true; // all three layouts ship with a metallic IHS in the real packages
 
   return (
     <group>
