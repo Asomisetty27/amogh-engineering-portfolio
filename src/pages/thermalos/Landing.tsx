@@ -1370,7 +1370,7 @@ const STYLES = `
 
 /* ── Gradient text ──────────────────────────────────────────────────────── */
 .tos-grad-text {
-  background: linear-gradient(120deg, #E8C870 0%, #D4AF37 40%, #F0D78C 100%);
+  background: linear-gradient(120deg, #ECE6D8 0%, #D4AF37 55%, #C9A84C 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
