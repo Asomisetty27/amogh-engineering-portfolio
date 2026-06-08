@@ -76,11 +76,14 @@ interface GPUSpec {
 //   - B200 SXM6: ~10-15% larger than SXM5
 //   - MI300X OAM: 228×107mm, very rectangular (2.13:1)
 const GPU_SPECS: GPUSpec[] = [
-  { id: 'a100',   name: 'A100 PCIe', arch: 'AMPERE · GA100',    mem: '80GB HBM2e',  vendor: 'NVIDIA', accent: '#76b900', cooler: 'blower',     dieLayout: 'monolithic',   memCount: 6, width: 6.6, depth: 5.6 },
-  { id: 'l40s',   name: 'L40S',      arch: 'ADA LOVELACE',      mem: '48GB GDDR6',  vendor: 'NVIDIA', accent: '#76b900', cooler: 'passive-fin', dieLayout: 'monolithic',   memCount: 8, width: 8.4, depth: 4.0 },
-  { id: 'h100',   name: 'H100 SXM5', arch: 'HOPPER · GH100',    mem: '80GB HBM3',   vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'monolithic',   memCount: 6, width: 7.6, depth: 5.4 },
-  { id: 'b200',   name: 'B200 SXM6', arch: 'BLACKWELL · GB100', mem: '192GB HBM3e', vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'dual-die',     memCount: 8, width: 7.4, depth: 6.6 },
-  { id: 'mi300x', name: 'MI300X',    arch: 'CDNA 3 · CHIPLET',  mem: '192GB HBM3',  vendor: 'AMD',    accent: '#ed1c24', cooler: 'cold-plate', dieLayout: 'chiplet-grid', memCount: 8, width: 8.6, depth: 4.4 },
+  // Dimensions tuned to match the real product footprint AND the exact pixel
+  // aspect of each photoreal skin texture so the printed lid covers the full
+  // top face with zero blank shroud showing.
+  { id: 'a100',   name: 'A100 PCIe', arch: 'AMPERE · GA100',    mem: '80GB HBM2e',  vendor: 'NVIDIA', accent: '#76b900', cooler: 'blower',     dieLayout: 'monolithic',   memCount: 6, width: 8.40, depth: 3.92 }, // PCIe 2-slot, ~2.14:1
+  { id: 'l40s',   name: 'L40S',      arch: 'ADA LOVELACE',      mem: '48GB GDDR6',  vendor: 'NVIDIA', accent: '#76b900', cooler: 'passive-fin', dieLayout: 'monolithic',   memCount: 8, width: 9.60, depth: 3.20 }, // long single-slot, 3:1
+  { id: 'h100',   name: 'H100 SXM5', arch: 'HOPPER · GH100',    mem: '80GB HBM3',   vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'monolithic',   memCount: 6, width: 6.00, depth: 4.00 }, // SXM5 module, 3:2
+  { id: 'b200',   name: 'B200 SXM6', arch: 'BLACKWELL · GB100', mem: '192GB HBM3e', vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'dual-die',     memCount: 8, width: 6.40, depth: 6.40 }, // SXM6 dual-die, 1:1
+  { id: 'mi300x', name: 'MI300X',    arch: 'CDNA 3 · CHIPLET',  mem: '192GB HBM3',  vendor: 'AMD',    accent: '#ed1c24', cooler: 'cold-plate', dieLayout: 'chiplet-grid', memCount: 8, width: 7.50, depth: 4.00 }, // OAM module, 1.875:1
 ];
 
 const HERO_INDEX = 2; // H100 SXM5 — the thermal-arc protagonist; Theta's primary subject
