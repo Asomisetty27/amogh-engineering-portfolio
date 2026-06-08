@@ -5,10 +5,8 @@ import { RoundedBox, Environment, Html, ContactShadows, MeshReflectorMaterial } 
 import {
   EffectComposer,
   Bloom,
-  ChromaticAberration,
   Vignette,
   DepthOfField,
-  Noise,
 } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
