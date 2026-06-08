@@ -867,7 +867,7 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
     <group>
       {/* Package substrate / interposer — rectangular, matching real silicon footprint */}
       <RoundedBox args={[spec.width * 0.92, 0.04, spec.depth * 0.92]} radius={0.03} smoothness={3} position={[0, -0.02, 0]}>
-        <meshStandardMaterial color="#1C1C20" roughness={0.5} metalness={0.1} map={textures.organic} />
+        <meshStandardMaterial color="#1C1C20" roughness={0.5} metalness={0.1} />
       </RoundedBox>
       {dies.map((d, i) => (
         <group key={i}>
