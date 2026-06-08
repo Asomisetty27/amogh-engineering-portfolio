@@ -923,17 +923,23 @@ export default function TowerUnit() {
   const ventMat = useMemo(() => new THREE.MeshStandardMaterial({
     color: '#040407', roughness: 0.9, metalness: 0.1,
   }), []);
+  // Rack frame — powder-coated 6061-T6 aluminum structural members:
+  // flatter, darker, less glossy than the sled panels. The intentional
+  // contrast (anodized panel vs. matte powder-coat frame) is what reads
+  // as "real assembled hardware" instead of one uniform material.
   const frameMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#1a1a1e',
-    roughness: 0.58,
-    metalness: 0.82,
-    envMapIntensity: 1.15,
+    color: '#3A3A42',
+    roughness: 0.7,
+    metalness: 0.4,
+    envMapIntensity: 1.0,
   }), []);
+  // Sled chassis — anodized 6061-T6 aluminum panel: slight tint, low gloss,
+  // distinctly lighter than the frame.
   const sledChassisMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#15151a',
+    color: '#9A9AA2',
     roughness: 0.5,
-    metalness: 0.78,
-    envMapIntensity: 1.1,
+    metalness: 0.6,
+    envMapIntensity: 1.15,
   }), []);
 
   useEffect(() => {
