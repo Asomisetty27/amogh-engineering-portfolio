@@ -903,7 +903,7 @@ export default function GPUHeroScene() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  const textures = useMemo(() => ({ pcb: makePCBTexture(), rough: makeRoughnessMap(), brushed: makeBrushedMetalTexture() }), []);
+  const textures = useMemo(() => ({ pcb: makePCBTexture(), rough: makeRoughnessMap(), brushed: makeBrushedMetalTexture(), organic: makeOrganicSubstrateTexture() }), []);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '90vh', background: T.bg }}>
