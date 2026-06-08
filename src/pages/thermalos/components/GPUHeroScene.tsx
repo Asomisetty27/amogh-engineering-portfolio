@@ -668,17 +668,14 @@ function CoolerLayer({
             </mesh>
           ))}
         </group>
-        {/* NVIDIA green accent strip — the only chromatic element on the card */}
-        <mesh position={[0, shellH / 2 + 0.045, ribLen / 2 - 0.6]}>
-          <boxGeometry args={[shellW * 0.45, 0.005, 0.5]} />
-          <meshStandardMaterial color={spec.accent} roughness={0.3} metalness={0.4} emissive={spec.accent} emissiveIntensity={0.55} toneMapped={false} />
-        </mesh>
-        {/* Screen-printed product wordmark on the top face — real L40S has
-            "NVIDIA L40S" silkscreened in green along the heatsink top. */}
-        {textures.decals.l40s && (
-          <mesh position={[0, shellH / 2 + 0.052, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[shellW * 0.62, ribLen * 0.18]} />
-            <meshBasicMaterial map={textures.decals.l40s} transparent toneMapped={false} opacity={0.9} depthWrite={false} />
+        {/* Photoreal product skin draped over the entire top face — ribbed
+            anodized heatsink, NVIDIA logo + L40S wordmark, mounting screws,
+            all sourced from a real product photo. Sits just above the rib
+            geometry so grazing light still picks up rib relief at the edges. */}
+        {maps?.skins?.l40s && (
+          <mesh position={[0, shellH / 2 + 0.055, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[shellW, ribLen]} />
+            <meshStandardMaterial map={maps.skins.l40s} roughness={0.55} metalness={0.55} envMapIntensity={1.0} />
           </mesh>
         )}
         <LayerLabel text="PASSIVE FIN STACK · 4× DP" sub="anodized aluminum extrusion · server airflow" opacityRef={labelOpacityRef} accent={spec.accent} />
