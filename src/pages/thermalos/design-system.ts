@@ -3,34 +3,34 @@
 // Credibility signal: "built by people who understand hardware"
 
 export const COLORS = {
-  // Phosphor amber glow — the primary visual signature
+  // Champagne gold phosphor — the primary visual signature
   amber: {
-    bright: '#FFA500',    // glowing readout
-    medium: '#FF9500',    // active trace
-    dim: '#D4860E',       // faint grid
+    bright: '#FFE8BC',    // champagne highlight
+    medium: '#D4AF37',    // 18k gold active
+    dim: '#8A6F2E',       // deep champagne faint
   },
-  // Brushed steel + instrument panel
+  // Warm platinum + obsidian (instrument bezel)
   steel: {
-    bright: '#E8E8F0',    // text
-    muted: '#818190',     // secondary labels
-    faint: '#404050',     // tertiary/borders
+    bright: '#ECE6D8',    // warm platinum text
+    muted: '#9A9285',     // warm muted
+    faint: '#3A332A',     // warm faint border
   },
-  // Canvas background — like old oscilloscope screen
+  // Canvas background — obsidian
   bg: {
-    deep: '#06060A',      // screen black
-    panel: '#0C0C11',     // instrument panel
-    surface: '#111117',   // card/surface
-    raised: '#17171E',    // highlight surface
+    deep: '#07060A',      // screen obsidian
+    panel: '#0C0B0F',     // instrument panel
+    surface: '#13111A',   // card surface
+    raised: '#1B1822',    // raised surface
   },
   // Semantic thermal colors (unchanged — already proven)
   thermal: {
-    healthy: '#27A05A',   // green
-    caution: '#C8942A',   // amber
-    rising: '#C85F2A',    // orange
-    critical: '#B83030',  // red
+    healthy: '#D4AF37',   // champagne gold (brand)
+    caution: '#E8B23A',   // amber
+    rising: '#C85F2A',    // burnt orange
+    critical: '#B83030',  // crimson
   },
-  // Accent for interactive elements
-  accent: '#5878A8',      // calm blue (power buttons, focus states)
+  // Accent for interactive elements — warm champagne
+  accent: '#C9A84C',      // champagne accent (was cool blue)
 };
 
 export const TYPOGRAPHY = {
