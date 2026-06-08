@@ -1167,18 +1167,34 @@ function TowerUnitMesh({
         </mesh>
       ))}
 
-      {/* Sleds — fixed: tower-local y starts at SLED_BASE_Y, not below floor */}
-      {Array.from({ length: SLEDS_PER_RACK }).map((_, i) => (
-        <Sled
-          key={i}
-          index={i}
-          yBase={SLED_BASE_Y + i * (SLED_H + SLED_GAP) + SLED_H / 2}
-          isHero={tower.hero}
-          textures={textures}
-          sledChassisMat={sledChassisMat}
-          ventMat={ventMat}
-        />
-      ))}
+      {/* Sleds — fixed: tower-local y starts at SLED_BASE_Y, not below floor.
+          The hero sled in the hero tower is replaced by HeroOpenSled which
+          slides on rails + opens its lid + exposes the GPU baseboard. */}
+      {Array.from({ length: SLEDS_PER_RACK }).map((_, i) => {
+        const yBase = SLED_BASE_Y + i * (SLED_H + SLED_GAP) + SLED_H / 2;
+        if (tower.hero && i === HERO_SLED_INDEX) {
+          return (
+            <HeroOpenSled
+              key={i}
+              yBase={yBase}
+              textures={textures}
+              sledChassisMat={sledChassisMat}
+              ventMat={ventMat}
+            />
+          );
+        }
+        return (
+          <Sled
+            key={i}
+            index={i}
+            yBase={yBase}
+            isHero={tower.hero}
+            textures={textures}
+            sledChassisMat={sledChassisMat}
+            ventMat={ventMat}
+          />
+        );
+      })}
     </group>
     </>
   );
