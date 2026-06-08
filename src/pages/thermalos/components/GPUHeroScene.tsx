@@ -643,7 +643,7 @@ function CoolerLayer({
       {maps?.skins?.a100 && (
         <mesh position={[0, 0.5 + shroudH / 2 + 0.004, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[spec.width, spec.depth]} />
-          <meshStandardMaterial map={maps.skins.a100} roughness={0.55} metalness={0.25} envMapIntensity={1.0} />
+          <meshStandardMaterial map={maps.skins.a100} roughness={0.92} metalness={0.05} envMapIntensity={0.35} />
         </mesh>
       )}
       {/* PCIe bracket — full-height steel I/O end-plate at +z edge. Real
