@@ -892,10 +892,20 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
       {/* B200 unified IHS — one large nickel-plated lid spanning both dies
           AND the 8 HBM3e stacks (reference: Blackwell B200 package shot). */}
       {spec.dieLayout === 'dual-die' && (
-        <RoundedBox args={[3.6, 0.05, 2.2]} radius={0.04} smoothness={4} position={[0, 0.345, 0]}>
-          <meshStandardMaterial color="#CFCAC0" roughness={0.18} metalness={0.95} envMapIntensity={1.25} map={maps?.nickelBrushed ?? undefined} />
-        </RoundedBox>
+        <group>
+          <RoundedBox args={[3.6, 0.05, 2.2]} radius={0.04} smoothness={4} position={[0, 0.345, 0]}>
+            <meshStandardMaterial color="#CFCAC0" roughness={0.18} metalness={0.95} envMapIntensity={1.25} map={maps?.nickelBrushed ?? undefined} />
+          </RoundedBox>
+          {/* NV-HBI signature — faint recessed hairline across the lid where the
+              two GB100 dies meet through the high-bandwidth interconnect bridge.
+              Slightly darker, slightly rougher than the lid for grazing-light read. */}
+          <mesh position={[0, 0.371, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[0.018, 2.16]} />
+            <meshStandardMaterial color="#5a564f" roughness={0.55} metalness={0.7} envMapIntensity={0.6} />
+          </mesh>
+        </group>
       )}
+
       {/* MI300X unified IHS — single nickel lid spanning the transposed 2×4
           chiplet field. Dimensions transposed to match the new grid. */}
       {spec.dieLayout === 'chiplet-grid' && (
