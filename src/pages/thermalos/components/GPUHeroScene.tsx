@@ -566,22 +566,18 @@ function CoolerLayer({
   );
 
   if (spec.cooler === 'cold-plate') {
-    // Liquid-cooled module — full top face replaced with a real-photo product
-    // skin (nickel IHS + HBM stacks + substrate + brand wordmark) generated
-    // from authoritative reference shots and clamped to the module dimensions.
+    // Liquid-cooled module — the photoreal product skin fills the entire top
+    // face edge-to-edge, sized exactly to spec.width × spec.depth so no stock
+    // lid color shows through.
     const skin = maps?.skins?.[spec.id];
     return (
       <group>
-        <RoundedBox args={[spec.width - 0.3, 0.16, spec.depth - 0.3]} radius={0.05} smoothness={4}>
+        <RoundedBox args={[spec.width, 0.16, spec.depth]} radius={0.05} smoothness={4}>
           <meshStandardMaterial ref={lidMatRef} color="#1a1a1f" roughness={0.45} metalness={0.55} envMapIntensity={1.0} emissive="#000" emissiveIntensity={0} />
         </RoundedBox>
-        <InstancedBoxes positions={grooves} size={[0.05, 0.05, spec.depth - 0.5]} color="#CFCAC0" roughness={0.25} metalness={0.9} />
         {skin && (
-          <mesh position={[0, 0.082, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[spec.width - 0.32, spec.depth - 0.32]} />
-            {/* meshStandardMaterial so the IHS reflects studio lighting as a
-                real metal surface would, while the printed circuitry/text
-                remain albedo-readable. */}
+          <mesh position={[0, 0.0805, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[spec.width, spec.depth]} />
             <meshStandardMaterial map={skin} roughness={0.35} metalness={0.65} envMapIntensity={1.15} />
           </mesh>
         )}
