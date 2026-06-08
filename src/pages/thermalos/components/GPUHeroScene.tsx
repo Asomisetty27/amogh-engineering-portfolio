@@ -1078,7 +1078,7 @@ function CameraRig({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
 // Post-processing
 // ──────────────────────────────────────────────────────────────────────────
 
-const _caOffset = new THREE.Vector2(0.0007, 0.0007);
+const _dofTargetUnused = null;
 const _dofTarget = new THREE.Vector3(0, 0.4, 0);
 
 function PostFX({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
