@@ -1072,24 +1072,12 @@ function TowerUnitMesh({
           machine" geometric tell. */}
       <RoundedBox args={[RACK_W, RACK_H, RACK_D]} radius={0.018} smoothness={3} position={[0, RACK_H / 2, 0]} castShadow receiveShadow material={frameMat} />
 
-      {/* Front faceplate — full PBR stack (color + roughness + normal + AO).
-          `ensureUv2` ref-callback copies uv→uv2 so the AO map actually
-          renders (Three.js does NOT auto-copy this). */}
-      <mesh position={[0, RACK_H / 2, RACK_D / 2 + 0.001]} ref={ensureUv2} castShadow receiveShadow>
-        <planeGeometry args={[RACK_W * 0.96, RACK_H * 0.97]} />
-        <meshStandardMaterial
-          map={textures.chassisColor}
-          roughnessMap={textures.chassisRough}
-          normalMap={textures.chassisNormal}
-          aoMap={textures.chassisAO}
-          aoMapIntensity={0.9}
-          roughness={1.0}
-          metalness={0.85}
-          normalScale={new THREE.Vector2(0.7, 0.7)}
-          envMapIntensity={1.2}
-          side={THREE.FrontSide}
-        />
-      </mesh>
+      {/* Front faceplate / door — for the hero tower this is wrapped in a
+          hinge group that pivots on the left edge and swings ~110° on the
+          service-sequence trigger; for the companion tower it stays a
+          static panel. `ensureUv2` keeps the AO map active. */}
+      <DoorPanel tower={tower} textures={textures} />
+
 
       {/* Top brand-plate strip — small bezel between the top edge and the
           first sled, gives a "rack header" silhouette */}
