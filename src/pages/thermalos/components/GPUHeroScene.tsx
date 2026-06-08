@@ -638,7 +638,7 @@ function CoolerLayer({
         <mesh position={[0, FIN_COUNT * spacing * 0.5 + 0.1, 0]}>
           <boxGeometry args={[spec.width - 1.0, 0.12, 0.5]} />
           {/* Baseplate — nickel-on-copper at the die contact face */}
-          <meshStandardMaterial ref={finMatRef} color="#CFCAC0" roughness={0.2} metalness={0.9} emissive="#c85f2a" emissiveIntensity={0} />
+          <meshStandardMaterial ref={finMatRef} color="#CFCAC0" roughness={0.18} metalness={0.95} emissive="#c85f2a" emissiveIntensity={0} map={maps?.nickelBrushed ?? undefined} />
         </mesh>
       </group>
       {/* Shroud — injection-molded plastic; matte, low reflectivity */}
