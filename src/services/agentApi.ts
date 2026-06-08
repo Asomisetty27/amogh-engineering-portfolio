@@ -172,7 +172,7 @@ function generateDemoFleetStatus(): FleetStatus {
 
 function generateDemoGpuHistory(index: number): GPUHistory {
   const now = Math.floor(Date.now() / 1000);
-  const samples: typeof GPUHistory.prototype.recent_samples = [];
+  const samples: GPUHistory['recent_samples'] = [];
   for (let i = 0; i < 120; i++) {
     const offset = (120 - i) * 30;  // 30s intervals
     const t = now - offset;
