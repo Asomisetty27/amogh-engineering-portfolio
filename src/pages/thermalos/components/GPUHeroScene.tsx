@@ -1115,23 +1115,30 @@ function PhaseHUD({ phaseRef, valuesRef }: { phaseRef: React.MutableRefObject<Ph
     idle: 'IDLE', load: 'UNDER LOAD', anomaly: 'ANOMALY DETECTED', critical: 'THERMAL CRITICAL', recovery: 'RECOVERING',
   };
 
+  // Luxury palette overrides — platinum text, champagne accents, amber-gold
+  // for critical (instead of harsh red) to keep the warm color harmony.
+  const PLATINUM = '#E2E8F0';
+  const CHAMPAGNE = '#D4AF37';
+  const AMBER_WARN = '#F2B441';
+  const accentColor = isCritical ? AMBER_WARN : CHAMPAGNE;
+
   return (
     <div style={{
-      position: 'absolute', bottom: 24, right: 24, width: 224, padding: '10px 12px',
-      background: 'rgba(6,6,10,0.88)', backdropFilter: 'blur(8px)',
-      border: `1px solid ${isCritical ? T.critical : T.border}`, borderRadius: 6,
-      fontFamily: FM, color: T.text, fontSize: 9, lineHeight: 1.7,
-      boxShadow: '0 6px 24px rgba(0,0,0,0.6)', pointerEvents: 'none',
+      position: 'absolute', bottom: 24, right: 24, width: 232, padding: '12px 14px',
+      background: 'rgba(10,10,11,0.55)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+      border: `0.5px solid rgba(212,175,55,0.22)`, borderRadius: 4,
+      fontFamily: FM, color: PLATINUM, fontSize: 9, lineHeight: 1.8, fontWeight: 300,
+      boxShadow: '0 10px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,232,188,0.04)', pointerEvents: 'none',
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-        <span style={{ color: T.muted, fontSize: 8, letterSpacing: '0.14em' }}>THETA · DAQ · NODE H100-04</span>
-        <span style={{ color: isCritical ? T.critical : tColor, fontWeight: 700, fontSize: 9, letterSpacing: '0.06em' }}>● {labelMap[phase]}</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <span style={{ color: 'rgba(226,232,240,0.5)', fontSize: 8, letterSpacing: '0.18em', fontWeight: 400 }}>THETA · DAQ · H100-04</span>
+        <span style={{ color: accentColor, fontWeight: 500, fontSize: 9, letterSpacing: '0.08em' }}>{labelMap[phase]}</span>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: T.muted }}>T_junction</span><span style={{ color: tColor }}>{Tj} °C</span></div>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: T.muted }}>R_θ_eff</span><span style={{ color: T.text }}>{Rtheta} °C/W</span></div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}><span style={{ color: T.muted }}>Watching</span><span style={{ color: T.bp }}>5 / 5 nodes</span></div>
-      <div style={{ height: 2, background: T.s1, borderRadius: 1, overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: `${Math.round(progress * 100)}%`, background: tColor, transition: 'width 0.12s linear' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'rgba(226,232,240,0.45)' }}>T_junction</span><span style={{ color: PLATINUM }}>{Tj} °C</span></div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'rgba(226,232,240,0.45)' }}>R_θ_eff</span><span style={{ color: PLATINUM }}>{Rtheta} °C/W</span></div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 9 }}><span style={{ color: 'rgba(226,232,240,0.45)' }}>Watching</span><span style={{ color: CHAMPAGNE }}>5 / 5 nodes</span></div>
+      <div style={{ height: 1, background: 'rgba(226,232,240,0.08)', overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: `${Math.round(progress * 100)}%`, background: accentColor, transition: 'width 0.12s linear' }} />
       </div>
     </div>
   );
@@ -1139,8 +1146,8 @@ function PhaseHUD({ phaseRef, valuesRef }: { phaseRef: React.MutableRefObject<Ph
 
 function LineupLabel() {
   return (
-    <div style={{ position: 'absolute', bottom: 24, left: 24, fontFamily: FM, fontSize: 8.5, letterSpacing: '0.16em', color: T.muted, opacity: 0.7, pointerEvents: 'none' }}>
-      ▶ THE FLEET THETA WATCHES · A100 · L40S · H100 · B200 · MI300X
+    <div style={{ position: 'absolute', bottom: 24, left: 24, fontFamily: FM, fontSize: 8.5, letterSpacing: '0.22em', color: 'rgba(226,232,240,0.45)', fontWeight: 300, pointerEvents: 'none' }}>
+      THE FLEET THETA WATCHES · A100 · L40S · H100 · B200 · MI300X
     </div>
   );
 }
