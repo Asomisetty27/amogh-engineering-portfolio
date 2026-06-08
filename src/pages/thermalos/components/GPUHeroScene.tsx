@@ -1201,28 +1201,28 @@ export default function GPUHeroScene() {
   const textures = useMemo(() => ({ pcb: makePCBTexture(), rough: makeRoughnessMap(), brushed: makeBrushedMetalTexture(), organic: makeOrganicSubstrateTexture() }), []);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '90vh', background: T.bg }}>
+    <div style={{ position: 'relative', width: '100%', height: '90vh', background: CINE.voidDeep }}>
       <Canvas
         shadows
-        gl={{ antialias: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1, outputColorSpace: THREE.SRGBColorSpace }}
+        gl={{ antialias: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0, outputColorSpace: THREE.SRGBColorSpace }}
         dpr={[1, 1.6]}
         camera={{ position: [LINEUP_X0, 4.6, 14], fov: 38 }}
       >
-        <color attach="background" args={[T.bg]} />
+        <color attach="background" args={[CINE.voidDeep]} />
+        <Backdrop />
         <SceneLights camXRef={camXRef} />
         <Runway textures={textures} />
         {GPU_SPECS.map((spec, i) => (
           <GPUCard key={spec.id} spec={spec} index={i} textures={textures} heroLevelRef={heroLevelRef} />
         ))}
-        <ContactShadows position={[0, -3.39, 0]} opacity={0.55} scale={70} blur={2.4} far={6} resolution={1024} color="#000000" />
-        {/* Warehouse HDRI gives metallics a more credible interior reflection
-            than the studio preset — closer to product-shot lighting that real
-            enterprise hardware press photos use. Bumped intensity reads more
-            of the IHS / cold-plate specular highlights. */}
-        <Environment preset="warehouse" environmentIntensity={0.9} />
+        <ContactShadows position={[0, -3.39, 0]} opacity={0.7} scale={80} blur={2.6} far={6} resolution={1024} color="#000000" />
+        {/* Lower env intensity — the cinematic rig (strip + rim + cyc) is now
+            doing the lighting work. HDRI only fills micro-reflections. */}
+        <Environment preset="warehouse" environmentIntensity={0.35} />
         <CameraRig camXRef={camXRef} />
         <PostFX camXRef={camXRef} />
       </Canvas>
+
 
       <PhaseHUD phaseRef={phaseRef} valuesRef={valuesRef} />
       <LineupLabel />
