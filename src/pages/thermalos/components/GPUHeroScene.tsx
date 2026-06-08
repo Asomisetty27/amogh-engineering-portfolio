@@ -1268,7 +1268,7 @@ export default function GPUHeroScene() {
     <div style={{ position: 'relative', width: '100%', height: '90vh', background: CINE.voidDeep }}>
       <Canvas
         shadows
-        gl={{ antialias: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0, outputColorSpace: THREE.SRGBColorSpace }}
+        gl={{ antialias: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 0.72, outputColorSpace: THREE.SRGBColorSpace }}
         dpr={[1, 1.6]}
         camera={{ position: [LINEUP_X0, 4.6, 14], fov: 38 }}
       >
@@ -1283,8 +1283,8 @@ export default function GPUHeroScene() {
             ))}
           </GpuMapsProvider>
         </Suspense>
-        <ContactShadows position={[0, -3.39, 0]} opacity={0.7} scale={80} blur={2.6} far={6} resolution={1024} color="#000000" />
-        <Environment preset="warehouse" environmentIntensity={0.35} />
+        <ContactShadows position={[0, -3.39, 0]} opacity={0.92} scale={80} blur={3.2} far={6} resolution={1024} color="#000000" />
+        <Environment preset="warehouse" environmentIntensity={0.16} />
         <CameraRig camXRef={camXRef} />
         <PostFX camXRef={camXRef} />
       </Canvas>
