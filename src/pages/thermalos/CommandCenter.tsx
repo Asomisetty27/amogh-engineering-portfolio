@@ -13,10 +13,10 @@ import {
 
 type Tone = "green" | "amber" | "red" | "blue" | "gray";
 const TONE: Record<Tone, { fg: string; bg: string; border: string }> = {
-  green: { fg: "#35C792", bg: "#0F6E5615", border: "#1D9E7540" },
+  green: { fg: "#D4AF37", bg: "#0F6E5615", border: "#1D9E7540" },
   amber: { fg: "#EF9F27", bg: "#EF9F2715", border: "#EF9F2740" },
   red:   { fg: "#D85A30", bg: "#D85A3015", border: "#D85A3040" },
-  blue:  { fg: "#60a5fa", bg: "#3b82f615", border: "#3b82f640" },
+  blue:  { fg: "#D89A5C", bg: "#B8733315", border: "#B8733340" },
   gray:  { fg: "#888780", bg: "#ffffff08", border: "#ffffff15" },
 };
 
@@ -54,7 +54,7 @@ function CopyButton({ text }: { text: string }) {
       onClick={handleCopy}
       className="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-1 rounded transition-colors"
       style={{
-        color: copied ? "#35C792" : "#888780",
+        color: copied ? "#D4AF37" : "#888780",
         background: "#ffffff08",
         border: "0.5px solid rgba(255,255,255,0.1)",
       }}

@@ -337,7 +337,7 @@ function TelemetryView() {
         <div style={{ background: C.s1, border: `1px solid rgba(255,255,255,.07)`, borderLeft: `3px solid ${C.stable}`, borderRadius: 8, padding: 14 }}>
           <div className="mono" style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.15em', color: C.healthy, marginBottom: 8 }}>ThermalOS Recommendation</div>
           <p className="mono" style={{ fontSize: 11, color: '#E6F7F1', lineHeight: 1.65 }}>Thermal resistance elevated at 2.1000 °C/W. Cooling path degrading — verify TIM and mounting pressure on G-03-B.</p>
-          <div className="mono" style={{ marginTop: 10, padding: '8px 10px', background: 'rgba(10,10,8,.8)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 4, fontSize: 10, color: '#9FE1CB', lineHeight: 1.8 }}>
+          <div className="mono" style={{ marginTop: 10, padding: '8px 10px', background: 'rgba(10,10,8,.8)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 4, fontSize: 10, color: '#D8D2C2', lineHeight: 1.8 }}>
             <div>Rθ_eff(t) = 2.1000 °C/W</div>
             <div>Formula: (T_gpu − T_amb) / P_draw</div>
             <div>Headroom = 4.0 °C to throttle</div>

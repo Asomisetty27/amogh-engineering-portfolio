@@ -94,7 +94,7 @@ function InnerLayout() {
 
   const navItems = role === "admin" ? ADMIN_NAV : role === "advisor" ? ADVISOR_NAV : PUBLIC_NAV;
   const roleLabel = role === "admin" ? "Admin" : role === "advisor" ? "Advisor" : null;
-  const roleFg = role === "admin" ? "var(--t-healthy)" : "#60a5fa";
+  const roleFg = role === "admin" ? "var(--t-healthy)" : "#D89A5C";
 
   useEffect(() => {
     if (role === "admin" && pathname === RESEARCH_BASE) {

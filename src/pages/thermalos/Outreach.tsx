@@ -9,7 +9,7 @@ const STATUS_ORDER = ["Not Contacted", "Contacted", "Replied", "Meeting Set", "P
 
 const STATUS_META: Record<string, { color: string; bg: string; border: string }> = {
   "Not Contacted": { color: "#888780", bg: "#88878015", border: "#88878040" },
-  "Contacted":     { color: "#3b82f6", bg: "#3b82f615", border: "#3b82f640" },
+  "Contacted":     { color: "#B87333", bg: "#B8733315", border: "#B8733340" },
   "Replied":       { color: "#EF9F27", bg: "#EF9F2715", border: "#EF9F2740" },
   "Meeting Set":   { color: "#a855f7", bg: "#a855f715", border: "#a855f740" },
   "Positive Quote":{ color: "#1D9E75", bg: "#1D9E7515", border: "#1D9E7540" },
@@ -62,7 +62,7 @@ function DiscoveryQuotes({ rows }: { rows: OutreachRow[] }) {
           </div>
         </div>
         <div className="flex items-center gap-3 text-[11px] font-mono">
-          <span className="text-[#9FE1CB]">
+          <span className="text-[#D8D2C2]">
             <span className="font-semibold text-[14px]">{discoveryCalls.length}</span>
             <span className="text-[#5a5a55]"> / {DISCOVERY_TARGET}</span> calls
           </span>
@@ -96,13 +96,13 @@ function DiscoveryQuotes({ rows }: { rows: OutreachRow[] }) {
                 <Quote
                   size={11}
                   className="mb-1.5"
-                  style={{ color: isPositive ? "#35C792" : "#888780" }}
+                  style={{ color: isPositive ? "#D4AF37" : "#888780" }}
                 />
                 <p className="text-[12px] text-[#E6F7F1] italic leading-snug mb-2">
                   &ldquo;{quote.length > 160 ? quote.slice(0, 160) + "..." : quote}&rdquo;
                 </p>
                 <div className="text-[10px] font-mono text-[#888780]">
-                  <span className="text-[#9FE1CB]">{row.name}</span>
+                  <span className="text-[#D8D2C2]">{row.name}</span>
                   {row.role && <span className="text-[#5a5a55]">, {row.role}</span>}
                   {row.org && <span className="text-[#5a5a55]"> · {row.org}</span>}
                 </div>
@@ -149,7 +149,7 @@ export default function Outreach() {
 
   const funnelSteps = [
     { label: "Total",          value: rows.length,                                                  color: "#888780" },
-    { label: "Contacted",      value: rows.filter((r) => r.status !== "Not Contacted").length,      color: "#3b82f6" },
+    { label: "Contacted",      value: rows.filter((r) => r.status !== "Not Contacted").length,      color: "#B87333" },
     { label: "Replied",        value: rows.filter((r) => ["Replied","Meeting Set","Positive Quote"].includes(r.status)).length, color: "#EF9F27" },
     { label: "Meetings",       value: rows.filter((r) => ["Meeting Set","Positive Quote"].includes(r.status)).length,           color: "#a855f7" },
     { label: "Positive Quotes",value: rows.filter((r) => r.status === "Positive Quote").length,    color: "#1D9E75" },
@@ -201,7 +201,7 @@ export default function Outreach() {
       {/* Status quick-filter pills */}
       <div className="flex flex-wrap gap-2 items-center">
         <button onClick={() => setFilterStatus("All")}
-          className={`px-2.5 py-1 rounded text-[11px] font-mono border transition-colors ${filterStatus === "All" ? "bg-[#0F6E56]/25 border-[#1D9E75]/60 text-[#35C792]" : "border-white/[0.08] text-[#888780] hover:text-[#E6F7F1]"}`}>
+          className={`px-2.5 py-1 rounded text-[11px] font-mono border transition-colors ${filterStatus === "All" ? "bg-[#0F6E56]/25 border-[#1D9E75]/60 text-[#D4AF37]" : "border-white/[0.08] text-[#888780] hover:text-[#E6F7F1]"}`}>
           All ({rows.length})
         </button>
         {STATUS_ORDER.map((s) => counts[s] ? (
@@ -216,7 +216,7 @@ export default function Outreach() {
         <span className="ml-1 text-[9px] font-mono uppercase tracking-wider text-[#5a5a55]">Type:</span>
         {types.map((t) => (
           <button key={t} onClick={() => setFilterType(t)}
-            className={`px-2.5 py-1 rounded text-[11px] font-mono border transition-colors ${filterType === t ? "bg-[#0F6E56]/25 border-[#1D9E75]/60 text-[#35C792]" : "border-white/[0.08] text-[#888780] hover:text-[#E6F7F1]"}`}>
+            className={`px-2.5 py-1 rounded text-[11px] font-mono border transition-colors ${filterType === t ? "bg-[#0F6E56]/25 border-[#1D9E75]/60 text-[#D4AF37]" : "border-white/[0.08] text-[#888780] hover:text-[#E6F7F1]"}`}>
             {t}
           </button>
         ))}
@@ -245,7 +245,7 @@ export default function Outreach() {
                     <td className="px-3 py-2 font-semibold">{r.name}</td>
                     <td className="px-3 py-2 text-[#a8a89f]">{r.org}</td>
                     <td className="px-3 py-2">
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#1D9E7510] text-[#9FE1CB] border border-[#1D9E7530]">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#1D9E7510] text-[#D8D2C2] border border-[#1D9E7530]">
                         {r.type}
                       </span>
                     </td>

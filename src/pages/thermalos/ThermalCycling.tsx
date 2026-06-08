@@ -111,7 +111,7 @@ export default function ThermalCycling() {
             <Legend wrapperStyle={{ fontSize: 10, color: "#888780" }} />
             <Line yAxisId="temp" type="monotone" dataKey="temp" stroke="#D85A30" strokeWidth={2} dot={false} name="Temp °C" />
             <Line yAxisId="power" type="monotone" dataKey="power" stroke="#EF9F27" strokeWidth={1.5} dot={false} name="Power W" />
-            <Line yAxisId="temp" type="monotone" dataKey="util" stroke="#9FE1CB" strokeWidth={1} dot={false} name="Util %" />
+            <Line yAxisId="temp" type="monotone" dataKey="util" stroke="#D8D2C2" strokeWidth={1} dot={false} name="Util %" />
           </LineChart>
         </ResponsiveContainer>
       </div>

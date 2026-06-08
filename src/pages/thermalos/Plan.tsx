@@ -44,7 +44,7 @@ export default function Plan() {
             <TabsTrigger
               key={t.value}
               value={t.value}
-              className="data-[state=active]:bg-transparent data-[state=active]:text-[#35C792] data-[state=active]:border-[#1D9E75] text-[#888780] hover:text-[#E6F7F1] rounded-none border-b-2 border-transparent px-4 py-2.5 text-[12px] font-mono uppercase tracking-[0.1em] shadow-none data-[state=active]:shadow-none transition-colors flex-col items-start gap-0.5 h-auto"
+              className="data-[state=active]:bg-transparent data-[state=active]:text-[#D4AF37] data-[state=active]:border-[#1D9E75] text-[#888780] hover:text-[#E6F7F1] rounded-none border-b-2 border-transparent px-4 py-2.5 text-[12px] font-mono uppercase tracking-[0.1em] shadow-none data-[state=active]:shadow-none transition-colors flex-col items-start gap-0.5 h-auto"
             >
               <span>{t.label}</span>
               <span className="text-[9px] normal-case tracking-normal text-[#5a5a55] font-mono">{t.sub}</span>

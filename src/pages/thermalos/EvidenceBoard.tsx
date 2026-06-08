@@ -54,7 +54,7 @@ export default function EvidenceBoard() {
         <div className="flex flex-wrap gap-6 items-center mb-3">
           <div>
             <div className="text-[9px] font-mono uppercase tracking-wider text-[#5a5a55] mb-1">YC Application Readiness</div>
-            <div className="text-[32px] font-bold font-mono text-[#35C792] leading-none">{pct}%</div>
+            <div className="text-[32px] font-bold font-mono text-[#D4AF37] leading-none">{pct}%</div>
             <div className="text-[11px] font-mono text-[#888780]">{proven} / {rows.length} claims proven</div>
           </div>
           <div className="flex gap-4 text-center">
@@ -90,7 +90,7 @@ export default function EvidenceBoard() {
       <div className="flex gap-2 flex-wrap">
         {(["All", "No proof yet", "In progress", "Proof exists ✓"] as const).map((f) => (
           <button key={f} onClick={() => setFilter(f)}
-            className={`px-2.5 py-1 rounded text-[11px] font-mono border transition-colors ${filter === f ? "bg-[#0F6E56]/25 border-[#1D9E75]/60 text-[#35C792]" : "border-white/[0.08] text-[#888780] hover:text-[#E6F7F1]"}`}>
+            className={`px-2.5 py-1 rounded text-[11px] font-mono border transition-colors ${filter === f ? "bg-[#0F6E56]/25 border-[#1D9E75]/60 text-[#D4AF37]" : "border-white/[0.08] text-[#888780] hover:text-[#E6F7F1]"}`}>
             {f}
           </button>
         ))}

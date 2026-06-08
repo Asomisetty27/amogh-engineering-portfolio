@@ -117,7 +117,7 @@ export default function Predictions() {
       current: experimentsDone,
       target: TARGET_EXPERIMENTS,
       unit: "experiments",
-      color: "#35C792",
+      color: "#D4AF37",
       achieved: experimentsDone >= TARGET_EXPERIMENTS,
     },
     {
@@ -125,7 +125,7 @@ export default function Predictions() {
       current: totalRows,
       target: TARGET_TELEMETRY_ROWS,
       unit: "rows",
-      color: "#3b82f6",
+      color: "#B87333",
       achieved: totalRows >= TARGET_TELEMETRY_ROWS,
     },
     {
@@ -161,11 +161,11 @@ export default function Predictions() {
         <div className="flex flex-wrap gap-6 items-center">
           <div>
             <div className="text-[9px] font-mono uppercase tracking-wider text-[#5a5a55] mb-1">YC W27 Deadline</div>
-            <div className="text-[32px] font-bold text-[#35C792] font-mono leading-none">{daysLeft}</div>
+            <div className="text-[32px] font-bold text-[#D4AF37] font-mono leading-none">{daysLeft}</div>
             <div className="text-[11px] font-mono text-[#888780]">days · {weeksLeft} weeks</div>
           </div>
           <div className="flex-1 min-w-[200px]">
-            <ProgressBar value={1} max={1} color="#35C792" />
+            <ProgressBar value={1} max={1} color="#D4AF37" />
             <div className="flex justify-between text-[9px] font-mono text-[#5a5a55] mt-1">
               <span>Stage 1 ✓</span>
               <span>Oct 1, 2026</span>
@@ -178,7 +178,7 @@ export default function Predictions() {
             </div>
             <div className="text-center">
               <div className="text-[9px] font-mono uppercase tracking-wider text-[#5a5a55]">Rows collected</div>
-              <div className="text-[20px] font-bold font-mono text-[#9FE1CB]">{totalRows.toLocaleString()}</div>
+              <div className="text-[20px] font-bold font-mono text-[#D8D2C2]">{totalRows.toLocaleString()}</div>
             </div>
           </div>
         </div>
@@ -189,7 +189,7 @@ export default function Predictions() {
         <div className="bg-[#141412] border border-white/[0.07] rounded-xl p-4">
           <div className="text-[9px] font-mono uppercase tracking-wider text-[#5a5a55] mb-1">Rθ_eff Trajectory — Best-So-Far</div>
           <div className="text-[10px] font-mono text-[#888780] mb-3">
-            Current best: <span className="text-[#35C792]">{bestRtheta?.toFixed(3) ?? "—"} °C/W</span>
+            Current best: <span className="text-[#D4AF37]">{bestRtheta?.toFixed(3) ?? "—"} °C/W</span>
             {avgRtheta !== null && (
               <>
                 {" · "}Avg: <span className="text-[#EF9F27]">{avgRtheta.toFixed(3)} °C/W</span>
@@ -223,9 +223,9 @@ export default function Predictions() {
             <div>
               <div className="flex justify-between text-[11px] font-mono mb-1">
                 <span className="text-[#888780]">Samples processed</span>
-                <span className="text-[#9FE1CB]">{totalRows.toLocaleString()}</span>
+                <span className="text-[#D8D2C2]">{totalRows.toLocaleString()}</span>
               </div>
-              <ProgressBar value={totalRows} max={TARGET_TELEMETRY_ROWS} color="#9FE1CB" />
+              <ProgressBar value={totalRows} max={TARGET_TELEMETRY_ROWS} color="#D8D2C2" />
             </div>
 
             <div>
@@ -245,9 +245,9 @@ export default function Predictions() {
             </div>
           </div>
 
-          <div className="mt-4 p-2.5 bg-[#0A0A08] rounded text-[10px] font-mono text-[#9FE1CB] leading-relaxed">
+          <div className="mt-4 p-2.5 bg-[#0A0A08] rounded text-[10px] font-mono text-[#D8D2C2] leading-relaxed">
             Stage 1 ({totalRows.toLocaleString()} rows) proved Rθ separates states. Stage 2 needs{" "}
-            <span className="text-[#35C792]">{TARGET_TELEMETRY_ROWS.toLocaleString()}</span> rows on dedicated
+            <span className="text-[#D4AF37]">{TARGET_TELEMETRY_ROWS.toLocaleString()}</span> rows on dedicated
             hardware to publish.
           </div>
         </div>

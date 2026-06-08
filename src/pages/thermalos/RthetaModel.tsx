@@ -67,7 +67,7 @@ export default function RthetaModel() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: "Mean Rθ_eff", value: `${mean.toFixed(4)}`, sub: "°C/W", accent: "#1D9E75" },
-          { label: "Std Dev", value: `${std.toFixed(4)}`, sub: "°C/W", accent: "#9FE1CB" },
+          { label: "Std Dev", value: `${std.toFixed(4)}`, sub: "°C/W", accent: "#D8D2C2" },
           { label: "Min", value: `${min?.toFixed(4) ?? "—"}`, sub: "°C/W", accent: "#1D9E75" },
           { label: "Max", value: `${max?.toFixed(4) ?? "—"}`, sub: "°C/W", accent: "#D85A30" },
         ].map((k) => (

@@ -103,7 +103,7 @@ export default function LiveTelemetry() {
                 <Tooltip
                   contentStyle={{ background: "#0D0D0B", border: "1px solid rgba(255,255,255,0.1)", fontSize: 11 }}
                   formatter={(v: number) => [`Rθ = ${v.toFixed(4)} °C/W`, ""]}
-                  labelStyle={{ color: "#9FE1CB" }}
+                  labelStyle={{ color: "#D8D2C2" }}
                 />
                 <Area type="monotone" dataKey="rtheta" fill="rgba(29,158,117,0.08)" stroke="none" />
                 <Line type="monotone" dataKey="rtheta" stroke="#1D9E75" strokeWidth={2} dot={false} />
@@ -136,7 +136,7 @@ export default function LiveTelemetry() {
                 <YAxis yAxisId="sm" orientation="right" domain={[0, 1700]} tick={{ fill: "#5a5a55", fontSize: 10 }} stroke="#2a2a26" />
                 <Tooltip contentStyle={{ background: "#0D0D0B", border: "1px solid rgba(255,255,255,0.1)", fontSize: 11 }} />
                 <Legend wrapperStyle={{ fontSize: 10, color: "#888780" }} />
-                <Line yAxisId="util" type="monotone" dataKey="util" stroke="#9FE1CB" strokeWidth={1.5} dot={false} name="Util %" />
+                <Line yAxisId="util" type="monotone" dataKey="util" stroke="#D8D2C2" strokeWidth={1.5} dot={false} name="Util %" />
                 <Line yAxisId="sm" type="monotone" dataKey="sm" stroke="#888780" strokeWidth={1.5} dot={false} name="SM MHz" />
               </LineChart>
             </ResponsiveContainer>
@@ -153,8 +153,8 @@ export default function LiveTelemetry() {
               <Row dot="#D85A30" label="GPU Temp" value={latest ? `${latest.tempC.toFixed(1)} °C` : "—"} />
               <Row dot="#EF9F27" label="Power Draw" value={latest ? `${latest.powerW.toFixed(1)} W` : "—"} />
               <Row dot="#888780" label="Power Cap" value={latest ? `${latest.powerCapW.toFixed(0)} W` : "—"} />
-              <Row dot="#9FE1CB" label="SM Clock" value={latest ? `${latest.smClockMhz.toLocaleString()} MHz` : "—"} />
-              <Row dot="#9FE1CB" label="Mem Clock" value={latest ? `${latest.memClockMhz.toLocaleString()} MHz` : "—"} />
+              <Row dot="#D8D2C2" label="SM Clock" value={latest ? `${latest.smClockMhz.toLocaleString()} MHz` : "—"} />
+              <Row dot="#D8D2C2" label="Mem Clock" value={latest ? `${latest.memClockMhz.toLocaleString()} MHz` : "—"} />
               <Row dot="#1D9E75" label="Utilization" value={latest ? `${latest.utilPct}%` : "—"} />
               <Row dot="#1D9E75" label="Headroom" value={latest ? `${latest.headroomC.toFixed(1)} °C` : "—"} />
               <Row dot="#5a5a55" label="Last sample" value={latest ? latest.timestamp.slice(0, 19).replace("T", " ") : "—"} last />
@@ -162,7 +162,7 @@ export default function LiveTelemetry() {
           </div>
 
           <div className="bg-[#141412] border border-white/[0.07] rounded-xl border-l-[3px] border-l-[#1D9E75] p-4">
-            <div className="text-[9px] font-mono uppercase tracking-wider text-[#35C792] mb-2">
+            <div className="text-[9px] font-mono uppercase tracking-wider text-[#D4AF37] mb-2">
               ThermalOS Recommendation
             </div>
             <p className="font-mono text-[12px] leading-relaxed text-[#E6F7F1]">
@@ -176,13 +176,13 @@ export default function LiveTelemetry() {
                 {rec.action}
               </span>
             </div>
-            <div className="mt-3 bg-[#0A0A08] border border-white/[0.07] rounded p-2.5 font-mono text-[11px] text-[#9FE1CB] leading-relaxed">
+            <div className="mt-3 bg-[#0A0A08] border border-white/[0.07] rounded p-2.5 font-mono text-[11px] text-[#D8D2C2] leading-relaxed">
               <div>Rθ_eff(t) = {latest?.rthetaCwatt.toFixed(4) ?? "—"} °C/W</div>
               <div>Formula: (T_gpu - T_amb) / P_draw</div>
               <div>Headroom = {latest?.headroomC.toFixed(1) ?? "—"} °C to throttle</div>
               <div>
                 Alert: <span style={{ color: rec.color }}>{latest?.alert ?? "—"}</span>
-                <span className="inline-block w-1.5 h-3 bg-[#35C792] ml-1 align-middle animate-pulse" />
+                <span className="inline-block w-1.5 h-3 bg-[#D4AF37] ml-1 align-middle animate-pulse" />
               </div>
             </div>
           </div>

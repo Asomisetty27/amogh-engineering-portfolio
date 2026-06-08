@@ -47,8 +47,8 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
 function StatusPill({ status }: { status: FormStatus }) {
   if (status.state === "idle") return null;
   const styles = {
-    submitting: { bg: "#3b82f615", border: "#3b82f640", fg: "#60a5fa", icon: Loader2 },
-    success:    { bg: "#0F6E5615", border: "#1D9E7540", fg: "#35C792", icon: Check },
+    submitting: { bg: "#B8733315", border: "#B8733340", fg: "#D89A5C", icon: Loader2 },
+    success:    { bg: "#0F6E5615", border: "#1D9E7540", fg: "#D4AF37", icon: Check },
     error:      { bg: "#f8717115", border: "#f8717140", fg: "#f87171", icon: AlertCircle },
   }[status.state];
 
@@ -364,7 +364,7 @@ export default function QuickEntry() {
         </div>
         {session?.user?.email && (
           <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-[#0F6E56]/15 border border-[#1D9E75]/30">
-            <span className="text-[11px] font-mono text-[#9FE1CB]">
+            <span className="text-[11px] font-mono text-[#D8D2C2]">
               {session.user.email}
             </span>
             <button onClick={handleSignOut} className="flex items-center gap-1 text-[10px] font-mono text-[#5a5a55] hover:text-[#888780] transition-colors">
@@ -401,7 +401,7 @@ export default function QuickEntry() {
           <TabsList className="bg-transparent p-0 h-auto border-b border-white/[0.07] rounded-none w-full justify-start gap-0 mb-6 overflow-x-auto">
             {TABS.map((t) => (
               <TabsTrigger key={t.value} value={t.value}
-                className="data-[state=active]:bg-transparent data-[state=active]:text-[#35C792] data-[state=active]:border-[#1D9E75] text-[#888780] hover:text-[#E6F7F1] rounded-none border-b-2 border-transparent px-4 py-2.5 text-[12px] font-mono uppercase tracking-[0.1em] shadow-none data-[state=active]:shadow-none transition-colors flex-col items-start gap-0.5 h-auto">
+                className="data-[state=active]:bg-transparent data-[state=active]:text-[#D4AF37] data-[state=active]:border-[#1D9E75] text-[#888780] hover:text-[#E6F7F1] rounded-none border-b-2 border-transparent px-4 py-2.5 text-[12px] font-mono uppercase tracking-[0.1em] shadow-none data-[state=active]:shadow-none transition-colors flex-col items-start gap-0.5 h-auto">
                 <span>{t.label}</span>
                 <span className="text-[9px] normal-case tracking-normal text-[#5a5a55] font-mono">{t.sub}</span>
               </TabsTrigger>

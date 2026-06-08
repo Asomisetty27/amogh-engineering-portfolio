@@ -74,7 +74,7 @@ function SensitivityTab() {
             The largest source of measurement error in Rθ_eff comes from T_reference (ambient temperature assumption). At idle (~9.5W), a ±5°C error in T_ref assumption causes a 35% swing in calculated Rθ_eff — exactly when anomaly detection needs precision most.
           </p>
           <div className="bg-[#0D0D0B] border border-white/[0.1] rounded p-4 mb-3">
-            <div className="font-mono text-[11px] text-[#9FE1CB] mb-2">Stage 1 sensitivity analysis (F002)</div>
+            <div className="font-mono text-[11px] text-[#D8D2C2] mb-2">Stage 1 sensitivity analysis (F002)</div>
             <ul className="space-y-1.5 text-[12px] text-[#a8a89f]">
               <li>• Idle (9.5W): 35.3% Rθ_eff swing with ±5°C ambient error</li>
               <li>• Load (68W): 10.2% Rθ_eff swing with same ambient error</li>
@@ -95,7 +95,7 @@ function SensitivityTab() {
             Telemetry power readings include measurement noise from the GPU's own power supply. Three smoothing methods were tested:
           </p>
           <div className="bg-[#0D0D0B] border border-white/[0.1] rounded p-4 mb-3">
-            <div className="font-mono text-[11px] text-[#9FE1CB] mb-2">Stage 1 filter comparison (F003)</div>
+            <div className="font-mono text-[11px] text-[#D8D2C2] mb-2">Stage 1 filter comparison (F003)</div>
             <ul className="space-y-1.5 text-[12px] text-[#a8a89f]">
               <li>• Rolling average (5s): R_theta std improved 3.5%</li>
               <li>• Median filter (5s): negligible improvement (&lt;0.5%)</li>
@@ -121,12 +121,12 @@ function ClassificationTab() {
             GPU thermal state must be inferred from telemetry to anchor Rθ_eff baselines. Following Kundu&apos;s direction, we replaced rule-based thresholds with a probabilistic classifier and compared Naive Bayes against Random Forest on the 3,880-sample expanded dataset.
           </p>
           <div className="bg-[#0D0D0B] border border-white/[0.1] rounded p-4 mb-3">
-            <div className="font-mono text-[11px] text-[#9FE1CB] mb-2">5-fold CV accuracy · 4 classes</div>
+            <div className="font-mono text-[11px] text-[#D8D2C2] mb-2">5-fold CV accuracy · 4 classes</div>
             <ul className="space-y-1.5 text-[12px] text-[#a8a89f]">
-              <li>• Naive Bayes (Gaussian) · raw: <span className="text-[#9FE1CB]">87.0% ± 1.2%</span></li>
-              <li>• Naive Bayes (Gaussian) · w/ 15s steady-state filter: <span className="text-[#9FE1CB]">99.9% ± 0.1%</span></li>
+              <li>• Naive Bayes (Gaussian) · raw: <span className="text-[#D8D2C2]">87.0% ± 1.2%</span></li>
+              <li>• Naive Bayes (Gaussian) · w/ 15s steady-state filter: <span className="text-[#D8D2C2]">99.9% ± 0.1%</span></li>
               <li>• Random Forest · raw: 99.3% ± 0.2%</li>
-              <li>• Random Forest · w/ steady-state filter: <span className="text-[#9FE1CB]">100.0% ± 0.0%</span></li>
+              <li>• Random Forest · w/ steady-state filter: <span className="text-[#D8D2C2]">100.0% ± 0.0%</span></li>
             </ul>
           </div>
           <p className="text-[12px] text-[#888780] leading-relaxed">
@@ -142,10 +142,10 @@ function ClassificationTab() {
             Naive Bayes is preferred for publication: the model is an equation, not a black box. Each class has a Gaussian conditional density per feature. Decision: argmax over classes of P(class) × ∏ P(feature | class).
           </p>
           <div className="bg-[#0D0D0B] border border-white/[0.1] rounded p-4 mb-3">
-            <div className="font-mono text-[11px] text-[#9FE1CB] mb-2">μ ± σ per class</div>
+            <div className="font-mono text-[11px] text-[#D8D2C2] mb-2">μ ± σ per class</div>
             <table className="text-[11px] font-mono text-[#a8a89f] w-full">
               <thead>
-                <tr className="text-[#9FE1CB]">
+                <tr className="text-[#D8D2C2]">
                   <th className="text-left pr-3">Class</th>
                   <th className="text-right pr-3">Rθ (C/W)</th>
                   <th className="text-right pr-3">Power (W)</th>
@@ -171,11 +171,11 @@ function ClassificationTab() {
         <SectionLabel>Next — Stage 2 validation on DGX B200</SectionLabel>
         <Card className="p-5">
           <ol className="space-y-1.5 text-[12px] text-[#a8a89f]">
-            <li><span className="text-[#9FE1CB]">1. v2 trials 3–7</span> — <span className="text-[#60a5fa]">running in Colab now</span>, ~3.5hr ETA. Replicate v2 T1/T2 protocol with 1800s wait.</li>
-            <li><span className="text-[#9FE1CB]">2. Retrain classifier on full v2 dataset</span> — confirm DT/NB stability with 7-trial v2 control</li>
-            <li><span className="text-[#9FE1CB]">3. Power-cap sweep (E005–E008)</span> — 6 power levels on DGX B200, measured ambient</li>
-            <li><span className="text-[#9FE1CB]">4. Lead-time testbed (E-LT)</span> — Sam returns Fall 2026, simulate cooling degradation</li>
-            <li><span className="text-[#9FE1CB]">5. Conference submission</span> — Two-dimensional F1 finding + Naive Bayes equation + sensitivity bands</li>
+            <li><span className="text-[#D8D2C2]">1. v2 trials 3–7</span> — <span className="text-[#D89A5C]">running in Colab now</span>, ~3.5hr ETA. Replicate v2 T1/T2 protocol with 1800s wait.</li>
+            <li><span className="text-[#D8D2C2]">2. Retrain classifier on full v2 dataset</span> — confirm DT/NB stability with 7-trial v2 control</li>
+            <li><span className="text-[#D8D2C2]">3. Power-cap sweep (E005–E008)</span> — 6 power levels on DGX B200, measured ambient</li>
+            <li><span className="text-[#D8D2C2]">4. Lead-time testbed (E-LT)</span> — Sam returns Fall 2026, simulate cooling degradation</li>
+            <li><span className="text-[#D8D2C2]">5. Conference submission</span> — Two-dimensional F1 finding + Naive Bayes equation + sensitivity bands</li>
           </ol>
         </Card>
       </div>
@@ -230,7 +230,7 @@ const FAULT_TAXONOMY = [
     timescale: "Workload-correlated, not monotonic over time",
     detection: "rtheta(mem_util > 70%) − rtheta(mem_util < 30%) > 0.06 C/W",
     remediation: "Reduce memory-intensive workload or check VRAM cooling",
-    color: "#9FE1CB",
+    color: "#D8D2C2",
   },
 ];
 
@@ -244,11 +244,11 @@ function FaultTaxonomyTab() {
             R_θ at a single power level tells you that something is wrong. The <em>shape</em> of the R_θ-vs-power curve, and how that shape changes over time, tells you <em>what</em> is wrong. The curve has two independently variable degrees of freedom:
           </p>
           <ul className="space-y-1.5 text-[12px] text-[#a8a89f] mb-3 pl-4">
-            <li>• <span className="text-[#9FE1CB] font-mono">Intercept</span> — R_θ at low power (5–25W), dominated by conduction</li>
-            <li>• <span className="text-[#9FE1CB] font-mono">Gap</span> — intercept minus R_θ at high power (55W+), reflects active cooling efficiency</li>
+            <li>• <span className="text-[#D8D2C2] font-mono">Intercept</span> — R_θ at low power (5–25W), dominated by conduction</li>
+            <li>• <span className="text-[#D8D2C2] font-mono">Gap</span> — intercept minus R_θ at high power (55W+), reflects active cooling efficiency</li>
           </ul>
           <p className="text-[12px] text-[#888780] leading-relaxed">
-            Each failure mode deforms one or both in a characteristic way. The fault_classifier module (<span className="font-mono text-[#9FE1CB]">thermalos/agent/fault_classifier.py</span>) tracks both per GPU, computes drift rates over a 30-day rolling window, and emits causal diagnosis with remediation guidance — not just &quot;something is wrong&quot;.
+            Each failure mode deforms one or both in a characteristic way. The fault_classifier module (<span className="font-mono text-[#D8D2C2]">thermalos/agent/fault_classifier.py</span>) tracks both per GPU, computes drift rates over a 30-day rolling window, and emits causal diagnosis with remediation guidance — not just &quot;something is wrong&quot;.
           </p>
         </Card>
       </div>
@@ -274,7 +274,7 @@ function FaultTaxonomyTab() {
                 </div>
                 <div>
                   <span className="text-[#5a5a55] font-mono">Detection rule:</span>{" "}
-                  <span className="font-mono text-[10px] text-[#9FE1CB]">{f.detection}</span>
+                  <span className="font-mono text-[10px] text-[#D8D2C2]">{f.detection}</span>
                 </div>
                 <div className="pt-1.5 border-t border-white/[0.05] mt-2">
                   <span className="text-[#5a5a55] font-mono">Remediation:</span>{" "}
@@ -291,7 +291,7 @@ function FaultTaxonomyTab() {
         <Card className="p-5">
           <table className="text-[11px] font-mono text-[#a8a89f] w-full">
             <thead>
-              <tr className="text-[#9FE1CB] border-b border-white/[0.1]">
+              <tr className="text-[#D8D2C2] border-b border-white/[0.1]">
                 <th className="text-left pr-3 py-2">Cause</th>
                 <th className="text-left pr-3 py-2">Intercept</th>
                 <th className="text-left pr-3 py-2">Slope</th>
@@ -318,11 +318,11 @@ function FaultTaxonomyTab() {
             The classifier ships in v0.1.9 but ground-truth labels come from controlled induction on the E-LT testbed (Sam, Fall 2026). Each failure mode gets its own induction protocol:
           </p>
           <ol className="space-y-1.5 text-[12px] text-[#a8a89f] pl-4">
-            <li>1. <span className="text-[#9FE1CB]">Dust</span> — tape over heatsink fins, measure R_θ(P) before/after</li>
-            <li>2. <span className="text-[#9FE1CB]">TIM</span> — bake cycles to accelerate pump-out, measure slope change</li>
-            <li>3. <span className="text-[#9FE1CB]">Fan</span> — reduce fan RPM via PWM, confirm power-threshold signature</li>
-            <li>4. <span className="text-[#9FE1CB]">Airflow</span> — restrict inlet with cardboard, confirm step-change + T_ref correlation</li>
-            <li>5. <span className="text-[#9FE1CB]">Mounting</span> — reduce heatsink contact pressure, confirm intercept step</li>
+            <li>1. <span className="text-[#D8D2C2]">Dust</span> — tape over heatsink fins, measure R_θ(P) before/after</li>
+            <li>2. <span className="text-[#D8D2C2]">TIM</span> — bake cycles to accelerate pump-out, measure slope change</li>
+            <li>3. <span className="text-[#D8D2C2]">Fan</span> — reduce fan RPM via PWM, confirm power-threshold signature</li>
+            <li>4. <span className="text-[#D8D2C2]">Airflow</span> — restrict inlet with cardboard, confirm step-change + T_ref correlation</li>
+            <li>5. <span className="text-[#D8D2C2]">Mounting</span> — reduce heatsink contact pressure, confirm intercept step</li>
           </ol>
           <p className="text-[12px] text-[#888780] leading-relaxed mt-3">
             No published paper has demonstrated this taxonomy from software telemetry alone. These five experiments are the E-LT paper&apos;s most novel contribution beyond the lead-time finding.
@@ -340,7 +340,7 @@ function MethodologyTab() {
       <div>
         <SectionLabel>Definition</SectionLabel>
         <Card className="p-5">
-          <div className="font-mono text-[13px] text-[#9FE1CB] mb-3 leading-relaxed">
+          <div className="font-mono text-[13px] text-[#D8D2C2] mb-3 leading-relaxed">
             Rθ_eff = (T_hot − T_reference) / P_dissipated
           </div>
           <p className="text-[13px] text-[#a8a89f] leading-relaxed">
@@ -396,13 +396,13 @@ function MethodologyTab() {
           <p className="text-[13px] text-[#a8a89f] leading-relaxed mb-3">
             Alongside the GPU telemetry work, we maintain a controlled physical rig measuring Rθ across
             thermal interface materials, mounting pressures, and fault conditions. The rig data is{" "}
-            <span className="text-[#9FE1CB]">not the headline result</span> — it&rsquo;s the methodological
+            <span className="text-[#D8D2C2]">not the headline result</span> — it&rsquo;s the methodological
             ground truth that lets us calibrate what &ldquo;normal&rdquo; cooling-path behavior looks like
             against a sensor-instrumented baseline.
           </p>
           <p className="text-[12px] text-[#888780] leading-relaxed">
-            Use the <span className="text-[#9FE1CB] font-mono">Rθ vs Pressure</span> tab to inspect the
-            regression model, and <span className="text-[#9FE1CB] font-mono">TIM Materials</span> for the
+            Use the <span className="text-[#D8D2C2] font-mono">Rθ vs Pressure</span> tab to inspect the
+            regression model, and <span className="text-[#D8D2C2] font-mono">TIM Materials</span> for the
             cross-material benchmark.
           </p>
         </Card>
@@ -524,7 +524,7 @@ function MoatTab() {
                         <p className="text-[11px] text-[#888780] leading-relaxed">{m.current}</p>
                       </div>
                       <div className="bg-[#0D0D0B] rounded p-2.5">
-                        <div className="text-[9px] font-mono text-[#9FE1CB] uppercase tracking-wider mb-1">Target</div>
+                        <div className="text-[9px] font-mono text-[#D8D2C2] uppercase tracking-wider mb-1">Target</div>
                         <p className="text-[11px] text-[#a8a89f] leading-relaxed">{m.target}</p>
                         <div className="text-[9px] font-mono text-[#5a5a55] mt-1.5">{m.timeline}</div>
                       </div>
@@ -603,7 +603,7 @@ export default function Research() {
             <TabsTrigger
               key={t.value}
               value={t.value}
-              className="data-[state=active]:bg-transparent data-[state=active]:text-[#35C792] data-[state=active]:border-[#1D9E75] text-[#888780] hover:text-[#E6F7F1] rounded-none border-b-2 border-transparent px-4 py-2.5 text-[12px] font-mono uppercase tracking-[0.1em] shadow-none data-[state=active]:shadow-none transition-colors flex-col items-start gap-0.5 h-auto"
+              className="data-[state=active]:bg-transparent data-[state=active]:text-[#D4AF37] data-[state=active]:border-[#1D9E75] text-[#888780] hover:text-[#E6F7F1] rounded-none border-b-2 border-transparent px-4 py-2.5 text-[12px] font-mono uppercase tracking-[0.1em] shadow-none data-[state=active]:shadow-none transition-colors flex-col items-start gap-0.5 h-auto"
             >
               <span>{t.label}</span>
               <span className="text-[9px] normal-case tracking-normal text-[#5a5a55] font-mono">{t.sub}</span>
