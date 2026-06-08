@@ -577,6 +577,36 @@ function makePCBColor(): THREE.CanvasTexture {
   return t;
 }
 
+// Lid underside — egg-crate thermal-foam pattern. What you actually see when
+// you lift a server lid: dark grey foam pressing on the cold-plate tops.
+function makeLidFoam(): THREE.CanvasTexture {
+  const SZ = 256;
+  const c = document.createElement('canvas');
+  c.width = c.height = SZ;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = '#16161a';
+  ctx.fillRect(0, 0, SZ, SZ);
+  const cell = 16;
+  for (let y = 0; y < SZ; y += cell) {
+    for (let x = 0; x < SZ; x += cell) {
+      const g = ctx.createRadialGradient(x + cell / 2, y + cell / 2, 1, x + cell / 2, y + cell / 2, cell * 0.55);
+      g.addColorStop(0, 'rgba(70,70,78,0.55)');
+      g.addColorStop(0.65, 'rgba(20,20,24,0.4)');
+      g.addColorStop(1, 'rgba(5,5,8,0.55)');
+      ctx.fillStyle = g;
+      ctx.fillRect(x, y, cell, cell);
+    }
+  }
+  // Faint label patch
+  ctx.fillStyle = 'rgba(180,170,140,0.18)';
+  ctx.fillRect(SZ - 70, 16, 54, 14);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(3, 2);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
 type Textures = {
   chassisColor: THREE.CanvasTexture;
   chassisRough: THREE.CanvasTexture;
@@ -586,6 +616,7 @@ type Textures = {
   floor: THREE.CanvasTexture;
   doorPerf: THREE.CanvasTexture;
   pcb: THREE.CanvasTexture;
+  lidFoam: THREE.CanvasTexture;
 };
 
 // ──────────────────────────────────────────────────────────────────────────
