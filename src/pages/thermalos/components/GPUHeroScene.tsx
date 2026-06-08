@@ -729,9 +729,11 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
   } else if (spec.dieLayout === 'dual-die') {
     dies = [{ pos: [-0.66, 0.07, 0], w: 1.25, d: 1.7 }, { pos: [0.66, 0.07, 0], w: 1.25, d: 1.7 }];
   } else {
+    // MI300X: 8 XCD/IOD chiplets in a tight 2×4 grid hybrid-bonded onto the
+    // active interposer — compact, central, NOT spread across the package.
     dies = [];
     for (let r = 0; r < 2; r++) for (let cI = 0; cI < 4; cI++) {
-      dies.push({ pos: [-1.05 + cI * 0.7, 0.07, -0.42 + r * 0.84], w: 0.6, d: 0.74 });
+      dies.push({ pos: [-0.63 + cI * 0.42, 0.07, -0.24 + r * 0.48], w: 0.38, d: 0.44 });
     }
   }
 
