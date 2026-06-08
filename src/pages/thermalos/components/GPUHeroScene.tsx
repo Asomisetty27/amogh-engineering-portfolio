@@ -691,8 +691,13 @@ function CoolerLayer({
 
 
   // Card archetypes: heatsink fin block (instanced) + shroud + fan(s)
-  const fanX = spec.cooler === 'triple-fan' ? [-2.0, 0, 2.0] : [0];
-  const fanRadius = spec.cooler === 'triple-fan' ? 0.95 : 1.6;
+  const isBlower = spec.cooler === 'blower';
+  // Triple-fan: 3 axial fans evenly across the shroud, fan radius matched to
+  // the slot height. Blower: ONE radial squirrel-cage at the END opposite the
+  // I/O bracket — the rest of the shroud top is a smooth lid stamped with the
+  // product wordmark (this is the visual signature of every server blower card).
+  const fanX = isBlower ? [-spec.width / 2 + 1.4] : [-2.0, 0, 2.0];
+  const fanRadius = isBlower ? 1.15 : 0.95;
 
   return (
     <group>
@@ -706,31 +711,62 @@ function CoolerLayer({
           <meshStandardMaterial ref={finMatRef} color="#CFCAC0" roughness={0.18} metalness={0.95} emissive="#c85f2a" emissiveIntensity={0} map={maps?.nickelBrushed ?? undefined} />
         </mesh>
       </group>
-      {/* Shroud — injection-molded plastic; matte, low reflectivity */}
+      {/* Shroud — injection-molded plastic; matte, low reflectivity. For
+          blower cards the shroud is a SEALED full-cover lid (no fan cutouts
+          on top); for triple-fan the shroud has fan openings cut into it. */}
       <RoundedBox args={[spec.width, 0.34, spec.depth]} radius={0.06} smoothness={4} position={[0, 0.5, 0]}>
-        <meshStandardMaterial color="#1A1A1F" roughness={0.65} metalness={0.0} />
+        <meshStandardMaterial color={isBlower ? '#0E0E11' : '#1A1A1F'} roughness={isBlower ? 0.5 : 0.65} metalness={isBlower ? 0.05 : 0.0} />
       </RoundedBox>
+      {/* Wordmark on top — centered on the smooth blower lid, or sub-strip
+          between fans on the triple-fan shroud. */}
+      {isBlower && textures.decals.a100 && (
+        <mesh position={[fanX[0] + fanRadius + 0.6, 0.68, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[spec.width * 0.55, spec.depth * 0.55]} />
+          <meshBasicMaterial map={textures.decals.a100} transparent toneMapped={false} opacity={0.92} depthWrite={false} />
+        </mesh>
+      )}
+      {/* Per-fan housings */}
       {fanX.map((x, i) => (
         <group key={`fan-grp-${i}`}>
+          {/* Fan bezel ring — recessed into the shroud */}
           <mesh position={[x, 0.7, 0]} rotation={[Math.PI / 2, 0, 0]}>
             <torusGeometry args={[fanRadius * 1.05, 0.05, 10, 48]} />
             <meshStandardMaterial color="#1c1c1e" roughness={0.4} metalness={0.4} />
           </mesh>
+          {isBlower && (
+            /* Blower intake guard — finger-grille rim, sealed mesh below */
+            <mesh position={[x, 0.69, 0]} rotation={[Math.PI / 2, 0, 0]}>
+              <ringGeometry args={[fanRadius * 0.18, fanRadius * 1.0, 48]} />
+              <meshStandardMaterial color="#08080a" roughness={0.85} metalness={0.1} side={THREE.DoubleSide} />
+            </mesh>
+          )}
           <group position={[x, 0.78, 0]}>
             <Fan fanRef={fanRefs[i]} radius={fanRadius} />
           </group>
         </group>
       ))}
-      {spec.cooler === 'blower' && (
-        <mesh position={[spec.width / 2 - 0.15, 0.5, 0]}>
-          <boxGeometry args={[0.12, 0.3, spec.depth - 1.2]} />
-          <meshStandardMaterial color="#0a0a0a" roughness={0.4} metalness={0.4} />
+      {/* PCIe bracket — full-height steel I/O end-plate at +z edge. Real
+          server cards have a vented bracket with screw notch + slot openings
+          for exhaust (blower) or display outputs (passive). */}
+      <group position={[0, 0.32, spec.depth / 2 + 0.04]}>
+        <mesh>
+          <boxGeometry args={[spec.width + 0.05, 1.3, 0.04]} />
+          <meshStandardMaterial color="#9a9aa0" roughness={0.55} metalness={0.85} />
         </mesh>
-      )}
-      <mesh position={[0, 0.34, spec.depth / 2 - 0.1]}>
-        <boxGeometry args={[spec.width - 0.4, 0.04, 0.06]} />
-        <meshStandardMaterial color={spec.accent} roughness={0.25} metalness={0.5} emissive={spec.accent} emissiveIntensity={0.6} toneMapped={false} />
-      </mesh>
+        {/* Screw-tab notch (top) */}
+        <mesh position={[spec.width / 2 - 0.2, 0.7, 0]}>
+          <boxGeometry args={[0.4, 0.08, 0.06]} />
+          <meshStandardMaterial color="#9a9aa0" roughness={0.55} metalness={0.85} />
+        </mesh>
+        {/* Exhaust vent slots for blower cards, DP cutouts for triple-fan
+            absent (triple-fans vent into the chassis, not out the bracket). */}
+        {isBlower && Array.from({ length: 8 }).map((_, i) => (
+          <mesh key={`vent-${i}`} position={[-spec.width / 2 + 1.2 + i * 0.5, -0.05, 0.01]}>
+            <boxGeometry args={[0.32, 0.55, 0.03]} />
+            <meshStandardMaterial color="#06060a" roughness={0.9} metalness={0.0} />
+          </mesh>
+        ))}
+      </group>
       <LayerLabel
         text={spec.cooler === 'blower' ? 'BLOWER + FIN STACK' : 'TRIPLE-FAN SHROUD'}
         sub={spec.cooler === 'blower' ? 'radial · single-slot exhaust' : '3 × 75mm axial · open shroud'}
