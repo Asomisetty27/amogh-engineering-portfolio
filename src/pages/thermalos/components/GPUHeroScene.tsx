@@ -489,6 +489,7 @@ function CoolerLayer({
 }) {
   const finMatRef = useRef<THREE.MeshStandardMaterial>(null!);
   const lidMatRef = useRef<THREE.MeshStandardMaterial>(null!);
+  const maps = useGpuMaps();
 
   useFrame(() => {
     const t = thermalRef.current;
