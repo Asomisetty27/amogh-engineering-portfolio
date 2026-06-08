@@ -308,11 +308,12 @@ function Fan({ fanRef, radius = 1.0 }: { fanRef: React.MutableRefObject<THREE.Gr
     <group ref={fanRef}>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[radius, 0.055, 12, 44]} />
-        <meshStandardMaterial color="#161618" roughness={0.5} metalness={0.3} />
+        {/* Fan frame — molded plastic, matte */}
+        <meshStandardMaterial color="#1A1A1F" roughness={0.65} metalness={0.0} />
       </mesh>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.16, 0.16, 0.18, 16]} />
-        <meshStandardMaterial color="#0a0a0c" roughness={0.6} metalness={0.3} />
+        <meshStandardMaterial color="#15151A" roughness={0.7} metalness={0.0} />
       </mesh>
       {Array.from({ length: 7 }).map((_, i) => {
         const angle = (i / 7) * Math.PI * 2;
@@ -320,7 +321,8 @@ function Fan({ fanRef, radius = 1.0 }: { fanRef: React.MutableRefObject<THREE.Gr
           <group key={i} rotation={[0, angle, 0]}>
             <mesh position={[radius * 0.5, 0, 0]} rotation={[0.35, 0, 0]}>
               <boxGeometry args={[radius * 0.72, 0.035, 0.2]} />
-              <meshStandardMaterial color="#1a1a1e" roughness={0.55} metalness={0.25} />
+              {/* Fan blades — light translucent-ish gray plastic */}
+              <meshStandardMaterial color="#C8C8CE" roughness={0.5} metalness={0.0} />
             </mesh>
           </group>
         );
