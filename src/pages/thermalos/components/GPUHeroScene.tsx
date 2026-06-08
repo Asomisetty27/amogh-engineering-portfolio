@@ -114,9 +114,11 @@ const PHASE_SEQUENCE: { phase: Phase; dur: number; level: number }[] = [
 // Cinematic reveal cycle — each card runs the same explode → hold → assemble →
 // hold loop, phase-offset by index so the runway is always mid-motion somewhere
 // (a living showroom, not five synchronized robots).
-const CYCLE = { explodedHold: 3.2, assembling: 2.1, assembledHold: 4.6, disassembling: 2.1 };
+const CYCLE = { explodedHold: 2.6, assembling: 2.4, assembledHold: 5.8, disassembling: 1.8 };
 const CYCLE_LEN = CYCLE.explodedHold + CYCLE.assembling + CYCLE.assembledHold + CYCLE.disassembling;
-const STAGGER = CYCLE_LEN / GPU_SPECS.length;
+// Phase cards so only one is mid-transition at a time — the eye lands on a
+// single moving card while the rest are held in their pose.
+const STAGGER = (CYCLE.assembling + CYCLE.disassembling + 0.6);
 
 function cardStageAt(elapsed: number, index: number): { stage: AnimStage; cycleProgress: number } {
   const t = (((elapsed + index * STAGGER) % CYCLE_LEN) + CYCLE_LEN) % CYCLE_LEN;
