@@ -134,13 +134,16 @@ function makePCBTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas');
   c.width = 512; c.height = 512;
   const ctx = c.getContext('2d')!;
-  ctx.fillStyle = '#0a1a0a';
+  // Dark forest green solder mask — server-grade boards run darker than consumer
+  ctx.fillStyle = '#0F4A2E';
   ctx.fillRect(0, 0, 512, 512);
-  ctx.strokeStyle = '#13301a';
+  // FR4 fiberglass weave — the visible warp/weft is the "expensive hardware" tell
+  ctx.strokeStyle = '#0a3622';
   ctx.lineWidth = 0.8;
   for (let y = 0; y < 512; y += 14) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke(); }
   for (let x = 0; x < 512; x += 18) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 512); ctx.stroke(); }
-  ctx.strokeStyle = '#1c4426';
+  // Trace routing
+  ctx.strokeStyle = '#175a3a';
   ctx.lineWidth = 1.4;
   for (let i = 0; i < 50; i++) {
     const sx = Math.random() * 512, sy = Math.random() * 512;
@@ -149,6 +152,7 @@ function makePCBTexture(): THREE.CanvasTexture {
     ctx.lineTo(sx + (Math.random() - 0.5) * 120, sy + (Math.random() - 0.5) * 90);
     ctx.stroke();
   }
+  // Via pads — nickel-gold ENIG finish
   ctx.fillStyle = '#b8860b';
   for (let i = 0; i < 320; i++) {
     ctx.beginPath();
@@ -200,7 +204,38 @@ function makeBrushedMetalTexture(): THREE.CanvasTexture {
   return t;
 }
 
-type Textures = { pcb: THREE.CanvasTexture; rough: THREE.CanvasTexture; brushed: THREE.CanvasTexture };
+// Organic ABF substrate — dark brown-black, fine grain. Used under SXM/OAM
+// mezzanine pads and HBM stacks (NOT green FR4 — this is the "server module,
+// not gaming card" tell).
+function makeOrganicSubstrateTexture(): THREE.CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 512;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = '#1C1C20';
+  ctx.fillRect(0, 0, 512, 512);
+  // Fine-grain speckle — ABF resin texture, not weave
+  const img = ctx.getImageData(0, 0, 512, 512);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const n = (Math.random() - 0.5) * 18;
+    img.data[i]     = THREE.MathUtils.clamp(img.data[i]     + n, 14, 50);
+    img.data[i + 1] = THREE.MathUtils.clamp(img.data[i + 1] + n, 14, 50);
+    img.data[i + 2] = THREE.MathUtils.clamp(img.data[i + 2] + n * 0.9, 16, 52);
+  }
+  ctx.putImageData(img, 0, 0);
+  // Subtle laminate striations
+  ctx.globalAlpha = 0.05;
+  for (let y = 0; y < 512; y += 2) {
+    ctx.fillStyle = Math.random() > 0.5 ? '#26262c' : '#101013';
+    ctx.fillRect(0, y, 512, 1);
+  }
+  ctx.globalAlpha = 1;
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.anisotropy = 8;
+  return t;
+}
+
+type Textures = { pcb: THREE.CanvasTexture; rough: THREE.CanvasTexture; brushed: THREE.CanvasTexture; organic: THREE.CanvasTexture };
 
 // ──────────────────────────────────────────────────────────────────────────
 // Instanced helpers — keep draw calls flat across five simultaneous assemblies
@@ -273,11 +308,12 @@ function Fan({ fanRef, radius = 1.0 }: { fanRef: React.MutableRefObject<THREE.Gr
     <group ref={fanRef}>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[radius, 0.055, 12, 44]} />
-        <meshStandardMaterial color="#161618" roughness={0.5} metalness={0.3} />
+        {/* Fan frame — molded plastic, matte */}
+        <meshStandardMaterial color="#1A1A1F" roughness={0.65} metalness={0.0} />
       </mesh>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.16, 0.16, 0.18, 16]} />
-        <meshStandardMaterial color="#0a0a0c" roughness={0.6} metalness={0.3} />
+        <meshStandardMaterial color="#15151A" roughness={0.7} metalness={0.0} />
       </mesh>
       {Array.from({ length: 7 }).map((_, i) => {
         const angle = (i / 7) * Math.PI * 2;
@@ -285,7 +321,8 @@ function Fan({ fanRef, radius = 1.0 }: { fanRef: React.MutableRefObject<THREE.Gr
           <group key={i} rotation={[0, angle, 0]}>
             <mesh position={[radius * 0.5, 0, 0]} rotation={[0.35, 0, 0]}>
               <boxGeometry args={[radius * 0.72, 0.035, 0.2]} />
-              <meshStandardMaterial color="#1a1a1e" roughness={0.55} metalness={0.25} />
+              {/* Fan blades — light translucent-ish gray plastic */}
+              <meshStandardMaterial color="#C8C8CE" roughness={0.5} metalness={0.0} />
             </mesh>
           </group>
         );
@@ -334,10 +371,13 @@ function SubstrateLayer({ spec, textures, labelOpacityRef }: { spec: GPUSpec; te
   }
   return (
     <group>
+      {/* Module baseplate — organic ABF substrate (dark brown-black), NOT green FR4.
+          This is the visual cue that says "server module, not consumer card". */}
       <RoundedBox args={[spec.width, 0.12, spec.depth]} radius={0.04} smoothness={4}>
-        <meshStandardMaterial color="#16161a" roughness={0.32} metalness={0.78} roughnessMap={textures.rough} envMapIntensity={1.0} />
+        <meshStandardMaterial color="#1C1C20" roughness={0.5} metalness={0.1} map={textures.organic} envMapIntensity={1.0} />
       </RoundedBox>
-      <InstancedBoxes positions={pads} size={[0.1, 0.02, 0.07]} color="#d8b840" roughness={0.1} metalness={1} />
+      {/* SXM5/OAM mezzanine pads — gold-on-nickel; same plated-gold spec as PCIe fingers */}
+      <InstancedBoxes positions={pads} size={[0.1, 0.02, 0.07]} color="#D4AF37" roughness={0.28} metalness={1.0} />
       <LayerLabel text="MODULE BASEPLATE" sub="SXM5 / OAM contact array · 56 pads" opacityRef={labelOpacityRef} accent={spec.accent} />
     </group>
   );
@@ -367,13 +407,16 @@ function SubstrateAndComponentsLayer({ spec, textures, labelOpacityRef }: { spec
 
   return (
     <group>
+      {/* PCB body — dark forest green solder mask over FR4; server-grade dark mask, not consumer bright green */}
       <RoundedBox args={[spec.width - 0.2, 0.22, spec.depth - 0.2]} radius={0.05} smoothness={4}>
-        <meshStandardMaterial color="#0a1a0a" roughness={0.82} metalness={0.06} map={textures.pcb} envMapIntensity={0.9} />
+        <meshStandardMaterial color="#0F4A2E" roughness={0.55} metalness={0.05} map={textures.pcb} envMapIntensity={0.9} />
       </RoundedBox>
       {profile === 'card' && Array.from({ length: 16 }).map((_, i) => (
         <mesh key={`pcie-${i}`} position={[-spec.width / 2 + 1.1 + i * 0.3, -0.02, spec.depth / 2 - 0.18]}>
           <boxGeometry args={[0.2, 0.2, 0.4]} />
-          <meshStandardMaterial color="#e0b430" roughness={0.06} metalness={1.0} />
+          {/* PCIe gold fingers — nickel underplate + hard gold overplate; roughness slightly above
+              pure gold so it reads as plated, not solid. */}
+          <meshStandardMaterial color="#D4AF37" roughness={0.28} metalness={1.0} />
         </mesh>
       ))}
       {inductors.map((p, i) => (
@@ -384,7 +427,7 @@ function SubstrateAndComponentsLayer({ spec, textures, labelOpacityRef }: { spec
       {smds.map((s, i) => (
         <mesh key={`smd-${i}`} position={s.pos}>
           <boxGeometry args={s.size} />
-          <meshStandardMaterial color={s.gold ? '#c8a838' : '#16161a'} roughness={s.gold ? 0.3 : 0.6} metalness={s.gold ? 0.8 : 0.3} roughnessMap={textures.rough} />
+          <meshStandardMaterial color={s.gold ? '#D4AF37' : '#16161a'} roughness={s.gold ? 0.3 : 0.6} metalness={s.gold ? 1.0 : 0.3} roughnessMap={s.gold ? undefined : textures.rough} />
         </mesh>
       ))}
       <LayerLabel
@@ -438,10 +481,13 @@ function CoolerLayer({
     // micro-channel grooves visible on the underside when separated.
     return (
       <group>
+        {/* Cold-plate lid — nickel-plated copper, lapped smooth for thermal contact
+            (NOT brushed — brushed surface would defeat its purpose). Warmer/yellower
+            than chrome. */}
         <RoundedBox args={[spec.width - 0.3, 0.16, spec.depth - 0.3]} radius={0.05} smoothness={4}>
-          <meshStandardMaterial ref={lidMatRef} color="#cdd2d8" roughness={0.18} metalness={0.95} map={textures.brushed} emissive="#000" emissiveIntensity={0} />
+          <meshStandardMaterial ref={lidMatRef} color="#D8D6D2" roughness={0.22} metalness={0.95} envMapIntensity={1.2} emissive="#000" emissiveIntensity={0} />
         </RoundedBox>
-        <InstancedBoxes positions={grooves} size={[0.05, 0.05, spec.depth - 0.5]} color="#9aa0a8" roughness={0.3} metalness={0.8} />
+        <InstancedBoxes positions={grooves} size={[0.05, 0.05, spec.depth - 0.5]} color="#CFCAC0" roughness={0.25} metalness={0.9} />
         <LayerLabel text="COLD PLATE · LIQUID I/F" sub="nickel-plated copper · micro-channel" opacityRef={labelOpacityRef} accent={spec.accent} />
       </group>
     );
@@ -455,15 +501,17 @@ function CoolerLayer({
     <group>
       {/* fin stack */}
       <group position={[0, -1.9, 0]}>
-        <InstancedBoxes positions={fins} size={[spec.width - 1.2, 0.045, spec.depth - 1.6]} color="#c8c8c8" roughness={0.3} metalness={0.7} emissive="#c85f2a" emissiveIntensity={0} />
+        {/* Extruded aluminum fins (6061/6063) — distinctly cooler & flatter than nickel-plated cold plate */}
+        <InstancedBoxes positions={fins} size={[spec.width - 1.2, 0.045, spec.depth - 1.6]} color="#B8B8BC" roughness={0.4} metalness={0.85} emissive="#c85f2a" emissiveIntensity={0} />
         <mesh position={[0, FIN_COUNT * spacing * 0.5 + 0.1, 0]}>
           <boxGeometry args={[spec.width - 1.0, 0.12, 0.5]} />
-          <meshStandardMaterial ref={finMatRef} color="#b87333" roughness={0.12} metalness={0.9} emissive="#c85f2a" emissiveIntensity={0} />
+          {/* Baseplate — nickel-on-copper at the die contact face */}
+          <meshStandardMaterial ref={finMatRef} color="#CFCAC0" roughness={0.2} metalness={0.9} emissive="#c85f2a" emissiveIntensity={0} />
         </mesh>
       </group>
-      {/* shroud */}
+      {/* Shroud — injection-molded plastic; matte, low reflectivity */}
       <RoundedBox args={[spec.width, 0.34, spec.depth]} radius={0.06} smoothness={4} position={[0, 0.5, 0]}>
-        <meshStandardMaterial color="#111111" roughness={0.45} metalness={0.3} />
+        <meshStandardMaterial color="#1A1A1F" roughness={0.65} metalness={0.0} />
       </RoundedBox>
       {fanX.map((x, i) => (
         <group key={`fan-grp-${i}`}>
@@ -628,12 +676,14 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
       </mesh>
       {dies.map((d, i) => (
         <RoundedBox key={i} args={[d.w, 0.12, d.d]} radius={0.02} smoothness={3} position={d.pos}>
-          <meshStandardMaterial ref={(m) => { matRefs.current[i] = m; }} color="#0d0d10" roughness={0.85} metalness={0.04} />
+          {/* Lapped silicon die — near-black with faint blue tint, picks up rim-light specularly */}
+          <meshStandardMaterial ref={(m) => { matRefs.current[i] = m; }} color="#16161C" roughness={0.15} metalness={0.3} />
         </RoundedBox>
       ))}
       {memPositions.map((p, i) => (
         <RoundedBox key={`mem-${i}`} args={[0.6, 0.16, 0.6]} radius={0.02} smoothness={3} position={p}>
-          <meshStandardMaterial color="#121216" roughness={0.4} metalness={0.35} />
+          {/* HBM on dark ABF substrate — matte brown-black, geometric */}
+          <meshStandardMaterial color="#26201C" roughness={0.5} metalness={0.1} />
         </RoundedBox>
       ))}
       <LayerLabel text={dieLabel} sub={`${spec.mem} · stacked memory`} opacityRef={opacityRef} accent={spec.accent} />
@@ -868,7 +918,7 @@ export default function GPUHeroScene() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  const textures = useMemo(() => ({ pcb: makePCBTexture(), rough: makeRoughnessMap(), brushed: makeBrushedMetalTexture() }), []);
+  const textures = useMemo(() => ({ pcb: makePCBTexture(), rough: makeRoughnessMap(), brushed: makeBrushedMetalTexture(), organic: makeOrganicSubstrateTexture() }), []);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '90vh', background: T.bg }}>
