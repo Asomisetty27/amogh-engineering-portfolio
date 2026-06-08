@@ -735,17 +735,54 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
     }
   }
 
-  const memPositions = useMemo<[number, number, number][]>(() => {
-    const out: [number, number, number][] = [];
-    const ringR = 2.3;
-    for (let i = 0; i < spec.memCount; i++) {
-      const a = (i / spec.memCount) * Math.PI * 2 + Math.PI / spec.memCount;
-      out.push([Math.cos(a) * ringR, 0.05, Math.sin(a) * (ringR * (spec.depth / spec.width))]);
+  // HBM placement is layout-specific. Real B200/H100 modules stack HBM in
+  // parallel rows flanking each die — NOT in a decorative ring. Chiplet
+  // modules (MI300X) do ring HBM around the chiplet grid.
+  type MemPlace = { pos: [number, number, number]; w: number; d: number; h: number };
+  const memPositions = useMemo<MemPlace[]>(() => {
+    const out: MemPlace[] = [];
+    // HBM3/3e stacks are tall (8-12-hi) — height matters visually
+    const hbmH = 0.32;
+    if (spec.dieLayout === 'dual-die') {
+      // Two rows of HBM flanking each die along its long (z) edges.
+      // 4 stacks per die × 2 dies = 8 (matches spec.memCount for B200).
+      const dieCenters = [-0.66, 0.66];
+      const perSide = Math.max(1, Math.floor(spec.memCount / (dieCenters.length * 2)));
+      const zSpan = 1.5;
+      dieCenters.forEach((dx) => {
+        [-1, 1].forEach((side) => {
+          for (let i = 0; i < perSide; i++) {
+            const z = perSide === 1 ? 0 : -zSpan / 2 + (i * zSpan) / (perSide - 1);
+            out.push({ pos: [dx + side * 0.95, hbmH / 2, z], w: 0.42, d: 0.62, h: hbmH });
+          }
+        });
+      });
+    } else if (spec.dieLayout === 'monolithic') {
+      // Two rows of 3 HBM stacks flanking the single die on both long edges.
+      const perSide = Math.max(1, Math.floor(spec.memCount / 2));
+      const zSpan = 1.7;
+      [-1, 1].forEach((side) => {
+        for (let i = 0; i < perSide; i++) {
+          const z = perSide === 1 ? 0 : -zSpan / 2 + (i * zSpan) / (perSide - 1);
+          out.push({ pos: [side * 1.35, hbmH / 2, z], w: 0.46, d: 0.6, h: hbmH });
+        }
+      });
+    } else {
+      // Chiplet grid (MI300X): ring HBM around the chiplet field.
+      const ringR = 2.3;
+      for (let i = 0; i < spec.memCount; i++) {
+        const a = (i / spec.memCount) * Math.PI * 2 + Math.PI / spec.memCount;
+        out.push({
+          pos: [Math.cos(a) * ringR, hbmH / 2, Math.sin(a) * (ringR * (spec.depth / spec.width))],
+          w: 0.6, d: 0.6, h: hbmH,
+        });
+      }
     }
     return out;
   }, [spec]);
 
   const dieLabel = spec.dieLayout === 'dual-die' ? 'DUAL-DIE COMPLEX' : spec.dieLayout === 'chiplet-grid' ? 'CHIPLET ARRAY · 8×' : 'MONOLITHIC DIE';
+  const showIHS = spec.dieLayout !== 'chiplet-grid'; // dual-die + monolithic have metallic IHS caps
 
   return (
     <group>
@@ -754,16 +791,40 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
         <meshStandardMaterial color="#8a8a8a" roughness={0.5} metalness={0.2} />
       </mesh>
       {dies.map((d, i) => (
-        <RoundedBox key={i} args={[d.w, 0.12, d.d]} radius={0.02} smoothness={3} position={d.pos}>
-          {/* Lapped silicon die — near-black with faint blue tint, picks up rim-light specularly */}
-          <meshStandardMaterial ref={(m) => { matRefs.current[i] = m; }} color="#16161C" roughness={0.15} metalness={0.3} />
-        </RoundedBox>
+        <group key={i}>
+          {/* Lapped silicon die — near-black with faint blue tint */}
+          <RoundedBox args={[d.w, 0.12, d.d]} radius={0.02} smoothness={3} position={d.pos}>
+            <meshStandardMaterial ref={(m) => { matRefs.current[i] = m; }} color="#16161C" roughness={0.15} metalness={0.3} />
+          </RoundedBox>
+          {/* IHS (integrated heat spreader) — nickel-plated copper cap that
+              actually contacts the cold plate. The metallic shine sitting
+              above the matte die is the canonical "real silicon package" tell. */}
+          {showIHS && (
+            <RoundedBox args={[d.w * 1.04, 0.05, d.d * 1.04]} radius={0.015} smoothness={3} position={[d.pos[0], d.pos[1] + 0.085, d.pos[2]]}>
+              <meshStandardMaterial color="#CFCAC0" roughness={0.22} metalness={0.92} envMapIntensity={1.2} />
+            </RoundedBox>
+          )}
+        </group>
       ))}
-      {memPositions.map((p, i) => (
-        <RoundedBox key={`mem-${i}`} args={[0.6, 0.16, 0.6]} radius={0.02} smoothness={3} position={p}>
-          {/* HBM on dark ABF substrate — matte brown-black, geometric */}
-          <meshStandardMaterial color="#26201C" roughness={0.5} metalness={0.1} />
-        </RoundedBox>
+      {memPositions.map((m, i) => (
+        <group key={`mem-${i}`} position={m.pos}>
+          {/* HBM stack base — dark ABF organic substrate */}
+          <mesh position={[0, -m.h / 2 + 0.02, 0]}>
+            <boxGeometry args={[m.w + 0.04, 0.04, m.d + 0.04]} />
+            <meshStandardMaterial color="#1A1614" roughness={0.6} metalness={0.05} />
+          </mesh>
+          {/* The stack itself — taller than wide, matte brown-black */}
+          <RoundedBox args={[m.w, m.h, m.d]} radius={0.015} smoothness={3}>
+            <meshStandardMaterial color="#26201C" roughness={0.55} metalness={0.1} />
+          </RoundedBox>
+          {/* Faint horizontal stack-layer striations — sells "this is 8-Hi
+              stacked DRAM" rather than a solid block. Thin lighter band
+              near the top edge of the stack. */}
+          <mesh position={[0, m.h / 2 - 0.02, m.d / 2 + 0.001]}>
+            <planeGeometry args={[m.w * 0.92, 0.012]} />
+            <meshStandardMaterial color="#3a3028" roughness={0.7} metalness={0.05} />
+          </mesh>
+        </group>
       ))}
       <LayerLabel text={dieLabel} sub={`${spec.mem} · stacked memory`} opacityRef={opacityRef} accent={spec.accent} />
     </group>
