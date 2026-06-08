@@ -1148,15 +1148,8 @@ function HeroOpenSled({
             <meshStandardMaterial color="#22222a" roughness={0.4} metalness={0.6} />
           </RoundedBox>
         ))}
-        {/* Tiny NVLink trace silkscreen — subtle gold X across the center */}
-        {[
-          [Math.PI / 4, 0.28], [-Math.PI / 4, 0.28],
-        ].map(([rot, len], i) => (
-          <mesh key={i} position={[0, 0.0035, 0]} rotation={[-Math.PI / 2, 0, rot]}>
-            <planeGeometry args={[len, 0.006]} />
-            <meshBasicMaterial color="#9b8538" transparent opacity={0.55} />
-          </mesh>
-        ))}
+        {/* NVLink silkscreen X removed per design — keeps the baseboard
+            reading as PCB + chips, no gold cross. */}
 
         {/* 4 SXM packages */}
         {diePositions.map(([x, z], i) => (
