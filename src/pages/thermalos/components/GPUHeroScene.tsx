@@ -668,6 +668,27 @@ function CoolerLayer({
           </mesh>
         ))}
       </group>
+      {/* A100 PCIe 8-pin EPS power connector — black housing with 8 gold pins,
+          mounted top-rear of the shroud (real card: single 8-pin near the
+          bracket end, recessed into the shroud). */}
+      {spec.cooler === 'blower' && (
+        <group position={[spec.width / 2 - 1.05, 0.5 + shroudH / 2 + 0.08, -spec.depth / 2 + 0.32]}>
+          <RoundedBox args={[0.95, 0.16, 0.42]} radius={0.025} smoothness={3}>
+            <meshStandardMaterial color="#0a0a0c" roughness={0.7} metalness={0.05} />
+          </RoundedBox>
+          {/* 2 rows × 4 cols of gold pin sockets, slightly recessed */}
+          {Array.from({ length: 8 }).map((_, i) => {
+            const col = i % 4, row = Math.floor(i / 4);
+            return (
+              <mesh key={`epin-${i}`} position={[-0.34 + col * 0.225, 0.07, -0.1 + row * 0.2]}>
+                <boxGeometry args={[0.11, 0.04, 0.11]} />
+                <meshStandardMaterial color="#D4AF37" roughness={0.3} metalness={1.0} />
+              </mesh>
+            );
+          })}
+        </group>
+      )}
+
       <LayerLabel
         text={spec.cooler === 'blower' ? 'BLOWER + FIN STACK' : 'TRIPLE-FAN SHROUD'}
         sub={spec.cooler === 'blower' ? 'radial · single-slot exhaust' : '3 × 75mm axial · open shroud'}
