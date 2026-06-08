@@ -1492,6 +1492,7 @@ export default function TowerUnit() {
 
         <CameraDrift />
         <ThermalDriver />
+        <SequenceDriver />
         <PostFX />
       </Canvas>
 
