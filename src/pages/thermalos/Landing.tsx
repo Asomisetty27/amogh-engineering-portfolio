@@ -30,9 +30,9 @@ const T = {
   s0:        COLORS.bg.panel,
   s1:        COLORS.bg.surface,
   s2:        COLORS.bg.raised,
-  s3:        '#1C1C24',
+  s3:        '#2C2738',
   border:    COLORS.steel.faint,
-  borderHi:  '#2E2E3E',
+  borderHi:  '#5A5142',
   text:      COLORS.steel.bright,
   muted:     COLORS.steel.muted,
   faint:     COLORS.steel.faint,
@@ -42,6 +42,9 @@ const T = {
   critical:  COLORS.thermal.critical,
   bp:        COLORS.accent,
   amber:     COLORS.amber.medium,
+  copper:    COLORS.copper,
+  platinum:  COLORS.platinum,
+  ink:       COLORS.ink,
 };
 
 const FD = TYPOGRAPHY.display.fontFamily;
