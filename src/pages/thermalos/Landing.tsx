@@ -154,7 +154,7 @@ function SectionHead({ eyebrow, title, body, center }: {
   return (
     <div style={{ maxWidth: 540, ...(center ? { margin: '0 auto', textAlign: 'center' } : {}) }}>
       <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 style={{ fontFamily: FD, fontSize: 'clamp(26px,3.2vw,40px)', fontWeight: 500, letterSpacing: '-.03em', lineHeight: 1.06, color: T.text, margin: '14px 0 12px' }}>
+      <h2 style={{ fontFamily: "'Instrument Serif', Didot, Georgia, serif", fontSize: 'clamp(28px,3.4vw,44px)', fontWeight: 400, letterSpacing: '-.02em', lineHeight: 1.05, color: T.text, margin: '14px 0 12px' }}>
         {title}
       </h2>
       {body && <p style={{ fontFamily: FD, fontSize: 14.5, lineHeight: 1.65, color: T.muted }}>{body}</p>}
@@ -448,7 +448,7 @@ function Hero() {
           }}>
             {/* Corner bracket — lab-instrument style */}
             <span style={{ position: 'absolute', top: 0, left: 0, width: 16, height: 16, border: `1px solid ${T.amber}`, borderRight: 'none', borderBottom: 'none' }} />
-            Thermal forensics<br />for <span className="tos-grad-text">GPU clusters.</span>
+            Thermal forensics<br />for <span className="tos-grad-text" style={{ fontFamily: "'Instrument Serif', Didot, Georgia, serif", fontStyle: 'italic', fontWeight: 400, letterSpacing: '-.02em' }}>GPU clusters.</span>
           </h1>
           <p data-h style={{
             opacity: 0,
