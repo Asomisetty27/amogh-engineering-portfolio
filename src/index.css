@@ -144,34 +144,45 @@
 
 /* ThermalOS brand tokens — Isotherm system */
 :root {
-  --t-abyss:        #0A0A0B;   /* obsidian backdrop */
-  --t-deep-field:   #1C1916;   /* warm slate */
-  --t-cold-probe:   #2A2620;   /* warm slate deep */
+  --t-abyss:        #050407;   /* true obsidian (page deepest) */
+  --t-deep-field:   #181522;   /* warm slate w/ violet undertone */
+  --t-cold-probe:   #2A2535;   /* warm slate deep */
   --t-stable:       #8A6F2E;   /* deep champagne */
-  --t-healthy:      #D4AF37;   /* 18k champagne (brand accent) */
+  --t-healthy:      #D4AF37;   /* 18k champagne — brand accent */
   --t-healthy-dim:  #8A6F2E;
-  --t-drift:        #C9A84C;   /* warm gold drift */
+  --t-drift:        #C9A84C;
   --t-caution:      #E8B23A;
-  --t-rising:       #E8743A;
+  --t-rising:       #C85F2A;   /* copper */
   --t-critical:     #D63D3D;
   --t-critical-dim: #8C2828;
-  --t-text:         #ECE6D8;   /* warm platinum */
-  --t-muted:        #9A9285;
-  --t-faint:        #5A5347;
+  --t-text:         #F0EADC;   /* warm ivory (high contrast) */
+  --t-muted:        #A8A092;   /* body secondary */
+  --t-faint:        #6A6354;   /* labels / hints */
   --t-ghost:        #2E2A24;
-  --t-border:       #2A2620;
-  --t-border-hi:    #3A332A;
+  --t-border:       #2E2A24;
+  --t-border-hi:    #48402F;   /* lifted border — clear delineation */
 
-  /* Landing surfaces — obsidian */
-  --t-surface-0:    #07060A;
-  --t-surface-1:    #0F0D11;
-  --t-surface-2:    #15131A;
+  /* Surface elevation — stepped for hierarchy/depth */
+  --t-surface-0:    #050407;
+  --t-surface-1:    #0E0C12;
+  --t-surface-2:    #181522;
+  --t-surface-3:    #221E2E;
 
-  /* Blueprint ink — warm champagne grid */
-  --t-blueprint:        rgba(212, 175, 55, 0.08);
-  --t-blueprint-hi:     rgba(212, 175, 55, 0.20);
+  /* Brand accents + counterpoint */
+  --t-platinum:     #D8D2C2;   /* highlight, divider */
+  --t-copper:       #B87333;   /* secondary accent (counterpoint to gold) */
+
+  /* Blueprint ink — warm champagne grid (low-density) */
+  --t-blueprint:        rgba(212, 175, 55, 0.07);
+  --t-blueprint-hi:     rgba(212, 175, 55, 0.18);
   --t-blueprint-ink:    #C9A84C;
-  --t-blueprint-tint:   rgba(212, 175, 55, 0.05);
+  --t-blueprint-tint:   rgba(212, 175, 55, 0.04);
+
+  /* Elevation shadows — premium depth */
+  --t-shadow-sm:    0 1px 2px rgba(0,0,0,0.4), 0 0 0 0.5px rgba(212,175,55,0.04);
+  --t-shadow-md:    0 4px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(240,234,220,0.04);
+  --t-shadow-lg:    0 12px 36px rgba(0,0,0,0.65), inset 0 1px 0 rgba(240,234,220,0.06);
+  --t-shadow-gold:  0 8px 28px rgba(212,175,55,0.18), inset 0 1px 0 rgba(245,217,138,0.18);
 
   /* Type stacks */
   --t-font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
