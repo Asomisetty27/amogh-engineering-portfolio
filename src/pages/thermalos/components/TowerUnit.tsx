@@ -861,6 +861,43 @@ const ShimmerShader = {
   `,
 };
 
+// HotSpot shader — physically-motivated die heatmap. Gaussian falloff around
+// a slowly-jittering hotspot (real GA100/GH100 dies don't heat uniformly —
+// the hottest area is offset from geometric center and wanders w/ workload).
+const HotSpotShader = {
+  uniforms: {
+    uTime: { value: 0 },
+    uIntensity: { value: 0 },
+    uColor: { value: new THREE.Color('#c85f2a') },
+    uSeed: { value: 0 },
+  },
+  vertexShader: /* glsl */`
+    varying vec2 vUv;
+    void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+  `,
+  fragmentShader: /* glsl */`
+    varying vec2 vUv;
+    uniform float uTime;
+    uniform float uIntensity;
+    uniform vec3 uColor;
+    uniform float uSeed;
+    void main() {
+      // Hotspot wanders ±0.08 from center, driven by per-die seed
+      vec2 c = vec2(
+        0.5 + 0.08 * sin(uTime * 0.7 + uSeed * 6.28),
+        0.5 + 0.08 * cos(uTime * 0.62 + uSeed * 4.11)
+      );
+      float d = distance(vUv, c);
+      float hot = exp(-d * d * 14.0) * uIntensity;
+      // Secondary cooler ring (the rest of the die at lower T)
+      float bulk = exp(-d * d * 4.0) * uIntensity * 0.45;
+      float a = clamp(hot + bulk, 0.0, 1.0) * 0.95;
+      vec3 col = uColor * (1.0 + hot * 1.6);
+      gl_FragColor = vec4(col, a);
+    }
+  `,
+};
+
 function HeroOpenSled({
   yBase, textures, sledChassisMat, ventMat,
 }: {
@@ -873,28 +910,45 @@ function HeroOpenSled({
   const pipeRef = useRef<THREE.MeshStandardMaterial>(null!);
   const slideRef = useRef<THREE.Group>(null!);
   const lidRef = useRef<THREE.Group>(null!);
-  const dieMatRefs = useRef<THREE.MeshBasicMaterial[]>([]);
+  const dieShaderRefs = useRef<THREE.ShaderMaterial[]>([]);
+  const finMatRef = useRef<THREE.MeshStandardMaterial>(null!);
   const shimmerRef = useRef<THREE.ShaderMaterial>(null!);
+  const strutLRef = useRef<THREE.Mesh>(null!);
+  const strutRRef = useRef<THREE.Mesh>(null!);
 
   const Z_FACE = RACK_D * 0.49;
   const SLED_HALF = SLED_H / 2;
   const SLIDE_TRAVEL = RACK_D * 0.72;
+  const LID_MAX_RAD = 80 * Math.PI / 180;
 
-  // GPU baseboard layout — 4 SXM packages in a 2x2 grid, NVSwitch center.
+  // ─── HGX-style baseboard layout ────────────────────────────────────────
+  // 4 GPU SXM packages in 2×2 arrangement around a central NVSwitch cluster
+  // (4 small fabric dies in a cross). DIMMs along the long edges; CPU
+  // sockets along the front edge.
   const DIE_W = 0.18;
-  const DIE_HALF_OFFSET_X = 0.22;
-  const DIE_HALF_OFFSET_Z = 0.18;
+  const DIE_HALF_OFFSET_X = 0.26;
+  const DIE_HALF_OFFSET_Z = 0.20;
   const diePositions: [number, number][] = [
     [-DIE_HALF_OFFSET_X,  DIE_HALF_OFFSET_Z],
     [ DIE_HALF_OFFSET_X,  DIE_HALF_OFFSET_Z],
     [-DIE_HALF_OFFSET_X, -DIE_HALF_OFFSET_Z],
     [ DIE_HALF_OFFSET_X, -DIE_HALF_OFFSET_Z],
   ];
+  // 4 NVSwitch dies arranged in a cross between the GPUs
+  const nvswitchPositions: [number, number][] = [
+    [ 0,         0.09 ],
+    [ 0,        -0.09 ],
+    [ 0.09,      0    ],
+    [-0.09,      0    ],
+  ];
+  // Cold plate fins (12 thin parallel fins on top of each plate)
+  const FIN_COUNT = 12;
+  const FIN_PITCH = (DIE_W * 0.58) / (FIN_COUNT - 1);
+  const finOffsets = Array.from({ length: FIN_COUNT }, (_, i) => -DIE_W * 0.29 + i * FIN_PITCH);
 
   useFrame((state) => {
     const t = _towerLevel.current;
     const phase = _towerPhase.current;
-    // LED blink behavior — same model as the regular Sled
     let blink = 1;
     if (phase === 'critical') {
       blink = 0.35 + 0.65 * (Math.sin(state.clock.elapsedTime * 22) > 0 ? 1 : 0);
@@ -914,19 +968,32 @@ function HeroOpenSled({
     if (slideRef.current) {
       slideRef.current.position.z = _sledOut.current * SLIDE_TRAVEL;
     }
-    // Lid hinge — pivot at rear edge, rotate -X up to 80°
+    // Lid hinge — pivot at rear edge, rotate -X
+    const lidRad = -_lidOpen.current * LID_MAX_RAD;
     if (lidRef.current) {
-      lidRef.current.rotation.x = -_lidOpen.current * (80 * Math.PI / 180);
+      lidRef.current.rotation.x = lidRad;
     }
-    // Heatmap on dies — color + alpha track the live thermal level
+    // Gas struts — extend their piston length to track lid angle. The piston
+    // is the inner cylinder; we scale its Y. Anchor cylinder stays fixed.
+    const strutScale = 1 + _lidOpen.current * 1.6;
+    if (strutLRef.current) strutLRef.current.scale.y = strutScale;
+    if (strutRRef.current) strutRRef.current.scale.y = strutScale;
+
+    // Hotspot shaders on each die
     const heatColor = thermalHex(t);
-    const heatAlpha = THREE.MathUtils.clamp(t * 0.95, 0, 0.95) * _lidOpen.current;
-    for (const mat of dieMatRefs.current) {
+    const heatI = THREE.MathUtils.clamp(t, 0, 1) * _lidOpen.current;
+    for (const mat of dieShaderRefs.current) {
       if (!mat) continue;
-      mat.color.copy(heatColor);
-      mat.opacity = heatAlpha;
+      mat.uniforms.uTime.value = state.clock.elapsedTime;
+      mat.uniforms.uIntensity.value = heatI;
+      mat.uniforms.uColor.value.copy(heatColor);
     }
-    // Shimmer plane — color, intensity, and time
+    // Fin glow — fins heat from contact: emissive ∝ level²
+    if (finMatRef.current) {
+      finMatRef.current.emissive.copy(heatColor);
+      finMatRef.current.emissiveIntensity = (t * t) * 1.6 * _lidOpen.current;
+    }
+    // Shimmer
     if (shimmerRef.current) {
       shimmerRef.current.uniforms.uTime.value = state.clock.elapsedTime;
       shimmerRef.current.uniforms.uIntensity.value = t * _lidOpen.current;
@@ -936,15 +1003,23 @@ function HeroOpenSled({
 
   return (
     <group position={[0, yBase, 0]} ref={slideRef}>
-      {/* ─── Sled chassis (same parts as regular Sled, no duplication shortcut
-              because the materials are shared and the geometry primitives
-              are tiny) ───────────────────────────────────────────────────── */}
+      {/* ─── Sled chassis ─────────────────────────────────────────────── */}
       <RoundedBox args={[RACK_W * 0.86, SLED_H, RACK_D * 0.62]} radius={0.012} smoothness={3} position={[0, 0, RACK_D * 0.18]} castShadow receiveShadow material={sledChassisMat} />
       <mesh position={[0, 0, Z_FACE + 0.002]} ref={ensureUv2} castShadow receiveShadow>
         <planeGeometry args={[RACK_W * 0.84, SLED_H * 0.94]} />
         <meshStandardMaterial map={textures.sledFace} roughness={0.62} metalness={0.55} side={THREE.FrontSide} />
       </mesh>
-      {/* Vent grille */}
+
+      {/* Rail flanges on each side — thin brushed-alu plates that ride the
+          static rack rails (which live in the chassis, not on the sled). */}
+      {[-1, 1].map((s) => (
+        <mesh key={s} position={[s * RACK_W * 0.435, -SLED_H * 0.18, RACK_D * 0.18]} castShadow>
+          <boxGeometry args={[0.012, 0.022, RACK_D * 0.58]} />
+          <meshStandardMaterial color="#7d818a" roughness={0.42} metalness={0.85} />
+        </mesh>
+      ))}
+
+      {/* Vent grille (front) */}
       <group position={[-RACK_W * 0.16, 0, Z_FACE + 0.006]}>
         {Array.from({ length: VENT_SLATS }).map((_, i) => {
           const y = -((VENT_SLATS - 1) / 2) * VENT_SLAT_PITCH + i * VENT_SLAT_PITCH;
@@ -959,7 +1034,8 @@ function HeroOpenSled({
           <meshStandardMaterial color="#020203" roughness={0.95} metalness={0} />
         </mesh>
       </group>
-      {/* LED strip + bezel + status pip + heat-pipe disk */}
+
+      {/* LED + bezel + status pip + heat-pipe disk */}
       <mesh position={[RACK_W * 0.3, -SLED_H * 0.34, Z_FACE + 0.007]}>
         <planeGeometry args={[RACK_W * 0.26, SLED_H * 0.13]} />
         <meshStandardMaterial ref={ledRef} color="#020203" roughness={0.2} metalness={0.0} emissive="#1c6b3a" emissiveIntensity={1.8} toneMapped={false} />
@@ -977,100 +1053,218 @@ function HeroOpenSled({
         <meshStandardMaterial ref={pipeRef} color="#020203" roughness={0.85} metalness={0.0} emissive="#1c6b3a" emissiveIntensity={0.5} toneMapped={false} />
       </mesh>
 
-      {/* ─── Lid hinge group ─ pivots at the REAR edge of the sled, opens UP
-              (-X rotation, 80°). Built so all child positions are relative
-              to the pivot (no offset trickery during animation). ─────────── */}
-      <group ref={lidRef} position={[0, SLED_HALF + 0.008, RACK_D * 0.18 - RACK_D * 0.31]}>
-        {/* Lid cover — thin powder-coat panel, hinges at rear */}
+      {/* ─── Hinge plate ─ a small fixed plate at the rear top edge that
+              represents the actual hinge body. The lid pivots on its forward
+              edge, not directly on the chassis edge — small detail, makes
+              the open-lid silhouette read mechanically. */}
+      <RoundedBox
+        args={[RACK_W * 0.86, 0.018, 0.034]}
+        radius={0.004}
+        smoothness={2}
+        position={[0, SLED_HALF + 0.009, RACK_D * 0.18 - RACK_D * 0.31 + 0.005]}
+        castShadow
+      >
+        <meshStandardMaterial color="#2c2c34" roughness={0.45} metalness={0.78} />
+      </RoundedBox>
+      {/* Two hinge knuckles — small cylinders on either end of the plate */}
+      {[-1, 1].map((s) => (
+        <mesh
+          key={s}
+          position={[s * RACK_W * 0.38, SLED_HALF + 0.018, RACK_D * 0.18 - RACK_D * 0.31 + 0.005]}
+          rotation={[0, 0, Math.PI / 2]}
+          castShadow
+        >
+          <cylinderGeometry args={[0.012, 0.012, 0.05, 12]} />
+          <meshStandardMaterial color="#1a1a1f" roughness={0.4} metalness={0.85} />
+        </mesh>
+      ))}
+
+      {/* ─── Gas struts ─ two black anchor cylinders fixed to chassis side
+              walls; each contains a metallic piston (the scaled inner mesh)
+              that extends as the lid opens. Visually sells the lid as a
+              real mechanism that's being held open under spring force. */}
+      <group position={[-RACK_W * 0.4, SLED_HALF + 0.005, RACK_D * 0.05]} rotation={[Math.PI / 3.2, 0, 0]}>
+        <mesh castShadow>
+          <cylinderGeometry args={[0.012, 0.012, 0.10, 10]} />
+          <meshStandardMaterial color="#0c0c10" roughness={0.55} metalness={0.5} />
+        </mesh>
+        <mesh ref={strutLRef} position={[0, 0.05, 0]} castShadow>
+          <cylinderGeometry args={[0.008, 0.008, 0.08, 10]} />
+          <meshStandardMaterial color="#b8bcc2" roughness={0.3} metalness={0.92} />
+        </mesh>
+      </group>
+      <group position={[RACK_W * 0.4, SLED_HALF + 0.005, RACK_D * 0.05]} rotation={[Math.PI / 3.2, 0, 0]}>
+        <mesh castShadow>
+          <cylinderGeometry args={[0.012, 0.012, 0.10, 10]} />
+          <meshStandardMaterial color="#0c0c10" roughness={0.55} metalness={0.5} />
+        </mesh>
+        <mesh ref={strutRRef} position={[0, 0.05, 0]} castShadow>
+          <cylinderGeometry args={[0.008, 0.008, 0.08, 10]} />
+          <meshStandardMaterial color="#b8bcc2" roughness={0.3} metalness={0.92} />
+        </mesh>
+      </group>
+
+      {/* ─── Lid hinge group ─ pivots on the FRONT edge of the hinge plate.
+              Children offset forward so geometry sits where a real lid would. */}
+      <group ref={lidRef} position={[0, SLED_HALF + 0.018, RACK_D * 0.18 - RACK_D * 0.31 + 0.022]}>
+        {/* Lid cover — top face */}
         <RoundedBox
-          args={[RACK_W * 0.86, 0.014, RACK_D * 0.62]}
+          args={[RACK_W * 0.86, 0.014, RACK_D * 0.6]}
           radius={0.006}
           smoothness={2}
-          position={[0, 0.007, RACK_D * 0.31]}
+          position={[0, 0.007, RACK_D * 0.30]}
           castShadow
           receiveShadow
           material={sledChassisMat}
         />
+        {/* Lid underside — egg-crate thermal foam (visible once lid is up) */}
+        <mesh position={[0, 0, RACK_D * 0.30]} rotation={[Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[RACK_W * 0.84, RACK_D * 0.58]} />
+          <meshStandardMaterial map={textures.lidFoam} roughness={0.92} metalness={0.05} side={THREE.FrontSide} />
+        </mesh>
         {/* Lid handle — small inset pull near the front edge */}
         <mesh position={[0, 0.016, RACK_D * 0.55]}>
           <boxGeometry args={[RACK_W * 0.12, 0.004, 0.018]} />
           <meshStandardMaterial color="#1c1c22" roughness={0.5} metalness={0.7} />
         </mesh>
-        {/* Service-label decal on lid top — small white sticker w/ asset tag */}
+        {/* Service-label decal on lid top */}
         <mesh position={[RACK_W * 0.32, 0.0145, RACK_D * 0.18]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[0.18, 0.06]} />
           <meshStandardMaterial color="#d8d2c2" roughness={0.78} />
         </mesh>
       </group>
 
-      {/* ─── Exposed baseboard (under the lid) ──────────────────────────────
-              Sits at sled-interior top, slightly recessed so the lid sits
-              flush in closed state. PCB plane + 4 SXM packages + cold
-              plates + perimeter DIMM slots. ─────────────────────────────── */}
+      {/* ─── Exposed baseboard (HGX-style) ──────────────────────────────── */}
       <group position={[0, SLED_HALF - 0.012, RACK_D * 0.18]}>
         {/* PCB substrate */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} ref={ensureUv2} receiveShadow>
           <planeGeometry args={[RACK_W * 0.82, RACK_D * 0.58]} />
           <meshStandardMaterial map={textures.pcb} roughness={0.65} metalness={0.15} />
         </mesh>
-        {/* NVSwitch / center hub — slightly taller chip in the middle */}
-        <RoundedBox args={[0.16, 0.022, 0.16]} radius={0.003} smoothness={2} position={[0, 0.011, 0]} castShadow>
-          <meshStandardMaterial color="#1a1a1d" roughness={0.45} metalness={0.55} />
-        </RoundedBox>
-        {/* 4 SXM packages — IHS on top, heatmap plane just above */}
+
+        {/* 4 NVSwitch fabric chips in a cross between the GPUs */}
+        {nvswitchPositions.map(([x, z], i) => (
+          <RoundedBox key={i} args={[0.07, 0.014, 0.07]} radius={0.002} smoothness={2} position={[x, 0.007, z]} castShadow>
+            <meshStandardMaterial color="#22222a" roughness={0.4} metalness={0.6} />
+          </RoundedBox>
+        ))}
+        {/* Tiny NVLink trace silkscreen — subtle gold X across the center */}
+        {[
+          [Math.PI / 4, 0.28], [-Math.PI / 4, 0.28],
+        ].map(([rot, len], i) => (
+          <mesh key={i} position={[0, 0.0035, 0]} rotation={[-Math.PI / 2, 0, rot]}>
+            <planeGeometry args={[len, 0.006]} />
+            <meshBasicMaterial color="#9b8538" transparent opacity={0.55} />
+          </mesh>
+        ))}
+
+        {/* 4 SXM packages */}
         {diePositions.map(([x, z], i) => (
           <group key={i} position={[x, 0, z]}>
-            {/* Package substrate (PCB-green underneath) */}
-            <mesh position={[0, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-              <planeGeometry args={[DIE_W * 1.05, DIE_W * 1.05]} />
-              <meshStandardMaterial color="#102818" roughness={0.6} metalness={0.1} />
-            </mesh>
-            {/* Integrated heat spreader (IHS) — nickel-plated copper look */}
+            {/* Package substrate (PCB-green underneath, slightly raised) */}
+            <RoundedBox args={[DIE_W * 1.08, 0.004, DIE_W * 1.08]} radius={0.002} smoothness={2} position={[0, 0.003, 0]} castShadow>
+              <meshStandardMaterial color="#0e2418" roughness={0.6} metalness={0.1} />
+            </RoundedBox>
+            {/* Integrated heat spreader (IHS) — nickel-plated copper */}
             <RoundedBox args={[DIE_W, 0.016, DIE_W]} radius={0.003} smoothness={2} position={[0, 0.013, 0]} castShadow receiveShadow>
               <meshStandardMaterial color="#9ea2a8" roughness={0.32} metalness={0.85} />
             </RoundedBox>
-            {/* Thermal heatmap overlay — additive plane right above the IHS */}
-            <mesh position={[0, 0.023, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            {/* Die hotspot overlay — Gaussian-falloff shader */}
+            <mesh position={[0, 0.0225, 0]} rotation={[-Math.PI / 2, 0, 0]}>
               <planeGeometry args={[DIE_W * 0.92, DIE_W * 0.92]} />
-              <meshBasicMaterial
-                ref={(m) => { if (m) dieMatRefs.current[i] = m; }}
-                color="#1c6b3a"
-                transparent
-                opacity={0}
-                blending={THREE.AdditiveBlending}
-                depthWrite={false}
-                toneMapped={false}
+              <shaderMaterial
+                ref={(m) => { if (m) dieShaderRefs.current[i] = m; }}
+                args={[{
+                  uniforms: {
+                    uTime: { value: 0 },
+                    uIntensity: { value: 0 },
+                    uColor: { value: new THREE.Color('#c85f2a') },
+                    uSeed: { value: i * 0.37 },
+                  },
+                  vertexShader: HotSpotShader.vertexShader,
+                  fragmentShader: HotSpotShader.fragmentShader,
+                  transparent: true,
+                  depthWrite: false,
+                  blending: THREE.AdditiveBlending,
+                  toneMapped: false,
+                }]}
               />
             </mesh>
-            {/* Cold-plate stub (brushed aluminum block bridging the IHS, with
-                a small copper heatpipe stub running toward the rear) */}
-            <RoundedBox args={[DIE_W * 0.6, 0.02, DIE_W * 0.6]} radius={0.003} smoothness={2} position={[0, 0.034, 0]} castShadow>
+
+            {/* Cold-plate body (brushed alu base) */}
+            <RoundedBox args={[DIE_W * 0.78, 0.008, DIE_W * 0.78]} radius={0.002} smoothness={2} position={[0, 0.027, 0]} castShadow>
               <meshStandardMaterial color="#c0c4c8" roughness={0.45} metalness={0.78} />
             </RoundedBox>
-            {/* Copper heatpipe — small horizontal cylinder */}
-            <mesh position={[0, 0.034, -DIE_W * 0.4]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-              <cylinderGeometry args={[0.008, 0.008, DIE_W * 0.5, 10]} />
-              <meshStandardMaterial color="#b87333" roughness={0.4} metalness={0.85} />
-            </mesh>
+            {/* Cold-plate fins — 12 thin parallel fins running rear→front */}
+            {finOffsets.map((fx, fi) => (
+              <mesh key={fi} position={[fx, 0.036, 0]} castShadow>
+                <boxGeometry args={[0.006, 0.018, DIE_W * 0.74]} />
+                <meshStandardMaterial
+                  ref={fi === 0 && i === 0 ? finMatRef : undefined}
+                  color="#a8acb2"
+                  roughness={0.5}
+                  metalness={0.82}
+                  emissive="#000000"
+                  emissiveIntensity={0}
+                  toneMapped={false}
+                />
+              </mesh>
+            ))}
+            {/* Copper inlet/outlet pipes — two short bent pipes per plate */}
+            {[-0.04, 0.04].map((px, pi) => (
+              <mesh key={pi} position={[px, 0.04, -DIE_W * 0.45]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+                <cylinderGeometry args={[0.006, 0.006, DIE_W * 0.36, 10]} />
+                <meshStandardMaterial color="#b87333" roughness={0.4} metalness={0.85} />
+              </mesh>
+            ))}
           </group>
         ))}
-        {/* Perimeter DIMM slots — 8 thin tall standoffs along the long edges */}
+
+        {/* Rear manifold — all the copper pipes converge to a small block */}
+        <RoundedBox args={[RACK_W * 0.56, 0.022, 0.04]} radius={0.003} smoothness={2} position={[0, 0.034, -RACK_D * 0.27]} castShadow>
+          <meshStandardMaterial color="#8a5526" roughness={0.5} metalness={0.78} />
+        </RoundedBox>
+
+        {/* Perimeter DIMM modules — green PCB stick + black SPD chip + gold edge */}
         {Array.from({ length: 8 }).map((_, i) => {
           const side = i < 4 ? -1 : 1;
           const k = i % 4;
           const x = -0.36 + k * 0.24;
           return (
-            <mesh key={i} position={[x, 0.018, side * RACK_D * 0.24]} castShadow>
-              <boxGeometry args={[0.16, 0.036, 0.012]} />
-              <meshStandardMaterial color="#0a0a0d" roughness={0.6} metalness={0.4} />
-            </mesh>
+            <group key={i} position={[x, 0.018, side * RACK_D * 0.245]}>
+              <mesh castShadow>
+                <boxGeometry args={[0.16, 0.036, 0.012]} />
+                <meshStandardMaterial color="#0d3220" roughness={0.55} metalness={0.18} />
+              </mesh>
+              {/* SPD chip */}
+              <mesh position={[0.05, 0.004, 0.007]}>
+                <boxGeometry args={[0.022, 0.012, 0.002]} />
+                <meshStandardMaterial color="#08080a" roughness={0.45} metalness={0.5} />
+              </mesh>
+              {/* Gold edge contacts at bottom */}
+              <mesh position={[0, -0.017, 0.007]}>
+                <boxGeometry args={[0.15, 0.004, 0.002]} />
+                <meshStandardMaterial color="#caa148" roughness={0.35} metalness={0.92} />
+              </mesh>
+            </group>
           );
         })}
-        {/* Heat-shimmer plane — hovers above the cold plates, faces +Y but
-            tilted slightly toward the camera so the haze reads when seen
-            from a low angle. Additive shader, opacity tracks live thermal. */}
+
+        {/* 2 CPU sockets at the front edge — small IHS squares */}
+        {[-0.18, 0.18].map((cx, i) => (
+          <group key={i} position={[cx, 0, RACK_D * 0.24]}>
+            <RoundedBox args={[0.12, 0.006, 0.12]} radius={0.002} smoothness={2} position={[0, 0.005, 0]} castShadow>
+              <meshStandardMaterial color="#1a1a1d" roughness={0.5} metalness={0.5} />
+            </RoundedBox>
+            <RoundedBox args={[0.094, 0.01, 0.094]} radius={0.002} smoothness={2} position={[0, 0.012, 0]} castShadow>
+              <meshStandardMaterial color="#a8acb2" roughness={0.38} metalness={0.85} />
+            </RoundedBox>
+          </group>
+        ))}
+
+        {/* Heat-shimmer plane — narrower (over cold-plate cluster), additive */}
         <mesh position={[0, 0.18, 0]} rotation={[-Math.PI / 2.2, 0, 0]}>
-          <planeGeometry args={[RACK_W * 0.75, RACK_D * 0.5, 1, 1]} />
+          <planeGeometry args={[RACK_W * 0.65, RACK_D * 0.55, 1, 1]} />
           <shaderMaterial
             ref={shimmerRef}
             args={[{
