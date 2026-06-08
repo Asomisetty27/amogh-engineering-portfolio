@@ -402,6 +402,7 @@ function SubstrateLayer({ spec, textures, labelOpacityRef }: { spec: GPUSpec; te
 
 function SubstrateAndComponentsLayer({ spec, textures, labelOpacityRef }: { spec: GPUSpec; textures: Textures; labelOpacityRef: React.MutableRefObject<number> }) {
   const profile = stackProfileFor(spec);
+  const maps = useGpuMaps();
 
   const smds = useMemo(() => {
     const out: { pos: [number, number, number]; size: [number, number, number]; gold: boolean }[] = [];
@@ -424,9 +425,18 @@ function SubstrateAndComponentsLayer({ spec, textures, labelOpacityRef }: { spec
 
   return (
     <group>
-      {/* PCB body — dark forest green solder mask over FR4; server-grade dark mask, not consumer bright green */}
+      {/* PCB body — dark forest green solder mask over FR4; server-grade dark mask, not consumer bright green.
+          PCB normal map (gpuTextures.pcbNormal) drives micro-relief solder-mask topography for grazing light. */}
       <RoundedBox args={[spec.width - 0.2, 0.22, spec.depth - 0.2]} radius={0.05} smoothness={4}>
-        <meshStandardMaterial color="#0F4A2E" roughness={0.55} metalness={0.05} map={textures.pcb} envMapIntensity={0.9} />
+        <meshStandardMaterial
+          color="#0F4A2E"
+          roughness={0.55}
+          metalness={0.05}
+          map={textures.pcb}
+          normalMap={maps?.pcbNormal ?? undefined}
+          normalScale={maps?.pcbNormal ? new THREE.Vector2(0.6, 0.6) : undefined}
+          envMapIntensity={0.9}
+        />
       </RoundedBox>
       {profile === 'card' && Array.from({ length: 16 }).map((_, i) => (
         <mesh key={`pcie-${i}`} position={[-spec.width / 2 + 1.1 + i * 0.3, -0.02, spec.depth / 2 - 0.18]}>
@@ -447,6 +457,17 @@ function SubstrateAndComponentsLayer({ spec, textures, labelOpacityRef }: { spec
           <meshStandardMaterial color={s.gold ? '#D4AF37' : '#16161a'} roughness={s.gold ? 0.3 : 0.6} metalness={s.gold ? 1.0 : 0.3} roughnessMap={s.gold ? undefined : textures.rough} />
         </mesh>
       ))}
+      {/* AMD INSTINCT silkscreen decal — printed on the PCB short edge of the
+          MI300X OAM module. Faces up; aligned along the long axis of the short edge. */}
+      {spec.id === 'mi300x' && maps?.amdDecal && (
+        <mesh
+          position={[spec.width / 2 - 0.65, 0.115 + 0.001, 0]}
+          rotation={[-Math.PI / 2, 0, -Math.PI / 2]}
+        >
+          <planeGeometry args={[Math.min(spec.depth - 0.8, 3.0), 0.5]} />
+          <meshBasicMaterial map={maps.amdDecal} transparent toneMapped={false} opacity={0.95} />
+        </mesh>
+      )}
       <LayerLabel
         text={profile === 'card' ? 'PCB SUBSTRATE' : 'INTERPOSER · ORGANIC SUBSTRATE'}
         sub={profile === 'card' ? '14-layer FR4 · power delivery' : 'CoWoS-style · die ↔ HBM fabric'}
