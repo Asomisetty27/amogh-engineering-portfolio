@@ -578,7 +578,7 @@ function CoolerLayer({
         {skin && (
           <mesh position={[0, 0.0805, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[spec.width, spec.depth]} />
-            <meshStandardMaterial map={skin} roughness={0.35} metalness={0.65} envMapIntensity={1.15} />
+            <meshStandardMaterial map={skin} roughness={0.92} metalness={0.05} envMapIntensity={0.35} />
           </mesh>
         )}
         <LayerLabel text="COLD PLATE · LIQUID I/F" sub="nickel-plated copper · micro-channel" opacityRef={labelOpacityRef} accent={spec.accent} />
