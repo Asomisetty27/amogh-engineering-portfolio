@@ -1091,8 +1091,12 @@ export default function GPUHeroScene() {
         {GPU_SPECS.map((spec, i) => (
           <GPUCard key={spec.id} spec={spec} index={i} textures={textures} heroLevelRef={heroLevelRef} />
         ))}
-        <ContactShadows position={[0, -3.39, 0]} opacity={0.5} scale={70} blur={2.6} far={6} resolution={512} color="#000000" />
-        <Environment preset="studio" environmentIntensity={0.65} />
+        <ContactShadows position={[0, -3.39, 0]} opacity={0.55} scale={70} blur={2.4} far={6} resolution={1024} color="#000000" />
+        {/* Warehouse HDRI gives metallics a more credible interior reflection
+            than the studio preset — closer to product-shot lighting that real
+            enterprise hardware press photos use. Bumped intensity reads more
+            of the IHS / cold-plate specular highlights. */}
+        <Environment preset="warehouse" environmentIntensity={0.9} />
         <CameraRig camXRef={camXRef} />
         <PostFX camXRef={camXRef} />
       </Canvas>
