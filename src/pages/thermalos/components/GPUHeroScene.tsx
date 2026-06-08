@@ -1261,13 +1261,15 @@ export default function GPUHeroScene() {
         <color attach="background" args={[CINE.voidDeep]} />
         <Backdrop />
         <SceneLights camXRef={camXRef} />
-        <Runway textures={textures} />
-        {GPU_SPECS.map((spec, i) => (
-          <GPUCard key={spec.id} spec={spec} index={i} textures={textures} heroLevelRef={heroLevelRef} />
-        ))}
+        <Suspense fallback={null}>
+          <GpuMapsProvider>
+            <Runway textures={textures} />
+            {GPU_SPECS.map((spec, i) => (
+              <GPUCard key={spec.id} spec={spec} index={i} textures={textures} heroLevelRef={heroLevelRef} />
+            ))}
+          </GpuMapsProvider>
+        </Suspense>
         <ContactShadows position={[0, -3.39, 0]} opacity={0.7} scale={80} blur={2.6} far={6} resolution={1024} color="#000000" />
-        {/* Lower env intensity — the cinematic rig (strip + rim + cyc) is now
-            doing the lighting work. HDRI only fills micro-reflections. */}
         <Environment preset="warehouse" environmentIntensity={0.35} />
         <CameraRig camXRef={camXRef} />
         <PostFX camXRef={camXRef} />
