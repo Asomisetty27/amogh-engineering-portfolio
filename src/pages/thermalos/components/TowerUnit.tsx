@@ -1652,21 +1652,23 @@ const _camLook = new THREE.Vector3();
 
 function CameraDrift() {
   const { camera } = useThree();
-  const cur = useRef(new THREE.Vector3(0, 1.75, 4.4));
-  const look = useRef(new THREE.Vector3(0.05, 1.55, -0.4));
+  const cur = useRef(new THREE.Vector3(0, 2.25, 4.4));
+  const look = useRef(new THREE.Vector3(0.05, 1.5, -0.4));
 
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime;
-    // Camera position — wide slow wander on X, narrow slow on Y, medium on Z
+    // Camera position — wide slow wander on X, narrow slow on Y, medium on Z.
+    // Raised eye-height so the framing looks down into the chassis rather than
+    // up at the rack face.
     _camTarget.set(
       noiseX(t * 0.08, 0, 0) * 0.55,            // ~±0.55 sideways
-      1.72 + noiseY(0, t * 0.06, 0) * 0.14,     // ~±0.14 vertical
+      2.22 + noiseY(0, t * 0.06, 0) * 0.14,     // ~±0.14 vertical
       4.15 + noiseZ(0, 0, t * 0.07) * 0.28      // ~±0.28 forward/back
     );
     // Look-target — micro-jitter so the framing 'breathes' on the towers
     _camLook.set(
       0.05 + noiseLX(t * 0.11, 5, 0) * 0.08,
-      1.55 + noiseLY(7, t * 0.09, 0) * 0.06,
+      1.5 + noiseLY(7, t * 0.09, 0) * 0.06,
       -0.4
     );
 
