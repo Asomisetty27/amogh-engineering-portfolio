@@ -252,7 +252,54 @@ function makeOrganicSubstrateTexture(): THREE.CanvasTexture {
   return t;
 }
 
-type Textures = { pcb: THREE.CanvasTexture; rough: THREE.CanvasTexture; brushed: THREE.CanvasTexture; organic: THREE.CanvasTexture };
+// Product-text decal — transparent canvas with crisp wordmark used as an
+// emissive/printed label on shroud tops and cold-plate lids. This is the
+// single biggest "real GPU vs generic 3D box" tell — every shipped accelerator
+// has its model name screen-printed or laser-etched on the exterior.
+function makeProductTextDecal(
+  primary: string,
+  secondary?: string,
+  opts: { color?: string; sub?: string; align?: 'center' | 'left'; tracking?: number } = {}
+): THREE.CanvasTexture {
+  const W = 1024, H = 256;
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d')!;
+  ctx.clearRect(0, 0, W, H);
+  const color = opts.color ?? '#E8E8EE';
+  const tracking = opts.tracking ?? 0.18;
+  ctx.fillStyle = color;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = opts.align ?? 'center';
+  const x = opts.align === 'left' ? 48 : W / 2;
+  // Primary wordmark — bold, wide-tracked
+  ctx.font = `700 96px "Helvetica Neue", "Arial Black", sans-serif`;
+  const tracked = primary.split('').join(String.fromCharCode(8201)); // thin-space tracking
+  ctx.shadowColor = 'rgba(0,0,0,0.35)';
+  ctx.shadowBlur = 4;
+  ctx.fillText(tracked, x, H / 2 - (secondary ? 28 : 0));
+  ctx.shadowBlur = 0;
+  if (secondary) {
+    ctx.font = `400 44px "JetBrains Mono", ui-monospace, monospace`;
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.72;
+    const trackedSub = secondary.split('').join(String.fromCharCode(8201));
+    ctx.fillText(trackedSub, x, H / 2 + 50);
+    ctx.globalAlpha = 1;
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
+}
+
+type Textures = {
+  pcb: THREE.CanvasTexture;
+  rough: THREE.CanvasTexture;
+  brushed: THREE.CanvasTexture;
+  organic: THREE.CanvasTexture;
+  decals: Record<string, THREE.CanvasTexture>;
+};
 
 // ──────────────────────────────────────────────────────────────────────────
 // Instanced helpers — keep draw calls flat across five simultaneous assemblies
