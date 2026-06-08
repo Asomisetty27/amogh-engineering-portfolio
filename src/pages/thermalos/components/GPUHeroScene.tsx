@@ -369,10 +369,13 @@ function SubstrateLayer({ spec, textures, labelOpacityRef }: { spec: GPUSpec; te
   }
   return (
     <group>
+      {/* Module baseplate — organic ABF substrate (dark brown-black), NOT green FR4.
+          This is the visual cue that says "server module, not consumer card". */}
       <RoundedBox args={[spec.width, 0.12, spec.depth]} radius={0.04} smoothness={4}>
-        <meshStandardMaterial color="#16161a" roughness={0.32} metalness={0.78} roughnessMap={textures.rough} envMapIntensity={1.0} />
+        <meshStandardMaterial color="#1C1C20" roughness={0.5} metalness={0.1} map={textures.organic} envMapIntensity={1.0} />
       </RoundedBox>
-      <InstancedBoxes positions={pads} size={[0.1, 0.02, 0.07]} color="#d8b840" roughness={0.1} metalness={1} />
+      {/* SXM5/OAM mezzanine pads — gold-on-nickel; same plated-gold spec as PCIe fingers */}
+      <InstancedBoxes positions={pads} size={[0.1, 0.02, 0.07]} color="#D4AF37" roughness={0.28} metalness={1.0} />
       <LayerLabel text="MODULE BASEPLATE" sub="SXM5 / OAM contact array · 56 pads" opacityRef={labelOpacityRef} accent={spec.accent} />
     </group>
   );
@@ -402,13 +405,16 @@ function SubstrateAndComponentsLayer({ spec, textures, labelOpacityRef }: { spec
 
   return (
     <group>
+      {/* PCB body — dark forest green solder mask over FR4; server-grade dark mask, not consumer bright green */}
       <RoundedBox args={[spec.width - 0.2, 0.22, spec.depth - 0.2]} radius={0.05} smoothness={4}>
-        <meshStandardMaterial color="#0a1a0a" roughness={0.82} metalness={0.06} map={textures.pcb} envMapIntensity={0.9} />
+        <meshStandardMaterial color="#0F4A2E" roughness={0.55} metalness={0.05} map={textures.pcb} envMapIntensity={0.9} />
       </RoundedBox>
       {profile === 'card' && Array.from({ length: 16 }).map((_, i) => (
         <mesh key={`pcie-${i}`} position={[-spec.width / 2 + 1.1 + i * 0.3, -0.02, spec.depth / 2 - 0.18]}>
           <boxGeometry args={[0.2, 0.2, 0.4]} />
-          <meshStandardMaterial color="#e0b430" roughness={0.06} metalness={1.0} />
+          {/* PCIe gold fingers — nickel underplate + hard gold overplate; roughness slightly above
+              pure gold so it reads as plated, not solid. */}
+          <meshStandardMaterial color="#D4AF37" roughness={0.28} metalness={1.0} />
         </mesh>
       ))}
       {inductors.map((p, i) => (
@@ -419,7 +425,7 @@ function SubstrateAndComponentsLayer({ spec, textures, labelOpacityRef }: { spec
       {smds.map((s, i) => (
         <mesh key={`smd-${i}`} position={s.pos}>
           <boxGeometry args={s.size} />
-          <meshStandardMaterial color={s.gold ? '#c8a838' : '#16161a'} roughness={s.gold ? 0.3 : 0.6} metalness={s.gold ? 0.8 : 0.3} roughnessMap={textures.rough} />
+          <meshStandardMaterial color={s.gold ? '#D4AF37' : '#16161a'} roughness={s.gold ? 0.3 : 0.6} metalness={s.gold ? 1.0 : 0.3} roughnessMap={s.gold ? undefined : textures.rough} />
         </mesh>
       ))}
       <LayerLabel
