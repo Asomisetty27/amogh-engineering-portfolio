@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useRef, useMemo, useEffect, useState } from 'react';
+import { useRef, useMemo, useEffect, useState, Suspense, createContext, useContext } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { RoundedBox, Environment, Html, ContactShadows, MeshReflectorMaterial } from '@react-three/drei';
 import {
@@ -12,6 +12,18 @@ import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
 import { createNoise3D } from 'simplex-noise';
+import { useGpuTextures, type GpuTextures } from './gpuTextures';
+
+// PBR maps from gpuTextures.ts — loaded once inside Suspense and threaded via
+// context so individual layer components can opt in without prop churn.
+const GpuMapsCtx = createContext<GpuTextures | null>(null);
+function GpuMapsProvider({ children }: { children: React.ReactNode }) {
+  const maps = useGpuTextures();
+  return <GpuMapsCtx.Provider value={maps}>{children}</GpuMapsCtx.Provider>;
+}
+function useGpuMaps(): GpuTextures | null {
+  return useContext(GpuMapsCtx);
+}
 
 RectAreaLightUniformsLib.init();
 
