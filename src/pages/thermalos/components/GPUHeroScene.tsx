@@ -729,9 +729,11 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
   } else if (spec.dieLayout === 'dual-die') {
     dies = [{ pos: [-0.66, 0.07, 0], w: 1.25, d: 1.7 }, { pos: [0.66, 0.07, 0], w: 1.25, d: 1.7 }];
   } else {
+    // MI300X: 8 XCD/IOD chiplets in a tight 2×4 grid hybrid-bonded onto the
+    // active interposer — compact, central, NOT spread across the package.
     dies = [];
     for (let r = 0; r < 2; r++) for (let cI = 0; cI < 4; cI++) {
-      dies.push({ pos: [-1.05 + cI * 0.7, 0.07, -0.42 + r * 0.84], w: 0.6, d: 0.74 });
+      dies.push({ pos: [-0.63 + cI * 0.42, 0.07, -0.24 + r * 0.48], w: 0.38, d: 0.44 });
     }
   }
 
@@ -768,21 +770,23 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
         }
       });
     } else {
-      // Chiplet grid (MI300X): ring HBM around the chiplet field.
-      const ringR = 2.3;
-      for (let i = 0; i < spec.memCount; i++) {
-        const a = (i / spec.memCount) * Math.PI * 2 + Math.PI / spec.memCount;
-        out.push({
-          pos: [Math.cos(a) * ringR, hbmH / 2, Math.sin(a) * (ringR * (spec.depth / spec.width))],
-          w: 0.6, d: 0.6, h: hbmH,
-        });
-      }
+      // MI300X: 8 HBM3 stacks in two parallel rows of 4, flanking the central
+      // chiplet complex along the long edges (reference: AMD MI300X die shot).
+      // NOT a decorative ring — real package geometry.
+      const perSide = Math.max(1, Math.floor(spec.memCount / 2));
+      const zSpan = 2.0;
+      [-1, 1].forEach((side) => {
+        for (let i = 0; i < perSide; i++) {
+          const z = perSide === 1 ? 0 : -zSpan / 2 + (i * zSpan) / (perSide - 1);
+          out.push({ pos: [side * 1.25, hbmH / 2, z], w: 0.42, d: 0.44, h: hbmH });
+        }
+      });
     }
     return out;
   }, [spec]);
 
-  const dieLabel = spec.dieLayout === 'dual-die' ? 'DUAL-DIE COMPLEX' : spec.dieLayout === 'chiplet-grid' ? 'CHIPLET ARRAY · 8×' : 'MONOLITHIC DIE';
-  const showIHS = spec.dieLayout !== 'chiplet-grid'; // dual-die + monolithic have metallic IHS caps
+  const dieLabel = spec.dieLayout === 'dual-die' ? 'DUAL-DIE COMPLEX' : spec.dieLayout === 'chiplet-grid' ? 'CHIPLET ARRAY · 8×XCD' : 'MONOLITHIC DIE';
+  const showIHS = true; // all three layouts ship with a metallic IHS in the real packages
 
   return (
     <group>
@@ -796,16 +800,22 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
           <RoundedBox args={[d.w, 0.12, d.d]} radius={0.02} smoothness={3} position={d.pos}>
             <meshStandardMaterial ref={(m) => { matRefs.current[i] = m; }} color="#16161C" roughness={0.15} metalness={0.3} />
           </RoundedBox>
-          {/* IHS (integrated heat spreader) — nickel-plated copper cap that
-              actually contacts the cold plate. The metallic shine sitting
-              above the matte die is the canonical "real silicon package" tell. */}
-          {showIHS && (
+          {/* Per-die IHS — only for monolithic/dual-die. Chiplet grid gets a
+              single unified IHS rendered separately below. */}
+          {showIHS && spec.dieLayout !== 'chiplet-grid' && (
             <RoundedBox args={[d.w * 1.04, 0.05, d.d * 1.04]} radius={0.015} smoothness={3} position={[d.pos[0], d.pos[1] + 0.085, d.pos[2]]}>
               <meshStandardMaterial color="#CFCAC0" roughness={0.22} metalness={0.92} envMapIntensity={1.2} />
             </RoundedBox>
           )}
         </group>
       ))}
+      {/* MI300X unified IHS — one large nickel-plated copper lid spanning the
+          entire 2×4 chiplet field (reference: AMD MI300X package photography). */}
+      {spec.dieLayout === 'chiplet-grid' && (
+        <RoundedBox args={[2.0, 0.05, 1.15]} radius={0.025} smoothness={4} position={[0, 0.155, 0]}>
+          <meshStandardMaterial color="#CFCAC0" roughness={0.22} metalness={0.92} envMapIntensity={1.2} />
+        </RoundedBox>
+      )}
       {memPositions.map((m, i) => (
         <group key={`mem-${i}`} position={m.pos}>
           {/* HBM stack base — dark ABF organic substrate */}
