@@ -1045,6 +1045,8 @@ export default function TowerUnit() {
     chassisAO: makeChassisAO(),
     sledFace: makeSledFaceColor(),
     floor: makeFloorColor(),
+    doorPerf: makeDoorPerf(),
+    pcb: makePCBColor(),
   }), []);
 
   // Shared geometries — instantiated once, reused across all instances.
