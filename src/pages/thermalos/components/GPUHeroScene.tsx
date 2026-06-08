@@ -563,25 +563,23 @@ function CoolerLayer({
   );
 
   if (spec.cooler === 'cold-plate') {
-    // Liquid-cooled module lid — flat nickel-plated copper plate, machined
-    // micro-channel grooves visible on the underside when separated.
-    const decal = textures.decals[spec.id];
+    // Liquid-cooled module — full top face replaced with a real-photo product
+    // skin (nickel IHS + HBM stacks + substrate + brand wordmark) generated
+    // from authoritative reference shots and clamped to the module dimensions.
+    const skin = maps?.skins?.[spec.id];
     return (
       <group>
-        {/* Cold-plate lid — nickel-plated copper, lapped smooth for thermal contact
-            (NOT brushed — brushed surface would defeat its purpose). Warmer/yellower
-            than chrome. */}
         <RoundedBox args={[spec.width - 0.3, 0.16, spec.depth - 0.3]} radius={0.05} smoothness={4}>
-          <meshStandardMaterial ref={lidMatRef} color="#D8D6D2" roughness={0.18} metalness={0.97} envMapIntensity={1.25} emissive="#000" emissiveIntensity={0} map={maps?.nickelBrushed ?? undefined} />
+          <meshStandardMaterial ref={lidMatRef} color="#1a1a1f" roughness={0.45} metalness={0.55} envMapIntensity={1.0} emissive="#000" emissiveIntensity={0} />
         </RoundedBox>
         <InstancedBoxes positions={grooves} size={[0.05, 0.05, spec.depth - 0.5]} color="#CFCAC0" roughness={0.25} metalness={0.9} />
-        {/* Laser-etched product wordmark on the lid top face — every real
-            SXM/OAM module has this exact stamp ("NVIDIA H100", "AMD INSTINCT
-            MI300X", etc.) */}
-        {decal && (
+        {skin && (
           <mesh position={[0, 0.082, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[(spec.width - 0.5) * 0.78, (spec.depth - 0.5) * 0.22]} />
-            <meshBasicMaterial map={decal} transparent toneMapped={false} opacity={0.85} depthWrite={false} />
+            <planeGeometry args={[spec.width - 0.32, spec.depth - 0.32]} />
+            {/* meshStandardMaterial so the IHS reflects studio lighting as a
+                real metal surface would, while the printed circuitry/text
+                remain albedo-readable. */}
+            <meshStandardMaterial map={skin} roughness={0.35} metalness={0.65} envMapIntensity={1.15} />
           </mesh>
         )}
         <LayerLabel text="COLD PLATE · LIQUID I/F" sub="nickel-plated copper · micro-channel" opacityRef={labelOpacityRef} accent={spec.accent} />
