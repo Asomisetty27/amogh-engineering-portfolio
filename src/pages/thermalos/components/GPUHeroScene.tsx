@@ -563,25 +563,23 @@ function CoolerLayer({
   );
 
   if (spec.cooler === 'cold-plate') {
-    // Liquid-cooled module lid — flat nickel-plated copper plate, machined
-    // micro-channel grooves visible on the underside when separated.
-    const decal = textures.decals[spec.id];
+    // Liquid-cooled module — full top face replaced with a real-photo product
+    // skin (nickel IHS + HBM stacks + substrate + brand wordmark) generated
+    // from authoritative reference shots and clamped to the module dimensions.
+    const skin = maps?.skins?.[spec.id];
     return (
       <group>
-        {/* Cold-plate lid — nickel-plated copper, lapped smooth for thermal contact
-            (NOT brushed — brushed surface would defeat its purpose). Warmer/yellower
-            than chrome. */}
         <RoundedBox args={[spec.width - 0.3, 0.16, spec.depth - 0.3]} radius={0.05} smoothness={4}>
-          <meshStandardMaterial ref={lidMatRef} color="#D8D6D2" roughness={0.18} metalness={0.97} envMapIntensity={1.25} emissive="#000" emissiveIntensity={0} map={maps?.nickelBrushed ?? undefined} />
+          <meshStandardMaterial ref={lidMatRef} color="#1a1a1f" roughness={0.45} metalness={0.55} envMapIntensity={1.0} emissive="#000" emissiveIntensity={0} />
         </RoundedBox>
         <InstancedBoxes positions={grooves} size={[0.05, 0.05, spec.depth - 0.5]} color="#CFCAC0" roughness={0.25} metalness={0.9} />
-        {/* Laser-etched product wordmark on the lid top face — every real
-            SXM/OAM module has this exact stamp ("NVIDIA H100", "AMD INSTINCT
-            MI300X", etc.) */}
-        {decal && (
+        {skin && (
           <mesh position={[0, 0.082, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[(spec.width - 0.5) * 0.78, (spec.depth - 0.5) * 0.22]} />
-            <meshBasicMaterial map={decal} transparent toneMapped={false} opacity={0.85} depthWrite={false} />
+            <planeGeometry args={[spec.width - 0.32, spec.depth - 0.32]} />
+            {/* meshStandardMaterial so the IHS reflects studio lighting as a
+                real metal surface would, while the printed circuitry/text
+                remain albedo-readable. */}
+            <meshStandardMaterial map={skin} roughness={0.35} metalness={0.65} envMapIntensity={1.15} />
           </mesh>
         )}
         <LayerLabel text="COLD PLATE · LIQUID I/F" sub="nickel-plated copper · micro-channel" opacityRef={labelOpacityRef} accent={spec.accent} />
@@ -670,17 +668,14 @@ function CoolerLayer({
             </mesh>
           ))}
         </group>
-        {/* NVIDIA green accent strip — the only chromatic element on the card */}
-        <mesh position={[0, shellH / 2 + 0.045, ribLen / 2 - 0.6]}>
-          <boxGeometry args={[shellW * 0.45, 0.005, 0.5]} />
-          <meshStandardMaterial color={spec.accent} roughness={0.3} metalness={0.4} emissive={spec.accent} emissiveIntensity={0.55} toneMapped={false} />
-        </mesh>
-        {/* Screen-printed product wordmark on the top face — real L40S has
-            "NVIDIA L40S" silkscreened in green along the heatsink top. */}
-        {textures.decals.l40s && (
-          <mesh position={[0, shellH / 2 + 0.052, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[shellW * 0.62, ribLen * 0.18]} />
-            <meshBasicMaterial map={textures.decals.l40s} transparent toneMapped={false} opacity={0.9} depthWrite={false} />
+        {/* Photoreal product skin draped over the entire top face — ribbed
+            anodized heatsink, NVIDIA logo + L40S wordmark, mounting screws,
+            all sourced from a real product photo. Sits just above the rib
+            geometry so grazing light still picks up rib relief at the edges. */}
+        {maps?.skins?.l40s && (
+          <mesh position={[0, shellH / 2 + 0.055, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[shellW, ribLen]} />
+            <meshStandardMaterial map={maps.skins.l40s} roughness={0.55} metalness={0.55} envMapIntensity={1.0} />
           </mesh>
         )}
         <LayerLabel text="PASSIVE FIN STACK · 4× DP" sub="anodized aluminum extrusion · server airflow" opacityRef={labelOpacityRef} accent={spec.accent} />
@@ -711,35 +706,31 @@ function CoolerLayer({
           <meshStandardMaterial ref={finMatRef} color="#CFCAC0" roughness={0.18} metalness={0.95} emissive="#c85f2a" emissiveIntensity={0} map={maps?.nickelBrushed ?? undefined} />
         </mesh>
       </group>
-      {/* Shroud — injection-molded plastic; matte, low reflectivity. For
-          blower cards the shroud is a SEALED full-cover lid (no fan cutouts
-          on top); for triple-fan the shroud has fan openings cut into it. */}
+      {/* Shroud body — dark matte plastic. The photoreal product skin draped
+          on top carries all the visible exterior detail (fan grille, brand
+          wordmark, accent strip) so the shroud underneath only contributes
+          thickness and side faces. */}
       <RoundedBox args={[spec.width, 0.34, spec.depth]} radius={0.06} smoothness={4} position={[0, 0.5, 0]}>
-        <meshStandardMaterial color={isBlower ? '#0E0E11' : '#1A1A1F'} roughness={isBlower ? 0.5 : 0.65} metalness={isBlower ? 0.05 : 0.0} />
+        <meshStandardMaterial color={isBlower ? '#0E0E11' : '#1A1A1F'} roughness={isBlower ? 0.55 : 0.65} metalness={0.05} />
       </RoundedBox>
-      {/* Wordmark on top — centered on the smooth blower lid, or sub-strip
-          between fans on the triple-fan shroud. */}
-      {isBlower && textures.decals.a100 && (
-        <mesh position={[fanX[0] + fanRadius + 0.6, 0.68, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[spec.width * 0.55, spec.depth * 0.55]} />
-          <meshBasicMaterial map={textures.decals.a100} transparent toneMapped={false} opacity={0.92} depthWrite={false} />
+      {/* Photoreal top-face skin — sized to the full shroud footprint. For
+          A100 this image already contains the radial blower, the smooth lid
+          with "NVIDIA A100" silkscreen, and the green accent strip, so we
+          don't render those features in 3D underneath. */}
+      {isBlower && maps?.skins?.a100 && (
+        <mesh position={[0, 0.68, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[spec.width, spec.depth]} />
+          <meshStandardMaterial map={maps.skins.a100} roughness={0.55} metalness={0.25} envMapIntensity={1.0} />
         </mesh>
       )}
-      {/* Per-fan housings */}
-      {fanX.map((x, i) => (
+      {/* 3D fan(s) — only for triple-fan archetype; the A100 blower's fan is
+          rendered as part of the printed skin above. */}
+      {!isBlower && fanX.map((x, i) => (
         <group key={`fan-grp-${i}`}>
-          {/* Fan bezel ring — recessed into the shroud */}
           <mesh position={[x, 0.7, 0]} rotation={[Math.PI / 2, 0, 0]}>
             <torusGeometry args={[fanRadius * 1.05, 0.05, 10, 48]} />
             <meshStandardMaterial color="#1c1c1e" roughness={0.4} metalness={0.4} />
           </mesh>
-          {isBlower && (
-            /* Blower intake guard — finger-grille rim, sealed mesh below */
-            <mesh position={[x, 0.69, 0]} rotation={[Math.PI / 2, 0, 0]}>
-              <ringGeometry args={[fanRadius * 0.18, fanRadius * 1.0, 48]} />
-              <meshStandardMaterial color="#08080a" roughness={0.85} metalness={0.1} side={THREE.DoubleSide} />
-            </mesh>
-          )}
           <group position={[x, 0.78, 0]}>
             <Fan fanRef={fanRefs[i]} radius={fanRadius} />
           </group>
