@@ -865,10 +865,10 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
 
   return (
     <group>
-      <mesh position={[0, -0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[1.05, 1.05, 0.02, 32]} />
-        <meshStandardMaterial color="#8a8a8a" roughness={0.5} metalness={0.2} />
-      </mesh>
+      {/* Package substrate / interposer — rectangular, matching real silicon footprint */}
+      <RoundedBox args={[spec.width * 0.92, 0.04, spec.depth * 0.92]} radius={0.03} smoothness={3} position={[0, -0.02, 0]}>
+        <meshStandardMaterial color="#1C1C20" roughness={0.5} metalness={0.1} />
+      </RoundedBox>
       {dies.map((d, i) => (
         <group key={i}>
           {/* Lapped silicon die — near-black with faint blue tint */}
