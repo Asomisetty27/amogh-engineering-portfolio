@@ -448,7 +448,7 @@ function Hero() {
           }}>
             {/* Corner bracket — lab-instrument style */}
             <span style={{ position: 'absolute', top: 0, left: 0, width: 16, height: 16, border: `1px solid ${T.amber}`, borderRight: 'none', borderBottom: 'none' }} />
-            Thermal forensics<br />for <span className="tos-grad-text">GPU clusters.</span>
+            Thermal forensics<br />for <span className="tos-grad-text" style={{ fontFamily: "'Instrument Serif', Didot, Georgia, serif", fontStyle: 'italic', fontWeight: 400, letterSpacing: '-.02em' }}>GPU clusters.</span>
           </h1>
           <p data-h style={{
             opacity: 0,
