@@ -22,29 +22,31 @@ const GPUHeroScene = React.lazy(() => import('./components/GPUHeroScene'));
 const DataCenterShowcase = React.lazy(() => import('./components/DataCenterShowcase'));
 const OperatorViewShowcase = React.lazy(() => import('./components/OperatorViewShowcase'));
 import ThetaLogo from '../../components/ThetaLogo';
+import { COLORS, TYPOGRAPHY, COMPONENTS, EASING } from './design-system';
 
-/* ─── Design tokens ───────────────────────────────────────────────────────── */
+/* ─── Design tokens (Industrial Instrument aesthetic) ───────────────────── */
 const T = {
-  bg:        '#09090D',
-  s0:        '#0C0C11',
-  s1:        '#111117',
-  s2:        '#17171E',
+  bg:        COLORS.bg.deep,
+  s0:        COLORS.bg.panel,
+  s1:        COLORS.bg.surface,
+  s2:        COLORS.bg.raised,
   s3:        '#1C1C24',
-  border:    '#232330',
+  border:    COLORS.steel.faint,
   borderHi:  '#2E2E3E',
-  text:      '#E8E8F0',
-  muted:     '#818190',
-  faint:     '#404050',
-  healthy:   '#27A05A',
-  caution:   '#C8942A',
-  rising:    '#C85F2A',
-  critical:  '#B83030',
-  bp:        '#5878A8',
+  text:      COLORS.steel.bright,
+  muted:     COLORS.steel.muted,
+  faint:     COLORS.steel.faint,
+  healthy:   COLORS.thermal.healthy,
+  caution:   COLORS.thermal.caution,
+  rising:    COLORS.thermal.rising,
+  critical:  COLORS.thermal.critical,
+  bp:        COLORS.accent,
+  amber:     COLORS.amber.medium,
 };
 
-const FD  = "'Space Grotesk', system-ui, sans-serif";
-const FM  = "'JetBrains Mono', ui-monospace, monospace";
-const EASE = [0.25, 0.46, 0.45, 0.94] as const;
+const FD = TYPOGRAPHY.display.fontFamily;
+const FM = TYPOGRAPHY.labels.fontFamily;
+const EASE = EASING.snappy;
 
 function rm() {
   return typeof window !== 'undefined' &&
@@ -434,7 +436,15 @@ function Hero() {
             letterSpacing: '-.04em',
             lineHeight: 0.95,
             marginBottom: 18,
+            position: 'relative',
+            paddingLeft: 20,
+            paddingTop: 12,
+            background: `linear-gradient(135deg, ${T.bg} 0%, ${T.s0} 50%, ${T.bg} 100%)`,
+            borderTop: `1px solid ${T.faint}`,
+            borderLeft: `1px solid ${T.faint}`,
           }}>
+            {/* Corner bracket — lab-instrument style */}
+            <span style={{ position: 'absolute', top: 0, left: 0, width: 16, height: 16, border: `1px solid ${T.amber}`, borderRight: 'none', borderBottom: 'none' }} />
             Thermal forensics<br />for <span className="tos-grad-text">GPU clusters.</span>
           </h1>
           <p data-h style={{
@@ -485,9 +495,19 @@ function Hero() {
       {/* ── STATS ROW — sits below canvas ── */}
       <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 32px 80px' }}>
         <div data-h style={{ opacity: 0 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 1, border: `1px solid ${T.border}`, borderRadius: 6, overflow: 'hidden', background: T.border }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 2, borderRadius: 6, overflow: 'hidden', background: T.s2 }}>
             {HERO_STATS.map((s) => (
-              <div key={s.l} style={{ background: T.s1, padding: '20px 24px' }}>
+              <div key={s.l} style={{
+                background: T.s1,
+                border: `1px solid ${T.border}`,
+                padding: '20px 24px',
+                position: 'relative',
+                boxShadow: `inset 0 1px 0 rgba(255,255,255,0.03), 0 2px 6px rgba(0,0,0,0.4)`,
+              }}>
+                {/* Calibration label */}
+                <div style={{ fontSize: 7.5, letterSpacing: '0.22em', color: T.amber, textTransform: 'uppercase', marginBottom: 12, opacity: 0.7 }}>
+                  ⬚ {s.l.substring(0, 3)}
+                </div>
                 <div style={{ fontFamily: FM, fontSize: 28, fontWeight: 600, letterSpacing: '-.02em', color: T.text, fontVariantNumeric: 'tabular-nums' }}>{s.v}</div>
                 <div style={{ fontFamily: FM, fontSize: 9, color: T.healthy, marginTop: 6, letterSpacing: '.08em', textTransform: 'uppercase' }}>{s.l}</div>
                 <div style={{ fontFamily: FM, fontSize: 9, color: T.faint, marginTop: 2, letterSpacing: '.02em' }}>{s.s}</div>
