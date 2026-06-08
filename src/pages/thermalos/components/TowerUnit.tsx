@@ -1462,6 +1462,7 @@ export default function TowerUnit() {
     floor: makeFloorColor(),
     doorPerf: makeDoorPerf(),
     pcb: makePCBColor(),
+    lidFoam: makeLidFoam(),
   }), []);
 
   // Shared geometries — instantiated once, reused across all instances.
