@@ -578,7 +578,7 @@ function CoolerLayer({
         {skin && (
           <mesh position={[0, 0.0805, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[spec.width, spec.depth]} />
-            <meshStandardMaterial map={skin} roughness={0.35} metalness={0.65} envMapIntensity={1.15} />
+            <meshStandardMaterial map={skin} roughness={0.92} metalness={0.05} envMapIntensity={0.35} />
           </mesh>
         )}
         <LayerLabel text="COLD PLATE · LIQUID I/F" sub="nickel-plated copper · micro-channel" opacityRef={labelOpacityRef} accent={spec.accent} />
@@ -608,7 +608,7 @@ function CoolerLayer({
         {maps?.skins?.l40s && (
           <mesh position={[0, shellH / 2 + 0.004, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[spec.width, spec.depth]} />
-            <meshStandardMaterial map={maps.skins.l40s} roughness={0.55} metalness={0.55} envMapIntensity={1.0} />
+            <meshStandardMaterial map={maps.skins.l40s} roughness={0.9} metalness={0.1} envMapIntensity={0.35} />
           </mesh>
         )}
         <LayerLabel text="PASSIVE FIN STACK · 4× DP" sub="anodized aluminum extrusion · server airflow" opacityRef={labelOpacityRef} accent={spec.accent} />
@@ -643,7 +643,7 @@ function CoolerLayer({
       {maps?.skins?.a100 && (
         <mesh position={[0, 0.5 + shroudH / 2 + 0.004, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[spec.width, spec.depth]} />
-          <meshStandardMaterial map={maps.skins.a100} roughness={0.55} metalness={0.25} envMapIntensity={1.0} />
+          <meshStandardMaterial map={maps.skins.a100} roughness={0.92} metalness={0.05} envMapIntensity={0.35} />
         </mesh>
       )}
       {/* PCIe bracket — full-height steel I/O end-plate at +z edge. Real
