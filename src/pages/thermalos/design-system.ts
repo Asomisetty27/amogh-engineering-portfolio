@@ -3,34 +3,37 @@
 // Credibility signal: "built by people who understand hardware"
 
 export const COLORS = {
-  // Champagne gold phosphor — the primary visual signature
+  // Champagne gold — primary brand accent (used sparingly, where it matters)
   amber: {
-    bright: '#FFE8BC',    // champagne highlight
-    medium: '#D4AF37',    // 18k gold active
-    dim: '#8A6F2E',       // deep champagne faint
+    bright: '#F5D98A',    // champagne highlight (rare — peak moments)
+    medium: '#D4AF37',    // 18k gold — primary CTA, brand mark
+    dim: '#8A6F2E',       // deep champagne — secondary borders/labels
   },
-  // Warm platinum + obsidian (instrument bezel)
+  // Warm platinum + obsidian — typographic + bezel hierarchy
   steel: {
-    bright: '#ECE6D8',    // warm platinum text
-    muted: '#9A9285',     // warm muted
-    faint: '#3A332A',     // warm faint border
+    bright: '#F0EADC',    // warm ivory text (highest contrast on obsidian)
+    muted: '#A8A092',     // warm muted (body text, secondary)
+    faint: '#48402F',     // warm faint border (more lift than before)
   },
-  // Canvas background — obsidian
+  // Canvas backgrounds — clear elevation stepping for depth
   bg: {
-    deep: '#07060A',      // screen obsidian
-    panel: '#0C0B0F',     // instrument panel
-    surface: '#13111A',   // card surface
-    raised: '#1B1822',    // raised surface
+    deep: '#050407',      // true obsidian (page bg, deepest)
+    panel: '#0E0C12',     // instrument panel (sections)
+    surface: '#181522',   // card surface (lifted 1)
+    raised: '#221E2E',    // raised surface (lifted 2 — hover/active)
   },
-  // Semantic thermal colors (unchanged — already proven)
+  // Semantic thermal colors — distinguishable, not all gold
   thermal: {
-    healthy: '#D4AF37',   // champagne gold (brand)
+    healthy: '#D4AF37',   // champagne gold — brand / OK
     caution: '#E8B23A',   // amber
-    rising: '#C85F2A',    // burnt orange
+    rising: '#C85F2A',    // burnt orange / copper
     critical: '#B83030',  // crimson
   },
-  // Accent for interactive elements — warm champagne
-  accent: '#C9A84C',      // champagne accent (was cool blue)
+  // Accents for differentiation when needed
+  accent: '#C9A84C',      // champagne accent (links, focus)
+  copper: '#B87333',      // burnished copper (secondary accent — counterpoint to gold)
+  platinum: '#D8D2C2',    // bright platinum (highlights, dividers)
+  ink: '#6E91C8',         // deep blueprint blue (kept for data/diagram accents only)
 };
 
 export const TYPOGRAPHY = {
