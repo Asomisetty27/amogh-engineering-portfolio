@@ -706,13 +706,16 @@ function Sled({
       // ~1.2 Hz soft pulse
       blink = 0.7 + 0.3 * (0.5 + 0.5 * Math.sin(state.clock.elapsedTime * 7.5));
     }
+    // Companion-sled breathing: slow 6 s sine + per-sled phase offset so the
+    // 5 non-hero LEDs don't blink in lockstep — sells "active hardware".
+    const breath = 0.78 + 0.22 * Math.sin(state.clock.elapsedTime * 1.05 + index * 1.37);
     if (ledRef.current) {
       ledRef.current.emissive.copy(thermalHex(t));
-      ledRef.current.emissiveIntensity = isHeroSled ? (1.4 + t * t * 7.5) * blink : 1.0;
+      ledRef.current.emissiveIntensity = isHeroSled ? (1.4 + t * t * 7.5) * blink : 1.05 * breath;
     }
     if (pipeRef.current) {
       pipeRef.current.emissive.copy(thermalHex(t));
-      pipeRef.current.emissiveIntensity = isHeroSled ? (0.5 + t * t * 5.0) * (0.7 + 0.3 * blink) : 0.3;
+      pipeRef.current.emissiveIntensity = isHeroSled ? (0.5 + t * t * 5.0) * (0.7 + 0.3 * blink) : 0.32 * breath;
     }
   });
 
