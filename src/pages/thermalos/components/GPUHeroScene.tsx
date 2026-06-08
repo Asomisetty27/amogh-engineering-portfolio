@@ -524,7 +524,7 @@ function CoolerLayer({
             (NOT brushed — brushed surface would defeat its purpose). Warmer/yellower
             than chrome. */}
         <RoundedBox args={[spec.width - 0.3, 0.16, spec.depth - 0.3]} radius={0.05} smoothness={4}>
-          <meshStandardMaterial ref={lidMatRef} color="#D8D6D2" roughness={0.22} metalness={0.95} envMapIntensity={1.2} emissive="#000" emissiveIntensity={0} />
+          <meshStandardMaterial ref={lidMatRef} color="#D8D6D2" roughness={0.18} metalness={0.97} envMapIntensity={1.25} emissive="#000" emissiveIntensity={0} map={maps?.nickelBrushed ?? undefined} />
         </RoundedBox>
         <InstancedBoxes positions={grooves} size={[0.05, 0.05, spec.depth - 0.5]} color="#CFCAC0" roughness={0.25} metalness={0.9} />
         <LayerLabel text="COLD PLATE · LIQUID I/F" sub="nickel-plated copper · micro-channel" opacityRef={labelOpacityRef} accent={spec.accent} />
