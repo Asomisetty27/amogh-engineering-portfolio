@@ -62,6 +62,23 @@ const PHASE_STARTS: number[] = (() => {
 })();
 const LOOP_SECONDS = PHASE_STARTS[PHASE_STARTS.length - 1] + PHASE_SEQUENCE[PHASE_SEQUENCE.length - 1].dur;
 
+// Per-phase eased interpolation: real thermal systems don't ramp linearly.
+//   load     → smoothstep (gradual ramp as utilization climbs)
+//   anomaly  → ease-in (slow drift then accelerating divergence)
+//   critical → snap (fast rise as throttle hits)
+//   recovery → exponential decay (Newton cooling)
+//   idle     → flat
+function easePhase(phase: Phase, p: number): number {
+  const x = THREE.MathUtils.clamp(p, 0, 1);
+  switch (phase) {
+    case 'load':     return x * x * (3 - 2 * x);          // smoothstep
+    case 'anomaly':  return x * x;                         // ease-in
+    case 'critical': return 1 - Math.pow(1 - x, 3);        // ease-out fast
+    case 'recovery': return 1 - Math.exp(-3.2 * x);        // exp decay
+    default:         return x;
+  }
+}
+
 function phaseAt(t: number): { idx: number; phase: Phase; level: number; progress: number } {
   const tt = t % LOOP_SECONDS;
   let idx = PHASE_SEQUENCE.length - 1;
@@ -72,7 +89,8 @@ function phaseAt(t: number): { idx: number; phase: Phase; level: number; progres
   const elapsed = tt - PHASE_STARTS[idx];
   const progress = THREE.MathUtils.clamp(elapsed / cur.dur, 0, 1);
   const next = PHASE_SEQUENCE[(idx + 1) % PHASE_SEQUENCE.length];
-  return { idx, phase: cur.phase, level: THREE.MathUtils.lerp(cur.level, next.level, progress * progress), progress };
+  const k = easePhase(cur.phase, progress);
+  return { idx, phase: cur.phase, level: THREE.MathUtils.lerp(cur.level, next.level, k), progress };
 }
 
 const _c0 = new THREE.Color('#1c6b3a');
@@ -491,15 +509,25 @@ function Sled({
   //   → front face at z = RACK_D*0.18 + RACK_D*0.31 = RACK_D*0.49
   const Z_FACE = RACK_D * 0.49;
 
-  useFrame(() => {
+  useFrame((state) => {
     const t = isHeroSled ? _towerLevel.current : 0.08;
+    // Real warning-LED behavior: steady when nominal, fast blink on critical
+    const phase = _towerPhase.current;
+    let blink = 1;
+    if (isHeroSled && phase === 'critical') {
+      // ~3.5 Hz hard blink (0.35..1.0)
+      blink = 0.35 + 0.65 * (Math.sin(state.clock.elapsedTime * 22) > 0 ? 1 : 0);
+    } else if (isHeroSled && phase === 'anomaly') {
+      // ~1.2 Hz soft pulse
+      blink = 0.7 + 0.3 * (0.5 + 0.5 * Math.sin(state.clock.elapsedTime * 7.5));
+    }
     if (ledRef.current) {
       ledRef.current.emissive.copy(thermalHex(t));
-      ledRef.current.emissiveIntensity = isHeroSled ? (1.4 + t * t * 7.5) : 1.0;
+      ledRef.current.emissiveIntensity = isHeroSled ? (1.4 + t * t * 7.5) * blink : 1.0;
     }
     if (pipeRef.current) {
       pipeRef.current.emissive.copy(thermalHex(t));
-      pipeRef.current.emissiveIntensity = isHeroSled ? (0.5 + t * t * 5.0) : 0.3;
+      pipeRef.current.emissiveIntensity = isHeroSled ? (0.5 + t * t * 5.0) * (0.7 + 0.3 * blink) : 0.3;
     }
   });
 
