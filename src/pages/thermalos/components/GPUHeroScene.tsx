@@ -800,16 +800,22 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
           <RoundedBox args={[d.w, 0.12, d.d]} radius={0.02} smoothness={3} position={d.pos}>
             <meshStandardMaterial ref={(m) => { matRefs.current[i] = m; }} color="#16161C" roughness={0.15} metalness={0.3} />
           </RoundedBox>
-          {/* IHS (integrated heat spreader) — nickel-plated copper cap that
-              actually contacts the cold plate. The metallic shine sitting
-              above the matte die is the canonical "real silicon package" tell. */}
-          {showIHS && (
+          {/* Per-die IHS — only for monolithic/dual-die. Chiplet grid gets a
+              single unified IHS rendered separately below. */}
+          {showIHS && spec.dieLayout !== 'chiplet-grid' && (
             <RoundedBox args={[d.w * 1.04, 0.05, d.d * 1.04]} radius={0.015} smoothness={3} position={[d.pos[0], d.pos[1] + 0.085, d.pos[2]]}>
               <meshStandardMaterial color="#CFCAC0" roughness={0.22} metalness={0.92} envMapIntensity={1.2} />
             </RoundedBox>
           )}
         </group>
       ))}
+      {/* MI300X unified IHS — one large nickel-plated copper lid spanning the
+          entire 2×4 chiplet field (reference: AMD MI300X package photography). */}
+      {spec.dieLayout === 'chiplet-grid' && (
+        <RoundedBox args={[2.0, 0.05, 1.15]} radius={0.025} smoothness={4} position={[0, 0.155, 0]}>
+          <meshStandardMaterial color="#CFCAC0" roughness={0.22} metalness={0.92} envMapIntensity={1.2} />
+        </RoundedBox>
+      )}
       {memPositions.map((m, i) => (
         <group key={`mem-${i}`} position={m.pos}>
           {/* HBM stack base — dark ABF organic substrate */}
