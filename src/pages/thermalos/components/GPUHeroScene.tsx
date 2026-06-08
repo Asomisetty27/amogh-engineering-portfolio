@@ -817,6 +817,13 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
           <RoundedBox args={[m.w, m.h, m.d]} radius={0.015} smoothness={3}>
             <meshStandardMaterial color="#26201C" roughness={0.55} metalness={0.1} />
           </RoundedBox>
+          {/* HBM3 top cap — champagne-gold metallic TIM/logic-die lid that
+              sits flush with the IHS plane. This is THE visual signature of
+              SXM5 HBM3 stacks in reference photography (image 3). */}
+          <mesh position={[0, m.h / 2 + 0.006, 0]}>
+            <boxGeometry args={[m.w * 0.96, 0.012, m.d * 0.96]} />
+            <meshStandardMaterial color="#C9A86A" roughness={0.32} metalness={0.95} envMapIntensity={1.15} />
+          </mesh>
           {/* Faint horizontal stack-layer striations — sells "this is 8-Hi
               stacked DRAM" rather than a solid block. Thin lighter band
               near the top edge of the stack. */}
