@@ -58,12 +58,18 @@ interface GPUSpec {
 // re-skins of the same box.
 // ──────────────────────────────────────────────────────────────────────────
 
+// Dimensions corrected against verified specs (see .agents/research/*-spec.md):
+//   - A100 PCIe blower: ~10.5" FHFL, narrow aspect
+//   - L40S: FHFL passive, 267×111mm, ~2.4:1 aspect → wider/flatter
+//   - H100 SXM5: SXM5 module with VRM wings, ~200×100mm
+//   - B200 SXM6: ~10-15% larger than SXM5
+//   - MI300X OAM: 228×107mm, very rectangular (2.13:1)
 const GPU_SPECS: GPUSpec[] = [
-  { id: 'a100',   name: 'A100',      arch: 'AMPERE · SM_80',   mem: '80GB HBM2e',  vendor: 'NVIDIA', accent: '#5a9c2e', cooler: 'blower',     dieLayout: 'monolithic',   memCount: 6, width: 6.6, depth: 5.6 },
-  { id: 'l40s',   name: 'L40S',      arch: 'ADA LOVELACE',     mem: '48GB GDDR6',  vendor: 'NVIDIA', accent: '#C9B58A', cooler: 'passive-fin', dieLayout: 'monolithic',   memCount: 8, width: 7.2, depth: 5.4 },
-  { id: 'h100',   name: 'H100 SXM5', arch: 'HOPPER · GH100',   mem: '80GB HBM3',   vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'monolithic',   memCount: 6, width: 6.2, depth: 6.0 },
-  { id: 'b200',   name: 'B200',      arch: 'BLACKWELL',        mem: '192GB HBM3e', vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'dual-die',     memCount: 8, width: 7.0, depth: 6.4 },
-  { id: 'mi300x', name: 'MI300X',    arch: 'CDNA 3 · CHIPLET', mem: '192GB HBM3',  vendor: 'AMD',    accent: '#ed1c24', cooler: 'cold-plate', dieLayout: 'chiplet-grid', memCount: 8, width: 6.4, depth: 6.2 },
+  { id: 'a100',   name: 'A100 PCIe', arch: 'AMPERE · GA100',    mem: '80GB HBM2e',  vendor: 'NVIDIA', accent: '#76b900', cooler: 'blower',     dieLayout: 'monolithic',   memCount: 6, width: 6.6, depth: 5.6 },
+  { id: 'l40s',   name: 'L40S',      arch: 'ADA LOVELACE',      mem: '48GB GDDR6',  vendor: 'NVIDIA', accent: '#76b900', cooler: 'passive-fin', dieLayout: 'monolithic',   memCount: 8, width: 8.4, depth: 4.0 },
+  { id: 'h100',   name: 'H100 SXM5', arch: 'HOPPER · GH100',    mem: '80GB HBM3',   vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'monolithic',   memCount: 6, width: 7.6, depth: 5.4 },
+  { id: 'b200',   name: 'B200 SXM6', arch: 'BLACKWELL · GB100', mem: '192GB HBM3e', vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'dual-die',     memCount: 8, width: 7.4, depth: 6.6 },
+  { id: 'mi300x', name: 'MI300X',    arch: 'CDNA 3 · CHIPLET',  mem: '192GB HBM3',  vendor: 'AMD',    accent: '#ed1c24', cooler: 'cold-plate', dieLayout: 'chiplet-grid', memCount: 8, width: 8.6, depth: 4.4 },
 ];
 
 const HERO_INDEX = 2; // H100 SXM5 — the thermal-arc protagonist; Theta's primary subject
@@ -522,31 +528,34 @@ function CoolerLayer({
       return out;
     }, [shellW]);
 
+    // L40S: dark gunmetal anodized aluminum (NOT champagne — that was wrong).
+    // Per research: charcoal heatsink with NVIDIA green logo only on top face,
+    // 4 DisplayPorts on bracket end. See .agents/research/l40s-spec.md.
+    const SHELL = '#3a3a42';       // dark anodized aluminum
+    const SHELL_RIB = '#42424a';   // slightly lighter for rib highlight catch
     return (
       <group>
-        {/* Main shell — champagne-gold anodized aluminum; warm satin finish */}
+        {/* Main shell — dark anodized aluminum, matte */}
         <RoundedBox args={[shellW, shellH, ribLen]} radius={0.035} smoothness={4} position={[0, 0, 0]}>
           <meshStandardMaterial
             ref={lidMatRef}
-            color="#C9B58A"
-            roughness={0.42}
-            metalness={0.78}
-            envMapIntensity={1.2}
+            color={SHELL}
+            roughness={0.55}
+            metalness={0.65}
+            envMapIntensity={1.0}
             emissive="#000"
             emissiveIntensity={0}
           />
         </RoundedBox>
-        {/* Longitudinal cooling ribs — the visual signature; thin extrusions
-            along the top, same anodized finish as shell. Catch HDRI specular
-            as parallel highlights — the "passive heatsink" tell. */}
+        {/* Longitudinal cooling ribs — same dark finish, slightly lighter to catch HDRI */}
         <InstancedBoxes
           positions={ribs}
           size={[shellW / (ribCount + 1) * 0.55, 0.05, ribLen * 0.96]}
-          color="#C9B58A"
-          roughness={0.4}
-          metalness={0.8}
+          color={SHELL_RIB}
+          roughness={0.5}
+          metalness={0.65}
         />
-        {/* End-cap exhaust grille — vertical slats at the bracket end */}
+        {/* End-cap exhaust grille */}
         <group position={[0, 0, -ribLen / 2 - 0.008]}>
           <mesh>
             <planeGeometry args={[shellW * 0.88, shellH * 0.78]} />
@@ -555,17 +564,27 @@ function CoolerLayer({
           <InstancedBoxes
             positions={grille}
             size={[shellW / 22, shellH * 0.7, 0.018]}
-            color="#9A8B68"
-            roughness={0.5}
-            metalness={0.7}
+            color="#2a2a30"
+            roughness={0.6}
+            metalness={0.5}
           />
         </group>
-        {/* PCIe bracket end — small accent strip in vendor color */}
-        <mesh position={[0, -shellH / 2 + 0.02, ribLen / 2 - 0.04]}>
-          <boxGeometry args={[shellW * 0.5, 0.03, 0.04]} />
-          <meshStandardMaterial color={spec.accent} roughness={0.35} metalness={0.6} emissive={spec.accent} emissiveIntensity={0.4} toneMapped={false} />
+        {/* I/O bracket end — 4× DisplayPort connectors (L40S signature: only
+            card in the lineup with display outputs). Stacked vertically. */}
+        <group position={[0, 0, ribLen / 2 + 0.012]}>
+          {[-0.27, -0.09, 0.09, 0.27].map((y, i) => (
+            <mesh key={`dp-${i}`} position={[0, y * shellH, 0]}>
+              <boxGeometry args={[shellW * 0.22, shellH * 0.14, 0.05]} />
+              <meshStandardMaterial color="#0a0a0c" roughness={0.7} metalness={0.3} />
+            </mesh>
+          ))}
+        </group>
+        {/* NVIDIA green accent strip — the only chromatic element on the card */}
+        <mesh position={[0, shellH / 2 + 0.045, ribLen / 2 - 0.6]}>
+          <boxGeometry args={[shellW * 0.45, 0.005, 0.5]} />
+          <meshStandardMaterial color={spec.accent} roughness={0.3} metalness={0.4} emissive={spec.accent} emissiveIntensity={0.55} toneMapped={false} />
         </mesh>
-        <LayerLabel text="PASSIVE FIN STACK" sub="anodized aluminum extrusion · server airflow" opacityRef={labelOpacityRef} accent={spec.accent} />
+        <LayerLabel text="PASSIVE FIN STACK · 4× DP" sub="anodized aluminum extrusion · server airflow" opacityRef={labelOpacityRef} accent={spec.accent} />
       </group>
     );
   }
@@ -1091,8 +1110,12 @@ export default function GPUHeroScene() {
         {GPU_SPECS.map((spec, i) => (
           <GPUCard key={spec.id} spec={spec} index={i} textures={textures} heroLevelRef={heroLevelRef} />
         ))}
-        <ContactShadows position={[0, -3.39, 0]} opacity={0.5} scale={70} blur={2.6} far={6} resolution={512} color="#000000" />
-        <Environment preset="studio" environmentIntensity={0.65} />
+        <ContactShadows position={[0, -3.39, 0]} opacity={0.55} scale={70} blur={2.4} far={6} resolution={1024} color="#000000" />
+        {/* Warehouse HDRI gives metallics a more credible interior reflection
+            than the studio preset — closer to product-shot lighting that real
+            enterprise hardware press photos use. Bumped intensity reads more
+            of the IHS / cold-plate specular highlights. */}
+        <Environment preset="warehouse" environmentIntensity={0.9} />
         <CameraRig camXRef={camXRef} />
         <PostFX camXRef={camXRef} />
       </Canvas>
