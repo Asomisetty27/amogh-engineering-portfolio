@@ -32,7 +32,7 @@ const FM = "'JetBrains Mono', ui-monospace, monospace";
 
 type Phase = 'idle' | 'load' | 'anomaly' | 'critical' | 'recovery';
 type AnimStage = 'exploded' | 'assembling' | 'assembled' | 'disassembling';
-type CoolerStyle = 'blower' | 'triple-fan' | 'cold-plate';
+type CoolerStyle = 'blower' | 'triple-fan' | 'cold-plate' | 'passive-fin';
 type DieLayout = 'monolithic' | 'dual-die' | 'chiplet-grid';
 type StackProfile = 'card' | 'module';
 
@@ -60,7 +60,7 @@ interface GPUSpec {
 
 const GPU_SPECS: GPUSpec[] = [
   { id: 'a100',   name: 'A100',      arch: 'AMPERE · SM_80',   mem: '80GB HBM2e',  vendor: 'NVIDIA', accent: '#5a9c2e', cooler: 'blower',     dieLayout: 'monolithic',   memCount: 6, width: 6.6, depth: 5.6 },
-  { id: 'l40s',   name: 'L40S',      arch: 'ADA LOVELACE',     mem: '48GB GDDR6',  vendor: 'NVIDIA', accent: '#5a9c2e', cooler: 'triple-fan', dieLayout: 'monolithic',   memCount: 8, width: 6.8, depth: 5.8 },
+  { id: 'l40s',   name: 'L40S',      arch: 'ADA LOVELACE',     mem: '48GB GDDR6',  vendor: 'NVIDIA', accent: '#C9B58A', cooler: 'passive-fin', dieLayout: 'monolithic',   memCount: 8, width: 7.2, depth: 5.4 },
   { id: 'h100',   name: 'H100 SXM5', arch: 'HOPPER · GH100',   mem: '80GB HBM3',   vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'monolithic',   memCount: 6, width: 6.2, depth: 6.0 },
   { id: 'b200',   name: 'B200',      arch: 'BLACKWELL',        mem: '192GB HBM3e', vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'dual-die',     memCount: 8, width: 7.0, depth: 6.4 },
   { id: 'mi300x', name: 'MI300X',    arch: 'CDNA 3 · CHIPLET', mem: '192GB HBM3',  vendor: 'AMD',    accent: '#ed1c24', cooler: 'cold-plate', dieLayout: 'chiplet-grid', memCount: 8, width: 6.4, depth: 6.2 },
