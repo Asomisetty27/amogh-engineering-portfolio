@@ -1420,14 +1420,26 @@ export default function TowerUnit() {
     envMapIntensity: 1.15,
   }), []);
 
+  const containerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     _towerLevel.current = 0.1;
     _towerPhase.current = 'idle';
     _towerProgress.current = 0;
+    // Scroll-into-view trigger — flips _seqTriggered once when the scene's
+    // container crosses 40% of the viewport. Sequence then plays once and
+    // stays open (matches the "On scroll into view" UX choice).
+    const el = containerRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) _seqTriggered.current = true; },
+      { threshold: 0.4 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', background: T.bg }}>
+    <div ref={containerRef} style={{ position: 'relative', width: '100%', height: '100%', background: T.bg }}>
       <Canvas
         shadows
         gl={{
