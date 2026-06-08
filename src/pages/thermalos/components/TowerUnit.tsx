@@ -146,6 +146,35 @@ function ThermalDriver() {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
+// Service-sequence driver — plays once when the section scrolls into view:
+// front mesh door swings, hero sled extends on rails, lid hinges up,
+// exposing the HGX baseboard for the heatmap + shimmer to overlay.
+// Triggered from outside by setting _seqTriggered = true (intersection
+// observer in root component); driver latches the start time off the R3F
+// clock so timing is independent of React render cadence.
+// ──────────────────────────────────────────────────────────────────────────
+
+export const _doorOpen = { current: 0 };
+export const _sledOut = { current: 0 };
+export const _lidOpen = { current: 0 };
+export const _seqTriggered = { current: false };
+let _seqStart = -1;
+
+const easeOutCubic = (x: number) => 1 - Math.pow(1 - x, 3);
+
+function SequenceDriver() {
+  useFrame((state) => {
+    if (!_seqTriggered.current) return;
+    if (_seqStart < 0) _seqStart = state.clock.elapsedTime;
+    const dt = state.clock.elapsedTime - _seqStart;
+    _doorOpen.current = easeOutCubic(THREE.MathUtils.clamp(dt / 1.4, 0, 1));
+    _sledOut.current  = easeOutCubic(THREE.MathUtils.clamp((dt - 0.6) / 1.6, 0, 1));
+    _lidOpen.current  = easeOutCubic(THREE.MathUtils.clamp((dt - 2.0) / 1.1, 0, 1));
+  });
+  return null;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
 // PBR texture pipeline — every map procedurally generated to keep the
 // "no imported binary assets" convention, but pushed to the resolution and
 // detail density needed to read as a real machine instead of a diagram.
