@@ -509,15 +509,25 @@ function Sled({
   //   → front face at z = RACK_D*0.18 + RACK_D*0.31 = RACK_D*0.49
   const Z_FACE = RACK_D * 0.49;
 
-  useFrame(() => {
+  useFrame((state) => {
     const t = isHeroSled ? _towerLevel.current : 0.08;
+    // Real warning-LED behavior: steady when nominal, fast blink on critical
+    const phase = _towerPhase.current;
+    let blink = 1;
+    if (isHeroSled && phase === 'critical') {
+      // ~3.5 Hz hard blink (0.35..1.0)
+      blink = 0.35 + 0.65 * (Math.sin(state.clock.elapsedTime * 22) > 0 ? 1 : 0);
+    } else if (isHeroSled && phase === 'anomaly') {
+      // ~1.2 Hz soft pulse
+      blink = 0.7 + 0.3 * (0.5 + 0.5 * Math.sin(state.clock.elapsedTime * 7.5));
+    }
     if (ledRef.current) {
       ledRef.current.emissive.copy(thermalHex(t));
-      ledRef.current.emissiveIntensity = isHeroSled ? (1.4 + t * t * 7.5) : 1.0;
+      ledRef.current.emissiveIntensity = isHeroSled ? (1.4 + t * t * 7.5) * blink : 1.0;
     }
     if (pipeRef.current) {
       pipeRef.current.emissive.copy(thermalHex(t));
-      pipeRef.current.emissiveIntensity = isHeroSled ? (0.5 + t * t * 5.0) : 0.3;
+      pipeRef.current.emissiveIntensity = isHeroSled ? (0.5 + t * t * 5.0) * (0.7 + 0.3 * blink) : 0.3;
     }
   });
 
