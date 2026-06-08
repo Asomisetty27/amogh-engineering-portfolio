@@ -1299,22 +1299,39 @@ function DoorPanel({ tower, textures }: { tower: typeof TOWERS[number]; textures
   });
   const half = RACK_W * 0.48;
   if (!tower.hero) {
+    // Companion door — flat panel + the same hinge/latch hardware the hero
+    // gets, so both racks share a physical language. No animation.
     return (
-      <mesh position={[0, RACK_H / 2, RACK_D / 2 + 0.001]} ref={ensureUv2} castShadow receiveShadow>
-        <planeGeometry args={[RACK_W * 0.96, RACK_H * 0.97]} />
-        <meshStandardMaterial
-          map={textures.chassisColor} roughnessMap={textures.chassisRough}
-          normalMap={textures.chassisNormal} aoMap={textures.chassisAO}
-          aoMapIntensity={0.9} roughness={1.0} metalness={0.85}
-          normalScale={new THREE.Vector2(0.7, 0.7)} envMapIntensity={1.2}
-          side={THREE.FrontSide}
-        />
-      </mesh>
+      <group position={[-half, RACK_H / 2, RACK_D / 2 + 0.001]}>
+        <mesh position={[half, 0, 0]} ref={ensureUv2} castShadow receiveShadow>
+          <planeGeometry args={[RACK_W * 0.96, RACK_H * 0.97]} />
+          <meshStandardMaterial
+            map={textures.chassisColor} roughnessMap={textures.chassisRough}
+            normalMap={textures.chassisNormal} aoMap={textures.chassisAO}
+            aoMapIntensity={0.9} roughness={1.0} metalness={0.85}
+            normalScale={new THREE.Vector2(0.7, 0.7)} envMapIntensity={1.2}
+            side={THREE.FrontSide}
+          />
+        </mesh>
+        {/* Hinge knuckles (left edge) */}
+        {[-RACK_H * 0.38, 0, RACK_H * 0.38].map((y, i) => (
+          <mesh key={i} position={[0.012, y, 0.012]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.014, 0.014, 0.05, 12]} />
+            <meshStandardMaterial color="#1a1a1f" roughness={0.45} metalness={0.85} />
+          </mesh>
+        ))}
+        {/* Latch + handle (right edge) */}
+        <mesh position={[2 * half - 0.06, 0, 0.012]} castShadow>
+          <boxGeometry args={[0.018, 0.22, 0.024]} />
+          <meshStandardMaterial color="#2a2a32" roughness={0.4} metalness={0.85} />
+        </mesh>
+      </group>
     );
   }
   // Hero: hinge group pivots at left edge (x = -half), door mesh offset to +half
   return (
     <group ref={hingeRef} position={[-half, RACK_H / 2, RACK_D / 2 + 0.001]}>
+      {/* Outer perforated steel sheet */}
       <mesh position={[half, 0, 0]} ref={ensureUv2} castShadow receiveShadow>
         <planeGeometry args={[RACK_W * 0.96, RACK_H * 0.97]} />
         <meshStandardMaterial
@@ -1327,6 +1344,43 @@ function DoorPanel({ tower, textures }: { tower: typeof TOWERS[number]; textures
           alphaTest={0.5}
           side={THREE.DoubleSide}
         />
+      </mesh>
+      {/* Inner dust filter — a darker semi-opaque mesh layer behind the steel */}
+      <mesh position={[half, 0, -0.006]}>
+        <planeGeometry args={[RACK_W * 0.94, RACK_H * 0.95]} />
+        <meshStandardMaterial
+          color="#06060a"
+          alphaMap={textures.doorPerf}
+          transparent
+          opacity={0.85}
+          roughness={0.95}
+          metalness={0}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+      {/* Door frame border — thin powder-coat rim around the perforation */}
+      {[
+        { p: [half, RACK_H * 0.48, 0.002] as [number, number, number], s: [RACK_W * 0.96, 0.022, 0.012] as [number, number, number] },
+        { p: [half, -RACK_H * 0.48, 0.002] as [number, number, number], s: [RACK_W * 0.96, 0.022, 0.012] as [number, number, number] },
+        { p: [0.011, 0, 0.002] as [number, number, number], s: [0.022, RACK_H * 0.97, 0.012] as [number, number, number] },
+        { p: [2 * half - 0.011, 0, 0.002] as [number, number, number], s: [0.022, RACK_H * 0.97, 0.012] as [number, number, number] },
+      ].map((b, i) => (
+        <mesh key={i} position={b.p} castShadow>
+          <boxGeometry args={b.s} />
+          <meshStandardMaterial color="#1c1c22" roughness={0.55} metalness={0.7} />
+        </mesh>
+      ))}
+      {/* Hinge knuckles — 3 along the left edge */}
+      {[-RACK_H * 0.38, 0, RACK_H * 0.38].map((y, i) => (
+        <mesh key={i} position={[0.012, y, 0.012]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.014, 0.014, 0.05, 12]} />
+          <meshStandardMaterial color="#1a1a1f" roughness={0.45} metalness={0.85} />
+        </mesh>
+      ))}
+      {/* Recessed latch — small square dimple just left of the handle */}
+      <mesh position={[2 * half - 0.085, -0.02, 0.008]}>
+        <boxGeometry args={[0.024, 0.024, 0.006]} />
+        <meshStandardMaterial color="#08080a" roughness={0.6} metalness={0.4} />
       </mesh>
       {/* Door handle — vertical bar near opening edge */}
       <mesh position={[2 * half - 0.06, 0, 0.012]} castShadow>
