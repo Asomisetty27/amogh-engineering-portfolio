@@ -134,13 +134,16 @@ function makePCBTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas');
   c.width = 512; c.height = 512;
   const ctx = c.getContext('2d')!;
-  ctx.fillStyle = '#0a1a0a';
+  // Dark forest green solder mask — server-grade boards run darker than consumer
+  ctx.fillStyle = '#0F4A2E';
   ctx.fillRect(0, 0, 512, 512);
-  ctx.strokeStyle = '#13301a';
+  // FR4 fiberglass weave — the visible warp/weft is the "expensive hardware" tell
+  ctx.strokeStyle = '#0a3622';
   ctx.lineWidth = 0.8;
   for (let y = 0; y < 512; y += 14) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke(); }
   for (let x = 0; x < 512; x += 18) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 512); ctx.stroke(); }
-  ctx.strokeStyle = '#1c4426';
+  // Trace routing
+  ctx.strokeStyle = '#175a3a';
   ctx.lineWidth = 1.4;
   for (let i = 0; i < 50; i++) {
     const sx = Math.random() * 512, sy = Math.random() * 512;
@@ -149,6 +152,7 @@ function makePCBTexture(): THREE.CanvasTexture {
     ctx.lineTo(sx + (Math.random() - 0.5) * 120, sy + (Math.random() - 0.5) * 90);
     ctx.stroke();
   }
+  // Via pads — nickel-gold ENIG finish
   ctx.fillStyle = '#b8860b';
   for (let i = 0; i < 320; i++) {
     ctx.beginPath();
@@ -200,7 +204,38 @@ function makeBrushedMetalTexture(): THREE.CanvasTexture {
   return t;
 }
 
-type Textures = { pcb: THREE.CanvasTexture; rough: THREE.CanvasTexture; brushed: THREE.CanvasTexture };
+// Organic ABF substrate — dark brown-black, fine grain. Used under SXM/OAM
+// mezzanine pads and HBM stacks (NOT green FR4 — this is the "server module,
+// not gaming card" tell).
+function makeOrganicSubstrateTexture(): THREE.CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 512;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = '#1C1C20';
+  ctx.fillRect(0, 0, 512, 512);
+  // Fine-grain speckle — ABF resin texture, not weave
+  const img = ctx.getImageData(0, 0, 512, 512);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const n = (Math.random() - 0.5) * 18;
+    img.data[i]     = THREE.MathUtils.clamp(img.data[i]     + n, 14, 50);
+    img.data[i + 1] = THREE.MathUtils.clamp(img.data[i + 1] + n, 14, 50);
+    img.data[i + 2] = THREE.MathUtils.clamp(img.data[i + 2] + n * 0.9, 16, 52);
+  }
+  ctx.putImageData(img, 0, 0);
+  // Subtle laminate striations
+  ctx.globalAlpha = 0.05;
+  for (let y = 0; y < 512; y += 2) {
+    ctx.fillStyle = Math.random() > 0.5 ? '#26262c' : '#101013';
+    ctx.fillRect(0, y, 512, 1);
+  }
+  ctx.globalAlpha = 1;
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.anisotropy = 8;
+  return t;
+}
+
+type Textures = { pcb: THREE.CanvasTexture; rough: THREE.CanvasTexture; brushed: THREE.CanvasTexture; organic: THREE.CanvasTexture };
 
 // ──────────────────────────────────────────────────────────────────────────
 // Instanced helpers — keep draw calls flat across five simultaneous assemblies
