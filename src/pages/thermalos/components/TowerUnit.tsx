@@ -201,9 +201,12 @@ function SequenceDriver() {
     if (!_seqTriggered.current) return;
     if (_seqStart < 0) _seqStart = state.clock.elapsedTime;
     const dt = state.clock.elapsedTime - _seqStart;
+    // Stagger so each stage starts where the previous one is visually
+    // committed: sled begins when the door is ~75% open (rail mouth clear),
+    // lid begins right as the sled finishes its rail-lock snap.
     _doorOpen.current = springEase(THREE.MathUtils.clamp(dt / 1.5, 0, 1));
-    _sledOut.current  = sledEase(dt - 0.7);
-    _lidOpen.current  = lidEase(dt - 2.3);
+    _sledOut.current  = sledEase(dt - 1.1);
+    _lidOpen.current  = lidEase(dt - 2.85);
 
     // Dynamic DoF: pull focus from rack-front toward baseboard, then toward
     // the front hero die as the lid opens. Mutate the existing Vector3
