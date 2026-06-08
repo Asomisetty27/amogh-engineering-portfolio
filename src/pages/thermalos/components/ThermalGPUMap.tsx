@@ -209,8 +209,8 @@ export default function ThermalGPUMap() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
           <div style={{
             width: 6, height: 6, borderRadius: '50%',
-            background: '#2FB36B',
-            boxShadow: '0 0 6px #2FB36B',
+            background: '#D4AF37',
+            boxShadow: '0 0 6px #D4AF37',
             animation: 'tos-blip 1.6s ease-in-out infinite',
           }} />
           <span style={{ fontSize: 9.5, letterSpacing: '.15em', textTransform: 'uppercase', color: '#525a55' }}>
@@ -316,7 +316,7 @@ export default function ThermalGPUMap() {
       }}>
         {/* Color scale legend */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1 }}>
-          {['#12203A', '#1E7A6E', '#2FB36B', '#E8B23A', '#E8743A', '#D63D3D'].map((c, i) => (
+          {['#12203A', '#1E7A6E', '#D4AF37', '#E8B23A', '#E8743A', '#D63D3D'].map((c, i) => (
             <div key={i} style={{ width: 18, height: 4, borderRadius: 2, background: c }} />
           ))}
           <span style={{ fontSize: 8.5, color: '#2E2E3E', marginLeft: 4 }}>cold → critical</span>

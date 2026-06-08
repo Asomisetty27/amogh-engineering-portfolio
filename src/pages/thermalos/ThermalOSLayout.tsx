@@ -110,7 +110,7 @@ function InnerLayout() {
     const prev = link?.href;
     const tmp = document.createElement("link");
     tmp.rel = "icon";
-    tmp.href = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><circle cx='10' cy='10' r='2' fill='%232FB36B'/><circle cx='10' cy='10' r='5' stroke='%232FB36B' stroke-width='1' fill='none' opacity='.6'/><circle cx='10' cy='10' r='8.5' stroke='%232FB36B' stroke-width='.7' fill='none' opacity='.3'/></svg>";
+    tmp.href = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><circle cx='10' cy='10' r='2' fill='%23D4AF37'/><circle cx='10' cy='10' r='5' stroke='%23D4AF37' stroke-width='1' fill='none' opacity='.6'/><circle cx='10' cy='10' r='8.5' stroke='%23D4AF37' stroke-width='.7' fill='none' opacity='.3'/></svg>";
     document.head.appendChild(tmp);
     return () => { tmp.remove(); if (link && prev) link.href = prev; };
   }, []);

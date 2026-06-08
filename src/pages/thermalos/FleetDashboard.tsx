@@ -17,7 +17,7 @@ import { sitePath } from './config';
 const C = {
   abyss: '#0A0E14', s1: '#141412', border: 'rgba(255,255,255,0.07)',
   text: '#F2F5F4', muted: '#8A938F', faint: '#525a55',
-  healthy: '#2FB36B', stable: '#1E7A6E', caution: '#E8B23A',
+  healthy: '#D4AF37', stable: '#1E7A6E', caution: '#E8B23A',
   rising: '#E8743A', critical: '#D63D3D', bp: '#6E91C8',
   tborder: '#1C2630', tborderHi: '#2A3850',
 };

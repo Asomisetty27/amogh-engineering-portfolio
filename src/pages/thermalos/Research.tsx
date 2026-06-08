@@ -478,7 +478,7 @@ const MOAT_STATUS = {
   gap:       { label: "Gap",        color: "#E8B23A" },
   partial:   { label: "Partial",    color: "#60A5FA" },
   planned:   { label: "Planned",    color: "#888780" },
-  built:     { label: "Built",      color: "#2FB36B" },
+  built:     { label: "Built",      color: "#D4AF37" },
 };
 
 function MoatTab() {

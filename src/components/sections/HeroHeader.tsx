@@ -78,7 +78,7 @@ export default function HeroHeader() {
               }}
               style={{
                 display: "inline-block",
-                background: ch === " " ? "none" : "linear-gradient(160deg, hsl(170 85% 75%) 0%, hsl(170 80% 50%) 50%, hsl(180 70% 45%) 100%)",
+                background: ch === " " ? "none" : "linear-gradient(160deg, hsl(43 75% 78%) 0%, hsl(43 68% 50%) 50%, hsl(34 60% 40%) 100%)",
                 WebkitBackgroundClip: ch === " " ? "unset" : "text",
                 WebkitTextFillColor: ch === " " ? "transparent" : "transparent",
                 backgroundClip: ch === " " ? "unset" : "text",
@@ -111,8 +111,8 @@ export default function HeroHeader() {
       >
         <span className="flex items-center gap-1.5 t-mono-xs" style={{ color: "var(--t-healthy)" }}>
           <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2FB36B] opacity-60" />
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#2FB36B]" style={{ boxShadow: "0 0 6px #2FB36B" }} />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4AF37] opacity-60" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#D4AF37]" style={{ boxShadow: "0 0 6px #D4AF37" }} />
           </span>
           SYS NOMINAL
         </span>

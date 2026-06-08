@@ -554,7 +554,7 @@ export default function RGMHologram() {
           })}
 
           {/* Flow label */}
-          <text x="231" y="12" textAnchor="middle" fill="hsl(170,80%,50%)" fontSize="2.8"
+          <text x="231" y="12" textAnchor="middle" fill="hsl(43,68%,50%)" fontSize="2.8"
             fontFamily="monospace" opacity="0.25">
             SIGNAL CHAIN: TOUCH → DETECT → ACTUATE → OUTPUT
           </text>
