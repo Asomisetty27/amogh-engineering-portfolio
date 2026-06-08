@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useRef, useMemo, useEffect, useState } from 'react';
+import { useRef, useMemo, useEffect, useState, Suspense, createContext, useContext } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { RoundedBox, Environment, Html, ContactShadows, MeshReflectorMaterial } from '@react-three/drei';
 import {
@@ -12,6 +12,18 @@ import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
 import { createNoise3D } from 'simplex-noise';
+import { useGpuTextures, type GpuTextures } from './gpuTextures';
+
+// PBR maps from gpuTextures.ts — loaded once inside Suspense and threaded via
+// context so individual layer components can opt in without prop churn.
+const GpuMapsCtx = createContext<GpuTextures | null>(null);
+function GpuMapsProvider({ children }: { children: React.ReactNode }) {
+  const maps = useGpuTextures();
+  return <GpuMapsCtx.Provider value={maps}>{children}</GpuMapsCtx.Provider>;
+}
+function useGpuMaps(): GpuTextures | null {
+  return useContext(GpuMapsCtx);
+}
 
 RectAreaLightUniformsLib.init();
 
@@ -390,6 +402,7 @@ function SubstrateLayer({ spec, textures, labelOpacityRef }: { spec: GPUSpec; te
 
 function SubstrateAndComponentsLayer({ spec, textures, labelOpacityRef }: { spec: GPUSpec; textures: Textures; labelOpacityRef: React.MutableRefObject<number> }) {
   const profile = stackProfileFor(spec);
+  const maps = useGpuMaps();
 
   const smds = useMemo(() => {
     const out: { pos: [number, number, number]; size: [number, number, number]; gold: boolean }[] = [];
@@ -412,9 +425,18 @@ function SubstrateAndComponentsLayer({ spec, textures, labelOpacityRef }: { spec
 
   return (
     <group>
-      {/* PCB body — dark forest green solder mask over FR4; server-grade dark mask, not consumer bright green */}
+      {/* PCB body — dark forest green solder mask over FR4; server-grade dark mask, not consumer bright green.
+          PCB normal map (gpuTextures.pcbNormal) drives micro-relief solder-mask topography for grazing light. */}
       <RoundedBox args={[spec.width - 0.2, 0.22, spec.depth - 0.2]} radius={0.05} smoothness={4}>
-        <meshStandardMaterial color="#0F4A2E" roughness={0.55} metalness={0.05} map={textures.pcb} envMapIntensity={0.9} />
+        <meshStandardMaterial
+          color="#0F4A2E"
+          roughness={0.55}
+          metalness={0.05}
+          map={textures.pcb}
+          normalMap={maps?.pcbNormal ?? undefined}
+          normalScale={maps?.pcbNormal ? new THREE.Vector2(0.6, 0.6) : undefined}
+          envMapIntensity={0.9}
+        />
       </RoundedBox>
       {profile === 'card' && Array.from({ length: 16 }).map((_, i) => (
         <mesh key={`pcie-${i}`} position={[-spec.width / 2 + 1.1 + i * 0.3, -0.02, spec.depth / 2 - 0.18]}>
@@ -435,6 +457,17 @@ function SubstrateAndComponentsLayer({ spec, textures, labelOpacityRef }: { spec
           <meshStandardMaterial color={s.gold ? '#D4AF37' : '#16161a'} roughness={s.gold ? 0.3 : 0.6} metalness={s.gold ? 1.0 : 0.3} roughnessMap={s.gold ? undefined : textures.rough} />
         </mesh>
       ))}
+      {/* AMD INSTINCT silkscreen decal — printed on the PCB short edge of the
+          MI300X OAM module. Faces up; aligned along the long axis of the short edge. */}
+      {spec.id === 'mi300x' && maps?.amdDecal && (
+        <mesh
+          position={[spec.width / 2 - 0.65, 0.115 + 0.001, 0]}
+          rotation={[-Math.PI / 2, 0, -Math.PI / 2]}
+        >
+          <planeGeometry args={[Math.min(spec.depth - 0.8, 3.0), 0.5]} />
+          <meshBasicMaterial map={maps.amdDecal} transparent toneMapped={false} opacity={0.95} />
+        </mesh>
+      )}
       <LayerLabel
         text={profile === 'card' ? 'PCB SUBSTRATE' : 'INTERPOSER · ORGANIC SUBSTRATE'}
         sub={profile === 'card' ? '14-layer FR4 · power delivery' : 'CoWoS-style · die ↔ HBM fabric'}
@@ -456,6 +489,7 @@ function CoolerLayer({
 }) {
   const finMatRef = useRef<THREE.MeshStandardMaterial>(null!);
   const lidMatRef = useRef<THREE.MeshStandardMaterial>(null!);
+  const maps = useGpuMaps();
 
   useFrame(() => {
     const t = thermalRef.current;
@@ -490,7 +524,7 @@ function CoolerLayer({
             (NOT brushed — brushed surface would defeat its purpose). Warmer/yellower
             than chrome. */}
         <RoundedBox args={[spec.width - 0.3, 0.16, spec.depth - 0.3]} radius={0.05} smoothness={4}>
-          <meshStandardMaterial ref={lidMatRef} color="#D8D6D2" roughness={0.22} metalness={0.95} envMapIntensity={1.2} emissive="#000" emissiveIntensity={0} />
+          <meshStandardMaterial ref={lidMatRef} color="#D8D6D2" roughness={0.18} metalness={0.97} envMapIntensity={1.25} emissive="#000" emissiveIntensity={0} map={maps?.nickelBrushed ?? undefined} />
         </RoundedBox>
         <InstancedBoxes positions={grooves} size={[0.05, 0.05, spec.depth - 0.5]} color="#CFCAC0" roughness={0.25} metalness={0.9} />
         <LayerLabel text="COLD PLATE · LIQUID I/F" sub="nickel-plated copper · micro-channel" opacityRef={labelOpacityRef} accent={spec.accent} />
@@ -544,6 +578,7 @@ function CoolerLayer({
             envMapIntensity={1.0}
             emissive="#000"
             emissiveIntensity={0}
+            map={maps?.anodizedDark ?? undefined}
           />
         </RoundedBox>
         {/* Longitudinal cooling ribs — same dark finish, slightly lighter to catch HDRI */}
@@ -603,7 +638,7 @@ function CoolerLayer({
         <mesh position={[0, FIN_COUNT * spacing * 0.5 + 0.1, 0]}>
           <boxGeometry args={[spec.width - 1.0, 0.12, 0.5]} />
           {/* Baseplate — nickel-on-copper at the die contact face */}
-          <meshStandardMaterial ref={finMatRef} color="#CFCAC0" roughness={0.2} metalness={0.9} emissive="#c85f2a" emissiveIntensity={0} />
+          <meshStandardMaterial ref={finMatRef} color="#CFCAC0" roughness={0.18} metalness={0.95} emissive="#c85f2a" emissiveIntensity={0} map={maps?.nickelBrushed ?? undefined} />
         </mesh>
       </group>
       {/* Shroud — injection-molded plastic; matte, low reflectivity */}
@@ -731,6 +766,7 @@ function GPUCard({
 // Small wrapper so DieBlock can take a plain opacity ref (avoids prop-shape mismatch above)
 function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; thermalRef: React.MutableRefObject<number>; opacityRef: React.MutableRefObject<number> }) {
   const matRefs = useRef<(THREE.MeshStandardMaterial | null)[]>([]);
+  const maps = useGpuMaps();
   useFrame(() => {
     const t = thermalRef.current;
     const c = thermalHex(t);
@@ -747,25 +783,24 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
   } else if (spec.dieLayout === 'dual-die') {
     dies = [{ pos: [-0.66, 0.07, 0], w: 1.25, d: 1.7 }, { pos: [0.66, 0.07, 0], w: 1.25, d: 1.7 }];
   } else {
-    // MI300X: 8 XCD/IOD chiplets in a tight 2×4 grid hybrid-bonded onto the
-    // active interposer — compact, central, NOT spread across the package.
+    // MI300X: 8 XCD/IOD chiplets — transposed to 2 cols × 4 rows so the
+    // chiplet field runs along the long (z) axis of the OAM package,
+    // matching AMD's MI300X die-shot orientation.
     dies = [];
-    for (let r = 0; r < 2; r++) for (let cI = 0; cI < 4; cI++) {
-      dies.push({ pos: [-0.63 + cI * 0.42, 0.07, -0.24 + r * 0.48], w: 0.38, d: 0.44 });
+    for (let r = 0; r < 4; r++) for (let cI = 0; cI < 2; cI++) {
+      dies.push({ pos: [-0.21 + cI * 0.42, 0.07, -0.72 + r * 0.48], w: 0.38, d: 0.44 });
     }
   }
 
   // HBM placement is layout-specific. Real B200/H100 modules stack HBM in
-  // parallel rows flanking each die — NOT in a decorative ring. Chiplet
-  // modules (MI300X) do ring HBM around the chiplet grid.
+  // rings/rows around the die — not decorative. Chiplet modules (MI300X)
+  // flank the chiplet grid along its long edges.
   type MemPlace = { pos: [number, number, number]; w: number; d: number; h: number };
   const memPositions = useMemo<MemPlace[]>(() => {
     const out: MemPlace[] = [];
-    // HBM3/3e stacks are tall (8-12-hi) — height matters visually
     const hbmH = 0.32;
     if (spec.dieLayout === 'dual-die') {
-      // Two rows of HBM flanking each die along its long (z) edges.
-      // 4 stacks per die × 2 dies = 8 (matches spec.memCount for B200).
+      // B200: 8 HBM3e stacks flanking the dual-die complex, 4 each side.
       const dieCenters = [-0.66, 0.66];
       const perSide = Math.max(1, Math.floor(spec.memCount / (dieCenters.length * 2)));
       const zSpan = 1.5;
@@ -778,25 +813,40 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
         });
       });
     } else if (spec.dieLayout === 'monolithic') {
-      // Two rows of 3 HBM stacks flanking the single die on both long edges.
-      const perSide = Math.max(1, Math.floor(spec.memCount / 2));
-      const zSpan = 1.7;
-      [-1, 1].forEach((side) => {
-        for (let i = 0; i < perSide; i++) {
-          const z = perSide === 1 ? 0 : -zSpan / 2 + (i * zSpan) / (perSide - 1);
-          out.push({ pos: [side * 1.35, hbmH / 2, z], w: 0.46, d: 0.6, h: hbmH });
+      // H100 SXM5: 6 HBM3 stacks in a hex ring around the central die.
+      // (A100 and other monolithic modules fall back to the flanking rows.)
+      if (spec.id === 'h100' && spec.memCount === 6) {
+        const R = 1.35;
+        const w = 0.46;
+        const d = 0.6;
+        // Hex angles starting at +x, every 60°. Real SXM5 reference: 3 stacks
+        // top, 3 stacks bottom — flatter on the long edges than a perfect hex
+        // so use a slight z-bias to read as two parallel rows of 3.
+        for (let i = 0; i < 6; i++) {
+          const ang = (i / 6) * Math.PI * 2 + Math.PI / 6;
+          const x = Math.cos(ang) * R * 1.1;
+          const z = Math.sin(ang) * R * 0.78;
+          out.push({ pos: [x, hbmH / 2, z], w, d, h: hbmH });
         }
-      });
+      } else {
+        const perSide = Math.max(1, Math.floor(spec.memCount / 2));
+        const zSpan = 1.7;
+        [-1, 1].forEach((side) => {
+          for (let i = 0; i < perSide; i++) {
+            const z = perSide === 1 ? 0 : -zSpan / 2 + (i * zSpan) / (perSide - 1);
+            out.push({ pos: [side * 1.35, hbmH / 2, z], w: 0.46, d: 0.6, h: hbmH });
+          }
+        });
+      }
     } else {
-      // MI300X: 8 HBM3 stacks in two parallel rows of 4, flanking the central
-      // chiplet complex along the long edges (reference: AMD MI300X die shot).
-      // NOT a decorative ring — real package geometry.
+      // MI300X (transposed grid): 8 HBM3 flanking the now-vertical chiplet
+      // field along its long (z) edges. perSide=4, zSpan widened.
       const perSide = Math.max(1, Math.floor(spec.memCount / 2));
-      const zSpan = 2.0;
+      const zSpan = 2.2;
       [-1, 1].forEach((side) => {
         for (let i = 0; i < perSide; i++) {
           const z = perSide === 1 ? 0 : -zSpan / 2 + (i * zSpan) / (perSide - 1);
-          out.push({ pos: [side * 1.25, hbmH / 2, z], w: 0.42, d: 0.44, h: hbmH });
+          out.push({ pos: [side * 0.95, hbmH / 2, z], w: 0.42, d: 0.44, h: hbmH });
         }
       });
     }
@@ -804,7 +854,12 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
   }, [spec]);
 
   const dieLabel = spec.dieLayout === 'dual-die' ? 'DUAL-DIE COMPLEX' : spec.dieLayout === 'chiplet-grid' ? 'CHIPLET ARRAY · 8×XCD' : 'MONOLITHIC DIE';
-  const showIHS = true; // all three layouts ship with a metallic IHS in the real packages
+  // Per-die IHS caps render for monolithic only. Dual-die (B200) and
+  // chiplet-grid (MI300X) get a single unified IHS spanning the full module.
+  const showPerDieIHS = spec.dieLayout === 'monolithic';
+  // HBM gold caps are hidden when the unified IHS covers them (B200), since
+  // they'd visually intersect the lid.
+  const showHbmCaps = spec.dieLayout !== 'dual-die';
 
   return (
     <group>
@@ -818,20 +873,32 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
           <RoundedBox args={[d.w, 0.12, d.d]} radius={0.02} smoothness={3} position={d.pos}>
             <meshStandardMaterial ref={(m) => { matRefs.current[i] = m; }} color="#16161C" roughness={0.15} metalness={0.3} />
           </RoundedBox>
-          {/* Per-die IHS — only for monolithic/dual-die. Chiplet grid gets a
-              single unified IHS rendered separately below. */}
-          {showIHS && spec.dieLayout !== 'chiplet-grid' && (
+          {showPerDieIHS && (
             <RoundedBox args={[d.w * 1.04, 0.05, d.d * 1.04]} radius={0.015} smoothness={3} position={[d.pos[0], d.pos[1] + 0.085, d.pos[2]]}>
-              <meshStandardMaterial color="#CFCAC0" roughness={0.22} metalness={0.92} envMapIntensity={1.2} />
+              <meshStandardMaterial color="#CFCAC0" roughness={0.18} metalness={0.95} envMapIntensity={1.25} map={maps?.nickelBrushed ?? undefined} />
             </RoundedBox>
           )}
         </group>
       ))}
-      {/* MI300X unified IHS — one large nickel-plated copper lid spanning the
-          entire 2×4 chiplet field (reference: AMD MI300X package photography). */}
+      {/* H100 SXM5 — NVIDIA wordmark etched into the IHS top face */}
+      {spec.id === 'h100' && maps?.nvidiaDecal && (
+        <mesh position={[0, 0.07 + 0.085 + 0.026, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[1.1, 0.28]} />
+          <meshBasicMaterial map={maps.nvidiaDecal} transparent toneMapped={false} opacity={0.9} />
+        </mesh>
+      )}
+      {/* B200 unified IHS — one large nickel-plated lid spanning both dies
+          AND the 8 HBM3e stacks (reference: Blackwell B200 package shot). */}
+      {spec.dieLayout === 'dual-die' && (
+        <RoundedBox args={[3.6, 0.05, 2.2]} radius={0.04} smoothness={4} position={[0, 0.345, 0]}>
+          <meshStandardMaterial color="#CFCAC0" roughness={0.18} metalness={0.95} envMapIntensity={1.25} map={maps?.nickelBrushed ?? undefined} />
+        </RoundedBox>
+      )}
+      {/* MI300X unified IHS — single nickel lid spanning the transposed 2×4
+          chiplet field. Dimensions transposed to match the new grid. */}
       {spec.dieLayout === 'chiplet-grid' && (
-        <RoundedBox args={[2.0, 0.05, 1.15]} radius={0.025} smoothness={4} position={[0, 0.155, 0]}>
-          <meshStandardMaterial color="#CFCAC0" roughness={0.22} metalness={0.92} envMapIntensity={1.2} />
+        <RoundedBox args={[1.15, 0.05, 2.05]} radius={0.025} smoothness={4} position={[0, 0.155, 0]}>
+          <meshStandardMaterial color="#CFCAC0" roughness={0.2} metalness={0.94} envMapIntensity={1.2} map={maps?.nickelBrushed ?? undefined} />
         </RoundedBox>
       )}
       {memPositions.map((m, i) => (
@@ -845,16 +912,14 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
           <RoundedBox args={[m.w, m.h, m.d]} radius={0.015} smoothness={3}>
             <meshStandardMaterial color="#26201C" roughness={0.55} metalness={0.1} />
           </RoundedBox>
-          {/* HBM3 top cap — champagne-gold metallic TIM/logic-die lid that
-              sits flush with the IHS plane. This is THE visual signature of
-              SXM5 HBM3 stacks in reference photography (image 3). */}
-          <mesh position={[0, m.h / 2 + 0.006, 0]}>
-            <boxGeometry args={[m.w * 0.96, 0.012, m.d * 0.96]} />
-            <meshStandardMaterial color="#C9A86A" roughness={0.32} metalness={0.95} envMapIntensity={1.15} />
-          </mesh>
-          {/* Faint horizontal stack-layer striations — sells "this is 8-Hi
-              stacked DRAM" rather than a solid block. Thin lighter band
-              near the top edge of the stack. */}
+          {/* HBM3 top cap — gold metallic TIM/logic-die lid. Hidden under
+              the unified B200 IHS where it'd visually intersect the lid. */}
+          {showHbmCaps && (
+            <mesh position={[0, m.h / 2 + 0.006, 0]}>
+              <boxGeometry args={[m.w * 0.96, 0.012, m.d * 0.96]} />
+              <meshStandardMaterial color="#C9A86A" roughness={0.32} metalness={0.95} envMapIntensity={1.15} />
+            </mesh>
+          )}
           <mesh position={[0, m.h / 2 - 0.02, m.d / 2 + 0.001]}>
             <planeGeometry args={[m.w * 0.92, 0.012]} />
             <meshStandardMaterial color="#3a3028" roughness={0.7} metalness={0.05} />
@@ -1196,13 +1261,15 @@ export default function GPUHeroScene() {
         <color attach="background" args={[CINE.voidDeep]} />
         <Backdrop />
         <SceneLights camXRef={camXRef} />
-        <Runway textures={textures} />
-        {GPU_SPECS.map((spec, i) => (
-          <GPUCard key={spec.id} spec={spec} index={i} textures={textures} heroLevelRef={heroLevelRef} />
-        ))}
+        <Suspense fallback={null}>
+          <GpuMapsProvider>
+            <Runway textures={textures} />
+            {GPU_SPECS.map((spec, i) => (
+              <GPUCard key={spec.id} spec={spec} index={i} textures={textures} heroLevelRef={heroLevelRef} />
+            ))}
+          </GpuMapsProvider>
+        </Suspense>
         <ContactShadows position={[0, -3.39, 0]} opacity={0.7} scale={80} blur={2.6} far={6} resolution={1024} color="#000000" />
-        {/* Lower env intensity — the cinematic rig (strip + rim + cyc) is now
-            doing the lighting work. HDRI only fills micro-reflections. */}
         <Environment preset="warehouse" environmentIntensity={0.35} />
         <CameraRig camXRef={camXRef} />
         <PostFX camXRef={camXRef} />
