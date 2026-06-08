@@ -144,34 +144,34 @@
 
 /* ThermalOS brand tokens — Isotherm system */
 :root {
-  --t-abyss:        #0A0E14;
-  --t-deep-field:   #12203A;
-  --t-cold-probe:   #15445E;
-  --t-stable:       #1E7A6E;
-  --t-healthy:      #D4AF37;
-  --t-healthy-dim:  #1E7A4A;
-  --t-drift:        #9FCB3B;
+  --t-abyss:        #0A0A0B;   /* obsidian backdrop */
+  --t-deep-field:   #1C1916;   /* warm slate */
+  --t-cold-probe:   #2A2620;   /* warm slate deep */
+  --t-stable:       #8A6F2E;   /* deep champagne */
+  --t-healthy:      #D4AF37;   /* 18k champagne (brand accent) */
+  --t-healthy-dim:  #8A6F2E;
+  --t-drift:        #C9A84C;   /* warm gold drift */
   --t-caution:      #E8B23A;
   --t-rising:       #E8743A;
   --t-critical:     #D63D3D;
   --t-critical-dim: #8C2828;
-  --t-text:         #F2F5F4;
-  --t-muted:        #8A938F;
-  --t-faint:        #525a55;
-  --t-ghost:        #2A3138;
-  --t-border:       #1C2630;
-  --t-border-hi:    #2A3850;
+  --t-text:         #ECE6D8;   /* warm platinum */
+  --t-muted:        #9A9285;
+  --t-faint:        #5A5347;
+  --t-ghost:        #2E2A24;
+  --t-border:       #2A2620;
+  --t-border-hi:    #3A332A;
 
-  /* Landing surfaces */
-  --t-surface-0:    #07090E;   /* page bg */
-  --t-surface-1:    #0C1117;   /* card bg */
-  --t-surface-2:    #11171F;   /* inner card */
+  /* Landing surfaces — obsidian */
+  --t-surface-0:    #07060A;
+  --t-surface-1:    #0F0D11;
+  --t-surface-2:    #15131A;
 
-  /* Blueprint architectural ink */
-  --t-blueprint:        rgba(110, 145, 200, 0.10);
-  --t-blueprint-hi:     rgba(110, 145, 200, 0.22);
-  --t-blueprint-ink:    #6E91C8;
-  --t-blueprint-tint:   rgba(110, 145, 200, 0.06);
+  /* Blueprint ink — warm champagne grid */
+  --t-blueprint:        rgba(212, 175, 55, 0.08);
+  --t-blueprint-hi:     rgba(212, 175, 55, 0.20);
+  --t-blueprint-ink:    #C9A84C;
+  --t-blueprint-tint:   rgba(212, 175, 55, 0.05);
 
   /* Type stacks */
   --t-font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
