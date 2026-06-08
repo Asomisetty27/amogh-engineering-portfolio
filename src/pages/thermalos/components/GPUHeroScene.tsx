@@ -479,10 +479,13 @@ function CoolerLayer({
     // micro-channel grooves visible on the underside when separated.
     return (
       <group>
+        {/* Cold-plate lid — nickel-plated copper, lapped smooth for thermal contact
+            (NOT brushed — brushed surface would defeat its purpose). Warmer/yellower
+            than chrome. */}
         <RoundedBox args={[spec.width - 0.3, 0.16, spec.depth - 0.3]} radius={0.05} smoothness={4}>
-          <meshStandardMaterial ref={lidMatRef} color="#cdd2d8" roughness={0.18} metalness={0.95} map={textures.brushed} emissive="#000" emissiveIntensity={0} />
+          <meshStandardMaterial ref={lidMatRef} color="#D8D6D2" roughness={0.22} metalness={0.95} envMapIntensity={1.2} emissive="#000" emissiveIntensity={0} />
         </RoundedBox>
-        <InstancedBoxes positions={grooves} size={[0.05, 0.05, spec.depth - 0.5]} color="#9aa0a8" roughness={0.3} metalness={0.8} />
+        <InstancedBoxes positions={grooves} size={[0.05, 0.05, spec.depth - 0.5]} color="#CFCAC0" roughness={0.25} metalness={0.9} />
         <LayerLabel text="COLD PLATE · LIQUID I/F" sub="nickel-plated copper · micro-channel" opacityRef={labelOpacityRef} accent={spec.accent} />
       </group>
     );
@@ -496,15 +499,17 @@ function CoolerLayer({
     <group>
       {/* fin stack */}
       <group position={[0, -1.9, 0]}>
-        <InstancedBoxes positions={fins} size={[spec.width - 1.2, 0.045, spec.depth - 1.6]} color="#c8c8c8" roughness={0.3} metalness={0.7} emissive="#c85f2a" emissiveIntensity={0} />
+        {/* Extruded aluminum fins (6061/6063) — distinctly cooler & flatter than nickel-plated cold plate */}
+        <InstancedBoxes positions={fins} size={[spec.width - 1.2, 0.045, spec.depth - 1.6]} color="#B8B8BC" roughness={0.4} metalness={0.85} emissive="#c85f2a" emissiveIntensity={0} />
         <mesh position={[0, FIN_COUNT * spacing * 0.5 + 0.1, 0]}>
           <boxGeometry args={[spec.width - 1.0, 0.12, 0.5]} />
-          <meshStandardMaterial ref={finMatRef} color="#b87333" roughness={0.12} metalness={0.9} emissive="#c85f2a" emissiveIntensity={0} />
+          {/* Baseplate — nickel-on-copper at the die contact face */}
+          <meshStandardMaterial ref={finMatRef} color="#CFCAC0" roughness={0.2} metalness={0.9} emissive="#c85f2a" emissiveIntensity={0} />
         </mesh>
       </group>
-      {/* shroud */}
+      {/* Shroud — injection-molded plastic; matte, low reflectivity */}
       <RoundedBox args={[spec.width, 0.34, spec.depth]} radius={0.06} smoothness={4} position={[0, 0.5, 0]}>
-        <meshStandardMaterial color="#111111" roughness={0.45} metalness={0.3} />
+        <meshStandardMaterial color="#1A1A1F" roughness={0.65} metalness={0.0} />
       </RoundedBox>
       {fanX.map((x, i) => (
         <group key={`fan-grp-${i}`}>
@@ -669,12 +674,14 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
       </mesh>
       {dies.map((d, i) => (
         <RoundedBox key={i} args={[d.w, 0.12, d.d]} radius={0.02} smoothness={3} position={d.pos}>
-          <meshStandardMaterial ref={(m) => { matRefs.current[i] = m; }} color="#0d0d10" roughness={0.85} metalness={0.04} />
+          {/* Lapped silicon die — near-black with faint blue tint, picks up rim-light specularly */}
+          <meshStandardMaterial ref={(m) => { matRefs.current[i] = m; }} color="#16161C" roughness={0.15} metalness={0.3} />
         </RoundedBox>
       ))}
       {memPositions.map((p, i) => (
         <RoundedBox key={`mem-${i}`} args={[0.6, 0.16, 0.6]} radius={0.02} smoothness={3} position={p}>
-          <meshStandardMaterial color="#121216" roughness={0.4} metalness={0.35} />
+          {/* HBM on dark ABF substrate — matte brown-black, geometric */}
+          <meshStandardMaterial color="#26201C" roughness={0.5} metalness={0.1} />
         </RoundedBox>
       ))}
       <LayerLabel text={dieLabel} sub={`${spec.mem} · stacked memory`} opacityRef={opacityRef} accent={spec.accent} />
