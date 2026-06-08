@@ -1295,7 +1295,19 @@ export default function GPUHeroScene() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  const textures = useMemo(() => ({ pcb: makePCBTexture(), rough: makeRoughnessMap(), brushed: makeBrushedMetalTexture(), organic: makeOrganicSubstrateTexture() }), []);
+  const textures = useMemo(() => ({
+    pcb: makePCBTexture(),
+    rough: makeRoughnessMap(),
+    brushed: makeBrushedMetalTexture(),
+    organic: makeOrganicSubstrateTexture(),
+    decals: {
+      a100:   makeProductTextDecal('NVIDIA',  'A100',                { color: '#76b900' }),
+      l40s:   makeProductTextDecal('NVIDIA',  'L40S',                { color: '#76b900' }),
+      h100:   makeProductTextDecal('NVIDIA',  'H100 SXM5',           { color: '#d8d8de' }),
+      b200:   makeProductTextDecal('NVIDIA',  'B200 · BLACKWELL',    { color: '#d8d8de' }),
+      mi300x: makeProductTextDecal('AMD INSTINCT', 'MI300X · CDNA 3', { color: '#e8e8ee' }),
+    },
+  }), []);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '90vh', background: CINE.voidDeep }}>
