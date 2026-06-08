@@ -706,35 +706,31 @@ function CoolerLayer({
           <meshStandardMaterial ref={finMatRef} color="#CFCAC0" roughness={0.18} metalness={0.95} emissive="#c85f2a" emissiveIntensity={0} map={maps?.nickelBrushed ?? undefined} />
         </mesh>
       </group>
-      {/* Shroud — injection-molded plastic; matte, low reflectivity. For
-          blower cards the shroud is a SEALED full-cover lid (no fan cutouts
-          on top); for triple-fan the shroud has fan openings cut into it. */}
+      {/* Shroud body — dark matte plastic. The photoreal product skin draped
+          on top carries all the visible exterior detail (fan grille, brand
+          wordmark, accent strip) so the shroud underneath only contributes
+          thickness and side faces. */}
       <RoundedBox args={[spec.width, 0.34, spec.depth]} radius={0.06} smoothness={4} position={[0, 0.5, 0]}>
-        <meshStandardMaterial color={isBlower ? '#0E0E11' : '#1A1A1F'} roughness={isBlower ? 0.5 : 0.65} metalness={isBlower ? 0.05 : 0.0} />
+        <meshStandardMaterial color={isBlower ? '#0E0E11' : '#1A1A1F'} roughness={isBlower ? 0.55 : 0.65} metalness={0.05} />
       </RoundedBox>
-      {/* Wordmark on top — centered on the smooth blower lid, or sub-strip
-          between fans on the triple-fan shroud. */}
-      {isBlower && textures.decals.a100 && (
-        <mesh position={[fanX[0] + fanRadius + 0.6, 0.68, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[spec.width * 0.55, spec.depth * 0.55]} />
-          <meshBasicMaterial map={textures.decals.a100} transparent toneMapped={false} opacity={0.92} depthWrite={false} />
+      {/* Photoreal top-face skin — sized to the full shroud footprint. For
+          A100 this image already contains the radial blower, the smooth lid
+          with "NVIDIA A100" silkscreen, and the green accent strip, so we
+          don't render those features in 3D underneath. */}
+      {isBlower && maps?.skins?.a100 && (
+        <mesh position={[0, 0.68, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[spec.width, spec.depth]} />
+          <meshStandardMaterial map={maps.skins.a100} roughness={0.55} metalness={0.25} envMapIntensity={1.0} />
         </mesh>
       )}
-      {/* Per-fan housings */}
-      {fanX.map((x, i) => (
+      {/* 3D fan(s) — only for triple-fan archetype; the A100 blower's fan is
+          rendered as part of the printed skin above. */}
+      {!isBlower && fanX.map((x, i) => (
         <group key={`fan-grp-${i}`}>
-          {/* Fan bezel ring — recessed into the shroud */}
           <mesh position={[x, 0.7, 0]} rotation={[Math.PI / 2, 0, 0]}>
             <torusGeometry args={[fanRadius * 1.05, 0.05, 10, 48]} />
             <meshStandardMaterial color="#1c1c1e" roughness={0.4} metalness={0.4} />
           </mesh>
-          {isBlower && (
-            /* Blower intake guard — finger-grille rim, sealed mesh below */
-            <mesh position={[x, 0.69, 0]} rotation={[Math.PI / 2, 0, 0]}>
-              <ringGeometry args={[fanRadius * 0.18, fanRadius * 1.0, 48]} />
-              <meshStandardMaterial color="#08080a" roughness={0.85} metalness={0.1} side={THREE.DoubleSide} />
-            </mesh>
-          )}
           <group position={[x, 0.78, 0]}>
             <Fan fanRef={fanRefs[i]} radius={fanRadius} />
           </group>
