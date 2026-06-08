@@ -454,6 +454,84 @@ function makeFloorColor(): THREE.CanvasTexture {
   return t;
 }
 
+// Perforated mesh-door alpha — circular holes on a tight grid, like the
+// front bezel of a DGX/HGX rack. Used as an alphaMap on a thin door panel
+// so light + the interior glow visibly bleed through after the door opens.
+function makeDoorPerf(): THREE.CanvasTexture {
+  const SZ = 512;
+  const c = document.createElement('canvas');
+  c.width = c.height = SZ;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, SZ, SZ);
+  ctx.fillStyle = '#000000';
+  const pitch = 14;
+  const r = 5;
+  for (let y = pitch; y < SZ - pitch; y += pitch) {
+    const offset = (Math.floor((y - pitch) / pitch) % 2) * (pitch / 2);
+    for (let x = pitch + offset; x < SZ - pitch; x += pitch) {
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.anisotropy = 8;
+  return t;
+}
+
+// PCB color map — dark green solder mask with white silkscreen pads + traces.
+// Sits as the baseboard surface revealed under the lid; sized to fill the
+// sled-interior footprint.
+function makePCBColor(): THREE.CanvasTexture {
+  const SZ = 1024;
+  const c = document.createElement('canvas');
+  c.width = c.height = SZ;
+  const ctx = c.getContext('2d')!;
+  // Deep PCB green (FR-4 with HASL finish look)
+  const g = ctx.createLinearGradient(0, 0, SZ, SZ);
+  g.addColorStop(0, '#0a2418');
+  g.addColorStop(0.5, '#0d2e1c');
+  g.addColorStop(1, '#08201a');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, SZ, SZ);
+  // Subtle noise
+  ctx.globalAlpha = 0.08;
+  for (let i = 0; i < 4000; i++) {
+    ctx.fillStyle = Math.random() > 0.5 ? '#1a4030' : '#04140a';
+    ctx.fillRect(Math.random() * SZ, Math.random() * SZ, 1.5, 1.5);
+  }
+  ctx.globalAlpha = 1;
+  // Silkscreen traces — random orthogonal lines (BGA breakout look)
+  ctx.strokeStyle = 'rgba(220,210,180,0.35)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 120; i++) {
+    const x = Math.random() * SZ; const y = Math.random() * SZ;
+    const len = 40 + Math.random() * 180;
+    const horiz = Math.random() > 0.5;
+    ctx.beginPath(); ctx.moveTo(x, y);
+    ctx.lineTo(x + (horiz ? len : 0), y + (horiz ? 0 : len));
+    ctx.stroke();
+  }
+  // Component pad clusters
+  ctx.fillStyle = 'rgba(210,200,170,0.55)';
+  for (let i = 0; i < 60; i++) {
+    const x = Math.random() * SZ; const y = Math.random() * SZ;
+    const w = 4 + Math.random() * 18; const h = 4 + Math.random() * 12;
+    ctx.fillRect(x, y, w, h);
+  }
+  // Silkscreen reference designators
+  ctx.fillStyle = 'rgba(232,232,232,0.55)';
+  ctx.font = '10px monospace';
+  for (let i = 0; i < 40; i++) {
+    ctx.fillText(`U${10 + i}`, Math.random() * SZ, Math.random() * SZ);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.anisotropy = 16;
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
 type Textures = {
   chassisColor: THREE.CanvasTexture;
   chassisRough: THREE.CanvasTexture;
@@ -461,6 +539,8 @@ type Textures = {
   chassisAO: THREE.CanvasTexture;
   sledFace: THREE.CanvasTexture;
   floor: THREE.CanvasTexture;
+  doorPerf: THREE.CanvasTexture;
+  pcb: THREE.CanvasTexture;
 };
 
 // ──────────────────────────────────────────────────────────────────────────
