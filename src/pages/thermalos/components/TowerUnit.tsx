@@ -62,6 +62,23 @@ const PHASE_STARTS: number[] = (() => {
 })();
 const LOOP_SECONDS = PHASE_STARTS[PHASE_STARTS.length - 1] + PHASE_SEQUENCE[PHASE_SEQUENCE.length - 1].dur;
 
+// Per-phase eased interpolation: real thermal systems don't ramp linearly.
+//   load     → smoothstep (gradual ramp as utilization climbs)
+//   anomaly  → ease-in (slow drift then accelerating divergence)
+//   critical → snap (fast rise as throttle hits)
+//   recovery → exponential decay (Newton cooling)
+//   idle     → flat
+function easePhase(phase: Phase, p: number): number {
+  const x = THREE.MathUtils.clamp(p, 0, 1);
+  switch (phase) {
+    case 'load':     return x * x * (3 - 2 * x);          // smoothstep
+    case 'anomaly':  return x * x;                         // ease-in
+    case 'critical': return 1 - Math.pow(1 - x, 3);        // ease-out fast
+    case 'recovery': return 1 - Math.exp(-3.2 * x);        // exp decay
+    default:         return x;
+  }
+}
+
 function phaseAt(t: number): { idx: number; phase: Phase; level: number; progress: number } {
   const tt = t % LOOP_SECONDS;
   let idx = PHASE_SEQUENCE.length - 1;
@@ -72,7 +89,8 @@ function phaseAt(t: number): { idx: number; phase: Phase; level: number; progres
   const elapsed = tt - PHASE_STARTS[idx];
   const progress = THREE.MathUtils.clamp(elapsed / cur.dur, 0, 1);
   const next = PHASE_SEQUENCE[(idx + 1) % PHASE_SEQUENCE.length];
-  return { idx, phase: cur.phase, level: THREE.MathUtils.lerp(cur.level, next.level, progress * progress), progress };
+  const k = easePhase(cur.phase, progress);
+  return { idx, phase: cur.phase, level: THREE.MathUtils.lerp(cur.level, next.level, k), progress };
 }
 
 const _c0 = new THREE.Color('#1c6b3a');
