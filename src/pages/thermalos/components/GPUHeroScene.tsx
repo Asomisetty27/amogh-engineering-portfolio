@@ -1,16 +1,18 @@
 import * as React from 'react';
 import { useRef, useMemo, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { RoundedBox, Environment, Html } from '@react-three/drei';
+import { RoundedBox, Environment, Html, ContactShadows } from '@react-three/drei';
 import {
   EffectComposer,
   Bloom,
   ChromaticAberration,
   Vignette,
+  DepthOfField,
 } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
+import { createNoise3D } from 'simplex-noise';
 
 RectAreaLightUniformsLib.init();
 
@@ -29,17 +31,57 @@ const T = {
 const FM = "'JetBrains Mono', ui-monospace, monospace";
 
 type Phase = 'idle' | 'load' | 'anomaly' | 'critical' | 'recovery';
-type AnimStage = 'exploded' | 'assembling' | 'assembled';
+type AnimStage = 'exploded' | 'assembling' | 'assembled' | 'disassembling';
+type CoolerStyle = 'blower' | 'triple-fan' | 'cold-plate';
+type DieLayout = 'monolithic' | 'dual-die' | 'chiplet-grid';
+type StackProfile = 'card' | 'module';
 
-// Module-level mutable state — safe for single-instance scene
-// Resets on mount via useEffect
-const _labelOpacity = { current: 1.0 };
-const _stage: { current: AnimStage } = { current: 'exploded' };
+interface GPUSpec {
+  id: string;
+  name: string;
+  arch: string;
+  mem: string;
+  vendor: string;
+  accent: string;
+  cooler: CoolerStyle;
+  dieLayout: DieLayout;
+  memCount: number;
+  width: number;
+  depth: number;
+}
 
-// Y positions for each group: [backplate, PCB, die, copper, fins, shroud]
-const EXPLODED_Y = [-5.5, -3.2, -1.2, 0.8, 2.8, 6.5] as const;
-// Assembled: fins bottom(-1.57) aligns with copper top(-1.57); shroud sits above fins
-const ASSEMBLED_Y = [-2.8, -2.5, -2.18, -1.72, 0.86, 4.0] as const;
+// ──────────────────────────────────────────────────────────────────────────
+// The lineup — five silicon archetypes that define the current AI-data-center
+// hardware landscape. Two PCIe-card silhouettes (blower / triple-fan) and
+// three flat OAM/SXM module silhouettes (cold-plate, no fans) — chosen so
+// every card on the runway reads as a genuinely different machine, not five
+// re-skins of the same box.
+// ──────────────────────────────────────────────────────────────────────────
+
+const GPU_SPECS: GPUSpec[] = [
+  { id: 'a100',   name: 'A100',      arch: 'AMPERE · SM_80',   mem: '80GB HBM2e',  vendor: 'NVIDIA', accent: '#5a9c2e', cooler: 'blower',     dieLayout: 'monolithic',   memCount: 6, width: 6.6, depth: 5.6 },
+  { id: 'l40s',   name: 'L40S',      arch: 'ADA LOVELACE',     mem: '48GB GDDR6',  vendor: 'NVIDIA', accent: '#5a9c2e', cooler: 'triple-fan', dieLayout: 'monolithic',   memCount: 8, width: 6.8, depth: 5.8 },
+  { id: 'h100',   name: 'H100 SXM5', arch: 'HOPPER · GH100',   mem: '80GB HBM3',   vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'monolithic',   memCount: 6, width: 6.2, depth: 6.0 },
+  { id: 'b200',   name: 'B200',      arch: 'BLACKWELL',        mem: '192GB HBM3e', vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'dual-die',     memCount: 8, width: 7.0, depth: 6.4 },
+  { id: 'mi300x', name: 'MI300X',    arch: 'CDNA 3 · CHIPLET', mem: '192GB HBM3',  vendor: 'AMD',    accent: '#ed1c24', cooler: 'cold-plate', dieLayout: 'chiplet-grid', memCount: 8, width: 6.4, depth: 6.2 },
+];
+
+const HERO_INDEX = 2; // H100 SXM5 — the thermal-arc protagonist; Theta's primary subject
+const CARD_SPACING = 9.6;
+const LINEUP_X0 = -((GPU_SPECS.length - 1) * CARD_SPACING) / 2;
+const cardX = (i: number) => LINEUP_X0 + i * CARD_SPACING;
+
+function stackProfileFor(spec: GPUSpec): StackProfile {
+  return spec.cooler === 'cold-plate' ? 'module' : 'card';
+}
+
+// Per-archetype layer separation. Cards (with fan shrouds) explode into a tall
+// stack; flat modules (liquid-cooled, no shroud) separate into a much shorter,
+// denser sandwich — the difference IS the story (one needs to move air, one doesn't).
+const LAYER_OFFSETS: Record<StackProfile, { exploded: number[]; assembled: number[] }> = {
+  card:   { exploded: [-4.3, -2.05, 0.35, 4.1],   assembled: [-1.27, -0.97, -0.61, 0.56] },
+  module: { exploded: [-2.75, -1.25, 0.25, 1.65], assembled: [-0.46, -0.30, -0.15, 0.07] },
+};
 
 const PHASE_SEQUENCE: { phase: Phase; dur: number; level: number }[] = [
   { phase: 'idle',     dur: 3.0, level: 0.12 },
@@ -48,6 +90,24 @@ const PHASE_SEQUENCE: { phase: Phase; dur: number; level: number }[] = [
   { phase: 'critical', dur: 2.4, level: 1.0  },
   { phase: 'recovery', dur: 2.8, level: 0.3  },
 ];
+
+// Cinematic reveal cycle — each card runs the same explode → hold → assemble →
+// hold loop, phase-offset by index so the runway is always mid-motion somewhere
+// (a living showroom, not five synchronized robots).
+const CYCLE = { explodedHold: 3.2, assembling: 2.1, assembledHold: 4.6, disassembling: 2.1 };
+const CYCLE_LEN = CYCLE.explodedHold + CYCLE.assembling + CYCLE.assembledHold + CYCLE.disassembling;
+const STAGGER = CYCLE_LEN / GPU_SPECS.length;
+
+function cardStageAt(elapsed: number, index: number): { stage: AnimStage; cycleProgress: number } {
+  const t = (((elapsed + index * STAGGER) % CYCLE_LEN) + CYCLE_LEN) % CYCLE_LEN;
+  if (t < CYCLE.explodedHold) return { stage: 'exploded', cycleProgress: t / CYCLE.explodedHold };
+  let acc = CYCLE.explodedHold;
+  if (t < acc + CYCLE.assembling) return { stage: 'assembling', cycleProgress: (t - acc) / CYCLE.assembling };
+  acc += CYCLE.assembling;
+  if (t < acc + CYCLE.assembledHold) return { stage: 'assembled', cycleProgress: (t - acc) / CYCLE.assembledHold };
+  acc += CYCLE.assembledHold;
+  return { stage: 'disassembling', cycleProgress: (t - acc) / CYCLE.disassembling };
+}
 
 const _c0 = new THREE.Color('#1c6b3a');
 const _c1 = new THREE.Color('#c8942a');
@@ -67,7 +127,7 @@ function spring(cur: number, target: number, delta: number, k: number): number {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Procedural textures
+// Procedural textures — generic PCB + roughness + brushed-metal (cold plates)
 // ──────────────────────────────────────────────────────────────────────────
 
 function makePCBTexture(): THREE.CanvasTexture {
@@ -78,15 +138,11 @@ function makePCBTexture(): THREE.CanvasTexture {
   ctx.fillRect(0, 0, 512, 512);
   ctx.strokeStyle = '#13301a';
   ctx.lineWidth = 0.8;
-  for (let y = 0; y < 512; y += 14) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke();
-  }
-  for (let x = 0; x < 512; x += 18) {
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 512); ctx.stroke();
-  }
+  for (let y = 0; y < 512; y += 14) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke(); }
+  for (let x = 0; x < 512; x += 18) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 512); ctx.stroke(); }
   ctx.strokeStyle = '#1c4426';
   ctx.lineWidth = 1.4;
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 50; i++) {
     const sx = Math.random() * 512, sy = Math.random() * 512;
     ctx.beginPath(); ctx.moveTo(sx, sy);
     ctx.lineTo(sx + (Math.random() - 0.5) * 120, sy);
@@ -94,7 +150,7 @@ function makePCBTexture(): THREE.CanvasTexture {
     ctx.stroke();
   }
   ctx.fillStyle = '#b8860b';
-  for (let i = 0; i < 420; i++) {
+  for (let i = 0; i < 320; i++) {
     ctx.beginPath();
     ctx.arc(Math.random() * 512, Math.random() * 512, 1.3, 0, Math.PI * 2);
     ctx.fill();
@@ -122,30 +178,86 @@ function makeRoughnessMap(): THREE.CanvasTexture {
   return t;
 }
 
-type Textures = { pcb: THREE.CanvasTexture; rough: THREE.CanvasTexture };
+function makeBrushedMetalTexture(): THREE.CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 512;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = '#aab0b8';
+  ctx.fillRect(0, 0, 512, 512);
+  for (let i = 0; i < 2200; i++) {
+    const y = Math.random() * 512;
+    const shade = 150 + Math.random() * 90;
+    ctx.strokeStyle = `rgba(${shade},${shade + 4},${shade + 8},${0.05 + Math.random() * 0.1})`;
+    ctx.lineWidth = 0.6 + Math.random() * 0.8;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(512, y + (Math.random() - 0.5) * 3);
+    ctx.stroke();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.anisotropy = 8;
+  return t;
+}
+
+type Textures = { pcb: THREE.CanvasTexture; rough: THREE.CanvasTexture; brushed: THREE.CanvasTexture };
 
 // ──────────────────────────────────────────────────────────────────────────
-// Layer label — reads _labelOpacity module-level ref via useFrame
+// Instanced helpers — keep draw calls flat across five simultaneous assemblies
 // ──────────────────────────────────────────────────────────────────────────
 
-function LayerLabel({ text, sub }: { text: string; sub?: string }) {
+function InstancedBoxes({
+  positions, size, color, roughness = 0.4, metalness = 0.6, emissive, emissiveIntensity,
+}: {
+  positions: [number, number, number][];
+  size: [number, number, number];
+  color: string;
+  roughness?: number;
+  metalness?: number;
+  emissive?: string;
+  emissiveIntensity?: number;
+}) {
+  const ref = useRef<THREE.InstancedMesh>(null!);
+  useEffect(() => {
+    if (!ref.current) return;
+    const m = new THREE.Matrix4();
+    positions.forEach((p, i) => {
+      m.makeTranslation(p[0], p[1], p[2]);
+      ref.current.setMatrixAt(i, m);
+    });
+    ref.current.instanceMatrix.needsUpdate = true;
+  }, [positions]);
+  return (
+    <instancedMesh ref={ref} args={[undefined as any, undefined as any, positions.length]} castShadow receiveShadow>
+      <boxGeometry args={size} />
+      <meshStandardMaterial
+        color={color}
+        roughness={roughness}
+        metalness={metalness}
+        emissive={emissive ?? '#000000'}
+        emissiveIntensity={emissiveIntensity ?? 0}
+        toneMapped={!emissive}
+      />
+    </instancedMesh>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Layer label — reads a per-card opacity ref via useFrame
+// ──────────────────────────────────────────────────────────────────────────
+
+function LayerLabel({ text, sub, opacityRef, accent }: { text: string; sub?: string; opacityRef: React.MutableRefObject<number>; accent: string }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   useFrame(() => {
-    if (wrapRef.current) wrapRef.current.style.opacity = String(_labelOpacity.current);
+    if (wrapRef.current) wrapRef.current.style.opacity = String(opacityRef.current);
   });
   return (
     <Html occlude={false} center={false} style={{ pointerEvents: 'none', userSelect: 'none' }}>
-      <div ref={wrapRef} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ width: 24, height: 1, background: 'rgba(255,255,255,0.22)' }} />
+      <div ref={wrapRef} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+        <div style={{ width: 20, height: 1, background: accent + '55' }} />
         <div>
-          <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 8.5, fontFamily: FM, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>
-            {text}
-          </div>
-          {sub && (
-            <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 7.5, fontFamily: FM, whiteSpace: 'nowrap', marginTop: 2 }}>
-              {sub}
-            </div>
-          )}
+          <div style={{ color: 'rgba(255,255,255,0.62)', fontSize: 8, fontFamily: FM, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>{text}</div>
+          {sub && <div style={{ color: 'rgba(255,255,255,0.28)', fontSize: 7, fontFamily: FM, whiteSpace: 'nowrap', marginTop: 2 }}>{sub}</div>}
         </div>
       </div>
     </Html>
@@ -153,196 +265,27 @@ function LayerLabel({ text, sub }: { text: string; sub?: string }) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Layer 0 — Aluminum Backplate
+// Shared sub-parts
 // ──────────────────────────────────────────────────────────────────────────
 
-function Backplate({ textures }: { textures: Textures }) {
-  return (
-    <group>
-      <RoundedBox args={[8.2, 0.18, 6.8]} radius={0.06} smoothness={4} position={[0, 0, 0]}>
-        <meshStandardMaterial color="#1a1a1e" roughness={0.18} metalness={0.9} roughnessMap={textures.rough} envMapIntensity={1.2} />
-      </RoundedBox>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <mesh key={i} position={[-3.0 + i * 1.5, 0.095, 0]}>
-          <boxGeometry args={[0.45, 0.03, 5.8]} />
-          <meshStandardMaterial color="#0c0c0e" roughness={0.4} metalness={0.85} envMapIntensity={0.7} />
-        </mesh>
-      ))}
-      <mesh position={[2.6, 0.095, 2.2]}>
-        <boxGeometry args={[1.4, 0.02, 0.4]} />
-        <meshStandardMaterial color="#060608" roughness={0.5} metalness={0.8} />
-      </mesh>
-      <LayerLabel text="ALUMINUM BACKPLATE" sub="anodized 6061 alloy" />
-    </group>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────────────────
-// Layer 1 — PCB substrate
-// ──────────────────────────────────────────────────────────────────────────
-
-function PCBLayer({ textures }: { textures: Textures }) {
-  const smds = useMemo(() => {
-    const out: { pos: [number, number, number]; size: [number, number, number]; gold: boolean }[] = [];
-    for (let i = 0; i < 70; i++) {
-      const x = (Math.random() - 0.5) * 7.4;
-      const z = (Math.random() - 0.5) * 6.0;
-      if (Math.abs(x) < 1.5 && Math.abs(z) < 1.5) continue;
-      out.push({ pos: [x, 0.13, z], size: [0.06 + Math.random() * 0.1, 0.05, 0.04 + Math.random() * 0.05], gold: Math.random() > 0.78 });
-    }
-    return out;
-  }, []);
-
-  const inductors = useMemo<[number, number, number][]>(() => [
-    [-2.6, 0.22, -1.9], [-1.5, 0.22, -1.9], [-0.4, 0.22, -1.9],
-    [0.7, 0.22, -1.9], [-2.6, 0.22, -0.8], [-2.6, 0.22, 0.3],
-  ], []);
-
-  return (
-    <group>
-      <RoundedBox args={[8.0, 0.22, 6.6]} radius={0.05} smoothness={4} position={[0, 0, 0]}>
-        <meshStandardMaterial color="#0a1a0a" roughness={0.82} metalness={0.06} map={textures.pcb} envMapIntensity={0.9} />
-      </RoundedBox>
-      {Array.from({ length: 18 }).map((_, i) => (
-        <mesh key={`pcie-${i}`} position={[-2.7 + i * 0.32, -0.02, 3.42]}>
-          <boxGeometry args={[0.2, 0.2, 0.42]} />
-          <meshStandardMaterial color="#e0b430" roughness={0.06} metalness={1.0} envMapIntensity={1.6} />
-        </mesh>
-      ))}
-      {inductors.map((p, i) => (
-        <RoundedBox key={`ind-${i}`} args={[0.42, 0.32, 0.42]} radius={0.04} smoothness={3} position={p}>
-          <meshStandardMaterial color="#2a2a2e" roughness={0.65} metalness={0.3} roughnessMap={textures.rough} envMapIntensity={0.8} />
-        </RoundedBox>
-      ))}
-      {smds.map((s, i) => (
-        <mesh key={`smd-${i}`} position={s.pos}>
-          <boxGeometry args={s.size} />
-          <meshStandardMaterial color={s.gold ? '#c8a838' : '#16161a'} roughness={s.gold ? 0.3 : 0.6} metalness={s.gold ? 0.8 : 0.3} roughnessMap={textures.rough} envMapIntensity={0.9} />
-        </mesh>
-      ))}
-      <LayerLabel text="PCB SUBSTRATE" sub="14-layer FR4 · GDDR6X signals" />
-    </group>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────────────────
-// Layer 2 — GPU die + VRAM chips + thermal paste
-// ──────────────────────────────────────────────────────────────────────────
-
-function DieLayer({ thermalLevelRef }: { thermalLevelRef: React.MutableRefObject<number> }) {
-  const dieMatRef = useRef<THREE.MeshStandardMaterial>(null!);
-
-  const vramPositions = useMemo<[number, number, number][]>(() => {
-    const out: [number, number, number][] = [];
-    for (let i = 0; i < 4; i++) {
-      out.push([-1.9 + i * 1.25, 0.05, 1.5]);
-      out.push([-1.9 + i * 1.25, 0.05, -1.5]);
-    }
-    return out;
-  }, []);
-
-  useFrame(() => {
-    if (dieMatRef.current) {
-      const t = thermalLevelRef.current;
-      dieMatRef.current.emissive.copy(thermalHex(t));
-      dieMatRef.current.emissiveIntensity = t * t * 1.8;
-    }
-  });
-
-  return (
-    <group>
-      <mesh position={[0, -0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[1.0, 1.0, 0.02, 32]} />
-        <meshStandardMaterial color="#8a8a8a" roughness={0.5} metalness={0.2} envMapIntensity={0.6} />
-      </mesh>
-      <RoundedBox args={[1.8, 0.12, 1.8]} radius={0.02} smoothness={3} position={[0, 0.07, 0]}>
-        <meshStandardMaterial ref={dieMatRef} color="#0d0d10" roughness={0.85} metalness={0.04} envMapIntensity={0.6} />
-      </RoundedBox>
-      {vramPositions.map((p, i) => (
-        <RoundedBox key={i} args={[1.2, 0.1, 1.2]} radius={0.015} smoothness={3} position={p}>
-          <meshStandardMaterial color="#121216" roughness={0.45} metalness={0.3} envMapIntensity={0.9} />
-        </RoundedBox>
-      ))}
-      <LayerLabel text="GPU DIE + VRAM" sub="Ada Lovelace · GDDR6X 24GB" />
-    </group>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────────────────
-// Layer 3 — Copper vapor chamber + heat pipes
-// ──────────────────────────────────────────────────────────────────────────
-
-function CopperLayer({ thermalLevelRef }: { thermalLevelRef: React.MutableRefObject<number> }) {
-  const baseMatRef = useRef<THREE.MeshStandardMaterial>(null!);
-
-  useFrame(() => {
-    if (baseMatRef.current) {
-      const t = thermalLevelRef.current;
-      baseMatRef.current.emissive.set('#c85f2a');
-      baseMatRef.current.emissiveIntensity = t * 0.4;
-    }
-  });
-
-  return (
-    <group>
-      <RoundedBox args={[5.5, 0.3, 4.8]} radius={0.05} smoothness={4} position={[0, 0, 0]}>
-        <meshStandardMaterial ref={baseMatRef} color="#b87333" roughness={0.12} metalness={0.9} envMapIntensity={1.5} emissive="#c85f2a" emissiveIntensity={0} />
-      </RoundedBox>
-      {Array.from({ length: 4 }).map((_, i) => (
-        <mesh key={i} position={[0, 0.12, -1.5 + i * 1.0]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.12, 0.12, 6, 24]} />
-          <meshStandardMaterial color="#c8843a" roughness={0.1} metalness={0.95} envMapIntensity={1.6} />
-        </mesh>
-      ))}
-      <LayerLabel text="COPPER VAPOR CHAMBER" sub="Δhvap = 2260 kJ/kg" />
-    </group>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────────────────
-// Layer 4 — Aluminum fin stack
-// ──────────────────────────────────────────────────────────────────────────
-
-function FinLayer() {
-  const FIN_COUNT = 28;
-  const spacing = 0.18;
-  const startY = -((FIN_COUNT - 1) * spacing) / 2;
-
-  return (
-    <group>
-      {Array.from({ length: FIN_COUNT }).map((_, i) => (
-        <mesh key={i} position={[0, startY + i * spacing, 0]}>
-          <boxGeometry args={[5.8, 0.04, 4.2]} />
-          <meshStandardMaterial color="#c8c8c8" roughness={0.3} metalness={0.7} envMapIntensity={1.3} />
-        </mesh>
-      ))}
-      <LayerLabel text="ALUMINUM FIN STACK" sub="28 fins · 0.18mm pitch" />
-    </group>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────────────────
-// Layer 5 — Fan shroud + triple fans
-// ──────────────────────────────────────────────────────────────────────────
-
-function Fan({ fanRef }: { fanRef: React.MutableRefObject<THREE.Group | null> }) {
+function Fan({ fanRef, radius = 1.0 }: { fanRef: React.MutableRefObject<THREE.Group | null>; radius?: number }) {
   return (
     <group ref={fanRef}>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[1.1, 0.06, 12, 48]} />
-        <meshStandardMaterial color="#161618" roughness={0.5} metalness={0.3} envMapIntensity={0.8} />
+        <torusGeometry args={[radius, 0.055, 12, 44]} />
+        <meshStandardMaterial color="#161618" roughness={0.5} metalness={0.3} />
       </mesh>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.18, 0.18, 0.2, 16]} />
-        <meshStandardMaterial color="#0a0a0c" roughness={0.6} metalness={0.3} envMapIntensity={0.6} />
+        <cylinderGeometry args={[0.16, 0.16, 0.18, 16]} />
+        <meshStandardMaterial color="#0a0a0c" roughness={0.6} metalness={0.3} />
       </mesh>
       {Array.from({ length: 7 }).map((_, i) => {
         const angle = (i / 7) * Math.PI * 2;
         return (
           <group key={i} rotation={[0, angle, 0]}>
-            <mesh position={[0.55, 0, 0]} rotation={[0.35, 0, 0]}>
-              <boxGeometry args={[0.8, 0.04, 0.22]} />
-              <meshStandardMaterial color="#1a1a1e" roughness={0.55} metalness={0.25} envMapIntensity={0.7} />
+            <mesh position={[radius * 0.5, 0, 0]} rotation={[0.35, 0, 0]}>
+              <boxGeometry args={[radius * 0.72, 0.035, 0.2]} />
+              <meshStandardMaterial color="#1a1a1e" roughness={0.55} metalness={0.25} />
             </mesh>
           </group>
         );
@@ -351,124 +294,413 @@ function Fan({ fanRef }: { fanRef: React.MutableRefObject<THREE.Group | null> })
   );
 }
 
-function ShroudLayer({ fanRefs }: { fanRefs: React.MutableRefObject<THREE.Group | null>[] }) {
-  const fanX = [-2.1, 0, 2.1];
+// ──────────────────────────────────────────────────────────────────────────
+// Layer renderers — parametrized by archetype (card vs module)
+// ──────────────────────────────────────────────────────────────────────────
+
+function SubstrateLayer({ spec, textures, labelOpacityRef }: { spec: GPUSpec; textures: Textures; labelOpacityRef: React.MutableRefObject<number> }) {
+  const profile = stackProfileFor(spec);
+
+  // Module baseplates carry a gold contact-pad array along the short edge —
+  // instanced (4 rows × 14 cols = 56 pads, one draw call). Computed
+  // unconditionally so this hook always runs in the same order regardless
+  // of which archetype this instance renders (rules-of-hooks).
+  const pads = useMemo<[number, number, number][]>(() => {
+    const out: [number, number, number][] = [];
+    const cols = 14, rows = 4;
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      out.push([-spec.width / 2 + 0.55 + c * ((spec.width - 1.1) / (cols - 1)), 0.07, spec.depth / 2 - 0.34 - r * 0.13]);
+    }
+    return out;
+  }, [spec]);
+
+  if (profile === 'card') {
+    return (
+      <group>
+        <RoundedBox args={[spec.width, 0.16, spec.depth]} radius={0.05} smoothness={4}>
+          <meshStandardMaterial color="#1a1a1e" roughness={0.2} metalness={0.88} roughnessMap={textures.rough} envMapIntensity={1.1} />
+        </RoundedBox>
+        <mesh position={[-spec.width / 2 - 0.06, -0.34, spec.depth * 0.3]}>
+          <boxGeometry args={[0.07, 1.0, 1.7]} />
+          <meshStandardMaterial color="#0c0c0e" roughness={0.4} metalness={0.85} />
+        </mesh>
+        <mesh position={[-spec.width / 2 - 0.06, -0.34, spec.depth * 0.3]}>
+          <boxGeometry args={[0.09, 0.12, 1.7]} />
+          <meshStandardMaterial color="#c8c8c8" roughness={0.25} metalness={0.9} />
+        </mesh>
+        <LayerLabel text="ALUMINUM BACKPLATE" sub="anodized 6061 · PCIe bracket" opacityRef={labelOpacityRef} accent={spec.accent} />
+      </group>
+    );
+  }
   return (
     <group>
-      <RoundedBox args={[6.8, 0.35, 5.2]} radius={0.06} smoothness={4} position={[0, 0, 0]}>
-        <meshStandardMaterial color="#111111" roughness={0.45} metalness={0.3} envMapIntensity={0.9} />
+      <RoundedBox args={[spec.width, 0.12, spec.depth]} radius={0.04} smoothness={4}>
+        <meshStandardMaterial color="#16161a" roughness={0.32} metalness={0.78} roughnessMap={textures.rough} envMapIntensity={1.0} />
       </RoundedBox>
-      {fanX.map((x, i) => (
-        <mesh key={`ring-${i}`} position={[x, 0.2, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[1.2, 0.05, 10, 48]} />
-          <meshStandardMaterial color="#1c1c1e" roughness={0.4} metalness={0.4} envMapIntensity={1.0} />
+      <InstancedBoxes positions={pads} size={[0.1, 0.02, 0.07]} color="#d8b840" roughness={0.1} metalness={1} />
+      <LayerLabel text="MODULE BASEPLATE" sub="SXM5 / OAM contact array · 56 pads" opacityRef={labelOpacityRef} accent={spec.accent} />
+    </group>
+  );
+}
+
+function SubstrateAndComponentsLayer({ spec, textures, labelOpacityRef }: { spec: GPUSpec; textures: Textures; labelOpacityRef: React.MutableRefObject<number> }) {
+  const profile = stackProfileFor(spec);
+
+  const smds = useMemo(() => {
+    const out: { pos: [number, number, number]; size: [number, number, number]; gold: boolean }[] = [];
+    const n = profile === 'card' ? 26 : 16;
+    for (let i = 0; i < n; i++) {
+      const x = (Math.random() - 0.5) * (spec.width - 1.0);
+      const z = (Math.random() - 0.5) * (spec.depth - 1.4);
+      if (Math.abs(x) < 1.4 && Math.abs(z) < 1.4) continue;
+      out.push({ pos: [x, 0.13, z], size: [0.06 + Math.random() * 0.09, 0.05, 0.04 + Math.random() * 0.05], gold: Math.random() > 0.78 });
+    }
+    return out;
+  }, [spec, profile]);
+
+  const inductors = useMemo<[number, number, number][]>(() => {
+    const out: [number, number, number][] = [];
+    const n = profile === 'card' ? 6 : 4;
+    for (let i = 0; i < n; i++) out.push([-spec.width / 2 + 0.9 + (i % 3) * 0.85, 0.22, -spec.depth / 2 + 0.85 + Math.floor(i / 3) * 0.85]);
+    return out;
+  }, [spec, profile]);
+
+  return (
+    <group>
+      <RoundedBox args={[spec.width - 0.2, 0.22, spec.depth - 0.2]} radius={0.05} smoothness={4}>
+        <meshStandardMaterial color="#0a1a0a" roughness={0.82} metalness={0.06} map={textures.pcb} envMapIntensity={0.9} />
+      </RoundedBox>
+      {profile === 'card' && Array.from({ length: 16 }).map((_, i) => (
+        <mesh key={`pcie-${i}`} position={[-spec.width / 2 + 1.1 + i * 0.3, -0.02, spec.depth / 2 - 0.18]}>
+          <boxGeometry args={[0.2, 0.2, 0.4]} />
+          <meshStandardMaterial color="#e0b430" roughness={0.06} metalness={1.0} />
         </mesh>
       ))}
+      {inductors.map((p, i) => (
+        <RoundedBox key={`ind-${i}`} args={[0.4, 0.3, 0.4]} radius={0.04} smoothness={3} position={p}>
+          <meshStandardMaterial color="#2a2a2e" roughness={0.65} metalness={0.3} roughnessMap={textures.rough} />
+        </RoundedBox>
+      ))}
+      {smds.map((s, i) => (
+        <mesh key={`smd-${i}`} position={s.pos}>
+          <boxGeometry args={s.size} />
+          <meshStandardMaterial color={s.gold ? '#c8a838' : '#16161a'} roughness={s.gold ? 0.3 : 0.6} metalness={s.gold ? 0.8 : 0.3} roughnessMap={textures.rough} />
+        </mesh>
+      ))}
+      <LayerLabel
+        text={profile === 'card' ? 'PCB SUBSTRATE' : 'INTERPOSER · ORGANIC SUBSTRATE'}
+        sub={profile === 'card' ? '14-layer FR4 · power delivery' : 'CoWoS-style · die ↔ HBM fabric'}
+        opacityRef={labelOpacityRef}
+        accent={spec.accent}
+      />
+    </group>
+  );
+}
+
+function CoolerLayer({
+  spec, textures, thermalRef, fanRefs, labelOpacityRef,
+}: {
+  spec: GPUSpec;
+  textures: Textures;
+  thermalRef: React.MutableRefObject<number>;
+  fanRefs: React.MutableRefObject<THREE.Group | null>[];
+  labelOpacityRef: React.MutableRefObject<number>;
+}) {
+  const finMatRef = useRef<THREE.MeshStandardMaterial>(null!);
+  const lidMatRef = useRef<THREE.MeshStandardMaterial>(null!);
+
+  useFrame(() => {
+    const t = thermalRef.current;
+    if (finMatRef.current) { finMatRef.current.emissive.set('#c85f2a'); finMatRef.current.emissiveIntensity = t * 0.35; }
+    if (lidMatRef.current) { lidMatRef.current.emissive.copy(thermalHex(t)); lidMatRef.current.emissiveIntensity = t * 0.5; }
+  });
+
+  // Both archetypes' instanced-position arrays are computed unconditionally
+  // (rules-of-hooks) — only one set is actually mounted per instance, decided
+  // by spec.cooler, which is invariant for the lifetime of this component.
+  const grooves = useMemo<[number, number, number][]>(() => {
+    const out: [number, number, number][] = [];
+    const n = 14;
+    for (let i = 0; i < n; i++) out.push([-spec.width / 2 + 0.5 + (i * (spec.width - 1)) / (n - 1), -0.07, 0]);
+    return out;
+  }, [spec]);
+
+  const FIN_COUNT = 16;
+  const spacing = 0.2;
+  const startY = -((FIN_COUNT - 1) * spacing) / 2;
+  const fins = useMemo<[number, number, number][]>(
+    () => Array.from({ length: FIN_COUNT }).map((_, i) => [0, startY + i * spacing, 0] as [number, number, number]),
+    [startY]
+  );
+
+  if (spec.cooler === 'cold-plate') {
+    // Liquid-cooled module lid — flat nickel-plated copper plate, machined
+    // micro-channel grooves visible on the underside when separated.
+    return (
+      <group>
+        <RoundedBox args={[spec.width - 0.3, 0.16, spec.depth - 0.3]} radius={0.05} smoothness={4}>
+          <meshStandardMaterial ref={lidMatRef} color="#cdd2d8" roughness={0.18} metalness={0.95} map={textures.brushed} emissive="#000" emissiveIntensity={0} />
+        </RoundedBox>
+        <InstancedBoxes positions={grooves} size={[0.05, 0.05, spec.depth - 0.5]} color="#9aa0a8" roughness={0.3} metalness={0.8} />
+        <LayerLabel text="COLD PLATE · LIQUID I/F" sub="nickel-plated copper · micro-channel" opacityRef={labelOpacityRef} accent={spec.accent} />
+      </group>
+    );
+  }
+
+  // Card archetypes: heatsink fin block (instanced) + shroud + fan(s)
+  const fanX = spec.cooler === 'triple-fan' ? [-2.0, 0, 2.0] : [0];
+  const fanRadius = spec.cooler === 'triple-fan' ? 0.95 : 1.6;
+
+  return (
+    <group>
+      {/* fin stack */}
+      <group position={[0, -1.9, 0]}>
+        <InstancedBoxes positions={fins} size={[spec.width - 1.2, 0.045, spec.depth - 1.6]} color="#c8c8c8" roughness={0.3} metalness={0.7} emissive="#c85f2a" emissiveIntensity={0} />
+        <mesh position={[0, FIN_COUNT * spacing * 0.5 + 0.1, 0]}>
+          <boxGeometry args={[spec.width - 1.0, 0.12, 0.5]} />
+          <meshStandardMaterial ref={finMatRef} color="#b87333" roughness={0.12} metalness={0.9} emissive="#c85f2a" emissiveIntensity={0} />
+        </mesh>
+      </group>
+      {/* shroud */}
+      <RoundedBox args={[spec.width, 0.34, spec.depth]} radius={0.06} smoothness={4} position={[0, 0.5, 0]}>
+        <meshStandardMaterial color="#111111" roughness={0.45} metalness={0.3} />
+      </RoundedBox>
       {fanX.map((x, i) => (
-        <group key={`fan-${i}`} position={[x, 0.28, 0]}>
-          <Fan fanRef={fanRefs[i]} />
+        <group key={`fan-grp-${i}`}>
+          <mesh position={[x, 0.7, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[fanRadius * 1.05, 0.05, 10, 48]} />
+            <meshStandardMaterial color="#1c1c1e" roughness={0.4} metalness={0.4} />
+          </mesh>
+          <group position={[x, 0.78, 0]}>
+            <Fan fanRef={fanRefs[i]} radius={fanRadius} />
+          </group>
         </group>
       ))}
-      <mesh position={[0, 0.05, 2.65]}>
-        <boxGeometry args={[6.6, 0.04, 0.06]} />
-        <meshStandardMaterial color="#c8c8c8" roughness={0.2} metalness={0.9} envMapIntensity={1.5} />
+      {spec.cooler === 'blower' && (
+        <mesh position={[spec.width / 2 - 0.15, 0.5, 0]}>
+          <boxGeometry args={[0.12, 0.3, spec.depth - 1.2]} />
+          <meshStandardMaterial color="#0a0a0a" roughness={0.4} metalness={0.4} />
+        </mesh>
+      )}
+      <mesh position={[0, 0.34, spec.depth / 2 - 0.1]}>
+        <boxGeometry args={[spec.width - 0.4, 0.04, 0.06]} />
+        <meshStandardMaterial color={spec.accent} roughness={0.25} metalness={0.5} emissive={spec.accent} emissiveIntensity={0.6} toneMapped={false} />
       </mesh>
-      <mesh position={[0, 0.19, 2.4]}>
-        <boxGeometry args={[1.8, 0.03, 0.18]} />
-        <meshStandardMaterial color="#0a0a0a" roughness={0.35} metalness={0.6} envMapIntensity={0.8} />
-      </mesh>
-      <LayerLabel text="TRIPLE-FAN SHROUD" sub="75mm axial fans" />
+      <LayerLabel
+        text={spec.cooler === 'blower' ? 'BLOWER + FIN STACK' : 'TRIPLE-FAN SHROUD'}
+        sub={spec.cooler === 'blower' ? 'radial · single-slot exhaust' : '3 × 75mm axial · open shroud'}
+        opacityRef={labelOpacityRef}
+        accent={spec.accent}
+      />
     </group>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Assembly — stage-aware: exploded → assembling → assembled
+// GPU card — full assembly with its own staggered explode/assemble loop
 // ──────────────────────────────────────────────────────────────────────────
 
-function GPUAssembly({
-  thermalLevelRef,
-  bloomRef,
-  assembledRef,
-  textures,
+function GPUCard({
+  spec, index, textures, heroLevelRef,
 }: {
-  thermalLevelRef: React.MutableRefObject<number>;
-  bloomRef: React.MutableRefObject<number>;
-  assembledRef: React.MutableRefObject<boolean>;
+  spec: GPUSpec;
+  index: number;
   textures: Textures;
+  heroLevelRef: React.MutableRefObject<number>;
 }) {
-  const backGroup   = useRef<THREE.Group>(null!);
-  const pcbGroup    = useRef<THREE.Group>(null!);
-  const dieGroup    = useRef<THREE.Group>(null!);
-  const copperGroup = useRef<THREE.Group>(null!);
-  const finGroup    = useRef<THREE.Group>(null!);
-  const shroudGroup = useRef<THREE.Group>(null!);
+  const isHero = index === HERO_INDEX;
+  const profile = stackProfileFor(spec);
+  const offsets = LAYER_OFFSETS[profile];
 
-  const fanRefs = [
-    useRef<THREE.Group | null>(null),
-    useRef<THREE.Group | null>(null),
-    useRef<THREE.Group | null>(null),
-  ];
+  const g0 = useRef<THREE.Group>(null!);
+  const g1 = useRef<THREE.Group>(null!);
+  const g2 = useRef<THREE.Group>(null!);
+  const g3 = useRef<THREE.Group>(null!);
+  const groups = [g0, g1, g2, g3];
 
-  const groups = [backGroup, pcbGroup, dieGroup, copperGroup, finGroup, shroudGroup];
+  const labelOpacity0 = useRef(0);
+  const labelOpacity1 = useRef(0);
+  const labelOpacity2 = useRef(0);
+  const labelOpacity3 = useRef(0);
+  const labelOpacities = [labelOpacity0, labelOpacity1, labelOpacity2, labelOpacity3];
+
+  const fanRefs = [useRef<THREE.Group | null>(null), useRef<THREE.Group | null>(null), useRef<THREE.Group | null>(null)];
+  const localLevelRef = useRef(0.07);
+  const stageRef = useRef<AnimStage>('exploded');
 
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime;
-    const stage = _stage.current;
+    const { stage } = cardStageAt(t, index);
+    stageRef.current = stage;
 
-    // Label fade — fast out during assembly, instant back if somehow returning
-    if (stage === 'exploded') {
-      _labelOpacity.current = Math.min(1, _labelOpacity.current + delta * 2);
-    } else {
-      _labelOpacity.current = Math.max(0, _labelOpacity.current - delta * 4);
-    }
+    const showLabels = stage === 'exploded' || stage === 'disassembling';
+    const targetLabelOp = showLabels ? 1 : 0;
+    const labelRate = showLabels ? 2.4 : 3.4;
+    labelOpacities.forEach((ref) => {
+      ref.current = spring(ref.current, targetLabelOp, delta, labelRate);
+    });
 
-    // Breathing offset — only in exploded mode, fades to zero during assembly
-    const breatheAmt = stage === 'exploded' ? 0.18 : 0;
-    const breathe = (i: number) => Math.sin(t * 0.5 + i) * breatheAmt;
+    const breatheAmt = (stage === 'exploded' || stage === 'disassembling') ? 0.13 : 0;
+    const breathe = (i: number) => Math.sin(t * 0.55 + i * 1.3 + index * 2.1) * breatheAmt;
 
-    const targetY = stage === 'exploded' ? EXPLODED_Y : ASSEMBLED_Y;
-    const k = stage === 'assembling' ? 3.0 : 2.0;
+    const assembledTarget = stage === 'assembling' || stage === 'assembled';
+    const targetY = assembledTarget ? offsets.assembled : offsets.exploded;
+    const k = (stage === 'assembling' || stage === 'disassembling') ? 2.7 : 1.9;
 
     for (let i = 0; i < groups.length; i++) {
       const ref = groups[i];
-      if (ref.current) {
-        ref.current.position.y = spring(ref.current.position.y, targetY[i] + breathe(i), delta, k);
-      }
+      if (ref.current) ref.current.position.y = spring(ref.current.position.y, targetY[i] + breathe(i), delta, k);
     }
 
-    // Fan speed — slow during exploded, ramp up after assembly
-    const fanBase = stage === 'exploded' ? 1.0 : stage === 'assembling' ? 2.5 : 4;
-    const fanSpeed = fanBase + (stage === 'assembled' ? thermalLevelRef.current * 10 : 0);
-    fanRefs.forEach((ref) => {
-      if (ref.current) ref.current.rotation.y += delta * fanSpeed;
-    });
+    // thermal level driving emissive die/cooler glow
+    if (isHero) {
+      localLevelRef.current = heroLevelRef.current;
+    } else {
+      localLevelRef.current = 0.07 + Math.sin(t * 0.25 + index * 1.9) * 0.035;
+    }
 
-    assembledRef.current = stage === 'assembled';
-    bloomRef.current = stage === 'assembled' ? 0.35 + thermalLevelRef.current * 1.5 : 0.15;
+    const fanBase = stage === 'assembled' ? 4 : stage === 'assembling' ? 2.2 : 0.9;
+    const fanSpeed = fanBase + (stage === 'assembled' ? localLevelRef.current * 9 : 0);
+    fanRefs.forEach((ref) => { if (ref.current) ref.current.rotation.y += delta * fanSpeed; });
   });
 
   return (
-    <group position={[0, 0, 0]}>
-      <group ref={backGroup}   position={[0, EXPLODED_Y[0], 0]}><Backplate textures={textures} /></group>
-      <group ref={pcbGroup}    position={[0, EXPLODED_Y[1], 0]}><PCBLayer textures={textures} /></group>
-      <group ref={dieGroup}    position={[0, EXPLODED_Y[2], 0]}><DieLayer thermalLevelRef={thermalLevelRef} /></group>
-      <group ref={copperGroup} position={[0, EXPLODED_Y[3], 0]}><CopperLayer thermalLevelRef={thermalLevelRef} /></group>
-      <group ref={finGroup}    position={[0, EXPLODED_Y[4], 0]}><FinLayer /></group>
-      <group ref={shroudGroup} position={[0, EXPLODED_Y[5], 0]}><ShroudLayer fanRefs={fanRefs} /></group>
+    <group position={[cardX(index), 0, 0]}>
+      <group ref={g0} position={[0, offsets.exploded[0], 0]}>
+        <SubstrateLayer spec={spec} textures={textures} labelOpacityRef={labelOpacities[0]} />
+      </group>
+      <group ref={g1} position={[0, offsets.exploded[1], 0]}>
+        <SubstrateAndComponentsLayer spec={spec} textures={textures} labelOpacityRef={labelOpacities[1]} />
+      </group>
+      <group ref={g2} position={[0, offsets.exploded[2], 0]}>
+        <DieBlockWrapper spec={spec} thermalRef={localLevelRef} opacityRef={labelOpacities[2]} />
+      </group>
+      <group ref={g3} position={[0, offsets.exploded[3], 0]}>
+        <CoolerLayer spec={spec} textures={textures} thermalRef={localLevelRef} fanRefs={fanRefs} labelOpacityRef={labelOpacities[3]} />
+      </group>
+      <CardNamePlate spec={spec} index={index} />
+    </group>
+  );
+}
+
+// Small wrapper so DieBlock can take a plain opacity ref (avoids prop-shape mismatch above)
+function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; thermalRef: React.MutableRefObject<number>; opacityRef: React.MutableRefObject<number> }) {
+  const matRefs = useRef<(THREE.MeshStandardMaterial | null)[]>([]);
+  useFrame(() => {
+    const t = thermalRef.current;
+    const c = thermalHex(t);
+    matRefs.current.forEach((m) => {
+      if (!m) return;
+      m.emissive.copy(c);
+      m.emissiveIntensity = t * t * 1.7;
+    });
+  });
+
+  let dies: { pos: [number, number, number]; w: number; d: number }[];
+  if (spec.dieLayout === 'monolithic') {
+    dies = [{ pos: [0, 0.07, 0], w: 1.7, d: 1.7 }];
+  } else if (spec.dieLayout === 'dual-die') {
+    dies = [{ pos: [-0.66, 0.07, 0], w: 1.25, d: 1.7 }, { pos: [0.66, 0.07, 0], w: 1.25, d: 1.7 }];
+  } else {
+    dies = [];
+    for (let r = 0; r < 2; r++) for (let cI = 0; cI < 4; cI++) {
+      dies.push({ pos: [-1.05 + cI * 0.7, 0.07, -0.42 + r * 0.84], w: 0.6, d: 0.74 });
+    }
+  }
+
+  const memPositions = useMemo<[number, number, number][]>(() => {
+    const out: [number, number, number][] = [];
+    const ringR = 2.3;
+    for (let i = 0; i < spec.memCount; i++) {
+      const a = (i / spec.memCount) * Math.PI * 2 + Math.PI / spec.memCount;
+      out.push([Math.cos(a) * ringR, 0.05, Math.sin(a) * (ringR * (spec.depth / spec.width))]);
+    }
+    return out;
+  }, [spec]);
+
+  const dieLabel = spec.dieLayout === 'dual-die' ? 'DUAL-DIE COMPLEX' : spec.dieLayout === 'chiplet-grid' ? 'CHIPLET ARRAY · 8×' : 'MONOLITHIC DIE';
+
+  return (
+    <group>
+      <mesh position={[0, -0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[1.05, 1.05, 0.02, 32]} />
+        <meshStandardMaterial color="#8a8a8a" roughness={0.5} metalness={0.2} />
+      </mesh>
+      {dies.map((d, i) => (
+        <RoundedBox key={i} args={[d.w, 0.12, d.d]} radius={0.02} smoothness={3} position={d.pos}>
+          <meshStandardMaterial ref={(m) => { matRefs.current[i] = m; }} color="#0d0d10" roughness={0.85} metalness={0.04} />
+        </RoundedBox>
+      ))}
+      {memPositions.map((p, i) => (
+        <RoundedBox key={`mem-${i}`} args={[0.6, 0.16, 0.6]} radius={0.02} smoothness={3} position={p}>
+          <meshStandardMaterial color="#121216" roughness={0.4} metalness={0.35} />
+        </RoundedBox>
+      ))}
+      <LayerLabel text={dieLabel} sub={`${spec.mem} · stacked memory`} opacityRef={opacityRef} accent={spec.accent} />
+    </group>
+  );
+}
+
+// Floating model name plate — visible while exploded, the "ad copy" beat
+function CardNamePlate({ spec, index }: { spec: GPUSpec; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useFrame((state) => {
+    if (!ref.current) return;
+    const { stage } = cardStageAt(state.clock.elapsedTime, index);
+    const target = (stage === 'exploded' || stage === 'disassembling') ? 1 : 0;
+    const cur = parseFloat(ref.current.dataset.op || '0');
+    const next = cur + (target - cur) * 0.06;
+    ref.current.dataset.op = String(next);
+    ref.current.style.opacity = String(next);
+    ref.current.style.transform = `translateY(${(1 - next) * 8}px)`;
+  });
+  return (
+    <Html position={[0, -3.6, 0]} center occlude={false} style={{ pointerEvents: 'none', userSelect: 'none' }}>
+      <div ref={ref} style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+        <div style={{ fontFamily: FM, fontSize: 8.5, letterSpacing: '0.22em', color: spec.accent, marginBottom: 3 }}>
+          {spec.vendor}
+        </div>
+        <div style={{ fontFamily: FM, fontSize: 15, fontWeight: 700, letterSpacing: '0.04em', color: T.text }}>
+          {spec.name}
+        </div>
+        <div style={{ fontFamily: FM, fontSize: 8, letterSpacing: '0.12em', color: T.muted, marginTop: 2 }}>
+          {spec.arch} · {spec.mem}
+        </div>
+      </div>
+    </Html>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// The set — runway floor + backdrop fog. Studio product-shot, not data-center.
+// ──────────────────────────────────────────────────────────────────────────
+
+function Runway({ textures }: { textures: Textures }) {
+  return (
+    <group position={[0, -3.4, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[GPU_SPECS.length * CARD_SPACING + 14, 16]} />
+        <meshStandardMaterial color="#0a0a0e" roughness={0.32} metalness={0.55} map={textures.brushed} envMapIntensity={0.7} />
+      </mesh>
+      {GPU_SPECS.map((spec, i) => (
+        <mesh key={spec.id} position={[cardX(i), 0.02, 0]} receiveShadow>
+          <ringGeometry args={[2.55, 2.7, 48]} />
+          <meshStandardMaterial color={spec.accent} emissive={spec.accent} emissiveIntensity={0.5} roughness={0.4} metalness={0.3} toneMapped={false} transparent opacity={0.55} />
+        </mesh>
+      ))}
+      <fogExp2 attach="fog" args={[T.bg, 0.018]} />
     </group>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Lighting
+// Lighting — studio rig: broad key/fill + per-card traveling rim spotlight
 // ──────────────────────────────────────────────────────────────────────────
 
-function SceneLights({ thermalLevelRef }: { thermalLevelRef: React.MutableRefObject<number> }) {
-  const keyRef     = useRef<THREE.RectAreaLight>(null!);
-  const fillRef    = useRef<THREE.RectAreaLight>(null!);
-  const thermalRef = useRef<THREE.PointLight>(null!);
-  const finGlowRef = useRef<THREE.PointLight>(null!);
+function SceneLights({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
+  const keyRef = useRef<THREE.RectAreaLight>(null!);
+  const fillRef = useRef<THREE.RectAreaLight>(null!);
+  const spotRef = useRef<THREE.SpotLight>(null!);
 
   useEffect(() => {
     keyRef.current?.lookAt(0, 0, 0);
@@ -476,58 +708,58 @@ function SceneLights({ thermalLevelRef }: { thermalLevelRef: React.MutableRefObj
   }, []);
 
   useFrame(() => {
-    const t = thermalLevelRef.current;
-    if (thermalRef.current) {
-      thermalRef.current.color.copy(thermalHex(t));
-      thermalRef.current.intensity = t * 8;
-    }
-    if (finGlowRef.current) {
-      finGlowRef.current.color.copy(thermalHex(t * 0.7));
-      finGlowRef.current.intensity = 0.5 + t * 3;
+    if (spotRef.current) {
+      spotRef.current.position.x = camXRef.current;
+      spotRef.current.target.position.x = camXRef.current;
+      spotRef.current.target.updateMatrixWorld();
     }
   });
 
   return (
     <>
-      <rectAreaLight ref={keyRef}  position={[8, 16, 8]}    width={12} height={10} intensity={14} color="#fff8f4" />
-      <rectAreaLight ref={fillRef} position={[-10, 8, 5]}   width={8}  height={6}  intensity={5}  color="#b8d0ff" />
-      <pointLight position={[-3, 6, -10]} intensity={3} color="#8ab4e0" />
-      <pointLight ref={thermalRef} position={[0, -1, 0]} distance={10} decay={2} />
-      <pointLight ref={finGlowRef} position={[0, 3.5, 0]} distance={6} decay={2} />
-      <ambientLight intensity={0.04} />
+      <rectAreaLight ref={keyRef} position={[6, 18, 12]} width={26} height={12} intensity={11} color="#fff8f4" />
+      <rectAreaLight ref={fillRef} position={[-14, 9, 6]} width={16} height={8} intensity={4} color="#b8d0ff" />
+      <spotLight ref={spotRef} position={[0, 14, 4]} angle={0.5} penumbra={0.6} intensity={26} color="#ffe9c8" distance={28} decay={2} castShadow />
+      <pointLight position={[0, 4, -14]} intensity={3} color="#8ab4e0" />
+      <ambientLight intensity={0.035} />
     </>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Camera — stage-aware orbit, springs between exploded and assembled params
+// Camera — slow lateral dolly sweeping the full runway, noise-driven drift
 // ──────────────────────────────────────────────────────────────────────────
 
-function CameraRig() {
+const SWEEP_HALF = (GPU_SPECS.length - 1) * CARD_SPACING * 0.5 + 3;
+const _camTarget = new THREE.Vector3();
+const _lookTarget = new THREE.Vector3();
+
+function CameraRig({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
   const { camera } = useThree();
-  const camState = useRef({ r: 26, el: 13 });
+  const noiseX = useMemo(() => createNoise3D(), []);
+  const noiseY = useMemo(() => createNoise3D(), []);
+  const noiseZ = useMemo(() => createNoise3D(), []);
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     const t = state.clock.elapsedTime;
-    const stage = _stage.current;
+    const SWEEP_PERIOD = 34;
+    const phase = (t % SWEEP_PERIOD) / SWEEP_PERIOD;
+    // Triangle wave 0→1→0 across the runway, eased at the turnarounds
+    const tri = phase < 0.5 ? phase * 2 : (1 - phase) * 2;
+    const eased = tri * tri * (3 - 2 * tri);
+    const sweepX = -SWEEP_HALF + eased * SWEEP_HALF * 2;
 
-    // Exploded: high + far to see all layers
-    // Assembling: transition
-    // Assembled: close, low angle — product photography
-    const targetR  = stage === 'assembled' ? 17 : stage === 'assembling' ? 21 : 26;
-    const targetEl = stage === 'assembled' ? 5  : stage === 'assembling' ? 8  : 13;
+    camXRef.current = sweepX;
 
-    camState.current.r  = spring(camState.current.r,  targetR,  delta, 0.7);
-    camState.current.el = spring(camState.current.el, targetEl, delta, 0.7);
+    _camTarget.set(
+      sweepX + noiseX(t * 0.05, 0, 0) * 1.1,
+      4.6 + noiseY(0, t * 0.045, 0) * 0.5,
+      13.5 + noiseZ(0, 0, t * 0.04) * 1.2
+    );
+    camera.position.lerp(_camTarget, 0.04);
 
-    const speed = stage === 'assembled' ? 0.022 : 0.038;
-    const phi = t * speed + Math.PI * 0.35;
-    const { r, el } = camState.current;
-
-    camera.position.set(Math.sin(phi) * r, el, Math.cos(phi) * r);
-    // lookAt center shifts: during exploded, center of exploded spread is ~y=0.5
-    // during assembled, center of assembled GPU body is ~y=0.6
-    camera.lookAt(0, stage === 'exploded' ? 0.5 : 0.6, 0);
+    _lookTarget.set(sweepX * 0.55, 0.4, 0);
+    camera.lookAt(_lookTarget);
   });
 
   return null;
@@ -537,39 +769,28 @@ function CameraRig() {
 // Post-processing
 // ──────────────────────────────────────────────────────────────────────────
 
-const _caOffset = new THREE.Vector2(0.0008, 0.0008);
+const _caOffset = new THREE.Vector2(0.0007, 0.0007);
+const _dofTarget = new THREE.Vector3(0, 0.4, 0);
 
-function PostFX({ bloomRef }: { bloomRef: React.MutableRefObject<number> }) {
-  const bloomEffectRef = useRef<any>(null);
-
+function PostFX({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
   useFrame(() => {
-    if (bloomEffectRef.current) {
-      bloomEffectRef.current.intensity = bloomRef.current;
-    }
+    _dofTarget.x = camXRef.current * 0.55;
   });
-
   return (
     <EffectComposer multisampling={0}>
-      <Bloom ref={bloomEffectRef} luminanceThreshold={0.18} luminanceSmoothing={0.25} intensity={0.4} radius={0.5} mipmapBlur />
+      <DepthOfField target={_dofTarget} focalLength={0.045} bokehScale={3.4} height={480} />
+      <Bloom luminanceThreshold={0.6} luminanceSmoothing={0.25} intensity={0.5} radius={0.5} mipmapBlur />
       <ChromaticAberration offset={_caOffset} blendFunction={BlendFunction.NORMAL} radialModulation={false} modulationOffset={0.15} />
-      <Vignette offset={0.3} darkness={0.5} eskil={false} blendFunction={BlendFunction.NORMAL} />
+      <Vignette offset={0.32} darkness={0.55} eskil={false} blendFunction={BlendFunction.NORMAL} />
     </EffectComposer>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// HUD — appears after assembly, bottom-right
+// HUD — Theta's readout on the hero card (H100), bottom-right
 // ──────────────────────────────────────────────────────────────────────────
 
-function PhaseHUD({
-  phaseRef,
-  valuesRef,
-  opacity,
-}: {
-  phaseRef: React.MutableRefObject<Phase>;
-  valuesRef: React.MutableRefObject<{ level: number; progress: number }>;
-  opacity: number;
-}) {
+function PhaseHUD({ phaseRef, valuesRef }: { phaseRef: React.MutableRefObject<Phase>; valuesRef: React.MutableRefObject<{ level: number; progress: number }> }) {
   const [, force] = useState(0);
   useEffect(() => {
     const id = setInterval(() => force((n) => n + 1), 120);
@@ -580,54 +801,27 @@ function PhaseHUD({
   const { level, progress } = valuesRef.current;
   const isCritical = phase === 'critical';
   const tColor = thermalHex(level).getStyle();
-
-  const Tj      = (38 + level * 56).toFixed(1);
-  const Rtheta  = (0.22 + level * 0.41).toFixed(3);
-  const pState  = level < 0.2 ? 'P8 · idle' : level < 0.55 ? 'P2 · active' : level < 0.85 ? 'P0 · boost' : 'P0 · throttle';
-
+  const Tj = (38 + level * 56).toFixed(1);
+  const Rtheta = (0.22 + level * 0.41).toFixed(3);
   const labelMap: Record<Phase, string> = {
-    idle: 'IDLE', load: 'UNDER LOAD', anomaly: 'ANOMALY DETECTED',
-    critical: 'THERMAL CRITICAL', recovery: 'RECOVERING',
+    idle: 'IDLE', load: 'UNDER LOAD', anomaly: 'ANOMALY DETECTED', critical: 'THERMAL CRITICAL', recovery: 'RECOVERING',
   };
 
   return (
     <div style={{
-      position: 'absolute',
-      bottom: 24,
-      right: 24,
-      width: 220,
-      padding: '10px 12px',
-      background: 'rgba(6,6,10,0.88)',
-      backdropFilter: 'blur(8px)',
-      border: `1px solid ${isCritical ? T.critical : T.border}`,
-      borderRadius: 6,
-      fontFamily: FM,
-      color: T.text,
-      fontSize: 9,
-      lineHeight: 1.7,
-      boxShadow: '0 6px 24px rgba(0,0,0,0.6)',
-      pointerEvents: 'none',
-      opacity,
-      transition: 'opacity 1.2s ease',
+      position: 'absolute', bottom: 24, right: 24, width: 224, padding: '10px 12px',
+      background: 'rgba(6,6,10,0.88)', backdropFilter: 'blur(8px)',
+      border: `1px solid ${isCritical ? T.critical : T.border}`, borderRadius: 6,
+      fontFamily: FM, color: T.text, fontSize: 9, lineHeight: 1.7,
+      boxShadow: '0 6px 24px rgba(0,0,0,0.6)', pointerEvents: 'none',
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-        <span style={{ color: T.muted, fontSize: 8, letterSpacing: '0.14em' }}>THETA · DAQ</span>
-        <span style={{ color: isCritical ? T.critical : tColor, fontWeight: 700, fontSize: 9, letterSpacing: '0.06em' }}>
-          ● {labelMap[phase]}
-        </span>
+        <span style={{ color: T.muted, fontSize: 8, letterSpacing: '0.14em' }}>THETA · DAQ · NODE H100-04</span>
+        <span style={{ color: isCritical ? T.critical : tColor, fontWeight: 700, fontSize: 9, letterSpacing: '0.06em' }}>● {labelMap[phase]}</span>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span style={{ color: T.muted }}>T_junction</span>
-        <span style={{ color: tColor }}>{Tj} °C</span>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span style={{ color: T.muted }}>R_θ_eff</span>
-        <span style={{ color: T.text }}>{Rtheta} °C/W</span>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}>
-        <span style={{ color: T.muted }}>P_state</span>
-        <span style={{ color: T.bp }}>{pState}</span>
-      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: T.muted }}>T_junction</span><span style={{ color: tColor }}>{Tj} °C</span></div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: T.muted }}>R_θ_eff</span><span style={{ color: T.text }}>{Rtheta} °C/W</span></div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}><span style={{ color: T.muted }}>Watching</span><span style={{ color: T.bp }}>5 / 5 nodes</span></div>
       <div style={{ height: 2, background: T.s1, borderRadius: 1, overflow: 'hidden' }}>
         <div style={{ height: '100%', width: `${Math.round(progress * 100)}%`, background: tColor, transition: 'width 0.12s linear' }} />
       </div>
@@ -635,27 +829,10 @@ function PhaseHUD({
   );
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-// Stage counter — bottom-left, shows current animation phase
-// ──────────────────────────────────────────────────────────────────────────
-
-function StageLabel({ stage }: { stage: AnimStage }) {
-  const label = stage === 'exploded' ? 'ANATOMY VIEW' : stage === 'assembling' ? 'ASSEMBLING...' : 'THERMAL MONITORING';
-  const color = stage === 'assembled' ? T.healthy : T.muted;
+function LineupLabel() {
   return (
-    <div style={{
-      position: 'absolute',
-      bottom: 24,
-      left: 24,
-      fontFamily: FM,
-      fontSize: 8.5,
-      letterSpacing: '0.16em',
-      color,
-      opacity: 0.7,
-      pointerEvents: 'none',
-      transition: 'color 0.8s ease, opacity 0.8s ease',
-    }}>
-      ▶ {label}
+    <div style={{ position: 'absolute', bottom: 24, left: 24, fontFamily: FM, fontSize: 8.5, letterSpacing: '0.16em', color: T.muted, opacity: 0.7, pointerEvents: 'none' }}>
+      ▶ THE FLEET THETA WATCHES · A100 · L40S · H100 · B200 · MI300X
     </div>
   );
 }
@@ -665,87 +842,56 @@ function StageLabel({ stage }: { stage: AnimStage }) {
 // ──────────────────────────────────────────────────────────────────────────
 
 export default function GPUHeroScene() {
-  const thermalLevelRef = useRef(0.08);
-  const bloomRef        = useRef(0.2);
-  const phaseRef        = useRef<Phase>('idle');
-  const assembledRef    = useRef(false);
-  const valuesRef       = useRef({ level: 0.08, progress: 0 });
-  const [hudOpacity, setHudOpacity] = useState(0);
-  const [uiStage, setUiStage]       = useState<AnimStage>('exploded');
+  const heroLevelRef = useRef(0.08);
+  const phaseRef = useRef<Phase>('idle');
+  const valuesRef = useRef({ level: 0.08, progress: 0 });
+  const camXRef = useRef(0);
 
-  // Stage machine: exploded (0s) → assembling (3.5s) → assembled (8s)
-  useEffect(() => {
-    _labelOpacity.current = 1.0;
-    _stage.current = 'exploded';
-    setUiStage('exploded');
-    setHudOpacity(0);
-
-    const t1 = setTimeout(() => {
-      _stage.current = 'assembling';
-      setUiStage('assembling');
-    }, 3500);
-
-    const t2 = setTimeout(() => {
-      _stage.current = 'assembled';
-      setUiStage('assembled');
-      setHudOpacity(1);
-    }, 8000);
-
-    return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, []);
-
-  // Thermal sequence — starts after assembly completes (8s delay)
   useEffect(() => {
     let raf = 0;
-    const startDelay = setTimeout(() => {
-      const start = performance.now();
-      let idx = 0;
-      let phaseStart = 0;
-
-      const tick = (now: number) => {
-        const elapsed = (now - start) / 1000;
-        const cur = PHASE_SEQUENCE[idx];
-        const pElapsed = elapsed - phaseStart;
-        const progress = THREE.MathUtils.clamp(pElapsed / cur.dur, 0, 1);
-
-        phaseRef.current = cur.phase;
-        const nextLevel = idx + 1 < PHASE_SEQUENCE.length
-          ? PHASE_SEQUENCE[idx + 1].level
-          : PHASE_SEQUENCE[0].level;
-        thermalLevelRef.current = THREE.MathUtils.lerp(cur.level, nextLevel, progress * progress);
-        valuesRef.current = { level: thermalLevelRef.current, progress };
-
-        if (pElapsed >= cur.dur) {
-          idx = (idx + 1) % PHASE_SEQUENCE.length;
-          phaseStart = elapsed;
-        }
-        raf = requestAnimationFrame(tick);
-      };
+    const start = performance.now();
+    let idx = 0;
+    let phaseStart = 0;
+    const tick = (now: number) => {
+      const elapsed = (now - start) / 1000;
+      const cur = PHASE_SEQUENCE[idx];
+      const pElapsed = elapsed - phaseStart;
+      const progress = THREE.MathUtils.clamp(pElapsed / cur.dur, 0, 1);
+      phaseRef.current = cur.phase;
+      const nextLevel = idx + 1 < PHASE_SEQUENCE.length ? PHASE_SEQUENCE[idx + 1].level : PHASE_SEQUENCE[0].level;
+      heroLevelRef.current = THREE.MathUtils.lerp(cur.level, nextLevel, progress * progress);
+      valuesRef.current = { level: heroLevelRef.current, progress };
+      if (pElapsed >= cur.dur) { idx = (idx + 1) % PHASE_SEQUENCE.length; phaseStart = elapsed; }
       raf = requestAnimationFrame(tick);
-    }, 8000);
-
-    return () => { clearTimeout(startDelay); cancelAnimationFrame(raf); };
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, []);
 
-  const textures = useMemo(() => ({ pcb: makePCBTexture(), rough: makeRoughnessMap() }), []);
+  const textures = useMemo(() => ({ pcb: makePCBTexture(), rough: makeRoughnessMap(), brushed: makeBrushedMetalTexture() }), []);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '90vh', background: T.bg }}>
       <Canvas
-        gl={{ antialias: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.15, outputColorSpace: THREE.SRGBColorSpace }}
-        dpr={[1, 2]}
-        camera={{ position: [14, 13, 22], fov: 36 }}
+        shadows
+        gl={{ antialias: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1, outputColorSpace: THREE.SRGBColorSpace }}
+        dpr={[1, 1.6]}
+        camera={{ position: [LINEUP_X0, 4.6, 14], fov: 38 }}
       >
         <color attach="background" args={[T.bg]} />
-        <SceneLights thermalLevelRef={thermalLevelRef} />
-        <GPUAssembly thermalLevelRef={thermalLevelRef} bloomRef={bloomRef} assembledRef={assembledRef} textures={textures} />
-        <Environment preset="studio" environmentIntensity={0.7} />
-        <CameraRig />
-        <PostFX bloomRef={bloomRef} />
+        <SceneLights camXRef={camXRef} />
+        <Runway textures={textures} />
+        {GPU_SPECS.map((spec, i) => (
+          <GPUCard key={spec.id} spec={spec} index={i} textures={textures} heroLevelRef={heroLevelRef} />
+        ))}
+        <ContactShadows position={[0, -3.39, 0]} opacity={0.5} scale={70} blur={2.6} far={6} resolution={512} color="#000000" />
+        <Environment preset="studio" environmentIntensity={0.65} />
+        <CameraRig camXRef={camXRef} />
+        <PostFX camXRef={camXRef} />
       </Canvas>
 
-      <PhaseHUD phaseRef={phaseRef} valuesRef={valuesRef} opacity={hudOpacity} />
-      <StageLabel stage={uiStage} />
+      <PhaseHUD phaseRef={phaseRef} valuesRef={valuesRef} />
+      <LineupLabel />
     </div>
   );
 }
