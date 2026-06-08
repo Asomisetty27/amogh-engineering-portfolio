@@ -1107,10 +1107,11 @@ function PostFX({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
   });
   return (
     <EffectComposer multisampling={0}>
-      <DepthOfField target={_dofTarget} focalLength={0.045} bokehScale={3.4} height={480} />
-      <Bloom luminanceThreshold={0.6} luminanceSmoothing={0.25} intensity={0.5} radius={0.5} mipmapBlur />
+      <DepthOfField target={_dofTarget} focalLength={0.05} bokehScale={3.0} height={480} />
+      <Bloom luminanceThreshold={0.45} luminanceSmoothing={0.3} intensity={1.15} radius={0.8} mipmapBlur />
       <ChromaticAberration offset={_caOffset} blendFunction={BlendFunction.NORMAL} radialModulation={false} modulationOffset={0.15} />
-      <Vignette offset={0.32} darkness={0.55} eskil={false} blendFunction={BlendFunction.NORMAL} />
+      <Vignette offset={0.28} darkness={0.7} eskil={false} blendFunction={BlendFunction.NORMAL} />
+      <Noise premultiply blendFunction={BlendFunction.SOFT_LIGHT} opacity={0.35} />
     </EffectComposer>
   );
 }
