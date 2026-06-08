@@ -161,15 +161,60 @@ export const _seqTriggered = { current: false };
 let _seqStart = -1;
 
 const easeOutCubic = (x: number) => 1 - Math.pow(1 - x, 3);
+const easeOutQuad = (x: number) => 1 - (1 - x) * (1 - x);
+
+// Damped spring: 0..0.85 eases up to a 4% overshoot, 0.85..1 settles back.
+// Reads as a real sprung hinge instead of a CSS transition.
+function springEase(x: number, overshoot = 1.04): number {
+  const k = THREE.MathUtils.clamp(x, 0, 1);
+  if (k < 0.85) return easeOutCubic(k / 0.85) * overshoot;
+  const u = (k - 0.85) / 0.15;
+  return overshoot + (1 - overshoot) * easeOutQuad(u);
+}
+
+// Lid two-stage: unlatch to 15%, pause (the click), lift with 2% overshoot,
+// settle back. Total ~1.95 s.
+function lidEase(dt: number): number {
+  const unlatch = 0.55, pause = 0.15, lift = 1.0, settle = 0.25;
+  const t1 = unlatch;
+  const t2 = t1 + pause;
+  const t3 = t2 + lift;
+  const t4 = t3 + settle;
+  if (dt <= 0) return 0;
+  if (dt < t1) return 0.15 * easeOutCubic(dt / t1);
+  if (dt < t2) return 0.15;
+  if (dt < t3) return 0.15 + (1.02 - 0.15) * easeOutCubic((dt - t2) / lift);
+  if (dt < t4) return 1.02 + (1 - 1.02) * easeOutQuad((dt - t3) / settle);
+  return 1;
+}
+
+// Sled: ease-out cubic + a tiny rail-lock snap at the end.
+function sledEase(dt: number): number {
+  const u = THREE.MathUtils.clamp(dt / 1.7, 0, 1);
+  const base = easeOutCubic(u);
+  const snap = u > 0.94 ? Math.sin((u - 0.94) * 60) * 0.014 * (1 - u) : 0;
+  return THREE.MathUtils.clamp(base + snap, 0, 1.014);
+}
 
 function SequenceDriver() {
   useFrame((state) => {
     if (!_seqTriggered.current) return;
     if (_seqStart < 0) _seqStart = state.clock.elapsedTime;
     const dt = state.clock.elapsedTime - _seqStart;
-    _doorOpen.current = easeOutCubic(THREE.MathUtils.clamp(dt / 1.4, 0, 1));
-    _sledOut.current  = easeOutCubic(THREE.MathUtils.clamp((dt - 0.6) / 1.6, 0, 1));
-    _lidOpen.current  = easeOutCubic(THREE.MathUtils.clamp((dt - 2.0) / 1.1, 0, 1));
+    _doorOpen.current = springEase(THREE.MathUtils.clamp(dt / 1.5, 0, 1));
+    _sledOut.current  = sledEase(dt - 0.7);
+    _lidOpen.current  = lidEase(dt - 2.3);
+
+    // Dynamic DoF: pull focus from rack-front toward baseboard, then toward
+    // the front hero die as the lid opens. Mutate the existing Vector3
+    // reference so PostFX picks it up without re-creating the effect.
+    const sP = THREE.MathUtils.clamp(_sledOut.current, 0, 1);
+    const lP = THREE.MathUtils.clamp(_lidOpen.current, 0, 1);
+    _dofTarget.set(
+      -1.05,
+      1.55 + 0.13 * sP + 0.04 * lP,
+      0.55 + 0.50 * sP + 0.06 * lP,
+    );
   });
   return null;
 }
