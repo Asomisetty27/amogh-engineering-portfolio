@@ -91,7 +91,7 @@ export default function CorrosionInteractive() {
           {/* Grid */}
           <defs>
             <pattern id="corr-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="hsl(170,80%,50%)" strokeWidth="0.2" opacity="0.05" />
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="hsl(43,68%,50%)" strokeWidth="0.2" opacity="0.05" />
             </pattern>
           </defs>
           <rect width="400" height="320" fill="url(#corr-grid)" />
@@ -140,11 +140,11 @@ export default function CorrosionInteractive() {
           {!removed.has("cathode") && (
             <g className="cursor-pointer" onClick={() => setSelected(elements.find(e => e.id === "cathode")!)}>
               <rect x="280" y="100" width="40" height="140" rx="2"
-                fill="hsl(170,80%,50%)" fillOpacity={selected?.id === "cathode" ? 0.3 : 0.15}
-                stroke="hsl(170,80%,50%)" strokeWidth={selected?.id === "cathode" ? 1.5 : 0.8}
+                fill="hsl(43,68%,50%)" fillOpacity={selected?.id === "cathode" ? 0.3 : 0.15}
+                stroke="hsl(43,68%,50%)" strokeWidth={selected?.id === "cathode" ? 1.5 : 0.8}
               />
-              <text x="300" y="90" textAnchor="middle" fill="hsl(170,80%,50%)" fontSize="10" fontFamily="monospace" fontWeight="bold">CATHODE</text>
-              <text x="300" y="175" textAnchor="middle" fill="hsl(170,80%,50%)" fontSize="6" fontFamily="monospace" opacity="0.7">O₂+H₂O+e⁻→OH⁻</text>
+              <text x="300" y="90" textAnchor="middle" fill="hsl(43,68%,50%)" fontSize="10" fontFamily="monospace" fontWeight="bold">CATHODE</text>
+              <text x="300" y="175" textAnchor="middle" fill="hsl(43,68%,50%)" fontSize="6" fontFamily="monospace" opacity="0.7">O₂+H₂O+e⁻→OH⁻</text>
             </g>
           )}
 
@@ -178,7 +178,7 @@ export default function CorrosionInteractive() {
           {corrosionActive && !removed.has("electrolyte") && (
             <>
               <circle cx={150 + Math.sin(tick * 0.03) * 30} cy={ionY} r="2" fill="hsl(0,72%,55%)" opacity="0.4" />
-              <circle cx={250 - Math.sin(tick * 0.035) * 25} cy={ionY + 15} r="2" fill="hsl(170,80%,50%)" opacity="0.4" />
+              <circle cx={250 - Math.sin(tick * 0.035) * 25} cy={ionY + 15} r="2" fill="hsl(43,68%,50%)" opacity="0.4" />
               <text x="200" y={ionY + 40} textAnchor="middle" fill="hsl(142,70%,50%)" fontSize="6" fontFamily="monospace" opacity="0.4">
                 ← ion transport →
               </text>

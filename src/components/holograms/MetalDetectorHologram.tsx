@@ -90,7 +90,7 @@ export default function MetalDetectorHologram() {
         <svg viewBox="0 0 380 100" className="w-full" style={{ minHeight: 300 }}>
           <defs>
             <pattern id="detect-grid" width="10" height="10" patternUnits="userSpaceOnUse">
-              <path d="M 10 0 L 0 0 0 10" fill="none" stroke="hsl(170,80%,50%)" strokeWidth="0.1" opacity="0.06" />
+              <path d="M 10 0 L 0 0 0 10" fill="none" stroke="hsl(43,68%,50%)" strokeWidth="0.1" opacity="0.06" />
             </pattern>
             <filter id="detect-glow">
               <feGaussianBlur stdDeviation="1.2" result="blur" />

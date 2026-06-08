@@ -62,7 +62,7 @@ export default function FunckNetworkHologram() {
         <svg viewBox="0 0 100 80" className="w-full h-full" style={{ minHeight: 350 }}>
           <defs>
             <pattern id="funck-grid" width="5" height="5" patternUnits="userSpaceOnUse">
-              <path d="M 5 0 L 0 0 0 5" fill="none" stroke="hsl(170,80%,50%)" strokeWidth="0.05" opacity="0.1" />
+              <path d="M 5 0 L 0 0 0 5" fill="none" stroke="hsl(43,68%,50%)" strokeWidth="0.05" opacity="0.1" />
             </pattern>
           </defs>
           <rect width="100" height="80" fill="url(#funck-grid)" />

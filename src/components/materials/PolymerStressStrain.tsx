@@ -119,34 +119,34 @@ export default function PolymerStressStrain() {
           {/* Grid */}
           <defs>
             <pattern id="poly-grid" width="34" height="22" patternUnits="userSpaceOnUse" x={chartX} y={chartY}>
-              <path d="M 34 0 L 0 0 0 22" fill="none" stroke="hsl(170,80%,50%)" strokeWidth="0.2" opacity="0.06" />
+              <path d="M 34 0 L 0 0 0 22" fill="none" stroke="hsl(43,68%,50%)" strokeWidth="0.2" opacity="0.06" />
             </pattern>
           </defs>
           <rect x={chartX} y={chartY} width={chartW} height={chartH} fill="url(#poly-grid)" />
 
           {/* Axes */}
-          <line x1={chartX} y1={chartY + chartH} x2={chartX + chartW} y2={chartY + chartH} stroke="hsl(170,80%,50%)" strokeWidth="0.8" opacity="0.4" />
-          <line x1={chartX} y1={chartY} x2={chartX} y2={chartY + chartH} stroke="hsl(170,80%,50%)" strokeWidth="0.8" opacity="0.4" />
+          <line x1={chartX} y1={chartY + chartH} x2={chartX + chartW} y2={chartY + chartH} stroke="hsl(43,68%,50%)" strokeWidth="0.8" opacity="0.4" />
+          <line x1={chartX} y1={chartY} x2={chartX} y2={chartY + chartH} stroke="hsl(43,68%,50%)" strokeWidth="0.8" opacity="0.4" />
 
           {/* X-axis labels */}
           {[0, 20, 40, 60, 80, 100, 120].map(s => (
             <g key={s}>
-              <line x1={strainToX(s)} y1={chartY + chartH} x2={strainToX(s)} y2={chartY + chartH + 4} stroke="hsl(170,80%,50%)" strokeWidth="0.4" opacity="0.4" />
-              <text x={strainToX(s)} y={chartY + chartH + 14} textAnchor="middle" fill="hsl(170,80%,50%)" fontSize="7" fontFamily="monospace" opacity="0.5">{s}%</text>
+              <line x1={strainToX(s)} y1={chartY + chartH} x2={strainToX(s)} y2={chartY + chartH + 4} stroke="hsl(43,68%,50%)" strokeWidth="0.4" opacity="0.4" />
+              <text x={strainToX(s)} y={chartY + chartH + 14} textAnchor="middle" fill="hsl(43,68%,50%)" fontSize="7" fontFamily="monospace" opacity="0.5">{s}%</text>
             </g>
           ))}
-          <text x={chartX + chartW / 2} y={chartY + chartH + 28} textAnchor="middle" fill="hsl(170,80%,50%)" fontSize="8" fontFamily="monospace" opacity="0.5">
+          <text x={chartX + chartW / 2} y={chartY + chartH + 28} textAnchor="middle" fill="hsl(43,68%,50%)" fontSize="8" fontFamily="monospace" opacity="0.5">
             Engineering Strain (%)
           </text>
 
           {/* Y-axis labels */}
           {[0, 20, 40, 60, 80].map(s => (
             <g key={s}>
-              <line x1={chartX - 4} y1={stressToY(s)} x2={chartX} y2={stressToY(s)} stroke="hsl(170,80%,50%)" strokeWidth="0.4" opacity="0.4" />
-              <text x={chartX - 8} y={stressToY(s) + 3} textAnchor="end" fill="hsl(170,80%,50%)" fontSize="7" fontFamily="monospace" opacity="0.5">{s}</text>
+              <line x1={chartX - 4} y1={stressToY(s)} x2={chartX} y2={stressToY(s)} stroke="hsl(43,68%,50%)" strokeWidth="0.4" opacity="0.4" />
+              <text x={chartX - 8} y={stressToY(s) + 3} textAnchor="end" fill="hsl(43,68%,50%)" fontSize="7" fontFamily="monospace" opacity="0.5">{s}</text>
             </g>
           ))}
-          <text x={20} y={chartY + chartH / 2} textAnchor="middle" fill="hsl(170,80%,50%)" fontSize="8" fontFamily="monospace" opacity="0.5" transform={`rotate(-90, 20, ${chartY + chartH / 2})`}>
+          <text x={20} y={chartY + chartH / 2} textAnchor="middle" fill="hsl(43,68%,50%)" fontSize="8" fontFamily="monospace" opacity="0.5" transform={`rotate(-90, 20, ${chartY + chartH / 2})`}>
             Stress (MPa)
           </text>
 

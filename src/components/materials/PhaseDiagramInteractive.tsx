@@ -193,34 +193,34 @@ export default function PhaseDiagramInteractive() {
           {/* Background grid */}
           <defs>
             <pattern id="phase-grid" width="40" height="30" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 30" fill="none" stroke="hsl(170,80%,50%)" strokeWidth="0.3" opacity="0.06" />
+              <path d="M 40 0 L 0 0 0 30" fill="none" stroke="hsl(43,68%,50%)" strokeWidth="0.3" opacity="0.06" />
             </pattern>
           </defs>
           <rect x={xMin} y={yMin} width={xMax - xMin} height={yMax - yMin} fill="url(#phase-grid)" />
 
           {/* Axes */}
-          <line x1={xMin} y1={yMax} x2={xMax} y2={yMax} stroke="hsl(170,80%,50%)" strokeWidth="1" opacity="0.4" />
-          <line x1={xMin} y1={yMin} x2={xMin} y2={yMax} stroke="hsl(170,80%,50%)" strokeWidth="1" opacity="0.4" />
+          <line x1={xMin} y1={yMax} x2={xMax} y2={yMax} stroke="hsl(43,68%,50%)" strokeWidth="1" opacity="0.4" />
+          <line x1={xMin} y1={yMin} x2={xMin} y2={yMax} stroke="hsl(43,68%,50%)" strokeWidth="1" opacity="0.4" />
 
           {/* X-axis labels */}
           {[0, 20, 40, 60, 80, 100].map(wt => (
             <g key={wt}>
-              <line x1={compToX(wt)} y1={yMax} x2={compToX(wt)} y2={yMax + 5} stroke="hsl(170,80%,50%)" strokeWidth="0.5" opacity="0.4" />
-              <text x={compToX(wt)} y={yMax + 16} textAnchor="middle" fill="hsl(170,80%,50%)" fontSize="8" fontFamily="monospace" opacity="0.6">{wt}</text>
+              <line x1={compToX(wt)} y1={yMax} x2={compToX(wt)} y2={yMax + 5} stroke="hsl(43,68%,50%)" strokeWidth="0.5" opacity="0.4" />
+              <text x={compToX(wt)} y={yMax + 16} textAnchor="middle" fill="hsl(43,68%,50%)" fontSize="8" fontFamily="monospace" opacity="0.6">{wt}</text>
             </g>
           ))}
-          <text x={(xMin + xMax) / 2} y={yMax + 30} textAnchor="middle" fill="hsl(170,80%,50%)" fontSize="9" fontFamily="monospace" opacity="0.5">
+          <text x={(xMin + xMax) / 2} y={yMax + 30} textAnchor="middle" fill="hsl(43,68%,50%)" fontSize="9" fontFamily="monospace" opacity="0.5">
             Composition (wt% Sn)
           </text>
 
           {/* Y-axis labels */}
           {[50, 100, 150, 183, 200, 250, 300, 327].map(t => (
             <g key={t}>
-              <line x1={xMin - 4} y1={tempToY(t)} x2={xMin} y2={tempToY(t)} stroke="hsl(170,80%,50%)" strokeWidth="0.5" opacity="0.4" />
-              <text x={xMin - 8} y={tempToY(t) + 3} textAnchor="end" fill="hsl(170,80%,50%)" fontSize="7" fontFamily="monospace" opacity="0.5">{t}°C</text>
+              <line x1={xMin - 4} y1={tempToY(t)} x2={xMin} y2={tempToY(t)} stroke="hsl(43,68%,50%)" strokeWidth="0.5" opacity="0.4" />
+              <text x={xMin - 8} y={tempToY(t) + 3} textAnchor="end" fill="hsl(43,68%,50%)" fontSize="7" fontFamily="monospace" opacity="0.5">{t}°C</text>
             </g>
           ))}
-          <text x={20} y={(yMin + yMax) / 2} textAnchor="middle" fill="hsl(170,80%,50%)" fontSize="9" fontFamily="monospace" opacity="0.5" transform={`rotate(-90, 20, ${(yMin + yMax) / 2})`}>
+          <text x={20} y={(yMin + yMax) / 2} textAnchor="middle" fill="hsl(43,68%,50%)" fontSize="9" fontFamily="monospace" opacity="0.5" transform={`rotate(-90, 20, ${(yMin + yMax) / 2})`}>
             Temperature (°C)
           </text>
 
@@ -229,16 +229,16 @@ export default function PhaseDiagramInteractive() {
           <text x={xMax + 5} y={tempToY(eutecticT) + 3} fill="hsl(38,90%,55%)" fontSize="7" fontFamily="monospace" opacity="0.7">183°C</text>
 
           {/* Liquidus lines */}
-          <polyline points={liquidusLeftPoints} fill="none" stroke="hsl(170,80%,50%)" strokeWidth="1.5" opacity="0.8" />
-          <polyline points={liquidusRightPoints} fill="none" stroke="hsl(170,80%,50%)" strokeWidth="1.5" opacity="0.8" />
+          <polyline points={liquidusLeftPoints} fill="none" stroke="hsl(43,68%,50%)" strokeWidth="1.5" opacity="0.8" />
+          <polyline points={liquidusRightPoints} fill="none" stroke="hsl(43,68%,50%)" strokeWidth="1.5" opacity="0.8" />
 
           {/* Solvus lines */}
           <polyline points={alphaSolvusPoints} fill="none" stroke="hsl(210,80%,60%)" strokeWidth="1" opacity="0.6" strokeDasharray="3 2" />
           <polyline points={betaSolvusPoints} fill="none" stroke="hsl(38,80%,60%)" strokeWidth="1" opacity="0.6" strokeDasharray="3 2" />
 
           {/* Phase field labels */}
-          <text x={compToX(30)} y={tempToY(300)} textAnchor="middle" fill="hsl(170,80%,50%)" fontSize="12" fontFamily="monospace" opacity="0.3" fontWeight="bold">L</text>
-          <text x={compToX(75)} y={tempToY(220)} textAnchor="middle" fill="hsl(170,80%,50%)" fontSize="10" fontFamily="monospace" opacity="0.25">L</text>
+          <text x={compToX(30)} y={tempToY(300)} textAnchor="middle" fill="hsl(43,68%,50%)" fontSize="12" fontFamily="monospace" opacity="0.3" fontWeight="bold">L</text>
+          <text x={compToX(75)} y={tempToY(220)} textAnchor="middle" fill="hsl(43,68%,50%)" fontSize="10" fontFamily="monospace" opacity="0.25">L</text>
           <text x={compToX(5)} y={tempToY(100)} textAnchor="middle" fill="hsl(210,80%,60%)" fontSize="9" fontFamily="monospace" opacity="0.3">α</text>
           <text x={compToX(99)} y={tempToY(100)} textAnchor="middle" fill="hsl(38,80%,60%)" fontSize="9" fontFamily="monospace" opacity="0.3">β</text>
           <text x={compToX(50)} y={tempToY(100)} textAnchor="middle" fill="hsl(142,70%,50%)" fontSize="10" fontFamily="monospace" opacity="0.3">α + β</text>

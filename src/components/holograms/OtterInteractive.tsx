@@ -625,7 +625,7 @@ export default function OtterInteractive() {
           )}
 
           {/* Header label */}
-          <text x="240" y="11" textAnchor="middle" fill="hsl(170,80%,50%)" fontSize="2.8"
+          <text x="240" y="11" textAnchor="middle" fill="hsl(43,68%,50%)" fontSize="2.8"
             fontFamily="monospace" opacity="0.22">
             OTTER RISC-V MCU · 2-STATE FSM · FETCH → EXEC
           </text>

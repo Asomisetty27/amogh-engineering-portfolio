@@ -148,7 +148,7 @@
   --t-deep-field:   #12203A;
   --t-cold-probe:   #15445E;
   --t-stable:       #1E7A6E;
-  --t-healthy:      #2FB36B;
+  --t-healthy:      #D4AF37;
   --t-healthy-dim:  #1E7A4A;
   --t-drift:        #9FCB3B;
   --t-caution:      #E8B23A;
@@ -416,9 +416,9 @@
 /* Gradient text fills (cyan, magenta, amber, green) */
 .fx-grad-text-cyan {
   background: linear-gradient(120deg,
-    hsl(170 90% 60%) 0%,
-    hsl(170 80% 50%) 50%,
-    hsl(180 70% 55%) 100%);
+    hsl(43 80% 62%) 0%,
+    hsl(43 68% 50%) 50%,
+    hsl(34 60% 48%) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

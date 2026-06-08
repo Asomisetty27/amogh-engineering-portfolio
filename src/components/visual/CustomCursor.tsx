@@ -107,8 +107,8 @@ export default function CustomCursor() {
             opacity: visible ? 0.4 : 0,
           }}
         >
-          <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 10, height: 1, background: "hsl(170 80% 50%)" }} />
-          <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 1, height: 10, background: "hsl(170 80% 50%)" }} />
+          <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 10, height: 1, background: "hsl(43 68% 50%)" }} />
+          <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 1, height: 10, background: "hsl(43 68% 50%)" }} />
         </motion.div>
       )}
 
@@ -123,7 +123,7 @@ export default function CustomCursor() {
           translateY: "-50%",
           position: "absolute",
           borderRadius: "50%",
-          background: state === "hover" ? "hsl(170 80% 70%)" : "hsl(170 80% 55%)",
+          background: state === "hover" ? "hsl(43 70% 72%)" : "hsl(43 70% 55%)",
           boxShadow: `0 0 6px hsl(170 80% 50% / 0.7)`,
           opacity: visible ? 1 : 0,
           transition: "width 0.15s ease, height 0.15s ease, opacity 0.15s ease",

@@ -16,9 +16,9 @@ interface Props {
 }
 
 const COLORS = [
-  "hsl(170 80% 50%)",  // cyan
-  "hsl(170 70% 45%)",
-  "hsl(170 75% 40%)",
+  "hsl(43 68% 50%)",  // cyan
+  "hsl(38 60% 45%)",
+  "hsl(36 58% 40%)",
   "hsl(280 65% 58%)",  // occasional magenta
 ];
 

@@ -44,7 +44,7 @@ function SectionLabel({ children, hint }: { children: React.ReactNode; hint?: st
 type Tone = "complete" | "progress" | "queued" | "locked" | "amber" | "gray";
 
 const TONE: Record<Tone, { fg: string; bg: string; border: string }> = {
-  complete: { fg: "#2FB36B", bg: "#2FB36B12", border: "#2FB36B38" },
+  complete: { fg: "#D4AF37", bg: "#D4AF3712", border: "#D4AF3738" },
   progress: { fg: "#60a5fa", bg: "#3b82f615", border: "#3b82f640" },
   queued:   { fg: "#E8B23A", bg: "#E8B23A12", border: "#E8B23A38" },
   locked:   { fg: "#8A938F", bg: "#ffffff08", border: "#ffffff15" },
@@ -101,7 +101,7 @@ function HeadlineFinding() {
       <div className="flex items-start gap-4">
         <div
           className="w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0"
-          style={{ background: "#2FB36B12", border: "0.5px solid #2FB36B38" }}
+          style={{ background: "#D4AF3712", border: "0.5px solid #D4AF3738" }}
         >
           <Cpu size={18} style={{ color: "var(--t-healthy)" }} />
         </div>
@@ -538,7 +538,7 @@ function LiveData() {
             />
             <ReferenceLine y={0.5} stroke="#E8743A" strokeDasharray="4 4" label={{ value: "Anomaly threshold", fill: "#E8743A", fontSize: 10, position: "right" }} />
             <Area type="monotone" dataKey="rtheta" fill="rgba(47,179,107,0.07)" stroke="none" />
-            <Line type="monotone" dataKey="rtheta" stroke="#2FB36B" strokeWidth={2} dot={false} />
+            <Line type="monotone" dataKey="rtheta" stroke="#D4AF37" strokeWidth={2} dot={false} />
           </ComposedChart>
         </ResponsiveContainer>
       </Card>

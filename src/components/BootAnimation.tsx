@@ -63,15 +63,15 @@ function TaskRow({ task, started }: { task: Task; started: boolean }) {
       <div
         className="w-1.5 h-1.5 rounded-full flex-shrink-0 transition-colors duration-300"
         style={{
-          background: done ? "#2FB36B" : progress > 0 ? "hsl(38 90% 55%)" : "#525a55",
-          boxShadow: done ? "0 0 6px #2FB36B" : progress > 0 ? "0 0 4px hsl(38 90% 55%)" : "none",
+          background: done ? "#D4AF37" : progress > 0 ? "hsl(38 90% 55%)" : "#525a55",
+          boxShadow: done ? "0 0 6px #D4AF37" : progress > 0 ? "0 0 4px hsl(38 90% 55%)" : "none",
         }}
       />
 
       {/* ASCII progress bar */}
       <span
         className="text-xs flex-shrink-0 tabular-nums"
-        style={{ color: done ? "#2FB36B" : "#6E91C8", letterSpacing: "0em" }}
+        style={{ color: done ? "#D4AF37" : "#6E91C8", letterSpacing: "0em" }}
       >
         [{("█").repeat(barW)}{("░").repeat(barEmpty)}]
       </span>
@@ -149,8 +149,8 @@ export default function BootAnimation({ onComplete }: { onComplete: () => void }
               <div className="flex items-center gap-3 mb-1">
                 {/* Hex badge */}
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M10 1 L18.66 6 L18.66 14 L10 19 L1.34 14 L1.34 6 Z" stroke="hsl(170 80% 50%)" strokeWidth="1" fill="none" />
-                  <circle cx="10" cy="10" r="2.5" fill="hsl(170 80% 50%)" />
+                  <path d="M10 1 L18.66 6 L18.66 14 L10 19 L1.34 14 L1.34 6 Z" stroke="hsl(43 68% 50%)" strokeWidth="1" fill="none" />
+                  <circle cx="10" cy="10" r="2.5" fill="hsl(43 68% 50%)" />
                 </svg>
                 <h1
                   style={{
@@ -158,7 +158,7 @@ export default function BootAnimation({ onComplete }: { onComplete: () => void }
                     fontSize: "18px",
                     letterSpacing: "0.28em",
                     fontWeight: 500,
-                    background: "linear-gradient(90deg, hsl(170 90% 70%), hsl(170 80% 50%))",
+                    background: "linear-gradient(90deg, hsl(170 90% 70%), hsl(43 68% 50%))",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
@@ -198,8 +198,8 @@ export default function BootAnimation({ onComplete }: { onComplete: () => void }
                   transition={{ duration: allDone ? 0.3 : TOTAL_MS / 1000, ease: allDone ? "easeOut" : "linear" }}
                   style={{
                     background: phase === "complete"
-                      ? "linear-gradient(90deg, #1D9E75, #2FB36B)"
-                      : "linear-gradient(90deg, hsl(170 80% 40%), hsl(170 80% 50%))",
+                      ? "linear-gradient(90deg, #1D9E75, #D4AF37)"
+                      : "linear-gradient(90deg, hsl(170 80% 40%), hsl(43 68% 50%))",
                   }}
                 />
               </div>
@@ -208,11 +208,11 @@ export default function BootAnimation({ onComplete }: { onComplete: () => void }
             {/* Status line */}
             <motion.div
               style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", letterSpacing: "0.15em" }}
-              animate={{ color: phase === "complete" ? "#2FB36B" : "#8A938F" }}
+              animate={{ color: phase === "complete" ? "#D4AF37" : "#8A938F" }}
               transition={{ duration: 0.3 }}
             >
               {phase === "complete" ? (
-                <span style={{ textShadow: "0 0 8px #2FB36B" }}>
+                <span style={{ textShadow: "0 0 8px #D4AF37" }}>
                   ✓ ALL SYSTEMS NOMINAL — MOUNTING INTERFACE
                 </span>
               ) : (
