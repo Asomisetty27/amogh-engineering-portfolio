@@ -56,15 +56,15 @@ function rm() {
 /* ─── Gradient orb background ────────────────────────────────────────────── */
 function GradientOrbs({ variant = 'green' }: { variant?: 'green' | 'blue' | 'mixed' }) {
   const orbs = variant === 'green' ? [
-    { cls: 'tos-orb-a', color: 'rgba(39,160,90,.11)', w: 640, h: 520, top: '-18%', left: '60%', blur: 120 },
-    { cls: 'tos-orb-b', color: 'rgba(39,160,90,.06)', w: 380, h: 380, top: '55%',  left: '5%',  blur: 90  },
+    { cls: 'tos-orb-a', color: 'rgba(212,175,55,.11)', w: 640, h: 520, top: '-18%', left: '60%', blur: 120 },
+    { cls: 'tos-orb-b', color: 'rgba(212,175,55,.06)', w: 380, h: 380, top: '55%',  left: '5%',  blur: 90  },
   ] : variant === 'blue' ? [
-    { cls: 'tos-orb-a', color: 'rgba(88,120,168,.12)', w: 580, h: 460, top: '-15%', left: '55%', blur: 110 },
-    { cls: 'tos-orb-b', color: 'rgba(88,120,168,.07)', w: 340, h: 340, top: '60%',  left: '2%',  blur: 90  },
+    { cls: 'tos-orb-a', color: 'rgba(201,168,76,.12)', w: 580, h: 460, top: '-15%', left: '55%', blur: 110 },
+    { cls: 'tos-orb-b', color: 'rgba(201,168,76,.07)', w: 340, h: 340, top: '60%',  left: '2%',  blur: 90  },
   ] : [
-    { cls: 'tos-orb-a', color: 'rgba(39,160,90,.10)',  w: 580, h: 480, top: '-20%', left: '62%', blur: 130 },
-    { cls: 'tos-orb-b', color: 'rgba(88,120,168,.09)', w: 400, h: 400, top: '50%',  left: '3%',  blur: 100 },
-    { cls: 'tos-orb-c', color: 'rgba(39,160,90,.05)',  w: 280, h: 280, top: '80%',  left: '70%', blur: 80  },
+    { cls: 'tos-orb-a', color: 'rgba(212,175,55,.10)',  w: 580, h: 480, top: '-20%', left: '62%', blur: 130 },
+    { cls: 'tos-orb-b', color: 'rgba(201,168,76,.09)', w: 400, h: 400, top: '50%',  left: '3%',  blur: 100 },
+    { cls: 'tos-orb-c', color: 'rgba(212,175,55,.05)',  w: 280, h: 280, top: '80%',  left: '70%', blur: 80  },
   ];
 
   return (
@@ -315,7 +315,7 @@ function Nav() {
             <GithubIcon s={12} /> github
           </a>
           <a href="https://pypi.org/project/thermalos/" target="_blank" rel="noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: FD, fontSize: 13, fontWeight: 500, padding: '6px 14px', borderRadius: 4, background: T.healthy, color: '#051A0D', textDecoration: 'none', transition: 'opacity .15s' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: FD, fontSize: 13, fontWeight: 500, padding: '6px 14px', borderRadius: 4, background: T.healthy, color: '#1A1408', textDecoration: 'none', transition: 'opacity .15s' }}
             onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.88')}
             onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
             install <ArrowRight s={11} />
@@ -342,20 +342,20 @@ function InstallBlock() {
       style={{
         display: 'flex', alignItems: 'center', width: '100%', maxWidth: 440,
         padding: '13px 17px', borderRadius: 6,
-        border: `1px solid rgba(39,160,90,.22)`,
+        border: `1px solid rgba(212,175,55,.22)`,
         background: 'linear-gradient(135deg, rgba(12,12,18,.9) 0%, rgba(9,9,13,.9) 100%)',
         backdropFilter: 'blur(12px)',
         cursor: 'pointer', fontFamily: FM, fontSize: 13, color: T.text,
         position: 'relative', overflow: 'hidden', textAlign: 'left',
         transition: 'border-color .2s, box-shadow .2s',
-        boxShadow: '0 0 0 0.5px rgba(39,160,90,.08) inset',
+        boxShadow: '0 0 0 0.5px rgba(212,175,55,.08) inset',
       }}
-      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = T.healthy + '55'; (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 0 20px rgba(39,160,90,.12), 0 0 0 0.5px rgba(39,160,90,.12) inset`; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(39,160,90,.22)'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 0 0.5px rgba(39,160,90,.08) inset'; }}
+      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = T.healthy + '55'; (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 0 20px rgba(212,175,55,.12), 0 0 0 0.5px rgba(212,175,55,.12) inset`; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(212,175,55,.22)'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 0 0.5px rgba(212,175,55,.08) inset'; }}
       aria-label="Copy install command"
     >
       {/* shimmer sweep */}
-      <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(105deg, transparent 30%, rgba(39,160,90,.06) 50%, transparent 70%)', backgroundSize: '200%', animation: 'tos-shimmer 3s linear infinite', pointerEvents: 'none' }} />
+      <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(105deg, transparent 30%, rgba(212,175,55,.06) 50%, transparent 70%)', backgroundSize: '200%', animation: 'tos-shimmer 3s linear infinite', pointerEvents: 'none' }} />
       <span style={{ color: T.healthy, marginRight: 12, userSelect: 'none' }}>$</span>
       <span style={{ flex: 1, color: T.text }}>{cmd}</span>
       <span className="tos-caret" style={{ display: 'inline-block', width: 7, height: 14, background: T.healthy, marginLeft: 4, verticalAlign: 'middle' }} />
@@ -851,8 +851,8 @@ function Evidence() {
           </div>
           {/* Bottom: key numbers — prominent glass card */}
           <div data-e style={{ opacity: 0, gridColumn: '1 / -1' }}>
-            <div className="tos-glass" style={{ borderRadius: 6, border: '1px solid rgba(39,160,90,.15)', overflow: 'hidden' }}>
-              <div style={{ padding: '9px 14px', borderBottom: '1px solid rgba(39,160,90,.1)', background: 'rgba(39,160,90,.04)' }}>
+            <div className="tos-glass" style={{ borderRadius: 6, border: '1px solid rgba(212,175,55,.15)', overflow: 'hidden' }}>
+              <div style={{ padding: '9px 14px', borderBottom: '1px solid rgba(212,175,55,.1)', background: 'rgba(212,175,55,.04)' }}>
                 <span style={{ fontFamily: FM, fontSize: 9.5, letterSpacing: '.16em', textTransform: 'uppercase', color: T.faint }}>Key numbers · thermal memory demonstration</span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 0 }}>
@@ -864,7 +864,7 @@ function Evidence() {
                   { v: '8,734', l: 'telemetry rows',    s: 'Stage 1 complete · Tesla T4' },
                 ].map((k, i) => (
                   <div key={k.l} style={{ padding: '18px 20px', borderLeft: i > 0 ? `1px solid rgba(255,255,255,.05)` : 'none' }}>
-                    <div style={{ fontFamily: FD, fontSize: 30, fontWeight: 600, letterSpacing: '-.03em', fontVariantNumeric: 'tabular-nums', background: 'linear-gradient(135deg, #e8e8f0 0%, #27A05A 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{k.v}</div>
+                    <div style={{ fontFamily: FD, fontSize: 30, fontWeight: 600, letterSpacing: '-.03em', fontVariantNumeric: 'tabular-nums', background: 'linear-gradient(135deg, #e8e8f0 0%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{k.v}</div>
                     <div style={{ fontFamily: FM, fontSize: 10, color: T.text, marginTop: 5 }}>{k.l}</div>
                     <div style={{ fontFamily: FM, fontSize: 9.5, color: T.faint, marginTop: 2 }}>{k.s}</div>
                   </div>
@@ -1219,7 +1219,7 @@ function Pricing() {
                 ))}
               </div>
               <a href="mailto:asomisetty27@gmail.com?subject=Theta fleet tier"
-                style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 11, borderRadius: 4, background: T.healthy, color: '#051A0D', fontFamily: FD, fontSize: 14, fontWeight: 500, textDecoration: 'none', transition: 'opacity .15s' }}
+                style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 11, borderRadius: 4, background: T.healthy, color: '#1A1408', fontFamily: FD, fontSize: 14, fontWeight: 500, textDecoration: 'none', transition: 'opacity .15s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.87')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
                 Request fleet tier <ArrowRight />
@@ -1298,10 +1298,10 @@ const STYLES = `
 /* ── Blueprint grid ─────────────────────────────────────────────────────── */
 .tos-grid-bg {
   background-image:
-    linear-gradient(rgba(88,120,168,.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(88,120,168,.07) 1px, transparent 1px),
-    linear-gradient(rgba(88,120,168,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(88,120,168,.04) 1px, transparent 1px);
+    linear-gradient(rgba(201,168,76,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,.07) 1px, transparent 1px),
+    linear-gradient(rgba(201,168,76,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,.04) 1px, transparent 1px);
   background-size: 96px 96px, 96px 96px, 24px 24px, 24px 24px;
   background-position: -1px -1px;
 }
@@ -1362,7 +1362,7 @@ const STYLES = `
   position: absolute;
   inset: -1px;
   border-radius: inherit;
-  background: linear-gradient(135deg, rgba(39,160,90,.45) 0%, rgba(88,120,168,.18) 50%, rgba(39,160,90,.08) 100%);
+  background: linear-gradient(135deg, rgba(212,175,55,.45) 0%, rgba(201,168,76,.18) 50%, rgba(212,175,55,.08) 100%);
   pointer-events: none;
   z-index: 0;
 }
@@ -1370,7 +1370,7 @@ const STYLES = `
 
 /* ── Gradient text ──────────────────────────────────────────────────────── */
 .tos-grad-text {
-  background: linear-gradient(120deg, #34c578 0%, #27A05A 40%, #4dd693 100%);
+  background: linear-gradient(120deg, #E8C870 0%, #D4AF37 40%, #F0D78C 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1408,7 +1408,7 @@ const STYLES = `
   position: absolute;
   top: 0; left: 50%; transform: translateX(-50%);
   width: 80%; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(39,160,90,.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,.3), transparent);
   pointer-events: none;
 }
 .tos-section-glow-blue::before {
@@ -1416,7 +1416,7 @@ const STYLES = `
   position: absolute;
   top: 0; left: 50%; transform: translateX(-50%);
   width: 80%; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(88,120,168,.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,.3), transparent);
   pointer-events: none;
 }
 
@@ -1425,8 +1425,8 @@ const STYLES = `
   transition: border-color .2s, box-shadow .25s;
 }
 .tos-feat-card:hover {
-  border-color: rgba(39,160,90,.25) !important;
-  box-shadow: 0 0 0 1px rgba(39,160,90,.08), 0 8px 24px rgba(0,0,0,.28);
+  border-color: rgba(212,175,55,.25) !important;
+  box-shadow: 0 0 0 1px rgba(212,175,55,.08), 0 8px 24px rgba(0,0,0,.28);
 }
 .tos-feat-card:hover .tos-feat-index { color: ${T.healthy} !important; }
 

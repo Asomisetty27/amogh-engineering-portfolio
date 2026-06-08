@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 const DataCenterScene = React.lazy(() => import('./DataCenterScene'));
 
-const T = { bg: '#06060A', text: '#E8E8F0', muted: '#818190' };
+const T = { bg: '#06060A', text: '#ECE6D8', muted: '#9A9285' };
 const FM = "'JetBrains Mono', ui-monospace, monospace";
 
 // ──────────────────────────────────────────────────────────────────────────

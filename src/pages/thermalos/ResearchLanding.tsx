@@ -20,7 +20,7 @@ const T = {
   text:     '#E2E2EA',
   muted:    '#7A7A8A',
   faint:    '#3A3A4A',
-  healthy:  '#27A05A',
+  healthy:  '#D4AF37',
   caution:  '#C8942A',
   rising:   '#C85F2A',
   accent:   '#3B82F6',

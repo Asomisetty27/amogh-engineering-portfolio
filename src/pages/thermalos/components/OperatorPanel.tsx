@@ -21,14 +21,14 @@ const T = {
   s1: '#111117',
   s2: '#17171E',
   border: '#232330',
-  text: '#E8E8F0',
-  muted: '#818190',
-  faint: '#404050',
-  healthy: '#27A05A',
+  text: '#ECE6D8',
+  muted: '#9A9285',
+  faint: '#3A332A',
+  healthy: '#D4AF37',
   caution: '#C8942A',
   rising: '#C85F2A',
   critical: '#B83030',
-  bp: '#5878A8',
+  bp: '#C9A84C',
 };
 const FM = "'JetBrains Mono', ui-monospace, monospace";
 

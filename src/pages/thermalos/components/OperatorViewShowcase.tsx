@@ -8,8 +8,8 @@ const T = {
   bg: '#06060A',
   s1: '#111117',
   border: '#232330',
-  text: '#E8E8F0',
-  muted: '#818190',
+  text: '#ECE6D8',
+  muted: '#9A9285',
 };
 const FM = "'JetBrains Mono', ui-monospace, monospace";
 
