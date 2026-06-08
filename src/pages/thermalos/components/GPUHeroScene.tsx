@@ -899,39 +899,129 @@ function CardNamePlate({ spec, index }: { spec: GPUSpec; index: number }) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// The set — runway floor + backdrop fog. Studio product-shot, not data-center.
+// Cinematic palette — "Cyberpunk Fusion": deep indigo → neon cyan, on charcoal.
+// 70/30 rule: 70% under-exposed indigo void, 30% saturated cyan hotspot.
+// Backdrop blackpoint clamped to ~#080810 (never pure 0,0,0).
 // ──────────────────────────────────────────────────────────────────────────
+const CINE = {
+  void:        '#10002B', // deep indigo (background dominant)
+  voidDeep:    '#080812', // backdrop blackpoint (charcoal, not pure black)
+  hot:         '#00F5D4', // neon cyan (accent hotspot)
+  hotSoft:     '#1F8C8C', // desaturated cyan fill
+  rim:         '#A78BFA', // soft violet rim accent
+  floor:       '#04040A',
+};
+
+// ──────────────────────────────────────────────────────────────────────────
+// The set — black acrylic reflective floor + RGB gradient cyc backdrop
+// with two colored tube emitters (indigo + neon cyan).
+// ──────────────────────────────────────────────────────────────────────────
+
+function Backdrop() {
+  // Vertical gradient on a tall curved cyc plane behind the lineup.
+  const gradTex = useMemo(() => {
+    const c = document.createElement('canvas');
+    c.width = 8; c.height = 512;
+    const ctx = c.getContext('2d')!;
+    const g = ctx.createLinearGradient(0, 0, 0, 512);
+    // Hot-center hotspot (cyan) blooming up into the indigo void, falling
+    // to charcoal blackpoint at the floor. Inverse-square falloff is faked
+    // by stacking stops weighted toward the top third.
+    g.addColorStop(0.00, CINE.voidDeep);
+    g.addColorStop(0.28, '#1a0540');
+    g.addColorStop(0.46, '#2a0a6e');
+    g.addColorStop(0.58, '#0c5c7a');
+    g.addColorStop(0.66, CINE.hot);
+    g.addColorStop(0.78, '#0a2840');
+    g.addColorStop(1.00, CINE.voidDeep);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 8, 512);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }, []);
+
+  return (
+    <group>
+      {/* Cyc backdrop — large, behind everything, slightly tilted toward camera */}
+      <mesh position={[0, 6, -18]} rotation={[0, 0, 0]}>
+        <planeGeometry args={[120, 38]} />
+        <meshBasicMaterial map={gradTex} toneMapped={false} />
+      </mesh>
+      {/* Vertical RGB tube — neon cyan, right of center, behind the lineup */}
+      <mesh position={[10, 5, -14]}>
+        <boxGeometry args={[0.18, 14, 0.18]} />
+        <meshBasicMaterial color={CINE.hot} toneMapped={false} />
+      </mesh>
+      {/* Vertical RGB tube — deep indigo, left of center */}
+      <mesh position={[-12, 5, -14]}>
+        <boxGeometry args={[0.18, 14, 0.18]} />
+        <meshBasicMaterial color={'#4a1aff'} toneMapped={false} />
+      </mesh>
+      {/* Faint horizon strip — pushes the eye toward the cards */}
+      <mesh position={[0, -1.2, -15]}>
+        <planeGeometry args={[60, 0.06]} />
+        <meshBasicMaterial color={CINE.hot} toneMapped={false} opacity={0.55} transparent />
+      </mesh>
+    </group>
+  );
+}
 
 function Runway({ textures }: { textures: Textures }) {
   return (
     <group position={[0, -3.4, 0]}>
+      {/* Black acrylic floor — true reflection of cards & backdrop lights.
+          Low blur, low mixStrength keeps it from competing with the hero. */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[GPU_SPECS.length * CARD_SPACING + 14, 16]} />
-        <meshStandardMaterial color="#0a0a0e" roughness={0.32} metalness={0.55} map={textures.brushed} envMapIntensity={0.7} />
+        <planeGeometry args={[GPU_SPECS.length * CARD_SPACING + 24, 26]} />
+        <MeshReflectorMaterial
+          blur={[260, 90]}
+          resolution={1024}
+          mixBlur={1}
+          mixStrength={1.1}
+          mixContrast={1.0}
+          roughness={0.55}
+          depthScale={0.6}
+          minDepthThreshold={0.4}
+          maxDepthThreshold={1.2}
+          color={CINE.floor}
+          metalness={0.85}
+          mirror={0.4}
+        />
       </mesh>
       {GPU_SPECS.map((spec, i) => (
         <mesh key={spec.id} position={[cardX(i), 0.02, 0]} receiveShadow>
           <ringGeometry args={[2.55, 2.7, 48]} />
-          <meshStandardMaterial color={spec.accent} emissive={spec.accent} emissiveIntensity={0.5} roughness={0.4} metalness={0.3} toneMapped={false} transparent opacity={0.55} />
+          <meshStandardMaterial color={CINE.hot} emissive={CINE.hot} emissiveIntensity={0.35} roughness={0.4} metalness={0.3} toneMapped={false} transparent opacity={0.4} />
         </mesh>
       ))}
-      <fogExp2 attach="fog" args={[T.bg, 0.018]} />
+      {/* Atmospheric haze — exponential, indigo-tinted so distance fades to void */}
+      <fogExp2 attach="fog" args={[CINE.void, 0.028]} />
     </group>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Lighting — studio rig: broad key/fill + per-card traveling rim spotlight
+// Lighting — cinematic product rig:
+//   • Overhead 1×4 strip box (long thin RectAreaLight) → linear edge highlights
+//   • Aggressive rim spot from BEHIND-BELOW → carves PCB profile (exploded kicker)
+//   • Indigo soft fill from camera-left, gridded
+//   • Cyan accent panel behind the lineup → backdrop wash bleed
+//   • Near-black ambient (blackpoint hover, not crush)
+// Per-card traveling spot follows the camera sweep so whichever card is hero
+// gets its own micro-spot.
 // ──────────────────────────────────────────────────────────────────────────
 
 function SceneLights({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
-  const keyRef = useRef<THREE.RectAreaLight>(null!);
+  const stripRef = useRef<THREE.RectAreaLight>(null!);
   const fillRef = useRef<THREE.RectAreaLight>(null!);
+  const cycRef = useRef<THREE.RectAreaLight>(null!);
   const spotRef = useRef<THREE.SpotLight>(null!);
+  const rimRef = useRef<THREE.SpotLight>(null!);
 
   useEffect(() => {
-    keyRef.current?.lookAt(0, 0, 0);
+    stripRef.current?.lookAt(0, 0, 0);
     fillRef.current?.lookAt(0, 0, 0);
+    cycRef.current?.lookAt(0, 4, 0);
   }, []);
 
   useFrame(() => {
@@ -940,15 +1030,27 @@ function SceneLights({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
       spotRef.current.target.position.x = camXRef.current;
       spotRef.current.target.updateMatrixWorld();
     }
+    if (rimRef.current) {
+      rimRef.current.position.x = camXRef.current;
+      rimRef.current.target.position.x = camXRef.current;
+      rimRef.current.target.updateMatrixWorld();
+    }
   });
 
   return (
     <>
-      <rectAreaLight ref={keyRef} position={[6, 18, 12]} width={26} height={12} intensity={11} color="#fff8f4" />
-      <rectAreaLight ref={fillRef} position={[-14, 9, 6]} width={16} height={8} intensity={4} color="#b8d0ff" />
-      <spotLight ref={spotRef} position={[0, 14, 4]} angle={0.5} penumbra={0.6} intensity={26} color="#ffe9c8" distance={28} decay={2} castShadow />
-      <pointLight position={[0, 4, -14]} intensity={3} color="#8ab4e0" />
-      <ambientLight intensity={0.035} />
+      {/* Overhead 1×4 strip box — long, narrow, directly above. Cool white. */}
+      <rectAreaLight ref={stripRef} position={[0, 14, 1.5]} width={28} height={1.4} intensity={14} color="#f4f8ff" />
+      {/* Indigo soft fill from camera-left, gridded (small) */}
+      <rectAreaLight ref={fillRef} position={[-12, 6, 8]} width={6} height={6} intensity={3.5} color={CINE.void} />
+      {/* Cyan cyc panel — washes backdrop, bleeds onto rear of cards */}
+      <rectAreaLight ref={cycRef} position={[0, 4, -10]} width={22} height={6} intensity={2.6} color={CINE.hot} />
+      {/* Per-card key spot — soft warm-neutral, follows hero */}
+      <spotLight ref={spotRef} position={[0, 12, 5]} angle={0.42} penumbra={0.7} intensity={22} color="#fff4e0" distance={26} decay={2} castShadow />
+      {/* Exploded-view kicker — hard rim from behind & below, carves PCB profile */}
+      <spotLight ref={rimRef} position={[0, -2.2, -7]} angle={0.32} penumbra={0.45} intensity={32} color={CINE.hot} distance={22} decay={2} />
+      {/* Blackpoint ambient — never pure black */}
+      <ambientLight intensity={0.025} color={CINE.void} />
     </>
   );
 }
