@@ -56,15 +56,15 @@ function rm() {
 /* ─── Gradient orb background ────────────────────────────────────────────── */
 function GradientOrbs({ variant = 'green' }: { variant?: 'green' | 'blue' | 'mixed' }) {
   const orbs = variant === 'green' ? [
-    { cls: 'tos-orb-a', color: 'rgba(212,175,55,.11)', w: 640, h: 520, top: '-18%', left: '60%', blur: 120 },
-    { cls: 'tos-orb-b', color: 'rgba(212,175,55,.06)', w: 380, h: 380, top: '55%',  left: '5%',  blur: 90  },
+    { cls: 'tos-orb-a', color: 'rgba(232,228,216,.06)', w: 640, h: 520, top: '-18%', left: '60%', blur: 120 },
+    { cls: 'tos-orb-b', color: 'rgba(212,175,55,.04)',  w: 380, h: 380, top: '55%',  left: '5%',  blur: 90  },
   ] : variant === 'blue' ? [
-    { cls: 'tos-orb-a', color: 'rgba(201,168,76,.12)', w: 580, h: 460, top: '-15%', left: '55%', blur: 110 },
-    { cls: 'tos-orb-b', color: 'rgba(201,168,76,.07)', w: 340, h: 340, top: '60%',  left: '2%',  blur: 90  },
+    { cls: 'tos-orb-a', color: 'rgba(232,228,216,.07)', w: 580, h: 460, top: '-15%', left: '55%', blur: 110 },
+    { cls: 'tos-orb-b', color: 'rgba(232,228,216,.04)', w: 340, h: 340, top: '60%',  left: '2%',  blur: 90  },
   ] : [
-    { cls: 'tos-orb-a', color: 'rgba(212,175,55,.10)',  w: 580, h: 480, top: '-20%', left: '62%', blur: 130 },
-    { cls: 'tos-orb-b', color: 'rgba(201,168,76,.09)', w: 400, h: 400, top: '50%',  left: '3%',  blur: 100 },
-    { cls: 'tos-orb-c', color: 'rgba(212,175,55,.05)',  w: 280, h: 280, top: '80%',  left: '70%', blur: 80  },
+    { cls: 'tos-orb-a', color: 'rgba(232,228,216,.06)', w: 580, h: 480, top: '-20%', left: '62%', blur: 130 },
+    { cls: 'tos-orb-b', color: 'rgba(212,175,55,.05)',  w: 400, h: 400, top: '50%',  left: '3%',  blur: 100 },
+    { cls: 'tos-orb-c', color: 'rgba(232,228,216,.03)', w: 280, h: 280, top: '80%',  left: '70%', blur: 80  },
   ];
 
   return (
