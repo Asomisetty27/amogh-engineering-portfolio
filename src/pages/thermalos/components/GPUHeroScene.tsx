@@ -76,11 +76,14 @@ interface GPUSpec {
 //   - B200 SXM6: ~10-15% larger than SXM5
 //   - MI300X OAM: 228×107mm, very rectangular (2.13:1)
 const GPU_SPECS: GPUSpec[] = [
-  { id: 'a100',   name: 'A100 PCIe', arch: 'AMPERE · GA100',    mem: '80GB HBM2e',  vendor: 'NVIDIA', accent: '#76b900', cooler: 'blower',     dieLayout: 'monolithic',   memCount: 6, width: 6.6, depth: 5.6 },
-  { id: 'l40s',   name: 'L40S',      arch: 'ADA LOVELACE',      mem: '48GB GDDR6',  vendor: 'NVIDIA', accent: '#76b900', cooler: 'passive-fin', dieLayout: 'monolithic',   memCount: 8, width: 8.4, depth: 4.0 },
-  { id: 'h100',   name: 'H100 SXM5', arch: 'HOPPER · GH100',    mem: '80GB HBM3',   vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'monolithic',   memCount: 6, width: 7.6, depth: 5.4 },
-  { id: 'b200',   name: 'B200 SXM6', arch: 'BLACKWELL · GB100', mem: '192GB HBM3e', vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'dual-die',     memCount: 8, width: 7.4, depth: 6.6 },
-  { id: 'mi300x', name: 'MI300X',    arch: 'CDNA 3 · CHIPLET',  mem: '192GB HBM3',  vendor: 'AMD',    accent: '#ed1c24', cooler: 'cold-plate', dieLayout: 'chiplet-grid', memCount: 8, width: 8.6, depth: 4.4 },
+  // Dimensions tuned to match the real product footprint AND the exact pixel
+  // aspect of each photoreal skin texture so the printed lid covers the full
+  // top face with zero blank shroud showing.
+  { id: 'a100',   name: 'A100 PCIe', arch: 'AMPERE · GA100',    mem: '80GB HBM2e',  vendor: 'NVIDIA', accent: '#76b900', cooler: 'blower',     dieLayout: 'monolithic',   memCount: 6, width: 8.40, depth: 3.92 }, // PCIe 2-slot, ~2.14:1
+  { id: 'l40s',   name: 'L40S',      arch: 'ADA LOVELACE',      mem: '48GB GDDR6',  vendor: 'NVIDIA', accent: '#76b900', cooler: 'passive-fin', dieLayout: 'monolithic',   memCount: 8, width: 9.60, depth: 3.20 }, // long single-slot, 3:1
+  { id: 'h100',   name: 'H100 SXM5', arch: 'HOPPER · GH100',    mem: '80GB HBM3',   vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'monolithic',   memCount: 6, width: 6.00, depth: 4.00 }, // SXM5 module, 3:2
+  { id: 'b200',   name: 'B200 SXM6', arch: 'BLACKWELL · GB100', mem: '192GB HBM3e', vendor: 'NVIDIA', accent: '#76b900', cooler: 'cold-plate', dieLayout: 'dual-die',     memCount: 8, width: 6.40, depth: 6.40 }, // SXM6 dual-die, 1:1
+  { id: 'mi300x', name: 'MI300X',    arch: 'CDNA 3 · CHIPLET',  mem: '192GB HBM3',  vendor: 'AMD',    accent: '#ed1c24', cooler: 'cold-plate', dieLayout: 'chiplet-grid', memCount: 8, width: 7.50, depth: 4.00 }, // OAM module, 1.875:1
 ];
 
 const HERO_INDEX = 2; // H100 SXM5 — the thermal-arc protagonist; Theta's primary subject
@@ -563,22 +566,18 @@ function CoolerLayer({
   );
 
   if (spec.cooler === 'cold-plate') {
-    // Liquid-cooled module — full top face replaced with a real-photo product
-    // skin (nickel IHS + HBM stacks + substrate + brand wordmark) generated
-    // from authoritative reference shots and clamped to the module dimensions.
+    // Liquid-cooled module — the photoreal product skin fills the entire top
+    // face edge-to-edge, sized exactly to spec.width × spec.depth so no stock
+    // lid color shows through.
     const skin = maps?.skins?.[spec.id];
     return (
       <group>
-        <RoundedBox args={[spec.width - 0.3, 0.16, spec.depth - 0.3]} radius={0.05} smoothness={4}>
+        <RoundedBox args={[spec.width, 0.16, spec.depth]} radius={0.05} smoothness={4}>
           <meshStandardMaterial ref={lidMatRef} color="#1a1a1f" roughness={0.45} metalness={0.55} envMapIntensity={1.0} emissive="#000" emissiveIntensity={0} />
         </RoundedBox>
-        <InstancedBoxes positions={grooves} size={[0.05, 0.05, spec.depth - 0.5]} color="#CFCAC0" roughness={0.25} metalness={0.9} />
         {skin && (
-          <mesh position={[0, 0.082, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[spec.width - 0.32, spec.depth - 0.32]} />
-            {/* meshStandardMaterial so the IHS reflects studio lighting as a
-                real metal surface would, while the printed circuitry/text
-                remain albedo-readable. */}
+          <mesh position={[0, 0.0805, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[spec.width, spec.depth]} />
             <meshStandardMaterial map={skin} roughness={0.35} metalness={0.65} envMapIntensity={1.15} />
           </mesh>
         )}
@@ -588,93 +587,27 @@ function CoolerLayer({
   }
 
   if (spec.cooler === 'passive-fin') {
-    // Passive single-slot server card (NVIDIA L4 / L40S server form). One
-    // continuous champagne-gold anodized aluminum extrusion with longitudinal
-    // ribs cut into the top surface. No fans — relies on chassis airflow
-    // through the end-cap vent grille. The ribs ARE the cooler.
-    const ribCount = 38;
-    const ribLen = spec.depth * 0.92;
-    const shellH = 0.62;            // single-slot height
-    const shellW = spec.width * 0.94;
-    const ribs = useMemo<[number, number, number][]>(() => {
-      const out: [number, number, number][] = [];
-      const pitch = shellW / (ribCount + 1);
-      for (let i = 0; i < ribCount; i++) {
-        out.push([-shellW / 2 + pitch * (i + 1), shellH / 2 + 0.015, 0]);
-      }
-      return out;
-    }, [shellW, ribCount, shellH]);
-
-    // End-cap exhaust grille — vertical slats at one end
-    const grille = useMemo<[number, number, number][]>(() => {
-      const n = 14;
-      const out: [number, number, number][] = [];
-      const w = shellW * 0.85;
-      for (let i = 0; i < n; i++) {
-        out.push([-w / 2 + (w / (n - 1)) * i, 0, 0]);
-      }
-      return out;
-    }, [shellW]);
-
-    // L40S: dark gunmetal anodized aluminum (NOT champagne — that was wrong).
-    // Per research: charcoal heatsink with NVIDIA green logo only on top face,
-    // 4 DisplayPorts on bracket end. See .agents/research/l40s-spec.md.
-    const SHELL = '#3a3a42';       // dark anodized aluminum
-    const SHELL_RIB = '#42424a';   // slightly lighter for rib highlight catch
+    // L40S single-slot passive card. The photoreal skin already contains the
+    // ribbed anodized-aluminum extrusion, the NVIDIA + L40S wordmark, the
+    // mounting-screw pockets, the green diagonal accent stripe AND the 4× DP
+    // bracket — so the 3D geometry is just a flat shroud sized exactly to the
+    // skin, with the skin draped over the full top face. No ribs poking
+    // through, no stock GPU showing.
+    const shellH = 0.62;
     return (
       <group>
-        {/* Main shell — dark anodized aluminum, matte */}
-        <RoundedBox args={[shellW, shellH, ribLen]} radius={0.035} smoothness={4} position={[0, 0, 0]}>
+        <RoundedBox args={[spec.width, shellH, spec.depth]} radius={0.035} smoothness={4} position={[0, 0, 0]}>
           <meshStandardMaterial
             ref={lidMatRef}
-            color={SHELL}
-            roughness={0.55}
-            metalness={0.65}
-            envMapIntensity={1.0}
-            emissive="#000"
-            emissiveIntensity={0}
-            map={maps?.anodizedDark ?? undefined}
-          />
-        </RoundedBox>
-        {/* Longitudinal cooling ribs — same dark finish, slightly lighter to catch HDRI */}
-        <InstancedBoxes
-          positions={ribs}
-          size={[shellW / (ribCount + 1) * 0.55, 0.05, ribLen * 0.96]}
-          color={SHELL_RIB}
-          roughness={0.5}
-          metalness={0.65}
-        />
-        {/* End-cap exhaust grille */}
-        <group position={[0, 0, -ribLen / 2 - 0.008]}>
-          <mesh>
-            <planeGeometry args={[shellW * 0.88, shellH * 0.78]} />
-            <meshStandardMaterial color="#08080b" roughness={0.95} metalness={0} />
-          </mesh>
-          <InstancedBoxes
-            positions={grille}
-            size={[shellW / 22, shellH * 0.7, 0.018]}
             color="#2a2a30"
             roughness={0.6}
-            metalness={0.5}
+            metalness={0.55}
+            envMapIntensity={1.0}
           />
-        </group>
-        {/* I/O bracket end — 4× DisplayPort connectors (L40S signature: only
-            card in the lineup with display outputs). Stacked vertically. */}
-        <group position={[0, 0, ribLen / 2 + 0.012]}>
-          {[-0.27, -0.09, 0.09, 0.27].map((y, i) => (
-            <mesh key={`dp-${i}`} position={[0, y * shellH, 0]}>
-              <boxGeometry args={[shellW * 0.22, shellH * 0.14, 0.05]} />
-              <meshStandardMaterial color="#0a0a0c" roughness={0.7} metalness={0.3} />
-            </mesh>
-          ))}
-        </group>
-        {/* Photoreal product skin draped over the entire top face — ribbed
-            anodized heatsink, NVIDIA logo + L40S wordmark, mounting screws,
-            all sourced from a real product photo. Sits just above the rib
-            geometry so grazing light still picks up rib relief at the edges. */}
+        </RoundedBox>
         {maps?.skins?.l40s && (
-          <mesh position={[0, shellH / 2 + 0.055, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[shellW, ribLen]} />
+          <mesh position={[0, shellH / 2 + 0.004, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[spec.width, spec.depth]} />
             <meshStandardMaterial map={maps.skins.l40s} roughness={0.55} metalness={0.55} envMapIntensity={1.0} />
           </mesh>
         )}
@@ -685,57 +618,34 @@ function CoolerLayer({
 
 
 
-  // Card archetypes: heatsink fin block (instanced) + shroud + fan(s)
-  const isBlower = spec.cooler === 'blower';
-  // Triple-fan: 3 axial fans evenly across the shroud, fan radius matched to
-  // the slot height. Blower: ONE radial squirrel-cage at the END opposite the
-  // I/O bracket — the rest of the shroud top is a smooth lid stamped with the
-  // product wordmark (this is the visual signature of every server blower card).
-  const fanX = isBlower ? [-spec.width / 2 + 1.4] : [-2.0, 0, 2.0];
-  const fanRadius = isBlower ? 1.15 : 0.95;
-
+  // A100 PCIe blower archetype. The photoreal skin contains the radial blower
+  // fan, the smooth shroud, the NVIDIA A100 silkscreen and the green accent
+  // stripe — so we render only a flat shroud sized to the skin and drape the
+  // skin over the entire top face. No 3D fan torus, no rib stack poking
+  // through. Internal fin block stays underneath for the exploded-view layer
+  // separation, but it sits well below the shroud top.
+  const shroudH = 0.34;
   return (
     <group>
-      {/* fin stack */}
+      {/* internal fin stack — only visible in exploded view, hidden under the shroud when assembled */}
       <group position={[0, -1.9, 0]}>
-        {/* Extruded aluminum fins (6061/6063) — distinctly cooler & flatter than nickel-plated cold plate */}
-        <InstancedBoxes positions={fins} size={[spec.width - 1.2, 0.045, spec.depth - 1.6]} color="#B8B8BC" roughness={0.4} metalness={0.85} emissive="#c85f2a" emissiveIntensity={0} />
+        <InstancedBoxes positions={fins} size={[spec.width - 1.2, 0.045, spec.depth - 1.2]} color="#B8B8BC" roughness={0.4} metalness={0.85} emissive="#c85f2a" emissiveIntensity={0} />
         <mesh position={[0, FIN_COUNT * spacing * 0.5 + 0.1, 0]}>
           <boxGeometry args={[spec.width - 1.0, 0.12, 0.5]} />
-          {/* Baseplate — nickel-on-copper at the die contact face */}
           <meshStandardMaterial ref={finMatRef} color="#CFCAC0" roughness={0.18} metalness={0.95} emissive="#c85f2a" emissiveIntensity={0} map={maps?.nickelBrushed ?? undefined} />
         </mesh>
       </group>
-      {/* Shroud body — dark matte plastic. The photoreal product skin draped
-          on top carries all the visible exterior detail (fan grille, brand
-          wordmark, accent strip) so the shroud underneath only contributes
-          thickness and side faces. */}
-      <RoundedBox args={[spec.width, 0.34, spec.depth]} radius={0.06} smoothness={4} position={[0, 0.5, 0]}>
-        <meshStandardMaterial color={isBlower ? '#0E0E11' : '#1A1A1F'} roughness={isBlower ? 0.55 : 0.65} metalness={0.05} />
+      {/* Shroud body — flat lid, exactly the card footprint, hidden by the skin on top */}
+      <RoundedBox args={[spec.width, shroudH, spec.depth]} radius={0.045} smoothness={4} position={[0, 0.5, 0]}>
+        <meshStandardMaterial color="#0E0E11" roughness={0.55} metalness={0.05} />
       </RoundedBox>
-      {/* Photoreal top-face skin — sized to the full shroud footprint. For
-          A100 this image already contains the radial blower, the smooth lid
-          with "NVIDIA A100" silkscreen, and the green accent strip, so we
-          don't render those features in 3D underneath. */}
-      {isBlower && maps?.skins?.a100 && (
-        <mesh position={[0, 0.68, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* Photoreal top-face skin — full footprint, edge-to-edge */}
+      {maps?.skins?.a100 && (
+        <mesh position={[0, 0.5 + shroudH / 2 + 0.004, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[spec.width, spec.depth]} />
           <meshStandardMaterial map={maps.skins.a100} roughness={0.55} metalness={0.25} envMapIntensity={1.0} />
         </mesh>
       )}
-      {/* 3D fan(s) — only for triple-fan archetype; the A100 blower's fan is
-          rendered as part of the printed skin above. */}
-      {!isBlower && fanX.map((x, i) => (
-        <group key={`fan-grp-${i}`}>
-          <mesh position={[x, 0.7, 0]} rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[fanRadius * 1.05, 0.05, 10, 48]} />
-            <meshStandardMaterial color="#1c1c1e" roughness={0.4} metalness={0.4} />
-          </mesh>
-          <group position={[x, 0.78, 0]}>
-            <Fan fanRef={fanRefs[i]} radius={fanRadius} />
-          </group>
-        </group>
-      ))}
       {/* PCIe bracket — full-height steel I/O end-plate at +z edge. Real
           server cards have a vented bracket with screw notch + slot openings
           for exhaust (blower) or display outputs (passive). */}
@@ -751,7 +661,7 @@ function CoolerLayer({
         </mesh>
         {/* Exhaust vent slots for blower cards, DP cutouts for triple-fan
             absent (triple-fans vent into the chassis, not out the bracket). */}
-        {isBlower && Array.from({ length: 8 }).map((_, i) => (
+        {spec.cooler === 'blower' && Array.from({ length: 8 }).map((_, i) => (
           <mesh key={`vent-${i}`} position={[-spec.width / 2 + 1.2 + i * 0.5, -0.05, 0.01]}>
             <boxGeometry args={[0.32, 0.55, 0.03]} />
             <meshStandardMaterial color="#06060a" roughness={0.9} metalness={0.0} />
