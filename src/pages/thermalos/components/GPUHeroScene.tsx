@@ -1045,12 +1045,7 @@ function Runway({ textures }: { textures: Textures }) {
           mirror={0.7}
         />
       </mesh>
-      {GPU_SPECS.map((spec, i) => (
-        <mesh key={spec.id} position={[cardX(i), 0.02, 0]} receiveShadow>
-          <ringGeometry args={[2.55, 2.7, 48]} />
-          <meshStandardMaterial color={CINE.hotSoft} emissive={CINE.hotSoft} emissiveIntensity={0.28} roughness={0.4} metalness={0.5} toneMapped={false} transparent opacity={0.3} />
-        </mesh>
-      ))}
+      {/* Removed gold ring halos under each GPU — read as an upside-down U arch. */}
       {/* Warm slate atmosphere — soft falloff, low density */}
       <fogExp2 attach="fog" args={[CINE.void, 0.02]} />
     </group>
