@@ -1806,7 +1806,7 @@ export default function TowerUnit() {
           outputColorSpace: THREE.SRGBColorSpace,
         }}
         dpr={[1, 2]}
-        camera={{ position: [0, 1.75, 4.4], fov: 38 }}
+        camera={{ position: [0, 2.25, 4.4], fov: 38 }}
       >
         <color attach="background" args={[T.bg]} />
 
