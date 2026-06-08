@@ -568,6 +568,9 @@ function CoolerLayer({
         <LayerLabel text="PASSIVE FIN STACK" sub="anodized aluminum extrusion · server airflow" opacityRef={labelOpacityRef} accent={spec.accent} />
       </group>
     );
+  }
+
+
 
   // Card archetypes: heatsink fin block (instanced) + shroud + fan(s)
   const fanX = spec.cooler === 'triple-fan' ? [-2.0, 0, 2.0] : [0];
