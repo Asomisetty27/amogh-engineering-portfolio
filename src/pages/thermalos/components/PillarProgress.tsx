@@ -68,7 +68,7 @@ export default function PillarProgress({ fleetStatus }: Props) {
       name: 'Adaptability',
       coverage: computeAdaptability(),
       desc: 'Self-calibration',
-      color: RISK.critical,
+      color: RISK.safe,
     },
   ];
 
@@ -178,7 +178,7 @@ export default function PillarProgress({ fleetStatus }: Props) {
         <div>
           <span style={{ color: RISK.safe }}>■</span> Ready ·{' '}
           <span style={{ color: RISK.warning }}>■</span> Partial ·{' '}
-          <span style={{ color: RISK.critical }}>■</span> Shipped
+          <span style={{ color: RISK.caution }}>■</span> In progress
         </div>
       </div>
     </div>

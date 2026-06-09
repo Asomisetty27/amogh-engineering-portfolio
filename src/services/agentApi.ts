@@ -214,120 +214,86 @@ function adaptFleetStatus(daemon: DaemonFleetStatus): FleetStatus {
 
 function generateDemoFleetStatus(): FleetStatus {
   const now = Math.floor(Date.now() / 1000);
-  const gpus: GPUStateSnapshot[] = [
-    {
-      index: 0,
-      model: 'H100-SXM5',
-      state: 'drifting',
-      temperature_c: 52.1,
-      power_w: 450.2,
-      utilization_pct: 78,
-      rtheta_cw: 0.84,
-      rtheta_baseline: 0.72,
-      rtheta_k_sigma: 2.1,
-      risk_score: 0.87,
+
+  // Cal Poly AI Factory — DGX B200, 8× B200 GPUs, liquid cold-plate cooling,
+  // 20°C coolant inlet. R_θ healthy ≈ 0.060 C/W; drifting GPU shows +20% rise.
+  const makeB200 = (
+    index: number,
+    state: GPUStateSnapshot['state'],
+    rtheta: number,
+    risk: number,
+    recommendation: GPUStateSnapshot['recommendation'],
+    fault_class: GPUStateSnapshot['fault_class'],
+    decision_log: GPUStateSnapshot['decision_log_recent'],
+  ): GPUStateSnapshot => ({
+    index,
+    model: 'B200-SXM6',
+    state,
+    temperature_c: 20 + rtheta * (state === 'load' || state === 'drifting' ? 1350 : 280),
+    power_w: state === 'idle' ? 95 : state === 'drifting' ? 1180 : 1350,
+    utilization_pct: state === 'idle' ? 3 : state === 'drifting' ? 82 : 88,
+    rtheta_cw: rtheta,
+    rtheta_baseline: 0.060,
+    rtheta_k_sigma: parseFloat(((rtheta - 0.060) / 0.002).toFixed(1)),
+    risk_score: risk,
+    confidence: 0.99,
+    recommendation,
+    recovery_eta_sec: state === 'drifting' ? 240 : 0,
+    fault_class,
+    ecc_sbit_total: 0,
+    ecc_dbit_any: false,
+    micro_throttle_detected: false,
+    last_state_change: {
+      ts: now - (state === 'drifting' ? 420 : 1800),
+      old_state: state === 'drifting' ? 'load' : 'idle',
+      new_state: state,
       confidence: 0.99,
-      recommendation: 'watch',
-      recovery_eta_sec: 180,
-      fault_class: 'cooling_degradation',
-      ecc_sbit_total: 12,
-      ecc_dbit_any: false,
-      micro_throttle_detected: false,
-      last_state_change: {
-        ts: now - 300,
+      reason: state === 'drifting'
+        ? 'R_θ rose 2.3σ above coolant-anchored baseline; liquid-cooled profile active'
+        : 'Sustained utilization > 80%',
+      duration_sec: state === 'drifting' ? 420 : 1800,
+    },
+    decision_log_recent: decision_log,
+  });
+
+  const gpus: GPUStateSnapshot[] = [
+    makeB200(0, 'load',     0.061, 0.08, 'ok',    null,                  []),
+    makeB200(1, 'load',     0.059, 0.06, 'ok',    null,                  []),
+    makeB200(2, 'load',     0.062, 0.09, 'ok',    null,                  []),
+    makeB200(3, 'drifting', 0.074, 0.81, 'drain', 'cooling_degradation', [
+      {
+        ts: now - 420,
         old_state: 'load',
         new_state: 'drifting',
         confidence: 0.99,
-        reason: 'R_θ rose 2.1σ above baseline; cooling path degradation likely',
-        duration_sec: 300,
+        reason: 'R_θ rose 2.3σ above coolant-anchored baseline',
       },
-      decision_log_recent: [
-        {
-          ts: now - 300,
-          old_state: 'load',
-          new_state: 'drifting',
-          confidence: 0.99,
-          reason: 'R_θ rose 2.1σ above baseline',
-        },
-        {
-          ts: now - 600,
-          old_state: 'idle',
-          new_state: 'load',
-          confidence: 0.98,
-          reason: 'Sustained utilization > 70%',
-        },
-      ],
-    },
-    {
-      index: 1,
-      model: 'A100-PCIE',
-      state: 'load',
-      temperature_c: 48.3,
-      power_w: 380.1,
-      utilization_pct: 65,
-      rtheta_cw: 0.76,
-      rtheta_baseline: 0.74,
-      rtheta_k_sigma: 0.3,
-      risk_score: 0.12,
-      confidence: 0.98,
-      recommendation: 'ok',
-      recovery_eta_sec: 0,
-      fault_class: null,
-      ecc_sbit_total: 0,
-      ecc_dbit_any: false,
-      micro_throttle_detected: false,
-      last_state_change: {
-        ts: now - 1200,
+      {
+        ts: now - 1800,
         old_state: 'idle',
         new_state: 'load',
         confidence: 0.98,
-        reason: 'Sustained utilization > 70%',
-        duration_sec: 1200,
+        reason: 'Sustained utilization > 80%',
       },
-      decision_log_recent: [],
-    },
-    {
-      index: 2,
-      model: 'L40S-PCIE',
-      state: 'idle',
-      temperature_c: 42.1,
-      power_w: 45.0,
-      utilization_pct: 2,
-      rtheta_cw: 0.72,
-      rtheta_baseline: 0.72,
-      rtheta_k_sigma: 0.0,
-      risk_score: 0.05,
-      confidence: 0.99,
-      recommendation: 'ok',
-      recovery_eta_sec: 0,
-      fault_class: null,
-      ecc_sbit_total: 0,
-      ecc_dbit_any: false,
-      micro_throttle_detected: false,
-      last_state_change: {
-        ts: now - 3600,
-        old_state: 'load',
-        new_state: 'idle',
-        confidence: 0.99,
-        reason: 'Utilization dropped below 5% sustained',
-        duration_sec: 3600,
-      },
-      decision_log_recent: [],
-    },
+    ]),
+    makeB200(4, 'load',     0.060, 0.07, 'ok',    null, []),
+    makeB200(5, 'load',     0.061, 0.08, 'ok',    null, []),
+    makeB200(6, 'idle',     0.060, 0.04, 'ok',    null, []),
+    makeB200(7, 'load',     0.059, 0.05, 'ok',    null, []),
   ];
 
   return {
     timestamp: now,
     gpus,
     fleet_metrics: {
-      rtheta_avg: 0.77,
-      rtheta_max: 0.84,
+      rtheta_avg: 0.062,
+      rtheta_max: 0.074,
       anomaly_count: 1,
       critical_count: 0,
     },
     correlations: [
       {
-        gpu_indices: [0],
+        gpu_indices: [3],
         correlation: 0.0,
         possible_cause: 'isolated_cooling_issue',
       },
@@ -545,19 +511,30 @@ function generateDemoAgentDetails(index: number): DaemonGpuDetails {
     },
     causal_explanation: gpu.state === 'drifting' || gpu.state === 'critical'
       ? {
-          headline: `GPU ${index}: heatsink loading with dust — R_θ drifted ${gpu.rtheta_k_sigma.toFixed(1)}σ above baseline.`,
+          headline: `GPU ${index}: liquid cooling path resistance elevated — R_θ drifted ${gpu.rtheta_k_sigma.toFixed(1)}σ above coolant-anchored baseline.`,
           urgency: gpu.state === 'critical' ? 'act_now' : 'act_soon',
           hypothesis: {
-            cause: 'dust_accumulation',
-            confidence: 0.82,
-            one_line: 'Heatsink fins are loading with dust — uniform R_θ rise across the power curve.',
+            cause: 'cooling_degradation',
+            confidence: 0.87,
+            one_line: 'Cold-plate flow restriction — R_θ uniform rise across load levels is the liquid-cooled signature of partial blockage or pump degradation.',
           },
-          alternatives: [],
+          alternatives: [
+            {
+              cause: 'thermal_interface_material',
+              confidence: 0.11,
+              one_line: 'TIM degradation possible but less likely — TIM failure shows steeper rise at high power that is not present here.',
+            },
+          ],
           evidence: [
             {
               name: 'rtheta_deviation',
-              value: `R_θ is ${gpu.rtheta_cw.toFixed(3)} C/W vs baseline ${gpu.rtheta_baseline.toFixed(3)} C/W (+${gpu.rtheta_k_sigma.toFixed(1)}σ)`,
-              weight: 0.85,
+              value: `R_θ is ${gpu.rtheta_cw.toFixed(3)} C/W vs coolant-anchored baseline ${gpu.rtheta_baseline.toFixed(3)} C/W (+${gpu.rtheta_k_sigma.toFixed(1)}σ)`,
+              weight: 0.87,
+            },
+            {
+              name: 'load_invariance',
+              value: 'R_θ rise is flat across power levels — consistent with hydraulic restriction, not TIM (which is power-dependent)',
+              weight: 0.76,
             },
             {
               name: 'smoothed_state',
@@ -567,23 +544,31 @@ function generateDemoAgentDetails(index: number): DaemonGpuDetails {
           ],
           actions: [
             {
-              title: 'Clean heatsink fins and air filters',
-              detail: 'Compressed-air blowout of the heatsink; replace filters > 6mo in service.',
-              effort: '20m maintenance window',
-              expected_impact: 'Restores R_θ to within ~5% of baseline.',
-              blocks_workload: true,
+              title: "Check coolant flow rate for this GPU's cold-plate loop",
+              detail: "Verify facility manifold pressure and per-GPU flow meter. B200 cold-plate requires >= 2.5 L/min; below 2.0 L/min raises R_theta ~20%.",
+              effort: '10m — no workload disruption required',
+              expected_impact: 'If flow is low, restoring pressure returns R_θ to baseline within 5 minutes.',
+              blocks_workload: false,
               integration: null,
             },
             {
-              title: `Recalibrate thresholds for GPU ${index}`,
-              detail: `Run theta calibrate --gpu ${index} after physical remediation.`,
-              effort: '5m — agent runs the calibration sweep automatically',
-              expected_impact: 'Per-unit thresholds replace hardware-class defaults.',
+              title: `Drain GPU ${index} from active workloads (SLURM)`,
+              detail: `scontrol update nodename=$(hostname) state=drain reason="theta:rtheta_drift_gpu${index}"`,
+              effort: '2m — SLURM drains after current job completes',
+              expected_impact: 'Prevents thermal throttle cascade to neighboring GPUs on the same cold-plate loop.',
+              blocks_workload: true,
+              integration: 'SLURM',
+            },
+            {
+              title: `Recalibrate coolant-inlet T_ref for GPU ${index}`,
+              detail: `Run: theta calibrate --gpu ${index} --ambient <coolant_inlet_c>  after flow is restored.`,
+              effort: '5m — agent runs sweep automatically',
+              expected_impact: 'Per-unit thresholds replace extrapolated B200 defaults.',
               blocks_workload: false,
               integration: null,
             },
           ],
-          when_started: '12 minutes ago',
+          when_started: '7 minutes ago',
           eta_to_threshold: gpu.recovery_eta_sec > 0 ? `${Math.ceil(gpu.recovery_eta_sec / 60)} minutes` : null,
           eta_to_recovery: null,
         }
@@ -603,14 +588,14 @@ function generateDemoAgentDetails(index: number): DaemonGpuDetails {
       headline: gpu.state === 'critical'
         ? `GPU ${index}: service recommended in ~3 days (primary driver: R_θ drift).`
         : gpu.state === 'drifting'
-        ? `GPU ${index}: service recommended in ~14 days (primary driver: R_θ drift).`
+        ? `GPU ${index}: check coolant flow — service recommended within ~14 days if not resolved.`
         : `GPU ${index}: nominal — no maintenance projected in next 90 days.`,
     },
     hw_profile: {
       canonical_name: gpu.model,
-      vendor: gpu.model.startsWith('MI') ? 'amd' : 'nvidia',
-      cooling: gpu.model.includes('SXM') || gpu.model.includes('OAM') ? 'liquid-cold-plate' : 'air-passive',
-      confidence: gpu.model === 'Tesla T4' ? 'measured' : 'extrapolated',
+      vendor: 'nvidia',
+      cooling: 'liquid-cold-plate',
+      confidence: 'extrapolated',
     },
   };
 }
