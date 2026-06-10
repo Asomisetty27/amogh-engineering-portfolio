@@ -480,7 +480,7 @@ function TelemetryTab({ details }: { details: DaemonGpuDetails }) {
         }}
       >
         <div>install_id: sha256(machine-id)[:16]</div>
-        <div>gpu_gen: {details.hw_profile?.family ?? 'unknown'}-class</div>
+        <div>gpu_gen: {(details.hw_profile as any)?.family ?? 'unknown'}-class</div>
         <div>n_samples_per_hour: ~720 (at 5s interval)</div>
         <div>rtheta_mean, rtheta_std, ecc_sbit_total, recovery_time_p50</div>
         <div style={{ color: COLORS.steel.muted, marginTop: '4px' }}>
