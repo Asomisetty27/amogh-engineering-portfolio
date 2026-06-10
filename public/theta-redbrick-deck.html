@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theta - Redbrick VC Deck</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/theme/black.css">
+    <style>
+        :root {
+            --r-main-font-size: 32px;
+            --r-main-color: #222;
+            --r-block-margin: 20px;
+            --r-heading-color: #1D9E75;
+            --r-accent-color: #D4AF37;
+        }
+
+        .reveal {
+            font-family: 'Inter', 'Space Grotesk', sans-serif;
+        }
+
+        .reveal h1, .reveal h2, .reveal h3 {
+            text-transform: none;
+            font-weight: 600;
+        }
+
+        .reveal section {
+            text-align: left;
+            padding: 60px;
+        }
+
+        .title-slide {
+            background: linear-gradient(135deg, #1D9E75 0%, #15704f 100%);
+            text-align: center !important;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .title-slide h1 {
+            color: #D4AF37;
+            font-size: 80px;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .title-slide p {
+            color: white;
+            font-size: 28px;
+            line-height: 1.4;
+        }
+
+        .content-slide {
+            background: white;
+        }
+
+        .content-slide h2 {
+            color: #1D9E75;
+            font-size: 54px;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #D4AF37;
+            padding-bottom: 20px;
+        }
+
+        .content-slide ul {
+            font-size: 24px;
+            line-height: 1.6;
+            list-style: none;
+            padding: 0;
+        }
+
+        .content-slide li {
+            margin: 16px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .content-slide li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #D4AF37;
+            font-weight: bold;
+        }
+
+        .formula {
+            background: #f0f4f2;
+            border: 3px solid #1D9E75;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #1D9E75;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .two-column {
+            display: flex;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .two-column > div {
+            flex: 1;
+        }
+
+        .two-column h3 {
+            color: #1D9E75;
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .two-column ul {
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        .tranche {
+            background: #f0f4f2;
+            border: 3px solid #D4AF37;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .tranche h3 {
+            color: #1D9E75;
+            font-size: 32px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .tranche-content {
+            font-size: 18px;
+            line-height: 1.6;
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .closing-slide {
+            background: linear-gradient(135deg, #1D9E75 0%, #15704f 100%);
+            text-align: center !important;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .closing-slide h2 {
+            color: #D4AF37;
+            font-size: 56px;
+            border: none;
+            padding: 0;
+            margin-bottom: 50px;
+        }
+
+        .closing-slide p {
+            color: white;
+            font-size: 28px;
+            line-height: 1.8;
+            margin: 10px 0;
+        }
+
+        .highlight {
+            color: #D4AF37;
+            font-weight: 700;
+        }
+
+        .slide-number {
+            display: none;
+        }
+
+        @media print {
+            .reveal {
+                display: flex !important;
+            }
+            .reveal section {
+                page-break-after: always;
+                display: flex !important;
+                flex-direction: column;
+                justify-content: center;
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <!-- Slide 1: Title -->
+            <section class="title-slide">
+                <h1>THETA</h1>
+                <p>GPU Thermal Forensics Platform</p>
+                <p style="font-size: 24px; margin-top: 30px;">Redbrick VC Investment | June 2026</p>
+            </section>
+
+            <!-- Slide 2: The Problem -->
+            <section class="content-slide">
+                <h2>The Problem</h2>
+                <ul>
+                    <li>GPU operators are flying blind on thermal degradation</li>
+                    <li>Temperature alone is ambiguous (workload vs. cooling failure?)</li>
+                    <li>Existing tools don't separate the two signals</li>
+                    <li>Operators discover cooling failures when throttling happens — too late</li>
+                    <li>Result: Production failures, SLA breaches, costly RMAs</li>
+                </ul>
+            </section>
+
+            <!-- Slide 3: The Insight -->
+            <section class="content-slide">
+                <h2>The Insight</h2>
+                <div class="formula">R_theta = (T_junction - T_ambient) / P_GPU</div>
+                <ul>
+                    <li>In healthy hardware: R_theta is stable (~0.72 C/W under load)</li>
+                    <li>When cooling degrades: R_theta rises, even at constant power</li>
+                    <li>This single metric from NVML telemetry detects failure before throttling</li>
+                </ul>
+            </section>
+
+            <!-- Slide 4: Stage 1 Validation -->
+            <section class="content-slide">
+                <h2>Stage 1: Validation Complete ✓</h2>
+                <ul>
+                    <li><strong>Finding 1: Thermal memory signature (n=7 trials)</strong>
+                        <ul style="margin-top: 10px; font-size: 20px;">
+                            <li>2°C ambient change → 3.5× power recovery time difference</li>
+                            <li>Publication-grade reproducibility (CV 1.8%)</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 20px;"><strong>Finding 2: CUDA context effect</strong>
+                        <ul style="margin-top: 10px; font-size: 20px;">
+                            <li>Context released: GPU recovers to idle in 140–210s ✓</li>
+                            <li>Context retained: GPU stuck at P0, never recovers ✗</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 20px;"><strong>Data: 8,734 rows across E001–E004</strong></li>
+                </ul>
+            </section>
+
+            <!-- Slide 5: Stage 2 -->
+            <section class="content-slide">
+                <h2>Stage 2: Next 90 Days (Summer 2026)</h2>
+                <ul>
+                    <li><strong>AI Factory Deployment (Cal Poly, DGX B200)</strong>
+                        <ul style="margin-top: 8px; font-size: 20px;">
+                            <li>Canary install on 1 of 4 new nodes | Gating: Lupo meeting (June 12)</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 16px;"><strong>OSS Agent v0 Launch</strong>
+                        <ul style="margin-top: 8px; font-size: 20px;">
+                            <li>pip install runtheta → 60s to first output | v0.1.9 live on PyPI</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 16px;"><strong>Lead-Time Validation</strong>
+                        <ul style="margin-top: 8px; font-size: 20px;">
+                            <li>Question: Does R_theta rise BEFORE throttling?</li>
+                            <li>Physics simulation predicts 1.2h TIM lead-time</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Slide 6: What $500 Buys -->
+            <section class="content-slide">
+                <h2>What $500 Buys</h2>
+                <div class="two-column">
+                    <div>
+                        <h3>Compute & Infrastructure</h3>
+                        <ul>
+                            <li><strong>Claude API</strong> ($200/mo) — 5M tokens for codebase optimization</li>
+                            <li><strong>Colab Pro+</strong> ($100/mo) — Sustained GPU for E005 experiments</li>
+                            <li><strong>AWS/GCP</strong> ($100) — Serverless endpoints</li>
+                            <li><strong>Domain</strong> ($50) — theta.ai registration</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Why It Matters</h3>
+                        <ul>
+                            <li>Converts "hobby project" to "credible product"</li>
+                            <li>Enables 24/7 lead-time experiments</li>
+                            <li>Hosted R_theta dashboard</li>
+                            <li>De-risks YC W27 application</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 7: Traction -->
+            <section class="content-slide">
+                <h2>Traction</h2>
+                <ul>
+                    <li>✓ <strong>PyPI:</strong> v0.1.9 published, pip install runtheta live</li>
+                    <li>✓ <strong>Code:</strong> Full source on GitHub (Asomisetty27/theta)</li>
+                    <li>✓ <strong>Data:</strong> 8,734 rows of experiments, publicly linked</li>
+                    <li>✓ <strong>Partnerships:</strong> Lupo (Cal Poly AI Factory), Kundu (Cal Poly EE, ex-Intel)</li>
+                    <li>✓ <strong>Discovery:</strong> Outreach sent to 3 neoclouds (June 2)</li>
+                    <li>✓ <strong>Academic:</strong> Paper in prep for ICPE 2027</li>
+                </ul>
+            </section>
+
+            <!-- Slide 8: Why Now -->
+            <section class="content-slide">
+                <h2>Why Now</h2>
+                <ul>
+                    <li><strong>Window Closing</strong>
+                        <ul style="margin-top: 8px; font-size: 20px;">
+                            <li>NVIDIA Mission Control + Phaidra moving upmarket (12-18 months to parity)</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 16px;"><strong>Cal Poly Partnership Live</strong>
+                        <ul style="margin-top: 8px; font-size: 20px;">
+                            <li>DGX B200 cluster (4 nodes) online NOW</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 16px;"><strong>YC W27 Timeline</strong>
+                        <ul style="margin-top: 8px; font-size: 20px;">
+                            <li>Need "working agent + operator feedback" by September</li>
+                            <li>Redbrick as lead investor strengthens application</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Slide 9: Team -->
+            <section class="content-slide">
+                <h2>The Team</h2>
+                <ul>
+                    <li><strong>Amogh Somisetty</strong> — Co-founder, Cal Poly EE '26, AI-native builder</li>
+                    <li><strong>Sam</strong> — Co-founder, Cal Poly ME, hardware design expert</li>
+                    <li><strong>Prof. Souvik Kundu</strong> — Advisor, Cal Poly EE, ex-Intel, thermal researcher</li>
+                    <li><strong>Prof. Christopher Lupo</strong> — Partner, Cal Poly CS/SE, Sandia resilience PI, AI Factory director</li>
+                </ul>
+            </section>
+
+            <!-- Slide 10: Success Metrics -->
+            <section class="content-slide">
+                <h2>Success by December 2026</h2>
+                <ul>
+                    <li>✓ E-LT validates lead-time prediction (R_theta rises 1+ hour before throttling)</li>
+                    <li>✓ First neocloud in production (RunPod or Vast.ai running Theta)</li>
+                    <li>✓ Thermal degradation detection >95% (validated on real hardware)</li>
+                    <li>✓ 500+ operators have pip installed Theta</li>
+                </ul>
+            </section>
+
+            <!-- Slide 11: The Ask -->
+            <section class="content-slide">
+                <h2>The Ask: $500 Redbrick Grant</h2>
+                <div class="tranche">
+                    <h3>Tranche 1: $250</h3>
+                    <div class="tranche-content">
+                        <strong>On Signature (June 2026)</strong>
+                        <ul style="margin-top: 12px; font-size: 18px;">
+                            <li>Claude API quota for codebase optimization</li>
+                            <li>Colab Pro+ for continuous E005 experiments</li>
+                            <li>AWS/GCP credits for serverless</li>
+                            <li>Domain registration</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="tranche">
+                    <h3>Tranche 2: $250</h3>
+                    <div class="tranche-content">
+                        <strong>On Milestone (July 15)</strong>
+                        <ul style="margin-top: 12px; font-size: 18px;">
+                            <li>Lupo canary install live on DGX B200</li>
+                            <li>Agent in production on real hardware</li>
+                            <li>Real hardware validation complete</li>
+                            <li>YC W27 application ready</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 12: Closing -->
+            <section class="closing-slide">
+                <h2>Theta: Predictive Maintenance for GPU Clusters</h2>
+                <p>runtheta.com</p>
+                <p>pip install runtheta</p>
+                <p>amogh.site/thermalos</p>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            transition: 'slide',
+            width: '100%',
+            height: '100%',
+            margin: 0.1,
+            minScale: 0.2,
+            maxScale: 2.0
+        });
+    </script>
+</body>
+</html>
