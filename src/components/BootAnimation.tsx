@@ -48,8 +48,8 @@ function TaskRow({ task, started }: { task: Task; started: boolean }) {
     };
   }, [started, task.ms, task.delay]);
 
-  const barW = Math.round(progress * 14);
-  const barEmpty = 14 - barW;
+  const barW = Math.max(0, Math.min(14, Math.round(progress * 14)));
+  const barEmpty = Math.max(0, 14 - barW);
 
   return (
     <motion.div
