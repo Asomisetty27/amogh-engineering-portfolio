@@ -81,6 +81,26 @@
       "priority": "normal"
     },
     {
+      "id": "What's the lowest-fr",
+      "date_raised": "2026-06-10T00:00:00.000Z",
+      "question": "Q: What's the lowest-friction path to make R_θ consumable by jobstats-running institutions?",
+      "what_i_tried": "\n## The question",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "What is Theta's firs",
+      "date_raised": "2026-06-11T00:00:00.000Z",
+      "question": "Q: What is Theta's first paid unit, and who pays it?",
+      "what_i_tried": "\n# The question",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
       "id": "Q_discovery_progress",
       "date_raised": "2026-06-01T00:00:00.000Z",
       "question": "Q_discovery_progress — Have Discovery Calls Started?",
@@ -197,6 +217,12 @@
     }
   ],
   "evidence": [
+    {
+      "claim": "> Reframe (2026-06-11)",
+      "proof": "** per [[accelerator_portfolio]], Theta no longer",
+      "location": "synthesis/yc_blockers.md",
+      "status": "Evidence collected"
+    },
     {
       "claim": "Question",
       "proof": "** Are infra/platform engineers at neoclouds saying \"yes, cooling-related throttling is a manual mess that costs us\"?",
@@ -804,6 +830,6 @@
       "status": "gap"
     }
   ],
-  "generated_at": "2026-06-07T20:27:21.980Z",
+  "generated_at": "2026-06-11T21:58:34.475Z",
   "vault_root": "/Users/amogh/thermalos-vault"
 }
