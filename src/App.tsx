@@ -12,7 +12,6 @@ import { FLEET_BASE, LEGACY_REDIRECTS, RESEARCH_BASE, SITE_BASE, THETA_BASE } fr
 const Index            = lazy(() => import("./pages/Index.tsx"));
 const NotFound         = lazy(() => import("./pages/NotFound.tsx"));
 const ThermalOSLayout  = lazy(() => import("./pages/thermalos/ThermalOSLayout.tsx"));
-const Landing          = lazy(() => import("./pages/thermalos/Landing.tsx"));
 const ResearchLanding  = lazy(() => import("./pages/thermalos/ResearchLanding.tsx"));
 const FleetDashboard   = lazy(() => import("./pages/thermalos/FleetDashboard.tsx"));
 const Overview         = lazy(() => import("./pages/thermalos/Overview.tsx"));
@@ -36,6 +35,14 @@ const RouteFallback = () => (
   <div style={{ minHeight: "100vh", background: "#09090D" }} aria-busy="true" />
 );
 
+// The commercial/client surface lives exclusively on runtheta.com now —
+// the portfolio keeps only the ThermalOS research surfaces. /theta links
+// in the wild hard-redirect to the product site.
+const RuntheaRedirect = () => {
+  window.location.replace("https://runtheta.com");
+  return <RouteFallback />;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -46,8 +53,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
 
-            {/* ══ THETA — startup / commercial surface ══════════════════════ */}
-            <Route path={THETA_BASE} element={<Landing />} />
+            {/* ══ THETA — commercial surface moved to runtheta.com ══════════ */}
+            <Route path={THETA_BASE} element={<RuntheaRedirect />} />
             {/* Lab kiosk — fullscreen "living data center" loop, no chrome.
                 Same <DataCenterScene> as the website showcase section. */}
             <Route path={`${THETA_BASE}/kiosk/datacenter`} element={<DataCenterKiosk />} />
