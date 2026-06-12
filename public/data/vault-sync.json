@@ -389,6 +389,13 @@
   "decision_log": [
     {
       "date": "2026-06-11",
+      "decision": "experiment",
+      "rationale": "Ran E004v2_TRIAL_3_ONLY.py in fresh Colab session. T3: start 35°C (coldest in",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-11",
       "decision": "checkpoint",
       "rationale": "---",
       "source_question_id": "",
@@ -516,13 +523,6 @@
     {
       "date": "2026-05-31",
       "decision": "init",
-      "rationale": "- Source summary: [[thermalos_project_state_2026_05]]",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-01",
-      "decision": "ingest",
       "rationale": "- Source summary: [[thermalos_project_state_2026_05]]",
       "source_question_id": "",
       "status": "active"
@@ -830,6 +830,6 @@
       "status": "gap"
     }
   ],
-  "generated_at": "2026-06-12T01:02:38.346Z",
+  "generated_at": "2026-06-12T01:13:44.754Z",
   "vault_root": "/Users/amogh/thermalos-vault"
 }
