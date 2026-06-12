@@ -761,7 +761,7 @@ function AgentBlock() {
           Project data
         </div>
         {[
-          { label: 'Controlled rows',  value: '8,734',  sub: 'Stage 1 · Tesla T4 · E001–E004 v2' },
+          { label: 'Controlled rows',  value: '9,050',  sub: 'Stage 1 · Tesla T4 · E001–E004 v2 (t1–t8)' },
           { label: 'Production samples', value: '29k',  sub: 'E009 · 72× H100 SXM5 · 30 s cadence' },
           { label: 'Validated findings', value: '6 + 1', sub: 'F1–F6 high · F7 partial (RMA pending)' },
           { label: 'Agent version',   value: 'v0.1.9', sub: 'live on PyPI' },
@@ -941,7 +941,7 @@ export default function ResearchLanding() {
             fontFamily: FM, fontSize: 11, color: T.muted, marginTop: 10,
             display: 'flex', gap: 20, flexWrap: 'wrap',
           }}>
-            <span>8,734 controlled rows (E001–E004 v2) + 29k production samples (E009)</span>
+            <span>9,050 controlled rows (E001–E004 v2) + 29k production samples (E009)</span>
             <Link to={researchPath('findings')} style={{ color: T.accent, textDecoration: 'none' }}>
               Full methodology + data →
             </Link>

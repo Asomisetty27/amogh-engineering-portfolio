@@ -388,6 +388,34 @@
   ],
   "decision_log": [
     {
+      "date": "2026-06-11",
+      "decision": "checkpoint",
+      "rationale": "---",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-11",
+      "decision": "build",
+      "rationale": "Trial 3 of E004 v2 was lost 2026-06-04 (thermal gate reached at +991s, Colab",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-11",
+      "decision": "sync",
+      "rationale": "- ResearchLanding had NO E009 content (F1-F6 only, confidence map said",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-11",
+      "decision": "analysis",
+      "rationale": "Exhaustive re-analysis of the Princeton Della data beyond A1-A10. New code:",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
       "date": "2026-06-07",
       "decision": "schema",
       "rationale": "Amogh asked to incorporate [qmd](https://github.com/tobi/qmd) (local hybrid",
@@ -496,34 +524,6 @@
       "date": "2026-06-01",
       "decision": "ingest",
       "rationale": "- Source summary: [[thermalos_project_state_2026_05]]",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-01",
-      "decision": "ingest",
-      "rationale": "- New source page: [[ThermalOS_Measurements_Raw]]",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-01",
-      "decision": "ingest",
-      "rationale": "- [[01_leadtime_testbed_protocol]] — feeds [[E-LT]] complete protocol",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-01",
-      "decision": "lint",
-      "rationale": "- 1 orphan: [[Q_conference_venue]] (resolved — inbound from [[overview]] confirmed)",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-01",
-      "decision": "query",
-      "rationale": "1. [[confidence_map_rtheta]] — What we know vs assume about R_theta (high/medium/low/speculation tiers)",
       "source_question_id": "",
       "status": "active"
     }
@@ -830,6 +830,6 @@
       "status": "gap"
     }
   ],
-  "generated_at": "2026-06-11T21:58:34.475Z",
+  "generated_at": "2026-06-12T01:02:38.346Z",
   "vault_root": "/Users/amogh/thermalos-vault"
 }
