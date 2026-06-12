@@ -388,6 +388,83 @@
   ],
   "decision_log": [
     {
+      "date": "2026-06-12",
+      "decision": "checkpoint",
+      "rationale": "---",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-12",
+      "decision": "sync",
+      "rationale": "The capture chain survived the checkpoint window and auto-installed. Final:",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-12",
+      "decision": "checkpoint",
+      "rationale": "---",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-12",
+      "decision": "sync",
+      "rationale": "Amogh's art direction, iterated live: \"fresh sleek tech advertisement /",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-12",
+      "decision": "fix",
+      "rationale": "> CONFLICT: the previous entry attributed the sped-up hero to camera pacing.",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-12",
+      "decision": "sync",
+      "rationale": "Both 3D sections of runtheta.com are now pre-rendered video with live DOM",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-12",
+      "decision": "sync",
+      "rationale": "The runtheta.com hero is now a 25.2 s seamless 1080p24 video (13.6 MB,",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-11",
+      "decision": "checkpoint",
+      "rationale": "---",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-11",
+      "decision": "checkpoint",
+      "rationale": "---",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-11",
+      "decision": "sync",
+      "rationale": "Amogh asked for Higgsfield on the GPU hero and data-tower visuals. Flagged",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-11",
+      "decision": "sync",
+      "rationale": "Social card + section backdrop shipped. **Higgsfield MCP was NOT available**",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
       "date": "2026-06-11",
       "decision": "experiment",
       "rationale": "Ran E004v2_TRIAL_3_ONLY.py in fresh Colab session. T3: start 35°C (coldest in",
@@ -447,83 +524,6 @@
       "date": "2026-06-06",
       "decision": "build",
       "rationale": "**E-LT simulation (thermalos-agent/sim/, commit 0420fee):**",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-06",
-      "decision": "refactor",
-      "rationale": "**Naming refactor (Theta = startup, ThermalOS = research):**",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-06",
-      "decision": "portfolio rebrand + ThermalOS landing animation",
-      "rationale": "Portfolio UI elevated with spring-physics micro-interactions: custom cursor (dual-ring, spring lag), magnetic nav buttons (380/26 stiffness), 3D tilt cards (rotateX/rotateY), particle field (55-particle constellation), redesigned boot animation (hex badge + ASCII progress bars), kinetic hero (character-by-character reveal + live clock + SLO coordinates).",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-05",
-      "decision": "sync",
-      "rationale": "Site updated to reflect today's work (v0.1.9 fault_classifier, Kundu 2026-06-03 mandates, Lupo proposal ready).",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-05",
-      "decision": "query",
-      "rationale": "Analyzed FinceptTerminal (25K stars, $10.2K/yr commercial, no VC, AGPL+commercial dual license) as a GTM comp for ThermalOS. Filed full VC positioning playbook covering: the one-sentence positioning, three-layer value prop, what Redbrick wants NOW vs. what YC wants in September, the narrative arc for investor meetings, FinceptTerminal license model adapted for ThermalOS, and the 12-week path to YC-ready.",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-05",
-      "decision": "ingest",
-      "rationale": "Sources ingested:",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-05",
-      "decision": "implementation",
-      "rationale": "Implemented `thermalos/agent/fault_classifier.py` (340 lines). Tracks R_theta at two power tiers per GPU (LOW_P: 5–25W, HIGH_P: 55+W) and classifies the 6 failure modes from the taxonomy:",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-05",
-      "decision": "query",
-      "rationale": "Created `wiki/concepts/rtheta_fault_taxonomy.md`. Maps dust accumulation, TIM pump-out, fan bearing wear, airflow blockage, mounting hardware loosening, and HBM thermal degradation to distinct R_theta(P) curve deformations (parallel shift, slope steepening, power-threshold gating, step change, inter-session jump, workload gating). Includes v0.2 classifier design and E-LT validation path.",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-05",
-      "decision": "query",
-      "rationale": "Applied 5 AI agent characteristics (Autonomy, Reasoning, Tool-Use, Memory, Adaptability) to ThermalOS. Created:",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-04",
-      "decision": "ingest",
-      "rationale": "Session built four agent releases from the E004 v2 Colab session. Key facts:",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-04",
-      "decision": "experiment",
-      "rationale": "- Ran v2 in Colab. Tesla T4 idle floor ~37°C → 35°C thermal gate UNREACHABLE.",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-05-31",
-      "decision": "init",
-      "rationale": "- Source summary: [[thermalos_project_state_2026_05]]",
       "source_question_id": "",
       "status": "active"
     }
@@ -830,6 +830,6 @@
       "status": "gap"
     }
   ],
-  "generated_at": "2026-06-12T01:13:44.754Z",
+  "generated_at": "2026-06-12T11:18:59.062Z",
   "vault_root": "/Users/amogh/thermalos-vault"
 }
