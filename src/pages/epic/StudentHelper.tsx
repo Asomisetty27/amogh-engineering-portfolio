@@ -5,6 +5,8 @@ import { CURRICULUM, DAY_TITLES, WIRE, COHORT, GROUP_COUNT, type Activity, type 
 const LS_GROUP = "epic_group";
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
+type Broadcast = { id: string; message: string; created_at: string };
+
 export default function StudentHelper() {
   const [group, setGroup] = useState<number | null>(null);
   const [activeId, setActiveId] = useState<string>(CURRICULUM[0].id);
@@ -12,6 +14,8 @@ export default function StudentHelper() {
   const [troubleOpen, setTroubleOpen] = useState(false);
   const [notified, setNotified] = useState<HelpType | null>(null);
   const [imgOk, setImgOk] = useState(true);
+  const [broadcast, setBroadcast] = useState<Broadcast | null>(null);
+  const [dismissedId, setDismissedId] = useState<string | null>(null);
 
   // Load saved group
   useEffect(() => {
