@@ -31,7 +31,7 @@ const AgentControlCenter = lazy(() => import("./pages/thermalos/AgentControlCent
 // EPIC 2026 — Arduino lab helper (hostname-routed to la.amogh.site)
 const StudentHelper       = lazy(() => import("./pages/epic/StudentHelper.tsx"));
 const InstructorDashboard = lazy(() => import("./pages/epic/InstructorDashboard.tsx"));
-const IS_LAB_HOST = typeof window !== "undefined" && window.location.hostname.startsWith("la.");
+const IS_LAB_HOST = typeof window !== "undefined" && window.location.hostname.startsWith("epic.");
 
 const queryClient = new QueryClient();
 

@@ -80,6 +80,27 @@ export type Database = {
         }
         Relationships: []
       }
+      broadcasts: {
+        Row: {
+          cohort: string
+          created_at: string
+          id: string
+          message: string
+        }
+        Insert: {
+          cohort?: string
+          created_at?: string
+          id?: string
+          message: string
+        }
+        Update: {
+          cohort?: string
+          created_at?: string
+          id?: string
+          message?: string
+        }
+        Relationships: []
+      }
       decision_log: {
         Row: {
           created_at: string

@@ -17,32 +17,47 @@ type ProgRow = { cohort: string; group_no: number; activity: string; updated_at:
 const pad2 = (n: number) => String(n).padStart(2, "0");
 const fmtMS = (sec: number) => `${pad2(Math.floor(sec / 60))}:${pad2(sec % 60)}`;
 const WAIT_ALERT = 180;
+const SILENT_FLOOR_SEC = 8 * 60;
+const SILENT_MULT = 2;
+
+const URGENCY: Record<HelpType, number> = {
+  not_working: 4,
+  wiring: 3,
+  question: 2,
+  done: 1,
+};
 
 export default function InstructorDashboard() {
   const [requests, setRequests] = useState<HelpRow[]>([]);
+  const [history, setHistory] = useState<HelpRow[]>([]);
   const [progress, setProgress] = useState<Record<number, ProgRow>>({});
   const [now, setNow] = useState(() => Date.now());
   const [soundOn, setSoundOn] = useState(false);
   const [flashId, setFlashId] = useState<string | null>(null);
+  const [tab, setTab] = useState<"live" | "friction">("live");
+  const [broadcastMsg, setBroadcastMsg] = useState("");
+  const [broadcastSending, setBroadcastSending] = useState(false);
+  const [broadcastSent, setBroadcastSent] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
-  // 1Hz tick for waiting timers
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
   }, []);
 
-  // Initial load + realtime subscription
+  // Initial load + realtime
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [{ data: reqs }, { data: progs }] = await Promise.all([
+      const [{ data: reqs }, { data: progs }, { data: hist }] = await Promise.all([
         supabase.from("help_requests").select("*")
           .eq("cohort", COHORT).eq("status", "open").order("created_at", { ascending: true }),
         supabase.from("group_progress").select("*").eq("cohort", COHORT),
+        supabase.from("help_requests").select("*").eq("cohort", COHORT),
       ]);
       if (cancelled) return;
       setRequests((reqs ?? []) as HelpRow[]);
+      setHistory((hist ?? []) as HelpRow[]);
       const map: Record<number, ProgRow> = {};
       (progs ?? []).forEach((p: any) => { map[p.group_no] = p as ProgRow; });
       setProgress(map);
@@ -53,12 +68,21 @@ export default function InstructorDashboard() {
       .on("postgres_changes",
         { event: "*", schema: "public", table: "help_requests", filter: `cohort=eq.${COHORT}` },
         (payload) => {
+          // history: keep every inserted/updated row
+          if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+            const row = payload.new as HelpRow;
+            setHistory(curr => {
+              const i = curr.findIndex(r => r.id === row.id);
+              if (i === -1) return [...curr, row];
+              const next = curr.slice(); next[i] = row; return next;
+            });
+          }
+          // open queue
           setRequests(curr => {
             if (payload.eventType === "INSERT") {
               const row = payload.new as HelpRow;
               if (row.status !== "open") return curr;
               if (curr.some(r => r.id === row.id)) return curr;
-              // sound + flash
               setFlashId(row.id);
               setTimeout(() => setFlashId(id => id === row.id ? null : id), 1600);
               if (soundOn) beep(audioCtxRef.current);
@@ -112,26 +136,116 @@ export default function InstructorDashboard() {
       .eq("id", id);
   };
 
-  const waiting = requests.length;
-  const longest = requests.length
-    ? Math.max(...requests.map(r => Math.floor((now - new Date(r.created_at).getTime()) / 1000)))
-    : 0;
+  const sendBroadcast = async () => {
+    const msg = broadcastMsg.trim();
+    if (!msg) return;
+    setBroadcastSending(true);
+    const { error } = await supabase.from("broadcasts").insert({ cohort: COHORT, message: msg });
+    setBroadcastSending(false);
+    if (!error) {
+      setBroadcastMsg("");
+      setBroadcastSent(true);
+      setTimeout(() => setBroadcastSent(false), 1800);
+    }
+  };
 
-  // Map activity title -> index in full sequence (for progress bar)
+  // ── derived: silent strugglers + triage ──────────────────────────────
   const activityIndex = useMemo(() => {
     const m: Record<string, number> = {};
     CURRICULUM.forEach((a, i) => { m[a.title] = i; });
     return m;
   }, []);
 
-  // Group -> open request color (if any)
-  const groupOpenColor = useMemo(() => {
-    const m: Record<number, string> = {};
-    requests.forEach(r => {
-      if (!m[r.group_no]) m[r.group_no] = WIRE[r.type]?.color ?? "#888";
+  const groupHasOpen = useMemo(() => {
+    const s = new Set<number>();
+    requests.forEach(r => s.add(r.group_no));
+    return s;
+  }, [requests]);
+
+  const groupTimes = useMemo(() => {
+    // seconds-on-current-activity for every group with progress
+    const m: Record<number, number> = {};
+    Object.values(progress).forEach(p => {
+      m[p.group_no] = Math.max(0, Math.floor((now - new Date(p.updated_at).getTime()) / 1000));
     });
     return m;
+  }, [progress, now]);
+
+  const roomMedianSec = useMemo(() => {
+    const arr = Object.values(groupTimes).sort((a, b) => a - b);
+    if (arr.length === 0) return 0;
+    const mid = Math.floor(arr.length / 2);
+    return arr.length % 2 ? arr[mid] : Math.round((arr[mid - 1] + arr[mid]) / 2);
+  }, [groupTimes]);
+
+  const silentStrugglers = useMemo(() => {
+    const out: { group_no: number; activity: string; sec: number; ratio: number }[] = [];
+    Object.values(progress).forEach(p => {
+      if (groupHasOpen.has(p.group_no)) return;
+      const sec = groupTimes[p.group_no] ?? 0;
+      if (sec < SILENT_FLOOR_SEC) return;
+      if (roomMedianSec <= 0) return;
+      const ratio = sec / roomMedianSec;
+      if (ratio >= SILENT_MULT) {
+        out.push({ group_no: p.group_no, activity: p.activity, sec, ratio });
+      }
+    });
+    return out.sort((a, b) => b.ratio - a.ratio);
+  }, [progress, groupHasOpen, groupTimes, roomMedianSec]);
+
+  type Triaged = { kind: "request"; req: HelpRow; score: number; waitSec: number }
+               | { kind: "silent"; group_no: number; activity: string; score: number; sec: number };
+
+  const triaged: Triaged[] = useMemo(() => {
+    const items: Triaged[] = requests.map(r => {
+      const waitSec = Math.floor((now - new Date(r.created_at).getTime()) / 1000);
+      const score = URGENCY[r.type] * (1 + (waitSec / 60) / 3);
+      return { kind: "request", req: r, score, waitSec };
+    });
+    silentStrugglers.forEach(s => {
+      const score = 3.5 * (1 + (s.sec / 60) / 3);
+      items.push({ kind: "silent", group_no: s.group_no, activity: s.activity, score, sec: s.sec });
+    });
+    return items.sort((a, b) => b.score - a.score);
+  }, [requests, silentStrugglers, now]);
+
+  const topPick = triaged[0];
+
+  // ── friction report (history) ────────────────────────────────────────
+  const friction = useMemo(() => {
+    const byAct: Record<string, { count: number; red: number; waitTotal: number; waitCount: number }> = {};
+    history.forEach(r => {
+      const bin = byAct[r.activity] ||= { count: 0, red: 0, waitTotal: 0, waitCount: 0 };
+      bin.count++;
+      if (r.type === "not_working") bin.red++;
+      if (r.resolved_at) {
+        const w = (new Date(r.resolved_at).getTime() - new Date(r.created_at).getTime()) / 1000;
+        if (w >= 0 && w < 60 * 60 * 4) { bin.waitTotal += w; bin.waitCount++; }
+      }
+    });
+    return Object.entries(byAct)
+      .map(([activity, b]) => ({
+        activity,
+        count: b.count,
+        redPct: b.count ? Math.round((b.red / b.count) * 100) : 0,
+        avgWait: b.waitCount ? Math.round(b.waitTotal / b.waitCount) : 0,
+        score: b.count + b.red * 0.5,
+      }))
+      .sort((a, b) => b.score - a.score);
+  }, [history]);
+
+  const waiting = requests.length;
+  const longest = requests.length
+    ? Math.max(...requests.map(r => Math.floor((now - new Date(r.created_at).getTime()) / 1000)))
+    : 0;
+
+  const groupOpenColor = useMemo(() => {
+    const m: Record<number, string> = {};
+    requests.forEach(r => { if (!m[r.group_no]) m[r.group_no] = WIRE[r.type]?.color ?? "#888"; });
+    return m;
   }, [requests]);
+
+  const silentSet = useMemo(() => new Set(silentStrugglers.map(s => s.group_no)), [silentStrugglers]);
 
   return (
     <div className="min-h-screen bg-[#09090D] text-foreground">
@@ -144,99 +258,248 @@ export default function InstructorDashboard() {
           <div className="flex items-center gap-4">
             <Stat label="WAITING" value={String(waiting)} />
             <Stat label="LONGEST" value={fmtMS(longest)} alert={longest > WAIT_ALERT} />
+            <Stat label="MEDIAN" value={fmtMS(roomMedianSec)} />
             <button onClick={enableSound}
               className="text-xs font-mono px-3 py-1.5 rounded border border-panel-border bg-white/[0.03] hover:bg-white/[0.07]">
               SOUND {soundOn ? "ON" : "OFF"}
             </button>
           </div>
         </div>
+        <div className="max-w-6xl mx-auto mt-3 flex gap-1">
+          {(["live", "friction"] as const).map(t => (
+            <button key={t} onClick={() => setTab(t)}
+              className={`text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 rounded-t border-b-2 transition-colors ${
+                tab === t ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}>
+              {t === "live" ? "Live" : "Friction Report"}
+            </button>
+          ))}
+        </div>
       </header>
 
-      <div className="max-w-6xl mx-auto p-4 md:p-6 grid md:grid-cols-2 gap-6">
-        {/* Queue */}
-        <section>
-          <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Help Queue</div>
-          {requests.length === 0 ? (
-            <div className="rounded-md border border-panel-border bg-white/[0.02] p-6 text-center text-sm text-muted-foreground">
-              All clear. No open requests.
+      {tab === "live" ? (
+        <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
+          {/* TOP PICK */}
+          {topPick && (
+            <section className="rounded-md border border-primary/40 bg-primary/[0.06] p-4 transition-all">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-primary mb-1">▶ Go here next</div>
+              {topPick.kind === "request" ? (
+                <TopPickRequest req={topPick.req} waitSec={topPick.waitSec} onResolve={() => resolve(topPick.req.id)} />
+              ) : (
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div>
+                    <div className="text-base font-semibold">Group {pad2(topPick.group_no)} — silent struggler</div>
+                    <div className="text-xs text-secondary-foreground mt-0.5">
+                      {fmtMS(topPick.sec)} on {topPick.activity} · hasn't asked
+                    </div>
+                  </div>
+                  <span className="font-mono text-xs px-2 py-1 rounded border border-[#F2B01E]/40 text-[#F2B01E] bg-[#F2B01E]/10">CHECK IN</span>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* SILENT STRUGGLERS LANE */}
+          {silentStrugglers.length > 0 && (
+            <section>
+              <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Needs a check-in</div>
+              <ul className="space-y-2">
+                {silentStrugglers.map(s => (
+                  <li key={s.group_no}
+                    className="rounded-md border border-[#F2B01E]/40 bg-[#F2B01E]/[0.06] p-3 flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-sm">
+                        <span className="font-mono">Group {pad2(s.group_no)}</span>
+                        <span className="text-muted-foreground"> — </span>
+                        <span className="text-secondary-foreground">{Math.round(s.sec / 60)} min on {s.activity}</span>
+                      </div>
+                      <div className="text-[11px] text-muted-foreground mt-0.5">
+                        {s.ratio.toFixed(1)}× room median · hasn't asked
+                      </div>
+                    </div>
+                    <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: "#F2B01E" }} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* BROADCAST */}
+          <section className="rounded-md border border-panel-border bg-white/[0.02] p-3">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Broadcast to all groups</div>
+            <div className="flex gap-2">
+              <input
+                value={broadcastMsg}
+                onChange={(e) => setBroadcastMsg(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") sendBroadcast(); }}
+                placeholder="e.g. 5 min warning — wrap up your current step"
+                className="flex-1 bg-black/40 border border-panel-border rounded px-3 py-2 text-sm focus:outline-none focus:border-[#2D7FF9]/60"
+              />
+              <button onClick={sendBroadcast} disabled={!broadcastMsg.trim() || broadcastSending}
+                className="text-xs font-mono px-3 py-2 rounded border border-[#2D7FF9]/40 text-[#2D7FF9] bg-[#2D7FF9]/10 hover:bg-[#2D7FF9]/20 disabled:opacity-50">
+                {broadcastSent ? "Sent ✓" : broadcastSending ? "..." : "Send"}
+              </button>
             </div>
-          ) : (
-            <ul className="space-y-2">
-              {requests.map(r => {
-                const w = WIRE[r.type] ?? { color: "#888", label: r.type };
-                const waitSec = Math.floor((now - new Date(r.created_at).getTime()) / 1000);
-                const past = waitSec > WAIT_ALERT;
-                const flash = flashId === r.id;
-                return (
-                  <li key={r.id}
-                    className="rounded-md border p-3 transition-all"
-                    style={{
-                      borderColor: past ? w.color : "hsl(var(--panel-border, 220 13% 18%))",
-                      background: flash ? `${w.color}22` : past ? `${w.color}10` : "rgba(255,255,255,.02)",
-                    }}>
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <span className="font-mono text-sm px-2 py-0.5 rounded border border-panel-border bg-black/30">
-                          GROUP {pad2(r.group_no)}
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: w.color }}>
-                          <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: w.color }} />
-                          {w.label}
+          </section>
+
+          {/* QUEUE (smart triage order) */}
+          <section>
+            <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Help queue · smart triage</div>
+            {requests.length === 0 ? (
+              <div className="rounded-md border border-panel-border bg-white/[0.02] p-6 text-center text-sm text-muted-foreground">
+                All clear. No open requests.
+              </div>
+            ) : (
+              <ul className="space-y-2">
+                {triaged.filter((t): t is Extract<Triaged, { kind: "request" }> => t.kind === "request").map(t => {
+                  const r = t.req;
+                  const w = WIRE[r.type] ?? { color: "#888", label: r.type };
+                  const past = t.waitSec > WAIT_ALERT;
+                  const flash = flashId === r.id;
+                  return (
+                    <li key={r.id}
+                      className="rounded-md border p-3 transition-all"
+                      style={{
+                        borderColor: past ? w.color : "hsl(var(--panel-border, 220 13% 18%))",
+                        background: flash ? `${w.color}22` : past ? `${w.color}10` : "rgba(255,255,255,.02)",
+                      }}>
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <span className="font-mono text-sm px-2 py-0.5 rounded border border-panel-border bg-black/30">
+                            GROUP {pad2(r.group_no)}
+                          </span>
+                          <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: w.color }}>
+                            <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: w.color }} />
+                            {w.label}
+                          </span>
+                        </div>
+                        <span className="font-mono text-sm" style={{ color: past ? w.color : "var(--muted-foreground, #888)" }}>
+                          {fmtMS(t.waitSec)}
                         </span>
                       </div>
-                      <span className="font-mono text-sm" style={{ color: past ? w.color : "var(--muted-foreground, #888)" }}>
-                        {fmtMS(waitSec)}
-                      </span>
+                      <div className="mt-1 text-xs text-secondary-foreground truncate">{r.activity}</div>
+                      <div className="mt-2 flex justify-end">
+                        <button onClick={() => resolve(r.id)}
+                          className="text-xs font-mono px-3 py-1.5 rounded border border-panel-border bg-white/[0.03] hover:bg-white/[0.07]">
+                          Resolve
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
+
+          {/* PROGRESS BOARD */}
+          <section>
+            <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Group progress</div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {Array.from({ length: GROUP_COUNT }, (_, i) => i + 1).map(g => {
+                const p = progress[g];
+                const dot = groupOpenColor[g] ?? WIRE.done.color;
+                const idx = p ? activityIndex[p.activity] ?? -1 : -1;
+                const pct = idx >= 0 ? ((idx + 1) / CURRICULUM.length) * 100 : 0;
+                const isSilent = silentSet.has(g);
+                return (
+                  <div key={g}
+                    className="rounded-md border p-2.5 transition-all"
+                    style={{
+                      borderColor: isSilent ? "#F2B01E" : "hsl(var(--panel-border, 220 13% 18%))",
+                      background: isSilent ? "rgba(242,176,30,0.06)" : "rgba(255,255,255,0.02)",
+                      boxShadow: isSilent ? "0 0 0 1px rgba(242,176,30,0.25)" : undefined,
+                    }}>
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="font-mono text-xs">G{pad2(g)}</div>
+                      <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: dot }} />
                     </div>
-                    <div className="mt-1 text-xs text-secondary-foreground truncate">{r.activity}</div>
-                    <div className="mt-2 flex justify-end">
-                      <button onClick={() => resolve(r.id)}
-                        className="text-xs font-mono px-3 py-1.5 rounded border border-panel-border bg-white/[0.03] hover:bg-white/[0.07]">
-                        Resolve
-                      </button>
+                    <div className="text-[11px] text-secondary-foreground min-h-[2.4em] leading-tight">
+                      {p?.activity ?? "—"}
                     </div>
-                  </li>
+                    <div className="mt-1 text-[10px] font-mono text-muted-foreground">
+                      {p ? fmtMS(groupTimes[g] ?? 0) : ""}
+                    </div>
+                    <div className="mt-1.5 h-1 rounded-full bg-white/5 overflow-hidden">
+                      <div className="h-full transition-all" style={{ width: `${pct}%`, background: "hsl(var(--primary))" }} />
+                    </div>
+                  </div>
                 );
               })}
-            </ul>
-          )}
-        </section>
-
-        {/* Progress board */}
-        <section>
-          <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Group Progress</div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {Array.from({ length: GROUP_COUNT }, (_, i) => i + 1).map(g => {
-              const p = progress[g];
-              const dot = groupOpenColor[g] ?? WIRE.done.color;
-              const idx = p ? activityIndex[p.activity] ?? -1 : -1;
-              const pct = idx >= 0 ? ((idx + 1) / CURRICULUM.length) * 100 : 0;
-              return (
-                <div key={g} className="rounded-md border border-panel-border bg-white/[0.02] p-2.5">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="font-mono text-xs">G{pad2(g)}</div>
-                    <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: dot }} />
-                  </div>
-                  <div className="text-[11px] text-secondary-foreground min-h-[2.4em] leading-tight">
-                    {p?.activity ?? "—"}
-                  </div>
-                  <div className="mt-2 h-1 rounded-full bg-white/5 overflow-hidden">
-                    <div className="h-full" style={{ width: `${pct}%`, background: "hsl(var(--primary))" }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="mt-3 flex flex-wrap gap-3 text-[10px] font-mono text-muted-foreground">
-            {(Object.keys(WIRE) as HelpType[]).map(k => (
-              <span key={k} className="inline-flex items-center gap-1.5">
-                <span className="inline-block w-2 h-2 rounded-full" style={{ background: WIRE[k].color }} />
-                {WIRE[k].label}
+            </div>
+            <div className="mt-3 flex flex-wrap gap-3 text-[10px] font-mono text-muted-foreground">
+              {(Object.keys(WIRE) as HelpType[]).map(k => (
+                <span key={k} className="inline-flex items-center gap-1.5">
+                  <span className="inline-block w-2 h-2 rounded-full" style={{ background: WIRE[k].color }} />
+                  {WIRE[k].label}
+                </span>
+              ))}
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block w-2 h-2 rounded-full" style={{ background: "#F2B01E" }} />
+                Silent struggler
               </span>
-            ))}
-          </div>
-        </section>
+            </div>
+          </section>
+        </div>
+      ) : (
+        <div className="max-w-6xl mx-auto p-4 md:p-6">
+          <section>
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Friction report</div>
+                <div className="text-xs text-secondary-foreground">Activities ranked by total trouble — copy-ready for the post-mortem.</div>
+              </div>
+              <button
+                onClick={() => navigator.clipboard?.writeText(friction.map(f =>
+                  `${f.activity} — ${f.count} requests, ${f.redPct}% stuck, avg wait ${fmtMS(f.avgWait)}`
+                ).join("\n"))}
+                className="text-xs font-mono px-3 py-1.5 rounded border border-panel-border bg-white/[0.03] hover:bg-white/[0.07]">
+                Copy
+              </button>
+            </div>
+            {friction.length === 0 ? (
+              <div className="rounded-md border border-panel-border bg-white/[0.02] p-6 text-center text-sm text-muted-foreground">
+                No help requests recorded yet.
+              </div>
+            ) : (
+              <ul className="rounded-md border border-panel-border overflow-hidden">
+                <li className="grid grid-cols-[1fr_auto_auto_auto] gap-4 px-3 py-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground bg-white/[0.02]">
+                  <span>Activity</span><span>Requests</span><span>% Stuck</span><span>Avg wait</span>
+                </li>
+                {friction.map((f, i) => (
+                  <li key={f.activity}
+                    className={`grid grid-cols-[1fr_auto_auto_auto] gap-4 px-3 py-2.5 text-sm items-center ${i % 2 ? "bg-white/[0.015]" : ""}`}>
+                    <span className="text-secondary-foreground truncate">{f.activity}</span>
+                    <span className="font-mono text-right w-14">{f.count}</span>
+                    <span className="font-mono text-right w-14" style={{ color: f.redPct >= 50 ? "#E5484D" : undefined }}>{f.redPct}%</span>
+                    <span className="font-mono text-right w-16">{fmtMS(f.avgWait)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TopPickRequest({ req, waitSec, onResolve }: { req: HelpRow; waitSec: number; onResolve: () => void }) {
+  const w = WIRE[req.type] ?? { color: "#888", label: req.type };
+  return (
+    <div className="flex items-center justify-between gap-3 flex-wrap">
+      <div className="min-w-0">
+        <div className="text-base font-semibold flex items-center gap-2">
+          <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: w.color }} />
+          Group {pad2(req.group_no)} — {w.label}
+        </div>
+        <div className="text-xs text-secondary-foreground mt-0.5 truncate">
+          {req.activity} · waiting {fmtMS(waitSec)}
+        </div>
       </div>
+      <button onClick={onResolve}
+        className="text-xs font-mono px-3 py-1.5 rounded border border-panel-border bg-white/[0.04] hover:bg-white/[0.08]">
+        Resolve
+      </button>
     </div>
   );
 }

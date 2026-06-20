@@ -5,6 +5,8 @@ import { CURRICULUM, DAY_TITLES, WIRE, COHORT, GROUP_COUNT, type Activity, type 
 const LS_GROUP = "epic_group";
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
+type Broadcast = { id: string; message: string; created_at: string };
+
 export default function StudentHelper() {
   const [group, setGroup] = useState<number | null>(null);
   const [activeId, setActiveId] = useState<string>(CURRICULUM[0].id);
@@ -12,12 +14,33 @@ export default function StudentHelper() {
   const [troubleOpen, setTroubleOpen] = useState(false);
   const [notified, setNotified] = useState<HelpType | null>(null);
   const [imgOk, setImgOk] = useState(true);
+  const [broadcast, setBroadcast] = useState<Broadcast | null>(null);
+  const [dismissedId, setDismissedId] = useState<string | null>(null);
 
   // Load saved group
   useEffect(() => {
     const raw = localStorage.getItem(LS_GROUP);
     const n = raw ? parseInt(raw, 10) : NaN;
     if (n >= 1 && n <= GROUP_COUNT) setGroup(n);
+  }, []);
+
+  // Broadcast subscription — newest non-dismissed banner
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("broadcasts").select("id,message,created_at")
+        .eq("cohort", COHORT).order("created_at", { ascending: false }).limit(1);
+      if (cancelled) return;
+      if (data && data[0]) setBroadcast(data[0] as Broadcast);
+    })();
+    const ch = supabase
+      .channel("epic-broadcasts")
+      .on("postgres_changes",
+        { event: "INSERT", schema: "public", table: "broadcasts", filter: `cohort=eq.${COHORT}` },
+        (payload) => setBroadcast(payload.new as Broadcast))
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(ch); };
   }, []);
 
   const activity = useMemo(
@@ -99,6 +122,16 @@ export default function StudentHelper() {
           GROUP {pad2(group)} · change
         </button>
       </header>
+
+      {broadcast && dismissedId !== broadcast.id && (
+        <div className="sticky top-[57px] z-10 border-b border-[#2D7FF9]/30 bg-[#2D7FF9]/[0.08] px-4 py-2 flex items-center gap-3">
+          <span className="inline-block w-2 h-2 rounded-full bg-[#2D7FF9] shrink-0" />
+          <div className="flex-1 text-sm text-foreground">{broadcast.message}</div>
+          <button onClick={() => setDismissedId(broadcast.id)}
+            className="text-[11px] font-mono text-[#2D7FF9] hover:text-foreground px-2 py-0.5">Dismiss</button>
+        </div>
+      )}
+
 
       <div className="flex flex-col md:flex-row max-w-6xl mx-auto pb-32">
         {/* Left nav */}
