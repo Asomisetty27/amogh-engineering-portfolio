@@ -123,6 +123,16 @@ export default function StudentHelper() {
         </button>
       </header>
 
+      {broadcast && dismissedId !== broadcast.id && (
+        <div className="sticky top-[57px] z-10 border-b border-[#2D7FF9]/30 bg-[#2D7FF9]/[0.08] px-4 py-2 flex items-center gap-3">
+          <span className="inline-block w-2 h-2 rounded-full bg-[#2D7FF9] shrink-0" />
+          <div className="flex-1 text-sm text-foreground">{broadcast.message}</div>
+          <button onClick={() => setDismissedId(broadcast.id)}
+            className="text-[11px] font-mono text-[#2D7FF9] hover:text-foreground px-2 py-0.5">Dismiss</button>
+        </div>
+      )}
+
+
       <div className="flex flex-col md:flex-row max-w-6xl mx-auto pb-32">
         {/* Left nav */}
         <aside className="md:w-64 md:border-r border-panel-border p-3 md:p-4 md:sticky md:top-[60px] md:self-start md:h-[calc(100vh-60px)] md:overflow-y-auto">
