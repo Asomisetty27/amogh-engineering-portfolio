@@ -24,6 +24,25 @@ export default function StudentHelper() {
     if (n >= 1 && n <= GROUP_COUNT) setGroup(n);
   }, []);
 
+  // Broadcast subscription — newest non-dismissed banner
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("broadcasts").select("id,message,created_at")
+        .eq("cohort", COHORT).order("created_at", { ascending: false }).limit(1);
+      if (cancelled) return;
+      if (data && data[0]) setBroadcast(data[0] as Broadcast);
+    })();
+    const ch = supabase
+      .channel("epic-broadcasts")
+      .on("postgres_changes",
+        { event: "INSERT", schema: "public", table: "broadcasts", filter: `cohort=eq.${COHORT}` },
+        (payload) => setBroadcast(payload.new as Broadcast))
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(ch); };
+  }, []);
+
   const activity = useMemo(
     () => CURRICULUM.find(a => a.id === activeId) ?? CURRICULUM[0],
     [activeId]
