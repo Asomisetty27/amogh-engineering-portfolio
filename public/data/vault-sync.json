@@ -51,6 +51,16 @@
       "priority": "normal"
     },
     {
+      "id": "Is cryogenic/quantum",
+      "date_raised": "2026-06-14T00:00:00.000Z",
+      "question": "Q: Is cryogenic/quantum-control thermal health a real Theta adjacency?",
+      "what_i_tried": "\n# Q: Is cryogenic / quantum-control thermal health a real Theta adjacency?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
       "id": "How should Theta sto",
       "date_raised": "2026-06-05T00:00:00.000Z",
       "question": "Q: How should Theta store and use per-GPU baseline history?",
@@ -389,6 +399,34 @@
   "decision_log": [
     {
       "date": "2026-06-12",
+      "decision": "sync",
+      "rationale": "The original Higgsfield queue item (from the og:image session) finally",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-12",
+      "decision": "sync",
+      "rationale": "Hero: the parallel session's quality pass (DOF fix, larger labels, Higgsfield",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-12",
+      "decision": "decision",
+      "rationale": "Amogh: get the Princeton email back before reaching out to Lupo — RMA",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-12",
+      "decision": "ingest",
+      "rationale": "Filed raw/conversations/kundu_nairr_pi_confirmation_2026_06_12.md. Kundu:",
+      "source_question_id": "",
+      "status": "active"
+    },
+    {
+      "date": "2026-06-12",
       "decision": "checkpoint",
       "rationale": "---",
       "source_question_id": "",
@@ -496,34 +534,6 @@
       "date": "2026-06-11",
       "decision": "analysis",
       "rationale": "Exhaustive re-analysis of the Princeton Della data beyond A1-A10. New code:",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-07",
-      "decision": "schema",
-      "rationale": "Amogh asked to incorporate [qmd](https://github.com/tobi/qmd) (local hybrid",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-07",
-      "decision": "ingest",
-      "rationale": "Amogh asked the [[elt_simulation|E-LT lead-time simulation]] to be made \"1:1 with",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-06",
-      "decision": "rename",
-      "rationale": "**Naming model changed:** Theta is now the company + product + OSS agent. ThermalOS is now ONLY the research project + academic publication. (Supersedes the morning's split where the agent was ThermalOS.) `theta` is taken on PyPI → distribution is `runtheta`; CLI command + brand are `theta`/Theta.",
-      "source_question_id": "",
-      "status": "active"
-    },
-    {
-      "date": "2026-06-06",
-      "decision": "build",
-      "rationale": "**E-LT simulation (thermalos-agent/sim/, commit 0420fee):**",
       "source_question_id": "",
       "status": "active"
     }
@@ -830,6 +840,6 @@
       "status": "gap"
     }
   ],
-  "generated_at": "2026-06-12T11:18:59.062Z",
+  "generated_at": "2026-06-16T14:39:14.116Z",
   "vault_root": "/Users/amogh/thermalos-vault"
 }
