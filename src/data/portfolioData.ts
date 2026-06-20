@@ -1905,7 +1905,7 @@ export const experiences: ExperienceItem[] = [
         confidence: "VERIFIED",
       },
     ],
-    link: { label: "View live dashboard →", href: "https://la.amogh.site/dashboard" },
+    link: { label: "View live dashboard →", href: "https://epic.amogh.site/dashboard" },
   },
 ];
 
