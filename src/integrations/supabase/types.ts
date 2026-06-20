@@ -115,6 +115,60 @@ export type Database = {
           },
         ]
       }
+      group_progress: {
+        Row: {
+          activity: string
+          cohort: string
+          group_no: number
+          updated_at: string
+        }
+        Insert: {
+          activity: string
+          cohort?: string
+          group_no: number
+          updated_at?: string
+        }
+        Update: {
+          activity?: string
+          cohort?: string
+          group_no?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      help_requests: {
+        Row: {
+          activity: string
+          cohort: string
+          created_at: string
+          group_no: number
+          id: string
+          resolved_at: string | null
+          status: string
+          type: string
+        }
+        Insert: {
+          activity: string
+          cohort?: string
+          created_at?: string
+          group_no: number
+          id?: string
+          resolved_at?: string | null
+          status?: string
+          type: string
+        }
+        Update: {
+          activity?: string
+          cohort?: string
+          created_at?: string
+          group_no?: number
+          id?: string
+          resolved_at?: string | null
+          status?: string
+          type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
