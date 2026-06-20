@@ -74,6 +74,13 @@ export default function ExperienceSection() {
               ))}
             </ul>
 
+            {exp.link && (
+              <a href={exp.link.href} target="_blank" rel="noreferrer"
+                className="inline-flex items-center gap-1 mt-3 text-xs font-mono px-2.5 py-1 rounded border border-primary/30 text-primary hover:bg-primary/10 transition-colors">
+                {exp.link.label}
+              </a>
+            )}
+
             {/* Process Improvement Card (Natera) */}
             {exp.processImprovement && (
               <div className="mt-4 border border-panel-border rounded-lg p-4">
