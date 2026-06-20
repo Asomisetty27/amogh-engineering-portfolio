@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { CURRICULUM, WIRE, COHORT, GROUP_COUNT, type HelpType } from "./curriculum";
+import { CURRICULUM, DAY_TITLES, WIRE, GROUP_COUNT, type Activity, type HelpType } from "./curriculum";
+import { readCohort, writeCohort, COHORTS, COHORT_LABEL, type Cohort } from "./cohort";
 
 type HelpRow = {
   id: string;
@@ -20,6 +21,14 @@ const WAIT_ALERT = 180;
 const SILENT_FLOOR_SEC = 8 * 60;
 const SILENT_MULT = 2;
 
+// Soft pacing hint per day for the run-of-show (static reference, not a timer).
+const DAY_HINT: Record<number, string> = {
+  1: "~2 hrs",
+  2: "~2 hrs",
+  3: "~1.5 hrs",
+  4: "~2 hrs",
+};
+
 const URGENCY: Record<HelpType, number> = {
   not_working: 4,
   wiring: 3,
@@ -28,13 +37,15 @@ const URGENCY: Record<HelpType, number> = {
 };
 
 export default function InstructorDashboard() {
+  const [cohort, setCohort] = useState<Cohort>(() => readCohort());
   const [requests, setRequests] = useState<HelpRow[]>([]);
   const [history, setHistory] = useState<HelpRow[]>([]);
   const [progress, setProgress] = useState<Record<number, ProgRow>>({});
+  const [roster, setRoster] = useState<Record<number, string[]>>({});
   const [now, setNow] = useState(() => Date.now());
   const [soundOn, setSoundOn] = useState(false);
   const [flashId, setFlashId] = useState<string | null>(null);
-  const [tab, setTab] = useState<"live" | "friction">("live");
+  const [tab, setTab] = useState<"live" | "today" | "friction">("live");
   const [broadcastMsg, setBroadcastMsg] = useState("");
   const [broadcastSending, setBroadcastSending] = useState(false);
   const [broadcastSent, setBroadcastSent] = useState(false);
@@ -45,15 +56,25 @@ export default function InstructorDashboard() {
     return () => clearInterval(t);
   }, []);
 
-  // Initial load + realtime
+  // Switch cohort: empty the room immediately, then the effect below reloads
+  // fresh data + re-subscribes scoped to the new cohort.
+  const changeCohort = (c: Cohort) => {
+    if (c === cohort) return;
+    writeCohort(c);
+    setRequests([]); setHistory([]); setProgress({}); setRoster({});
+    setCohort(c);
+  };
+
+  // Initial load + realtime (re-runs on cohort switch)
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [{ data: reqs }, { data: progs }, { data: hist }] = await Promise.all([
+      const [{ data: reqs }, { data: progs }, { data: hist }, { data: rost }] = await Promise.all([
         supabase.from("help_requests").select("*")
-          .eq("cohort", COHORT).eq("status", "open").order("created_at", { ascending: true }),
-        supabase.from("group_progress").select("*").eq("cohort", COHORT),
-        supabase.from("help_requests").select("*").eq("cohort", COHORT),
+          .eq("cohort", cohort).eq("status", "open").order("created_at", { ascending: true }),
+        supabase.from("group_progress").select("*").eq("cohort", cohort),
+        supabase.from("help_requests").select("*").eq("cohort", cohort),
+        supabase.from("group_roster").select("*").eq("cohort", cohort),
       ]);
       if (cancelled) return;
       setRequests((reqs ?? []) as HelpRow[]);
@@ -61,12 +82,15 @@ export default function InstructorDashboard() {
       const map: Record<number, ProgRow> = {};
       (progs ?? []).forEach((p: any) => { map[p.group_no] = p as ProgRow; });
       setProgress(map);
+      const rmap: Record<number, string[]> = {};
+      (rost ?? []).forEach((r: any) => { rmap[r.group_no] = (r.members as string[]) ?? []; });
+      setRoster(rmap);
     })();
 
     const channel = supabase
-      .channel("epic-classroom")
+      .channel(`epic-classroom-${cohort}`)
       .on("postgres_changes",
-        { event: "*", schema: "public", table: "help_requests", filter: `cohort=eq.${COHORT}` },
+        { event: "*", schema: "public", table: "help_requests", filter: `cohort=eq.${cohort}` },
         (payload) => {
           // history: keep every inserted/updated row
           if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
@@ -105,7 +129,7 @@ export default function InstructorDashboard() {
           });
         })
       .on("postgres_changes",
-        { event: "*", schema: "public", table: "group_progress", filter: `cohort=eq.${COHORT}` },
+        { event: "*", schema: "public", table: "group_progress", filter: `cohort=eq.${cohort}` },
         (payload) => {
           if (payload.eventType === "DELETE") {
             const old = payload.old as ProgRow;
@@ -115,10 +139,27 @@ export default function InstructorDashboard() {
             setProgress(curr => ({ ...curr, [row.group_no]: row }));
           }
         })
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "group_roster", filter: `cohort=eq.${cohort}` },
+        (payload) => {
+          if (payload.eventType === "DELETE") {
+            const old = payload.old as { group_no: number };
+            setRoster(curr => { const next = { ...curr }; delete next[old.group_no]; return next; });
+          } else {
+            const row = payload.new as { group_no: number; members: string[] };
+            setRoster(curr => ({ ...curr, [row.group_no]: row.members ?? [] }));
+          }
+        })
       .subscribe();
 
     return () => { cancelled = true; supabase.removeChannel(channel); };
-  }, [soundOn]);
+  }, [soundOn, cohort]);
+
+  // "Maya R., Devin K." for a group, or "" when no roster yet.
+  const names = (g: number) => {
+    const m = roster[g];
+    return m && m.length ? m.join(", ") : "";
+  };
 
   const enableSound = () => {
     if (!audioCtxRef.current) {
@@ -140,7 +181,7 @@ export default function InstructorDashboard() {
     const msg = broadcastMsg.trim();
     if (!msg) return;
     setBroadcastSending(true);
-    const { error } = await supabase.from("broadcasts").insert({ cohort: COHORT, message: msg });
+    const { error } = await supabase.from("broadcasts").insert({ cohort, message: msg });
     setBroadcastSending(false);
     if (!error) {
       setBroadcastMsg("");
@@ -148,6 +189,26 @@ export default function InstructorDashboard() {
       setTimeout(() => setBroadcastSent(false), 1800);
     }
   };
+
+  // Broadcast composer — reused on both Live and Today tabs.
+  const renderBroadcast = () => (
+    <section className="rounded-md border border-panel-border bg-white/[0.02] p-3">
+      <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Broadcast to all groups</div>
+      <div className="flex gap-2">
+        <input
+          value={broadcastMsg}
+          onChange={(e) => setBroadcastMsg(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") sendBroadcast(); }}
+          placeholder="e.g. 5 min warning — wrap up your current step"
+          className="flex-1 bg-black/40 border border-panel-border rounded px-3 py-2 text-sm focus:outline-none focus:border-[#2D7FF9]/60"
+        />
+        <button onClick={sendBroadcast} disabled={!broadcastMsg.trim() || broadcastSending}
+          className="text-xs font-mono px-3 py-2 rounded border border-[#2D7FF9]/40 text-[#2D7FF9] bg-[#2D7FF9]/10 hover:bg-[#2D7FF9]/20 disabled:opacity-50">
+          {broadcastSent ? "Sent ✓" : broadcastSending ? "..." : "Send"}
+        </button>
+      </div>
+    </section>
+  );
 
   // ── derived: silent strugglers + triage ──────────────────────────────
   const activityIndex = useMemo(() => {
@@ -234,6 +295,13 @@ export default function InstructorDashboard() {
       .sort((a, b) => b.score - a.score);
   }, [history]);
 
+  // Run-of-show: curriculum grouped by day (static reference).
+  const byDay = useMemo(() => {
+    const m: Record<number, Activity[]> = {};
+    CURRICULUM.forEach(a => { (m[a.day] ||= []).push(a); });
+    return m;
+  }, []);
+
   const waiting = requests.length;
   const longest = requests.length
     ? Math.max(...requests.map(r => Math.floor((now - new Date(r.created_at).getTime()) / 1000)))
@@ -256,6 +324,13 @@ export default function InstructorDashboard() {
             <h1 className="text-base font-semibold">Lab Dashboard</h1>
           </div>
           <div className="flex items-center gap-4">
+            <label className="flex items-center gap-1.5">
+              <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">Cohort</span>
+              <select value={cohort} onChange={(e) => changeCohort(e.target.value as Cohort)}
+                className="text-xs font-mono px-2 py-1.5 rounded border border-panel-border bg-black/40 hover:bg-white/[0.05] focus:outline-none focus:border-primary/60">
+                {COHORTS.map(c => <option key={c} value={c} className="bg-[#0b0b10]">{COHORT_LABEL[c]}</option>)}
+              </select>
+            </label>
             <Stat label="WAITING" value={String(waiting)} />
             <Stat label="LONGEST" value={fmtMS(longest)} alert={longest > WAIT_ALERT} />
             <Stat label="MEDIAN" value={fmtMS(roomMedianSec)} />
@@ -266,12 +341,12 @@ export default function InstructorDashboard() {
           </div>
         </div>
         <div className="max-w-6xl mx-auto mt-3 flex gap-1">
-          {(["live", "friction"] as const).map(t => (
+          {(["live", "today", "friction"] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`text-[11px] font-mono uppercase tracking-wider px-3 py-1.5 rounded-t border-b-2 transition-colors ${
                 tab === t ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
               }`}>
-              {t === "live" ? "Live" : "Friction Report"}
+              {t === "live" ? "Live" : t === "today" ? "Today" : "Friction Report"}
             </button>
           ))}
         </div>
@@ -284,11 +359,14 @@ export default function InstructorDashboard() {
             <section className="rounded-md border border-primary/40 bg-primary/[0.06] p-4 transition-all">
               <div className="text-[10px] font-mono uppercase tracking-wider text-primary mb-1">▶ Go here next</div>
               {topPick.kind === "request" ? (
-                <TopPickRequest req={topPick.req} waitSec={topPick.waitSec} onResolve={() => resolve(topPick.req.id)} />
+                <TopPickRequest req={topPick.req} waitSec={topPick.waitSec} names={names(topPick.req.group_no)} onResolve={() => resolve(topPick.req.id)} />
               ) : (
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <div>
-                    <div className="text-base font-semibold">Group {pad2(topPick.group_no)} — silent struggler</div>
+                    <div className="text-base font-semibold">
+                      Group {pad2(topPick.group_no)} — silent struggler
+                      {names(topPick.group_no) && <span className="text-secondary-foreground font-normal text-sm"> · {names(topPick.group_no)}</span>}
+                    </div>
                     <div className="text-xs text-secondary-foreground mt-0.5">
                       {fmtMS(topPick.sec)} on {topPick.activity} · hasn't asked
                     </div>
@@ -310,6 +388,7 @@ export default function InstructorDashboard() {
                     <div className="min-w-0">
                       <div className="text-sm">
                         <span className="font-mono">Group {pad2(s.group_no)}</span>
+                        {names(s.group_no) && <span className="text-secondary-foreground"> · {names(s.group_no)}</span>}
                         <span className="text-muted-foreground"> — </span>
                         <span className="text-secondary-foreground">{Math.round(s.sec / 60)} min on {s.activity}</span>
                       </div>
@@ -325,22 +404,7 @@ export default function InstructorDashboard() {
           )}
 
           {/* BROADCAST */}
-          <section className="rounded-md border border-panel-border bg-white/[0.02] p-3">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Broadcast to all groups</div>
-            <div className="flex gap-2">
-              <input
-                value={broadcastMsg}
-                onChange={(e) => setBroadcastMsg(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") sendBroadcast(); }}
-                placeholder="e.g. 5 min warning — wrap up your current step"
-                className="flex-1 bg-black/40 border border-panel-border rounded px-3 py-2 text-sm focus:outline-none focus:border-[#2D7FF9]/60"
-              />
-              <button onClick={sendBroadcast} disabled={!broadcastMsg.trim() || broadcastSending}
-                className="text-xs font-mono px-3 py-2 rounded border border-[#2D7FF9]/40 text-[#2D7FF9] bg-[#2D7FF9]/10 hover:bg-[#2D7FF9]/20 disabled:opacity-50">
-                {broadcastSent ? "Sent ✓" : broadcastSending ? "..." : "Send"}
-              </button>
-            </div>
-          </section>
+          {renderBroadcast()}
 
           {/* QUEUE (smart triage order) */}
           <section>
@@ -377,6 +441,7 @@ export default function InstructorDashboard() {
                           {fmtMS(t.waitSec)}
                         </span>
                       </div>
+                      {names(r.group_no) && <div className="mt-1 text-[11px] text-muted-foreground truncate">{names(r.group_no)}</div>}
                       <div className="mt-1 text-xs text-secondary-foreground truncate">{r.activity}</div>
                       <div className="mt-2 flex justify-end">
                         <button onClick={() => resolve(r.id)}
@@ -413,6 +478,7 @@ export default function InstructorDashboard() {
                       <div className="font-mono text-xs">G{pad2(g)}</div>
                       <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: dot }} />
                     </div>
+                    {names(g) && <div className="text-[10px] text-muted-foreground truncate mb-0.5">{names(g)}</div>}
                     <div className="text-[11px] text-secondary-foreground min-h-[2.4em] leading-tight">
                       {p?.activity ?? "—"}
                     </div>
@@ -437,6 +503,39 @@ export default function InstructorDashboard() {
                 <span className="inline-block w-2 h-2 rounded-full" style={{ background: "#F2B01E" }} />
                 Silent struggler
               </span>
+            </div>
+          </section>
+        </div>
+      ) : tab === "today" ? (
+        <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
+          {/* Pace the room from the same view */}
+          {renderBroadcast()}
+
+          <section>
+            <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1">Run of show</div>
+            <div className="text-xs text-secondary-foreground mb-3">The 4-day plan at a glance. Optional activities are flexible if you're short on time.</div>
+            <div className="space-y-4">
+              {Object.keys(DAY_TITLES).map(k => {
+                const day = Number(k);
+                const acts = byDay[day] ?? [];
+                return (
+                  <div key={day} className="rounded-md border border-panel-border overflow-hidden">
+                    <div className="flex items-center justify-between px-3 py-2 bg-white/[0.02] border-b border-panel-border">
+                      <div className="text-sm font-medium">{DAY_TITLES[day]}</div>
+                      <div className="text-[11px] font-mono text-muted-foreground">{acts.length} activities · {DAY_HINT[day] ?? ""}</div>
+                    </div>
+                    <ul>
+                      {acts.map((a, i) => (
+                        <li key={a.id} className={`flex items-center gap-3 px-3 py-2 text-sm ${i % 2 ? "bg-white/[0.015]" : ""}`}>
+                          <span className="font-mono text-[10px] text-muted-foreground w-20 shrink-0">{a.lesson}</span>
+                          <span className="text-secondary-foreground flex-1">{a.title}</span>
+                          {a.optional && <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground px-1.5 py-0.5 rounded border border-panel-border">optional</span>}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
             </div>
           </section>
         </div>
@@ -483,7 +582,7 @@ export default function InstructorDashboard() {
   );
 }
 
-function TopPickRequest({ req, waitSec, onResolve }: { req: HelpRow; waitSec: number; onResolve: () => void }) {
+function TopPickRequest({ req, waitSec, names, onResolve }: { req: HelpRow; waitSec: number; names: string; onResolve: () => void }) {
   const w = WIRE[req.type] ?? { color: "#888", label: req.type };
   return (
     <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -491,6 +590,7 @@ function TopPickRequest({ req, waitSec, onResolve }: { req: HelpRow; waitSec: nu
         <div className="text-base font-semibold flex items-center gap-2">
           <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: w.color }} />
           Group {pad2(req.group_no)} — {w.label}
+          {names && <span className="text-secondary-foreground font-normal text-sm">· {names}</span>}
         </div>
         <div className="text-xs text-secondary-foreground mt-0.5 truncate">
           {req.activity} · waiting {fmtMS(waitSec)}
