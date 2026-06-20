@@ -28,6 +28,11 @@ const QuickEntry       = lazy(() => import("./pages/thermalos/QuickEntry.tsx"));
 const DataCenterKiosk  = lazy(() => import("./pages/thermalos/components/DataCenterKiosk.tsx"));
 const AgentControlCenter = lazy(() => import("./pages/thermalos/AgentControlCenter.tsx"));
 
+// EPIC 2026 — Arduino lab helper (hostname-routed to la.amogh.site)
+const StudentHelper       = lazy(() => import("./pages/epic/StudentHelper.tsx"));
+const InstructorDashboard = lazy(() => import("./pages/epic/InstructorDashboard.tsx"));
+const IS_LAB_HOST = typeof window !== "undefined" && window.location.hostname.startsWith("la.");
+
 const queryClient = new QueryClient();
 
 // Dark fallback (matches the site theme) so route transitions don't flash white.
@@ -51,6 +56,12 @@ const App = () => (
       <BrowserRouter>
         <Suspense fallback={<RouteFallback />}>
           <Routes>
+            {/* ══ EPIC 2026 — Arduino lab helper (la.amogh.site front door) ══ */}
+            {IS_LAB_HOST && <Route path="/" element={<StudentHelper />} />}
+            {IS_LAB_HOST && <Route path="/dashboard" element={<InstructorDashboard />} />}
+            <Route path="/epic" element={<StudentHelper />} />
+            <Route path="/epic/dashboard" element={<InstructorDashboard />} />
+
             <Route path="/" element={<Index />} />
 
             {/* ══ THETA — commercial surface moved to runtheta.com ══════════ */}
