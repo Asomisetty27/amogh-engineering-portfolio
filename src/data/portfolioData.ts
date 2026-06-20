@@ -1840,6 +1840,7 @@ export interface ExperienceItem {
     whatChanged: string[];
     measurementMethod: string;
   };
+  link?: { label: string; href: string };
 }
 
 export const experiences: ExperienceItem[] = [
@@ -1888,6 +1889,23 @@ export const experiences: ExperienceItem[] = [
         confidence: "VERIFIED",
       },
     ],
+  },
+  {
+    company: "EPIC 2026 — Arduino Instructor",
+    role: "Noyce School outreach (Prof. Souvik Kundu)",
+    location: "",
+    period: "Summer 2026",
+    bullets: [
+      {
+        text: "Designed a real-time Arduino lab helper for a high-school cohort: per-group help requests with color-coded wire signals, live instructor queue, and progress board powered by Supabase realtime.",
+        confidence: "VERIFIED",
+      },
+      {
+        text: "Authored a 4-day, 12-activity curriculum (LED, sensors, motor control) with verified code, wiring diagrams, and a self-serve troubleshooter.",
+        confidence: "VERIFIED",
+      },
+    ],
+    link: { label: "View live dashboard →", href: "https://la.amogh.site/dashboard" },
   },
 ];
 
