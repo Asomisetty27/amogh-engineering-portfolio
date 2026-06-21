@@ -72,10 +72,10 @@ function Hero({ rowCount, demo, syncedAt }: { rowCount: number; demo: boolean; s
   return (
     <div className="mb-8">
       <div className="flex items-center gap-2 mb-3 flex-wrap">
-        <Pill tone="complete">YC W27 target</Pill>
+        <Pill tone="progress">Accelerator track (YC / AI Grant)</Pill>
         <Pill tone="progress">Pre-seed · Pre-revenue</Pill>
         <Pill tone="complete">Stage 1 complete · 8,734 rows · 14 trials</Pill>
-        <Pill tone="complete">Agent v0.1.9 · pip install runtheta</Pill>
+        <Pill tone="complete">Agent v0.1.10 · pip install runtheta</Pill>
         {syncedAt && (
           <span className="text-[10px] font-mono" style={{ color: "var(--t-faint)" }}>synced {syncedAt}</span>
         )}

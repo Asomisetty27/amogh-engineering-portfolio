@@ -764,7 +764,7 @@ function AgentBlock() {
           { label: 'Controlled rows',  value: '9,050',  sub: 'Stage 1 · Tesla T4 · E001–E004 v2 (t1–t8)' },
           { label: 'Production samples', value: '29k',  sub: 'E009 · 72× H100 SXM5 · 30 s cadence' },
           { label: 'Validated findings', value: '6 + 1', sub: 'F1–F6 high · F7 partial (RMA pending)' },
-          { label: 'Agent version',   value: 'v0.1.9', sub: 'live on PyPI' },
+          { label: 'Agent version',   value: 'v0.1.10', sub: 'live on PyPI' },
           { label: 'Detection layers', value: '6',     sub: 'ensemble → fault curve → ECC' },
         ].map(({ label, value, sub }) => (
           <div key={label} style={{
@@ -795,7 +795,7 @@ function AgentBlock() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {[
             { label: 'GitHub', href: 'https://github.com/Asomisetty27/theta', badge: 'source' },
-            { label: 'PyPI',   href: 'https://pypi.org/project/runtheta', badge: 'v0.1.9' },
+            { label: 'PyPI',   href: 'https://pypi.org/project/runtheta', badge: 'v0.1.10' },
             { label: 'Research app', href: researchPath(), badge: 'internal', internal: true },
           ].map(({ label, href, badge, internal }) => (
             internal ? (
@@ -881,7 +881,7 @@ export default function ResearchLanding() {
         <div style={{ marginBottom: 72 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
             <Badge color={T.healthy}>First production validation · 72× H100</Badge>
-            <Badge color={T.accent}>v0.1.9 on PyPI</Badge>
+            <Badge color={T.accent}>v0.1.10 on PyPI</Badge>
           </div>
           <h1 style={{
             fontFamily: FD,
