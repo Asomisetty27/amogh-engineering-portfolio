@@ -49,6 +49,7 @@ export default function InstructorDashboard() {
   const [broadcastMsg, setBroadcastMsg] = useState("");
   const [broadcastSending, setBroadcastSending] = useState(false);
   const [broadcastSent, setBroadcastSent] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
@@ -154,6 +155,13 @@ export default function InstructorDashboard() {
 
     return () => { cancelled = true; supabase.removeChannel(channel); };
   }, [soundOn, cohort]);
+
+  // Copyable per-cohort student link, e.g. https://amogh.site/epic?cohort=week2.
+  // Built from the live origin so it's correct on whatever domain is serving.
+  const studentLink = `${typeof window !== "undefined" ? window.location.origin : ""}/epic?cohort=${cohort}`;
+  const copyStudentLink = async () => {
+    try { await navigator.clipboard.writeText(studentLink); setLinkCopied(true); setTimeout(() => setLinkCopied(false), 1500); } catch {}
+  };
 
   // "Maya R., Devin K." for a group, or "" when no roster yet.
   const names = (g: number) => {
@@ -331,6 +339,10 @@ export default function InstructorDashboard() {
                 {COHORTS.map(c => <option key={c} value={c} className="bg-[#0b0b10]">{COHORT_LABEL[c]}</option>)}
               </select>
             </label>
+            <button onClick={copyStudentLink} title={studentLink}
+              className="text-xs font-mono px-3 py-1.5 rounded border border-[#2D7FF9]/40 text-[#2D7FF9] bg-[#2D7FF9]/10 hover:bg-[#2D7FF9]/20">
+              {linkCopied ? "Link copied ✓" : "Copy student link"}
+            </button>
             <Stat label="WAITING" value={String(waiting)} />
             <Stat label="LONGEST" value={fmtMS(longest)} alert={longest > WAIT_ALERT} />
             <Stat label="MEDIAN" value={fmtMS(roomMedianSec)} />

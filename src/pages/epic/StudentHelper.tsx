@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CURRICULUM, DAY_TITLES, WIRE, GROUP_COUNT, type Activity, type HelpType } from "./curriculum";
-import { readCohort } from "./cohort";
+import { readCohort, COHORT_LABEL } from "./cohort";
 
 const LS_GROUP = "epic_group";
 const LS_SETUP = "epic_setup_done";
@@ -153,7 +153,10 @@ export default function StudentHelper() {
     return (
       <div className="min-h-screen bg-[#09090D] text-foreground flex items-center justify-center p-6">
         <div className="fx-glass fx-card max-w-md w-full rounded-lg p-6 border border-panel-border">
-          <h1 className="text-xl font-semibold mb-1">EPIC 2026 — Arduino Lab</h1>
+          <div className="flex items-center gap-2 mb-1">
+            <h1 className="text-xl font-semibold">EPIC 2026 — Arduino Lab</h1>
+            <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border border-primary/40 bg-primary/10 text-primary">{COHORT_LABEL[cohort]}</span>
+          </div>
           <p className="text-sm text-muted-foreground mb-5">Pick your group to begin.</p>
           <div className="grid grid-cols-4 gap-2">
             {Array.from({ length: GROUP_COUNT }, (_, i) => i + 1).map(n => (
@@ -213,7 +216,7 @@ export default function StudentHelper() {
     <div className="min-h-screen bg-[#09090D] text-foreground">
       <header className="sticky top-0 z-20 border-b border-panel-border bg-[#0b0b10]/90 backdrop-blur px-4 py-3 flex items-center justify-between">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-mono">EPIC 2026 · Arduino Lab</div>
+          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-mono">EPIC 2026 · Arduino Lab · {COHORT_LABEL[cohort]}</div>
           <h1 className="text-base font-semibold">{currentLabel}</h1>
         </div>
         <button onClick={() => { localStorage.removeItem(LS_GROUP); setGroup(null); }}
