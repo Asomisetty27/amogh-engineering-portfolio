@@ -298,7 +298,7 @@ export default function StudentHelper() {
                       : "border-transparent hover:bg-white/[0.04] text-secondary-foreground"
                   }`}>
                   <span className="font-mono text-[10px] text-muted-foreground mr-1.5">Last</span>
-                  🎉 Thank Professor Kundu
+                  🎉 Thank the EPIC team
                 </button>
               </li>
             </ul>
@@ -312,10 +312,10 @@ export default function StudentHelper() {
               const ready = hope.trim().length > 3;
               const subject = `Thank you from EPIC 2026 — Group ${pad2(group)}`;
               const body =
-                `Dear Professor Kundu,\n\nThank you for the EPIC 2026 Arduino lab! ` +
+                `Dear Professor Kundu and Maria,\n\nThank you for the EPIC 2026 Arduino lab! ` +
                 `One thing I'm looking forward to building or doing with what I learned: ${hope.trim() || "..."}.\n\n` +
                 `— Group ${group}${thanksName.trim() ? `, ${thanksName.trim()}` : ""}, EPIC 2026`;
-              const mailto = `mailto:${encodeURIComponent(THANKYOU_EMAIL)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+              const mailto = `mailto:${THANKYOU_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
               const gmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(THANKYOU_EMAIL)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
               const noRecipient = THANKYOU_EMAIL.startsWith("REPLACE_WITH");
               return (
@@ -324,8 +324,8 @@ export default function StudentHelper() {
                     <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1">Last step</div>
                     <h2 className="text-lg font-semibold">Say thanks 🎉</h2>
                     <p className="text-sm text-secondary-foreground mt-1">
-                      You built real circuits and wrote real code this week. Send Professor Kundu a quick
-                      thank-you and tell them one thing you want to build or do next with your new skills.
+                      You built real circuits and wrote real code this week. Send Professor Kundu and Maria
+                      a quick thank-you and tell them one thing you want to build or do next with your new skills.
                     </p>
                   </section>
                   <section className="space-y-3 max-w-xl">

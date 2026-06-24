@@ -17,9 +17,9 @@ export interface Activity {
   extension?: string;   // optional "done early?" challenge for fast finishers
 }
 
-// Recipient for the end-of-lab thank-you email step (StudentHelper "Wrap up").
-// TODO(amogh): replace with Professor Kundu's real Cal Poly address before the lab runs.
-export const THANKYOU_EMAIL = "REPLACE_WITH_KUNDU_EMAIL@calpoly.edu";
+// Recipients for the end-of-lab thank-you email step (StudentHelper "Wrap up"):
+// Professor Kundu + Maria (EPIC organizer). Comma-separated for mailto / Gmail.
+export const THANKYOU_EMAIL = "sokundu@calpoly.edu,msmanzan@calpoly.edu";
 
 export const CURRICULUM: Activity[] = [
   // ── Day 1 ────────────────────────────────────────────────
