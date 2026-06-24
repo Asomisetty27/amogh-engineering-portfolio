@@ -72,10 +72,13 @@ Deno.serve(async (req) => {
       if (!authHeader?.startsWith("Bearer ") || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
         return jsonResponse({ error: "unauthorized" }, 401);
       }
-      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      const token = authHeader.replace("Bearer ", "");
-      const { data, error } = await supabase.auth.getClaims(token);
-      if (error || !data?.claims) {
+      // Use getUser() (server-side validation w/ revocation), not getClaims()
+      // — revoked / disabled sessions must be rejected immediately.
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) {
         return jsonResponse({ error: "unauthorized" }, 401);
       }
     }

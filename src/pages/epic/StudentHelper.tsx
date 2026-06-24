@@ -104,9 +104,9 @@ export default function StudentHelper() {
     setGroup(n);
     setRosterOpen(true);
     // Prefill names if this group already has a roster for this cohort.
-    const { data } = await supabase.from("group_roster")
+    const { data } = await (supabase as any).from("group_roster")
       .select("members").eq("cohort", cohort).eq("group_no", n).maybeSingle();
-    const existing = (data?.members as string[] | undefined) ?? [];
+    const existing = ((data as any)?.members as string[] | undefined) ?? [];
     setMembers([0, 1, 2, 3].map(i => existing[i] ?? ""));
   };
 
@@ -114,7 +114,7 @@ export default function StudentHelper() {
   const saveRoster = async () => {
     if (group == null) return;
     const cleaned = members.map(m => m.trim()).filter(Boolean).slice(0, 4);
-    await supabase.from("group_roster").upsert(
+    await (supabase as any).from("group_roster").upsert(
       { cohort, group_no: group, members: cleaned, updated_at: new Date().toISOString() },
       { onConflict: "cohort,group_no" }
     );
