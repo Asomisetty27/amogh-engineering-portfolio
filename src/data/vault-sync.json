@@ -1,127 +1,4 @@
 {
-  "advisor_questions": [
-    {
-      "id": "Thermodynamics Advis",
-      "date_raised": "2026-06-03T00:00:00.000Z",
-      "question": "Thermodynamics Advisor Questions — Prof. Stephen Peuker",
-      "what_i_tried": "\n# Thermodynamics Advisor Questions — Prof. Stephen Peuker",
-      "status": "open",
-      "answer": "",
-      "answered_date": "",
-      "priority": "normal"
-    },
-    {
-      "id": "Does Lupo expose a S",
-      "date_raised": "2026-06-05T00:00:00.000Z",
-      "question": "Q: Does Lupo expose a SLURM API that ThermalOS can call for job actions?",
-      "what_i_tried": "\n# Q: Does Lupo expose a SLURM API that ThermalOS can call for job actions?",
-      "status": "open",
-      "answer": "",
-      "answered_date": "",
-      "priority": "normal"
-    },
-    {
-      "id": "What is dR_theta/dT_",
-      "date_raised": "2026-06-05T00:00:00.000Z",
-      "question": "Q: What is dR_theta/dT_amb at each power level? (sensitivity analysis)",
-      "what_i_tried": "\n# Q: What is dR_theta/dT_amb at each power level?",
-      "status": "open",
-      "answer": "",
-      "answered_date": "",
-      "priority": "normal"
-    },
-    {
-      "id": "What is the right pe",
-      "date_raised": "2026-06-05T00:00:00.000Z",
-      "question": "Q: What is the right persistent storage for thermal fingerprints?",
-      "what_i_tried": "\n# Q: What is the right persistent storage for thermal fingerprints?",
-      "status": "open",
-      "answer": "",
-      "answered_date": "",
-      "priority": "normal"
-    },
-    {
-      "id": "Q_lead_time — Lead T",
-      "date_raised": "2026-06-01T00:00:00.000Z",
-      "question": "Q_lead_time — Lead Time Before Throttling",
-      "what_i_tried": "\n# Q_lead_time — Lead Time Before Throttling",
-      "status": "open",
-      "answer": "",
-      "answered_date": "",
-      "priority": "normal"
-    },
-    {
-      "id": "Q_discovery_progress",
-      "date_raised": "2026-06-01T00:00:00.000Z",
-      "question": "Q_discovery_progress — Have Discovery Calls Started?",
-      "what_i_tried": "\n# Q_discovery_progress — Have Discovery Calls Started?",
-      "status": "open",
-      "answer": "",
-      "answered_date": "",
-      "priority": "normal"
-    },
-    {
-      "id": "Q_conference_venue —",
-      "date_raised": "2026-06-01T00:00:00.000Z",
-      "question": "Q_conference_venue — Publication Target and Deadline",
-      "what_i_tried": "\n# Q_conference_venue — Publication Target and Deadline",
-      "status": "open",
-      "answer": "",
-      "answered_date": "",
-      "priority": "normal"
-    },
-    {
-      "id": "Q_ambient_measuremen",
-      "date_raised": "2026-06-01T00:00:00.000Z",
-      "question": "Q_ambient_measurement — BMC Native Ambient or External Sensor",
-      "what_i_tried": "\n# Q_ambient_measurement — BMC Native Ambient or External Sensor",
-      "status": "open",
-      "answer": "",
-      "answered_date": "",
-      "priority": "normal"
-    },
-    {
-      "id": "Should ThermalOS bui",
-      "date_raised": "2026-06-05T00:00:00.000Z",
-      "question": "Q: Should ThermalOS build its own reasoning layer or integrate an existing LLM framework?",
-      "what_i_tried": "\n# Q: Should ThermalOS build its own reasoning layer or integrate an existing LLM framework?",
-      "status": "open",
-      "answer": "",
-      "answered_date": "",
-      "priority": "normal"
-    },
-    {
-      "id": "Q_Kundu_email — Cal ",
-      "date_raised": "2026-06-01T00:00:00.000Z",
-      "question": "Q_Kundu_email — Cal Poly Email for Supabase Allowlist",
-      "what_i_tried": "\n# Q_Kundu_email — Cal Poly Email for Supabase Allowlist",
-      "status": "open",
-      "answer": "",
-      "answered_date": "",
-      "priority": "normal"
-    },
-    {
-      "id": "Q_E004_data — Where ",
-      "date_raised": "2026-06-01T00:00:00.000Z",
-      "question": "Q_E004_data — Where is E004 replication data?",
-      "what_i_tried": "\n# Q_E004_data — Where is E004 replication data?",
-      "status": "open",
-      "answer": "",
-      "answered_date": "",
-      "priority": "normal"
-    },
-    {
-      "id": "Q_AI_Factory_access ",
-      "date_raised": "2026-06-01T00:00:00.000Z",
-      "question": "Q_AI_Factory_access — Hardware Access Confirmation",
-      "what_i_tried": "\n# Q_AI_Factory_access — Hardware Access Confirmation",
-      "status": "open",
-      "answer": "",
-      "answered_date": "",
-      "priority": "normal"
-    }
-  ],
-  "outreach": [],
   "evidence": [
     {
       "claim": "Question",
@@ -137,13 +14,13 @@
     },
     {
       "claim": "Status",
-      "proof": "** [[Q_discovery_progress]] — unknown if calls have started.",
+      "proof": "** [[Q_discovery_progress]] \u2014 unknown if calls have started.",
       "location": "synthesis/yc_blockers.md",
       "status": "Evidence collected"
     },
     {
       "claim": "Resolution path",
-      "proof": "** Run 10 calls per [[03_discovery_call_script]]. Need at minimum 2–3 strong positive signals (manual diagnostic process, failed internal tooling attempts, named cost) by August.",
+      "proof": "** Run 10 calls per [[03_discovery_call_script]]. Need at minimum 2\u20133 strong positive signals (manual diagnostic process, failed internal tooling attempts, named cost) by August.",
       "location": "synthesis/yc_blockers.md",
       "status": "Evidence collected"
     },
@@ -215,13 +92,13 @@
     },
     {
       "claim": "Status",
-      "proof": "** Build sequence outlined ([[OSS_agent_v0]] step 1–6). Not started (based on current vault state).",
+      "proof": "** Build sequence outlined ([[OSS_agent_v0]] step 1\u20136). Not started (based on current vault state).",
       "location": "synthesis/yc_blockers.md",
       "status": "Evidence collected"
     },
     {
       "claim": "Resolution path",
-      "proof": "** Step 1–3 (telemetry abstraction + virtual ambient + perf/watt + readout) is the minimum viable. Could be shipped by August with focused effort. Steps 4–5 (drift detector + packaging) make it useful.",
+      "proof": "** Step 1\u20133 (telemetry abstraction + virtual ambient + perf/watt + readout) is the minimum viable. Could be shipped by August with focused effort. Steps 4\u20135 (drift detector + packaging) make it useful.",
       "location": "synthesis/yc_blockers.md",
       "status": "Evidence collected"
     },
@@ -245,7 +122,7 @@
     },
     {
       "claim": "Resolution path",
-      "proof": "** Ask Kundu. 1–2 weeks.",
+      "proof": "** Ask Kundu. 1\u20132 weeks.",
       "location": "synthesis/yc_blockers.md",
       "status": "Evidence collected"
     },
@@ -257,7 +134,7 @@
     },
     {
       "claim": "Why it matters",
-      "proof": "** F5 (reproducibility, 1.68% CoV across 3 trials) is one of the strongest Stage 1 claims and is currently unverifiable from the CSV provided. A YC reviewer with technical depth could ask for the data — it should exist.",
+      "proof": "** F5 (reproducibility, 1.68% CoV across 3 trials) is one of the strongest Stage 1 claims and is currently unverifiable from the CSV provided. A YC reviewer with technical depth could ask for the data \u2014 it should exist.",
       "location": "synthesis/yc_blockers.md",
       "status": "Evidence collected"
     },
@@ -276,6 +153,5 @@
   ],
   "decision_log": [],
   "timeline": [],
-  "generated_at": "2026-06-05T21:05:55.275Z",
-  "vault_root": "/Users/amogh/thermalos-vault"
+  "generated_at": "2026-06-05T21:05:55.275Z"
 }
