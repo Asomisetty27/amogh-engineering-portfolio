@@ -1,4 +1,231 @@
 {
+  "advisor_questions": [
+    {
+      "id": "What operator workfl",
+      "date_raised": "2026-06-05T00:00:00.000Z",
+      "question": "Q: What operator workflows should Theta integrate with first?",
+      "what_i_tried": "\n# Q: What operator workflows should Theta integrate with first?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "Does installing Thet",
+      "date_raised": "2026-06-05T00:00:00.000Z",
+      "question": "Q: Does installing Theta on Cal Poly infrastructure create a university IP claim?",
+      "what_i_tried": "\n# Q: Does installing Theta on Cal Poly infrastructure create a university IP claim?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "Thermodynamics Advis",
+      "date_raised": "2026-06-03T00:00:00.000Z",
+      "question": "Thermodynamics Advisor Questions — Prof. Stephen Peuker",
+      "what_i_tried": "\n# Thermodynamics Advisor Questions — Prof. Stephen Peuker",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "Does Lupo expose a S",
+      "date_raised": "2026-06-05T00:00:00.000Z",
+      "question": "Q: Does Lupo expose a SLURM API that Theta can call for job actions?",
+      "what_i_tried": "\n# Q: Does Lupo expose a SLURM API that Theta can call for job actions?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "What is dR_theta/dT_",
+      "date_raised": "2026-06-05T00:00:00.000Z",
+      "question": "Q: What is dR_theta/dT_amb at each power level? (sensitivity analysis)",
+      "what_i_tried": "\n# Q: What is dR_theta/dT_amb at each power level?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "Is cryogenic/quantum",
+      "date_raised": "2026-06-14T00:00:00.000Z",
+      "question": "Q: Is cryogenic/quantum-control thermal health a real Theta adjacency?",
+      "what_i_tried": "\n# Q: Is cryogenic / quantum-control thermal health a real Theta adjacency?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "How should Theta sto",
+      "date_raised": "2026-06-05T00:00:00.000Z",
+      "question": "Q: How should Theta store and use per-GPU baseline history?",
+      "what_i_tried": "\n# Q: How should Theta store and use per-GPU baseline history?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "What is the right pe",
+      "date_raised": "2026-06-05T00:00:00.000Z",
+      "question": "Q: What is the right persistent storage for thermal fingerprints?",
+      "what_i_tried": "\n# Q: What is the right persistent storage for thermal fingerprints?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "Q_lead_time — Lead T",
+      "date_raised": "2026-06-01T00:00:00.000Z",
+      "question": "Q_lead_time — Lead Time Before Throttling",
+      "what_i_tried": "\n# Q_lead_time — Lead Time Before Throttling",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "What's the lowest-fr",
+      "date_raised": "2026-06-10T00:00:00.000Z",
+      "question": "Q: What's the lowest-friction path to make R_θ consumable by jobstats-running institutions?",
+      "what_i_tried": "\n## The question",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "What is Theta's firs",
+      "date_raised": "2026-06-11T00:00:00.000Z",
+      "question": "Q: What is Theta's first paid unit, and who pays it?",
+      "what_i_tried": "\n# The question",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "Q_discovery_progress",
+      "date_raised": "2026-06-01T00:00:00.000Z",
+      "question": "Q_discovery_progress — Have Discovery Calls Started?",
+      "what_i_tried": "\n# Q_discovery_progress — Have Discovery Calls Started?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "How does Theta calib",
+      "date_raised": "2026-06-05T00:00:00.000Z",
+      "question": "Q: How does Theta calibrate R_theta thresholds across GPU vendors and models?",
+      "what_i_tried": "\n# Q: How does Theta calibrate R_theta thresholds across GPU vendors and models?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "Q_conference_venue —",
+      "date_raised": "2026-06-01T00:00:00.000Z",
+      "question": "Q_conference_venue — Publication Target and Deadline",
+      "what_i_tried": "\n# Q_conference_venue — Publication Target and Deadline",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "Q_ambient_measuremen",
+      "date_raised": "2026-06-01T00:00:00.000Z",
+      "question": "Q_ambient_measurement — BMC Native Ambient or External Sensor",
+      "what_i_tried": "\n# Q_ambient_measurement — BMC Native Ambient or External Sensor",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "Should Theta build i",
+      "date_raised": "2026-06-05T00:00:00.000Z",
+      "question": "Q: Should Theta build its own reasoning layer or integrate an existing LLM framework?",
+      "what_i_tried": "\n# Q: Should Theta build its own reasoning layer or integrate an existing LLM framework?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "Q_Kundu_email — Cal ",
+      "date_raised": "2026-06-01T00:00:00.000Z",
+      "question": "Q_Kundu_email — Cal Poly Email for Supabase Allowlist",
+      "what_i_tried": "\n# Q_Kundu_email — Cal Poly Email for Supabase Allowlist",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "Q_E004_data — Where ",
+      "date_raised": "2026-06-01T00:00:00.000Z",
+      "question": "Q_E004_data — Where is E004 replication data?",
+      "what_i_tried": "\n# Q_E004_data — Where is E004 replication data?",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    },
+    {
+      "id": "Q_AI_Factory_access ",
+      "date_raised": "2026-06-01T00:00:00.000Z",
+      "question": "Q_AI_Factory_access — Hardware Access Confirmation",
+      "what_i_tried": "\n# Q_AI_Factory_access — Hardware Access Confirmation",
+      "status": "open",
+      "answer": "",
+      "answered_date": "",
+      "priority": "normal"
+    }
+  ],
+  "outreach": [
+    {
+      "name": "RunPod",
+      "org": "",
+      "role": "X reply / Discord #infrastructure",
+      "email": "",
+      "type": "Neocloud (discovery)",
+      "status": "Confirmed",
+      "date": "2026-06-05T00:00:00.000Z",
+      "priority": "P0 — Critical",
+      "notes": "Technical peer, short format"
+    },
+    {
+      "name": "Vast.ai",
+      "org": "",
+      "role": "Email / Discord community",
+      "email": "",
+      "type": "Neocloud (discovery)",
+      "status": "Confirmed",
+      "date": "2026-06-05T00:00:00.000Z",
+      "priority": "P0 — Critical",
+      "notes": "Marketplace reliability angle"
+    },
+    {
+      "name": "Lambda Labs",
+      "org": "",
+      "role": "X DM / reply to engineering posts",
+      "email": "",
+      "type": "Neocloud (discovery)",
+      "status": "Confirmed",
+      "date": "2026-06-05T00:00:00.000Z",
+      "priority": "P0 — Critical",
+      "notes": "Customer relationship + shared problem"
+    }
+  ],
   "evidence": [
     {
       "claim": "> Reframe (2026-06-11)",
@@ -20,13 +247,13 @@
     },
     {
       "claim": "Status",
-      "proof": "** [[Q_discovery_progress]] \u2014 unknown if calls have started.",
+      "proof": "** [[Q_discovery_progress]] — unknown if calls have started.",
       "location": "synthesis/yc_blockers.md",
       "status": "Evidence collected"
     },
     {
       "claim": "Resolution path",
-      "proof": "** Run 10 calls per [[03_discovery_call_script]]. Need at minimum 2\u20133 strong positive signals (manual diagnostic process, failed internal tooling attempts, named cost) by August.",
+      "proof": "** Run 10 calls per [[03_discovery_call_script]]. Need at minimum 2–3 strong positive signals (manual diagnostic process, failed internal tooling attempts, named cost) by August.",
       "location": "synthesis/yc_blockers.md",
       "status": "Evidence collected"
     },
@@ -98,13 +325,13 @@
     },
     {
       "claim": "Status",
-      "proof": "** Build sequence outlined ([[OSS_agent_v0]] step 1\u20136). Not started (based on current vault state).",
+      "proof": "** Build sequence outlined ([[OSS_agent_v0]] step 1–6). Not started (based on current vault state).",
       "location": "synthesis/yc_blockers.md",
       "status": "Evidence collected"
     },
     {
       "claim": "Resolution path",
-      "proof": "** Step 1\u20133 (telemetry abstraction + virtual ambient + perf/watt + readout) is the minimum viable. Could be shipped by August with focused effort. Steps 4\u20135 (drift detector + packaging) make it useful.",
+      "proof": "** Step 1–3 (telemetry abstraction + virtual ambient + perf/watt + readout) is the minimum viable. Could be shipped by August with focused effort. Steps 4–5 (drift detector + packaging) make it useful.",
       "location": "synthesis/yc_blockers.md",
       "status": "Evidence collected"
     },
@@ -128,7 +355,7 @@
     },
     {
       "claim": "Resolution path",
-      "proof": "** Ask Kundu. 1\u20132 weeks.",
+      "proof": "** Ask Kundu. 1–2 weeks.",
       "location": "synthesis/yc_blockers.md",
       "status": "Evidence collected"
     },
@@ -140,7 +367,7 @@
     },
     {
       "claim": "Why it matters",
-      "proof": "** F5 (reproducibility, 1.68% CoV across 3 trials) is one of the strongest Stage 1 claims and is currently unverifiable from the CSV provided. A YC reviewer with technical depth could ask for the data \u2014 it should exist.",
+      "proof": "** F5 (reproducibility, 1.68% CoV across 3 trials) is one of the strongest Stage 1 claims and is currently unverifiable from the CSV provided. A YC reviewer with technical depth could ask for the data — it should exist.",
       "location": "synthesis/yc_blockers.md",
       "status": "Evidence collected"
     },
@@ -158,7 +385,7 @@
     },
     {
       "claim": "Addendum (2026-06-07)",
-      "proof": "** the `/yc` page is also where to land a \"how we build\" section \u2014 see [[ai_native_yc_narrative]]. It's a low-cost, fully-evidenced founder-credibility asset (public commit history showing one founder + AI agent shipping production infra at team-scale velocity) that complements the discovery-call traction story without depending on it.",
+      "proof": "** the `/yc` page is also where to land a \"how we build\" section — see [[ai_native_yc_narrative]]. It's a low-cost, fully-evidenced founder-credibility asset (public commit history showing one founder + AI agent shipping production infra at team-scale velocity) that complements the discovery-call traction story without depending on it.",
       "location": "synthesis/yc_blockers.md",
       "status": "Evidence collected"
     },
@@ -187,7 +414,7 @@
     {
       "date": "2026-06-12",
       "decision": "decision",
-      "rationale": "Amogh: get the Princeton email back before reaching out to Lupo \u2014 RMA",
+      "rationale": "Amogh: get the Princeton email back before reaching out to Lupo — RMA",
       "source_question_id": "",
       "status": "active"
     },
@@ -278,7 +505,7 @@
     {
       "date": "2026-06-11",
       "decision": "experiment",
-      "rationale": "Ran E004v2_TRIAL_3_ONLY.py in fresh Colab session. T3: start 35\u00b0C (coldest in",
+      "rationale": "Ran E004v2_TRIAL_3_ONLY.py in fresh Colab session. T3: start 35°C (coldest in",
       "source_question_id": "",
       "status": "active"
     },
@@ -313,305 +540,227 @@
   ],
   "timeline": [
     {
-      "phase": "Stage 1 \u2014 Colab baseline",
-      "week": "W1\u2013W4",
-      "dates": "\u2014",
-      "milestone": "E001\u2013E004: idle, same-process, cross-process, controlled-variable cooldown",
+      "phase": "Stage 1 — Colab baseline",
+      "week": "W1–W4",
+      "dates": "—",
+      "milestone": "E001–E004: idle, same-process, cross-process, controlled-variable cooldown",
       "owner": "Amogh",
-      "status": "Done \u2713",
-      "priority": "P1 \u2014 High",
+      "status": "Done ✓",
+      "priority": "P1 — High",
       "layer": "Research",
       "notes": ""
     },
     {
       "phase": "",
       "week": "W3",
-      "dates": "\u2014",
-      "milestone": "F1 confirmed: 2\u00b0C ambient \u2192 3.5\u00d7 recovery time (n=7, CV 1.8%)",
+      "dates": "—",
+      "milestone": "F1 confirmed: 2°C ambient → 3.5× recovery time (n=7, CV 1.8%)",
       "owner": "Amogh",
-      "status": "Done \u2713",
-      "priority": "P1 \u2014 High",
+      "status": "Done ✓",
+      "priority": "P1 — High",
       "layer": "Research",
       "notes": ""
     },
     {
-      "phase": "Stage 1 \u2014 Colab baseline",
+      "phase": "Stage 1 — Colab baseline",
       "week": "W4",
-      "dates": "\u2014",
-      "milestone": "Classifier: Naive Bayes 87% \u2192 Decision Tree 100% with steady-state filter",
+      "dates": "—",
+      "milestone": "Classifier: Naive Bayes 87% → Decision Tree 100% with steady-state filter",
       "owner": "Amogh",
-      "status": "Done \u2713",
-      "priority": "P1 \u2014 High",
+      "status": "Done ✓",
+      "priority": "P1 — High",
       "layer": "SW",
       "notes": ""
     },
     {
       "phase": "",
       "week": "W4",
-      "dates": "\u2014",
-      "milestone": "Kundu advisor confirmed \u00b7 3 mandates filed (sensitivity, Bayesian, E003/E004 rerun)",
+      "dates": "—",
+      "milestone": "Kundu advisor confirmed · 3 mandates filed (sensitivity, Bayesian, E003/E004 rerun)",
       "owner": "Amogh",
-      "status": "Done \u2713",
-      "priority": "P1 \u2014 High",
+      "status": "Done ✓",
+      "priority": "P1 — High",
       "layer": "Comms",
       "notes": ""
     },
     {
-      "phase": "Stage 2 \u2014 Agent v0.1.9",
+      "phase": "Stage 2 — Agent v0.1.9",
       "week": "W5",
-      "dates": "\u2014",
-      "milestone": "pip install runtheta \u00b7 pynvml + Redfish + DCGM telemetry collector",
+      "dates": "—",
+      "milestone": "pip install runtheta · pynvml + Redfish + DCGM telemetry collector",
       "owner": "Amogh",
-      "status": "Done \u2713",
-      "priority": "P1 \u2014 High",
+      "status": "Done ✓",
+      "priority": "P1 — High",
       "layer": "SW",
       "notes": ""
     },
     {
       "phase": "",
       "week": "W5",
-      "dates": "\u2014",
-      "milestone": "Fault curve classifier: 6 failure modes from R_\u03b8(P) shape",
+      "dates": "—",
+      "milestone": "Fault curve classifier: 6 failure modes from R_θ(P) shape",
       "owner": "Amogh",
-      "status": "Done \u2713",
-      "priority": "P1 \u2014 High",
+      "status": "Done ✓",
+      "priority": "P1 — High",
       "layer": "SW",
       "notes": ""
     },
     {
-      "phase": "Stage 2 \u2014 Agent v0.1.9",
+      "phase": "Stage 2 — Agent v0.1.9",
       "week": "W5",
-      "dates": "\u2014",
-      "milestone": "Discovery outreach: RunPod, Vast.ai, Lambda Labs \u2014 awaiting replies",
+      "dates": "—",
+      "milestone": "Discovery outreach: RunPod, Vast.ai, Lambda Labs — awaiting replies",
       "owner": "Amogh",
       "status": "In Progress",
-      "priority": "P2 \u2014 Normal",
+      "priority": "P2 — Normal",
       "layer": "Comms",
       "notes": ""
     },
     {
       "phase": "",
       "week": "W5",
-      "dates": "\u2014",
+      "dates": "—",
       "milestone": "Lupo proposal + Campus IT one-pager ready to send",
       "owner": "Amogh",
       "status": "In Progress",
-      "priority": "P2 \u2014 Normal",
+      "priority": "P2 — Normal",
       "layer": "Comms",
       "notes": ""
     },
     {
-      "phase": "Stage 3 \u2014 Cal Poly AI Factory deployment",
+      "phase": "Stage 3 — Cal Poly AI Factory deployment",
       "week": "W6",
-      "dates": "\u2014",
-      "milestone": "Lupo meeting \u00b7 deliver AI Factory proposal \u00b7 get greenlight",
+      "dates": "—",
+      "milestone": "Lupo meeting · deliver AI Factory proposal · get greenlight",
       "owner": "Amogh",
       "status": "Not Started",
-      "priority": "P2 \u2014 Normal",
+      "priority": "P2 — Normal",
       "layer": "Comms",
       "notes": ""
     },
     {
       "phase": "",
       "week": "W7",
-      "dates": "\u2014",
-      "milestone": "Canary install on 1 of 4 DGX B200 nodes \u00b7 BMC-measured ambient",
+      "dates": "—",
+      "milestone": "Canary install on 1 of 4 DGX B200 nodes · BMC-measured ambient",
       "owner": "Amogh",
       "status": "Not Started",
-      "priority": "P2 \u2014 Normal",
+      "priority": "P2 — Normal",
       "layer": "SW",
       "notes": ""
     },
     {
-      "phase": "Stage 3 \u2014 Cal Poly AI Factory deployment",
+      "phase": "Stage 3 — Cal Poly AI Factory deployment",
       "week": "W8",
-      "dates": "\u2014",
-      "milestone": "E005: power-cap sweep at 6 levels on DGX B200 \u00b7 compare to T4 baseline",
+      "dates": "—",
+      "milestone": "E005: power-cap sweep at 6 levels on DGX B200 · compare to T4 baseline",
       "owner": "Amogh",
       "status": "Not Started",
-      "priority": "P2 \u2014 Normal",
+      "priority": "P2 — Normal",
       "layer": "Research",
       "notes": ""
     },
     {
       "phase": "",
       "week": "W8",
-      "dates": "\u2014",
-      "milestone": "TARUC integration angle confirmed with Lupo \u00b7 ICPE 2027 co-authorship scoped",
+      "dates": "—",
+      "milestone": "TARUC integration angle confirmed with Lupo · ICPE 2027 co-authorship scoped",
       "owner": "Both",
       "status": "Not Started",
-      "priority": "P2 \u2014 Normal",
+      "priority": "P2 — Normal",
       "layer": "Comms",
       "notes": ""
     },
     {
-      "phase": "Stage 4 \u2014 Anomaly detector v2 + sensitivity analysis",
+      "phase": "Stage 4 — Anomaly detector v2 + sensitivity analysis",
       "week": "W9",
-      "dates": "\u2014",
-      "milestone": "dR_\u03b8/dT_amb sensitivity analysis at each power tier (Kundu mandate)",
+      "dates": "—",
+      "milestone": "dR_θ/dT_amb sensitivity analysis at each power tier (Kundu mandate)",
       "owner": "Amogh",
       "status": "Not Started",
-      "priority": "P2 \u2014 Normal",
+      "priority": "P2 — Normal",
       "layer": "Research",
       "notes": ""
     },
     {
       "phase": "",
       "week": "W9",
-      "dates": "\u2014",
-      "milestone": "E003 + E004 rerun on DGX B200 \u00b7 n \u2265 10 \u00b7 steady-state + Bayesian",
+      "dates": "—",
+      "milestone": "E003 + E004 rerun on DGX B200 · n ≥ 10 · steady-state + Bayesian",
       "owner": "Amogh",
       "status": "Not Started",
-      "priority": "P2 \u2014 Normal",
+      "priority": "P2 — Normal",
       "layer": "Research",
       "notes": ""
     },
     {
-      "phase": "Stage 4 \u2014 Anomaly detector v2 + sensitivity analysis",
+      "phase": "Stage 4 — Anomaly detector v2 + sensitivity analysis",
       "week": "W10",
-      "dates": "\u2014",
-      "milestone": "Bayesian classifier refit on DGX data \u00b7 model equation extracted",
+      "dates": "—",
+      "milestone": "Bayesian classifier refit on DGX data · model equation extracted",
       "owner": "Amogh",
       "status": "Not Started",
-      "priority": "P2 \u2014 Normal",
+      "priority": "P2 — Normal",
       "layer": "SW",
       "notes": ""
     },
     {
       "phase": "",
       "week": "W10",
-      "dates": "\u2014",
-      "milestone": "Lead-time prediction (E-LT testbed \u00b7 Sam \u00b7 fall 2026)",
+      "dates": "—",
+      "milestone": "Lead-time prediction (E-LT testbed · Sam · fall 2026)",
       "owner": "Sam",
       "status": "Not Started",
-      "priority": "P2 \u2014 Normal",
+      "priority": "P2 — Normal",
       "layer": "EE",
       "notes": ""
     },
     {
-      "phase": "Stage 5 \u2014 Multi-GPU validation + publication",
+      "phase": "Stage 5 — Multi-GPU validation + publication",
       "week": "W11",
-      "dates": "\u2014",
+      "dates": "—",
       "milestone": "A100 / H100 / RTX generalization experiments",
       "owner": "Amogh",
       "status": "Not Started",
-      "priority": "P2 \u2014 Normal",
+      "priority": "P2 — Normal",
       "layer": "Research",
       "notes": ""
     },
     {
       "phase": "",
       "week": "W12",
-      "dates": "\u2014",
-      "milestone": "EE 4400 project: formal course credit for Stage 2\u20134 experiments",
+      "dates": "—",
+      "milestone": "EE 4400 project: formal course credit for Stage 2–4 experiments",
       "owner": "Amogh",
       "status": "Not Started",
-      "priority": "P2 \u2014 Normal",
+      "priority": "P2 — Normal",
       "layer": "Research",
       "notes": ""
     },
     {
-      "phase": "Stage 5 \u2014 Multi-GPU validation + publication",
+      "phase": "Stage 5 — Multi-GPU validation + publication",
       "week": "W13",
-      "dates": "\u2014",
-      "milestone": "Conference paper draft \u00b7 two-dim F1 finding \u00b7 sensitivity confidence bands",
+      "dates": "—",
+      "milestone": "Conference paper draft · two-dim F1 finding · sensitivity confidence bands",
       "owner": "Both",
       "status": "Not Started",
-      "priority": "P2 \u2014 Normal",
+      "priority": "P2 — Normal",
       "layer": "Research",
       "notes": ""
     },
     {
       "phase": "",
       "week": "W14",
-      "dates": "\u2014",
-      "milestone": "YC W27 application \u00b7 submit by September deadline",
+      "dates": "—",
+      "milestone": "YC W27 application · submit by September deadline",
       "owner": "Amogh",
       "status": "Not Started",
-      "priority": "P2 \u2014 Normal",
+      "priority": "P2 — Normal",
       "layer": "Comms",
       "notes": ""
     }
   ],
-  "moat_dimensions": [
-    {
-      "name": "Validated lead-time data",
-      "current": "Unproven \u2014 E-LT planned for fall 2026",
-      "target": "Minutes-to-hours of R_theta rise before throttle, on real hardware, with n \u2265 10 fault inductions",
-      "status": "unproven"
-    },
-    {
-      "name": "Per-GPU baseline history",
-      "current": "Not implemented \u2014 agent computes R_theta live but does not store fingerprints",
-      "target": "Each GPU has a unique R_theta(P) fingerprint stored persistently; drift is detected against that GPU's own history, not a fleet average",
-      "status": "not_built"
-    },
-    {
-      "name": "Operator workflow integration",
-      "current": "Not implemented \u2014 agent emits alerts and Prometheus metrics",
-      "target": "SLURM job annotations, Grafana incident panels, k8s node taints, PagerDuty escalation with thermal context",
-      "status": "not_built"
-    },
-    {
-      "name": "Cross-vendor support",
-      "current": "T4 only (Colab Stage 1) \u2014 no A100, H100, MI300X data",
-      "target": "Calibration mode that learns per-GPU-model idle floor and thermal resistance baseline automatically",
-      "status": "gap"
-    },
-    {
-      "name": "Failure/degradation dataset",
-      "current": "Planned (E-LT), not collected",
-      "target": "Ground-truth fault signatures: dust, TIM, fan, blockage, mounting \u2014 each with a labeled R_theta(P) curve",
-      "status": "planned"
-    },
-    {
-      "name": "Trusted alert calibration",
-      "current": "Naive thresholds from T4 experiments",
-      "target": "Per-GPU model, per-rack alert thresholds learned from operator feedback; false-positive rate tracked and minimized",
-      "status": "partial"
-    },
-    {
-      "name": "What to build",
-      "current": "Why",
-      "target": "When",
-      "status": "gap"
-    },
-    {
-      "name": "Per-GPU baseline history (persistent fingerprinting)",
-      "current": "Moat dimension 2 \u2014 can't be copied without the data",
-      "target": "Stage 2 (DGX B200 install)",
-      "status": "gap"
-    },
-    {
-      "name": "Calibration mode (learn idle floor per GPU model)",
-      "current": "Moat dimension 4 \u2014 prerequisite for any operator install",
-      "target": "Before first live install",
-      "status": "gap"
-    },
-    {
-      "name": "SLURM job annotation",
-      "current": "Moat dimension 3 \u2014 SLURM is the scheduler at Cal Poly AI Factory",
-      "target": "Stage 3 (AI Factory deployment)",
-      "status": "gap"
-    },
-    {
-      "name": "Grafana panel / annotation hook",
-      "current": "Moat dimension 3 \u2014 where operators already look",
-      "target": "Stage 2\u20133",
-      "status": "gap"
-    },
-    {
-      "name": "E-LT lead-time experiment",
-      "current": "Moat dimension 1 \u2014 make-or-break scientific validation",
-      "target": "Fall 2026 with Sam",
-      "status": "gap"
-    },
-    {
-      "name": "Labeled fault dataset",
-      "current": "Moat dimension 5 \u2014 requires physical testbed",
-      "target": "Fall 2026 with Sam",
-      "status": "gap"
-    }
-  ],
-  "generated_at": "2026-06-16T14:39:14.116Z"
+  "moat_dimensions": [],
+  "generated_at": "2026-06-24T16:10:28.726Z",
+  "vault_root": "/Users/amogh/thermalos-vault"
 }
