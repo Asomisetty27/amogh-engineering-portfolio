@@ -75,7 +75,7 @@ export default function InstructorDashboard() {
           .eq("cohort", cohort).eq("status", "open").order("created_at", { ascending: true }),
         supabase.from("group_progress").select("*").eq("cohort", cohort),
         supabase.from("help_requests").select("*").eq("cohort", cohort),
-        supabase.from("group_roster").select("*").eq("cohort", cohort),
+        (supabase as any).from("group_roster").select("*").eq("cohort", cohort),
       ]);
       if (cancelled) return;
       setRequests((reqs ?? []) as HelpRow[]);
