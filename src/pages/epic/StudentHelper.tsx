@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { CURRICULUM, DAY_TITLES, WIRE, GROUP_COUNT, type Activity, type HelpType } from "./curriculum";
+import { CURRICULUM, DAY_TITLES, WIRE, GROUP_COUNT, THANKYOU_EMAIL, type Activity, type HelpType } from "./curriculum";
 import { readCohort, COHORT_LABEL } from "./cohort";
 
 const LS_GROUP = "epic_group";
@@ -38,6 +38,10 @@ export default function StudentHelper() {
   // Group roster — first name + last initial ONLY (minors' data).
   const [rosterOpen, setRosterOpen] = useState(false);
   const [members, setMembers] = useState<string[]>(["", "", "", ""]);
+
+  // Wrap-up thank-you step
+  const [hope, setHope] = useState("");
+  const [thanksName, setThanksName] = useState("");
 
   // Setup checklist progress (per device).
   const [setupDone, setSetupDone] = useState<boolean[]>(() => {
@@ -78,8 +82,9 @@ export default function StudentHelper() {
     [activeId]
   );
   const onSetup = activeId === "setup";
+  const onThankYou = activeId === "thankyou";
   // What this group is "on" right now — used for progress + help labels.
-  const currentLabel = onSetup ? "Setup" : activity.title;
+  const currentLabel = onSetup ? "Setup" : onThankYou ? "Wrap-up" : activity.title;
 
   // Reset transient state when activity changes
   useEffect(() => {
@@ -280,11 +285,79 @@ export default function StudentHelper() {
               </div>
             );
           })}
+
+          {/* Wrap up — last step */}
+          <div className="mb-2">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Wrap up</div>
+            <ul className="space-y-1">
+              <li>
+                <button onClick={() => setActiveId("thankyou")}
+                  className={`w-full text-left text-sm px-2.5 py-1.5 rounded border transition-colors ${
+                    onThankYou
+                      ? "border-primary/40 bg-primary/10 text-foreground"
+                      : "border-transparent hover:bg-white/[0.04] text-secondary-foreground"
+                  }`}>
+                  <span className="font-mono text-[10px] text-muted-foreground mr-1.5">Last</span>
+                  🎉 Thank Professor Kundu
+                </button>
+              </li>
+            </ul>
+          </div>
         </aside>
 
         {/* Main */}
         <main className="flex-1 p-4 md:p-6 space-y-5">
-          {onSetup ? (
+          {onThankYou ? (
+            (() => {
+              const ready = hope.trim().length > 3;
+              const subject = `Thank you from EPIC 2026 — Group ${pad2(group)}`;
+              const body =
+                `Dear Professor Kundu,\n\nThank you for the EPIC 2026 Arduino lab! ` +
+                `One thing I'm looking forward to building or doing with what I learned: ${hope.trim() || "..."}.\n\n` +
+                `— Group ${group}${thanksName.trim() ? `, ${thanksName.trim()}` : ""}, EPIC 2026`;
+              const mailto = `mailto:${encodeURIComponent(THANKYOU_EMAIL)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+              const gmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(THANKYOU_EMAIL)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+              const noRecipient = THANKYOU_EMAIL.startsWith("REPLACE_WITH");
+              return (
+                <>
+                  <section>
+                    <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1">Last step</div>
+                    <h2 className="text-lg font-semibold">Say thanks 🎉</h2>
+                    <p className="text-sm text-secondary-foreground mt-1">
+                      You built real circuits and wrote real code this week. Send Professor Kundu a quick
+                      thank-you and tell them one thing you want to build or do next with your new skills.
+                    </p>
+                  </section>
+                  <section className="space-y-3 max-w-xl">
+                    <label className="block">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Your name(s) — optional</span>
+                      <input value={thanksName} onChange={(e) => setThanksName(e.target.value)} placeholder="Maya R. & Devin K."
+                        className="mt-1 w-full bg-black/40 border border-panel-border rounded px-3 py-2 text-sm focus:outline-none focus:border-primary/60" />
+                    </label>
+                    <label className="block">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">One thing I'm looking forward to building or doing</span>
+                      <textarea value={hope} onChange={(e) => setHope(e.target.value)} rows={3}
+                        placeholder="a robot that avoids walls / a light that turns on when it gets dark..."
+                        className="mt-1 w-full bg-black/40 border border-panel-border rounded px-3 py-2 text-sm resize-none focus:outline-none focus:border-primary/60" />
+                    </label>
+                    <pre className="text-xs font-mono leading-relaxed bg-black/60 border border-panel-border rounded-md p-3 whitespace-pre-wrap text-secondary-foreground">{body}</pre>
+                    <div className="flex flex-wrap gap-2">
+                      <a href={ready ? mailto : undefined} aria-disabled={!ready}
+                        className={`rounded-md px-4 py-2.5 text-sm font-medium border ${ready ? "border-primary/40 bg-primary/10 text-foreground hover:bg-primary/20" : "border-panel-border text-muted-foreground pointer-events-none opacity-50"}`}>
+                        Open in email app
+                      </a>
+                      <a href={ready ? gmail : undefined} target="_blank" rel="noreferrer" aria-disabled={!ready}
+                        className={`rounded-md px-4 py-2.5 text-sm font-mono border ${ready ? "border-panel-border bg-white/[0.03] hover:bg-white/[0.07]" : "border-panel-border text-muted-foreground pointer-events-none opacity-50"}`}>
+                        Open in Gmail
+                      </a>
+                    </div>
+                    {!ready && <p className="text-[11px] text-muted-foreground">Type one thing above to enable the buttons.</p>}
+                    {noRecipient && <p className="text-[11px] text-[#F2B01E]">Instructor: set THANKYOU_EMAIL to Professor Kundu's address in curriculum.ts.</p>}
+                  </section>
+                </>
+              );
+            })()
+          ) : onSetup ? (
             <>
               <section>
                 <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1">Get your station ready</div>

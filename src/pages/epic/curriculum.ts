@@ -17,6 +17,10 @@ export interface Activity {
   extension?: string;   // optional "done early?" challenge for fast finishers
 }
 
+// Recipient for the end-of-lab thank-you email step (StudentHelper "Wrap up").
+// TODO(amogh): replace with Professor Kundu's real Cal Poly address before the lab runs.
+export const THANKYOU_EMAIL = "REPLACE_WITH_KUNDU_EMAIL@calpoly.edu";
+
 export const CURRICULUM: Activity[] = [
   // ── Day 1 ────────────────────────────────────────────────
   {id:"intro", day:1, lesson:"Intro", title:"Arduino & the IDE", goal:"Meet the board and learn to upload a program.", materials:["Arduino UNO","USB cable"], wiring:[], code:"// Tools > Board > Arduino UNO\n// Tools > Port > (pick the port)\n// Paste code, click Verify (check), then Upload (arrow).", test:["The IDE shows \"Done uploading.\""], trouble:["Upload error → check Board and Port under Tools."]},

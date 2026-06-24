@@ -50,6 +50,7 @@ export default function InstructorDashboard() {
   const [broadcastSending, setBroadcastSending] = useState(false);
   const [broadcastSent, setBroadcastSent] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
@@ -183,6 +184,30 @@ export default function InstructorDashboard() {
     await supabase.from("help_requests")
       .update({ status: "resolved", resolved_at: new Date().toISOString() })
       .eq("id", id);
+  };
+
+  // Resolve every open request at once (clears a cluttered board mid-session).
+  const clearQueue = async () => {
+    if (!requests.length || !confirm(`Resolve all ${requests.length} open request(s)?`)) return;
+    const ids = requests.map(r => r.id);
+    setRequests([]);
+    await supabase.from("help_requests")
+      .update({ status: "resolved", resolved_at: new Date().toISOString() })
+      .in("id", ids);
+  };
+
+  // Hard reset: wipe ALL data for this cohort — requests, progress, rosters.
+  // Use it to start a fresh session / new groups (the cohort label can be reused).
+  const resetCohort = async () => {
+    if (!confirm(`Reset ${COHORT_LABEL[cohort]}? This permanently clears all help requests, progress, and rosters for this cohort. Use it to start a fresh session with new groups.`)) return;
+    setResetting(true);
+    await Promise.all([
+      supabase.from("help_requests").delete().eq("cohort", cohort),
+      supabase.from("group_progress").delete().eq("cohort", cohort),
+      (supabase as any).from("group_roster").delete().eq("cohort", cohort),
+    ]);
+    setRequests([]); setHistory([]); setProgress({}); setRoster({});
+    setResetting(false);
   };
 
   const sendBroadcast = async () => {
@@ -350,6 +375,10 @@ export default function InstructorDashboard() {
               className="text-xs font-mono px-3 py-1.5 rounded border border-panel-border bg-white/[0.03] hover:bg-white/[0.07]">
               SOUND {soundOn ? "ON" : "OFF"}
             </button>
+            <button onClick={resetCohort} disabled={resetting} title="Wipe this cohort's requests, progress, and rosters"
+              className="text-xs font-mono px-3 py-1.5 rounded border border-[#E5484D]/40 text-[#E5484D] bg-[#E5484D]/10 hover:bg-[#E5484D]/20 disabled:opacity-50">
+              {resetting ? "Resetting…" : "Reset cohort"}
+            </button>
           </div>
         </div>
         <div className="max-w-6xl mx-auto mt-3 flex gap-1">
@@ -420,7 +449,15 @@ export default function InstructorDashboard() {
 
           {/* QUEUE (smart triage order) */}
           <section>
-            <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Help queue · smart triage</div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Help queue · smart triage</div>
+              {requests.length > 0 && (
+                <button onClick={clearQueue}
+                  className="text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded border border-panel-border text-muted-foreground hover:text-foreground hover:bg-white/[0.05]">
+                  Clear queue
+                </button>
+              )}
+            </div>
             {requests.length === 0 ? (
               <div className="rounded-md border border-panel-border bg-white/[0.02] p-6 text-center text-sm text-muted-foreground">
                 All clear. No open requests.
