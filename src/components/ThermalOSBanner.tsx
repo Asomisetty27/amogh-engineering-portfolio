@@ -60,7 +60,7 @@ export default function ThermalOSBanner() {
 
         <p className="text-sm text-secondary-foreground leading-relaxed mb-4">
           The peer-relative thermal-resistance method flags degrading GPUs that fixed temperature thresholds miss —
-          <span className="text-[#9FE1CB] font-semibold"> blind-validated on 72 production H100s</span>. A controlled Stage-1 study
+          <span className="text-[#9FE1CB] font-semibold"> blind-validated on 72 Princeton H100s</span>. A controlled Stage-1 study
           (Tesla T4, n=7, CV 1.8%) showed a 2°C ambient delta drives a 3.5× change in power-recovery time — direct evidence of
           GPU thermal memory. Hardware lead-time validation runs on a DGX B200 cluster in fall 2026.
         </p>
@@ -83,7 +83,7 @@ export default function ThermalOSBanner() {
 
         <div className="grid grid-cols-3 gap-2 mb-4">
           {[
-            { v: "72", l: "H100s · blind validation" },
+            { v: "72", l: "Princeton H100s · blind" },
             { v: "3.5×", l: "recovery delta · 2°C (T4)" },
             { v: "v0.1.10", l: "pip install runtheta" },
           ].map((s) => (
@@ -122,7 +122,7 @@ export default function ThermalOSBanner() {
             <ArrowRight size={12} />
           </Link>
           <a
-            href="https://github.com/Asomisetty27/thermalos"
+            href="https://github.com/Asomisetty27/theta"
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-muted-foreground hover:text-foreground text-[12px] font-mono transition-all hover:scale-[1.02]"

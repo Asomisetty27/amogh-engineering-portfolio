@@ -11,7 +11,7 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 const strengths = [
   {
     title: "GPU & ML Infrastructure",
-    description: "Theta/ThermalOS — open-source GPU reliability agent: real-time thermal-resistance (R_θ) anomaly detection from NVML/DCGM telemetry, peer-relative method blind-validated on 72 production H100s, survival-analysis lead-time modeling, shipped on PyPI",
+    description: "Theta/ThermalOS — open-source GPU reliability agent: real-time thermal-resistance (R_θ) anomaly detection from NVML/DCGM telemetry, peer-relative method blind-validated on 72 Princeton H100s, survival-analysis lead-time modeling, shipped on PyPI",
     icon: Cpu,
     color: "neon-green",
   },
@@ -56,7 +56,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
             }}
           />
           <p className="text-sm leading-relaxed text-secondary-foreground pl-1">
-            I build GPU and ML-infrastructure software. My main project, Theta/ThermalOS, is an open-source GPU reliability agent (<span className="font-mono text-primary">pip install runtheta</span>) whose peer-relative thermal-resistance method was blind-validated on 72 production H100s. I back it with a full-stack hardware foundation — analog signal chains, embedded control, RISC-V/FPGA digital systems — and the measurement discipline to know when a number is real.
+            I build GPU and ML-infrastructure software. My main project, Theta/ThermalOS, is an open-source GPU reliability agent (<span className="font-mono text-primary">pip install runtheta</span>) whose peer-relative thermal-resistance method was blind-validated on 72 Princeton H100s. I back it with a full-stack hardware foundation — analog signal chains, embedded control, RISC-V/FPGA digital systems — and the measurement discipline to know when a number is real.
           </p>
         </div>
 
@@ -162,7 +162,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               {[
-                "Peer-Relative GPU Anomaly Detection → Theta, blind-validated on 72 H100s",
+                "Peer-Relative GPU Anomaly Detection → Theta, blind-validated on 72 Princeton H100s",
                 "Real-Time R_θ Thermal Forensics → NVML/DCGM telemetry pipeline",
                 "Survival-Analysis Lead-Time Modeling → lifelines on GPU telemetry",
                 "End-to-End Signal Pipeline → EE 143 ADC/DAC System",

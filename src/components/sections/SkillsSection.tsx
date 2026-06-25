@@ -18,7 +18,7 @@ const skillCategories: { id: string; title: string; color: string; skills: Skill
     skills: [
       { name: "Python (systems & data)", evidence: "runtheta OSS package — pip install runtheta, v0.1.10 on PyPI" },
       { name: "GPU Telemetry (NVML / DCGM)", evidence: "Real-time R_θ = ΔT/P computed from live GPU telemetry (Theta)" },
-      { name: "Time-Series Anomaly Detection", evidence: "Peer-relative median-polish across fleet GPUs — blind-validated on 72 H100s" },
+      { name: "Time-Series Anomaly Detection", evidence: "Peer-relative median-polish across fleet GPUs — blind-validated on 72 Princeton H100s" },
       { name: "Statistical Modeling (NumPy / SciPy / pandas)", evidence: "Robust stats, median-polish, z-score fleet baselining" },
       { name: "Survival Analysis (lifelines)", evidence: "Lead-time-to-failure modeling on GPU telemetry" },
       { name: "scikit-learn / Classification", evidence: "Fault-mode classifier (RF/DT) on thermal signatures" },
