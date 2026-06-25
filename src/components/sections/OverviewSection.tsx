@@ -10,21 +10,21 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const strengths = [
   {
-    title: "Systems Integration",
-    description: "End-to-end signal pipelines, multi-stage electromechanical chains, full analog↔digital validation across subsystem boundaries",
-    icon: Radio,
-    color: "neon-cyan",
-  },
-  {
-    title: "Hardware Validation & Debugging",
-    description: "PCB design, sensor integration, 6+ documented failure modes resolved with root cause analysis and systematic fix verification",
-    icon: Zap,
+    title: "GPU & ML Infrastructure",
+    description: "Theta/ThermalOS — open-source GPU reliability agent: real-time thermal-resistance (R_θ) anomaly detection from NVML/DCGM telemetry, peer-relative method blind-validated on 72 production H100s, survival-analysis lead-time modeling, shipped on PyPI",
+    icon: Cpu,
     color: "neon-green",
   },
   {
+    title: "Data & Statistical Modeling",
+    description: "Python (NumPy/SciPy/pandas/scikit-learn/lifelines), robust statistics, time-series anomaly detection, fault-mode classification, reproducible analysis pipelines",
+    icon: Zap,
+    color: "neon-cyan",
+  },
+  {
     title: "Signal, Embedded & Digital Systems",
-    description: "RISC-V CPU architecture, FPGA synthesis, FSM control, embedded C++ for real-time sensing, DShot motor telemetry",
-    icon: Cpu,
+    description: "RISC-V CPU architecture, FPGA synthesis, FSM control, embedded C++ for real-time sensing, analog signal chains, hardware-validated measurement discipline",
+    icon: Radio,
     color: "neon-magenta",
   },
 ];
@@ -56,9 +56,19 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
             }}
           />
           <p className="text-sm leading-relaxed text-secondary-foreground pl-1">
-            I design, build, and validate integrated hardware systems — from analog signal chains and embedded control to electromechanical actuation and RF architecture. Every system on this site was debugged, tested, and documented with real evidence.
+            I build GPU and ML-infrastructure software. My main project, Theta/ThermalOS, is an open-source GPU reliability agent (<span className="font-mono text-primary">pip install runtheta</span>) whose peer-relative thermal-resistance method was blind-validated on 72 production H100s. I back it with a full-stack hardware foundation — analog signal chains, embedded control, RISC-V/FPGA digital systems — and the measurement discipline to know when a number is real.
           </p>
         </div>
+
+        {/* Active Project — ThermalOS (flagship, leads the page) */}
+        <div className="flex items-center gap-2 mb-3">
+          <span className="inline-block w-1.5 h-1.5 rounded-full animate-glow-pulse"
+            style={{ background: "#35C792", boxShadow: "0 0 8px #35C792" }} />
+          <h3 className="text-xs font-mono font-semibold tracking-wider uppercase fx-grad-text-green">
+            Flagship Project
+          </h3>
+        </div>
+        <ThermalOSBanner />
 
         {/* 3 Core Strengths — fx-card hover + top radial glow */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
@@ -96,19 +106,9 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
           })}
         </div>
 
-        {/* Active Project — ThermalOS */}
-        <div className="flex items-center gap-2 mb-3">
-          <span className="inline-block w-1.5 h-1.5 rounded-full animate-glow-pulse"
-            style={{ background: "#35C792", boxShadow: "0 0 8px #35C792" }} />
-          <h3 className="text-xs font-mono font-semibold tracking-wider uppercase fx-grad-text-green">
-            Active Project
-          </h3>
-        </div>
-        <ThermalOSBanner />
-
-        {/* Flagship Systems — fx-card hover with shimmer */}
+        {/* Coursework & Hardware Systems — fx-card hover with shimmer */}
         <h3 className="text-xs font-mono font-semibold tracking-wider uppercase mb-3 fx-grad-text-cyan">
-          Flagship Systems
+          Hardware & Systems Foundation
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
           {topProjects.map((p, i) => {
@@ -162,12 +162,12 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               {[
+                "Peer-Relative GPU Anomaly Detection → Theta, blind-validated on 72 H100s",
+                "Real-Time R_θ Thermal Forensics → NVML/DCGM telemetry pipeline",
+                "Survival-Analysis Lead-Time Modeling → lifelines on GPU telemetry",
                 "End-to-End Signal Pipeline → EE 143 ADC/DAC System",
-                "9-Stage Electromechanical Chain → RGM (EE 241)",
                 "RISC-V CPU Architecture → OTTER MCU (CPE 233)",
-                "CAD → Fabrication → Assembly → IME 144 Air Motor",
                 "6 Failure Modes Resolved → RGM Root Cause Analysis",
-                "Micro FPV Systems Analysis → 6-Subsystem Integration",
               ].map((item) => (
                 <div key={item} className="flex items-start gap-1.5 text-secondary-foreground">
                   <span className="text-primary mt-0.5">▸</span>

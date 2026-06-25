@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Github, Zap } from "lucide-react";
+import { ArrowRight, Github, Zap, Package } from "lucide-react";
 
 export default function ThermalOSBanner() {
   return (
@@ -41,7 +41,7 @@ export default function ThermalOSBanner() {
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#35C792]" style={{ boxShadow: "0 0 6px #35C792" }} />
               </span>
               <span className="text-[10px] font-mono uppercase tracking-wider text-[#9FE1CB]">
-                Stage 1 Complete · Ship v0.1.9
+                Live on PyPI · v0.1.10
               </span>
             </span>
           </div>
@@ -55,17 +55,18 @@ export default function ThermalOSBanner() {
         </h2>
 
         <p className="font-mono text-[12px] text-[#9FE1CB]/80 mb-3">
-          Real-time R_θ = ΔT/P · failure prediction · SDC detection · DCGM + Redfish fusion · Targeting YC W27
+          Real-time R_θ = ΔT/P · peer-relative anomaly detection · NVML/DCGM telemetry · pip install runtheta
         </p>
 
         <p className="text-sm text-secondary-foreground leading-relaxed mb-4">
-          Stage 1 (Tesla T4 / Colab, 8,734 telemetry rows) closed with controlled-variable evidence of GPU
-          thermal memory: <span className="text-[#9FE1CB] font-semibold">a 2°C ambient delta produces a 3.5× change in power-recovery time</span> (n=7, within-condition CV 1.8%).
-          Stage 2 deploys on Cal Poly's Noyce AI Factory DGX B200 cluster before fall semester.
+          The peer-relative thermal-resistance method flags degrading GPUs that fixed temperature thresholds miss —
+          <span className="text-[#9FE1CB] font-semibold"> blind-validated on 72 production H100s</span>. A controlled Stage-1 study
+          (Tesla T4, n=7, CV 1.8%) showed a 2°C ambient delta drives a 3.5× change in power-recovery time — direct evidence of
+          GPU thermal memory. Hardware lead-time validation runs on a DGX B200 cluster in fall 2026.
         </p>
 
         <div className="flex flex-wrap gap-1.5 mb-4">
-          {["pynvml", "DCGM", "Redfish/BMC", "scikit-learn", "Prometheus", "FastAPI", "SLURM", "Supabase"].map((t) => (
+          {["Python", "pynvml", "DCGM", "scikit-learn", "lifelines", "pandas/NumPy", "FastAPI", "SLURM"].map((t) => (
             <span
               key={t}
               className="text-[10px] font-mono px-2 py-0.5 rounded transition-colors hover:text-white"
@@ -82,9 +83,9 @@ export default function ThermalOSBanner() {
 
         <div className="grid grid-cols-3 gap-2 mb-4">
           {[
-            { v: "3.5×", l: "recovery delta · 2°C ambient" },
-            { v: "8,734", l: "Stage 1 telemetry rows" },
-            { v: "v0.1.9", l: "live on PyPI" },
+            { v: "72", l: "H100s · blind validation" },
+            { v: "3.5×", l: "recovery delta · 2°C (T4)" },
+            { v: "v0.1.10", l: "pip install runtheta" },
           ].map((s) => (
             <div key={s.l}
               className="rounded p-2 text-center relative overflow-hidden"
@@ -132,6 +133,19 @@ export default function ThermalOSBanner() {
           >
             <Github size={12} />
             GitHub
+          </a>
+          <a
+            href="https://pypi.org/project/runtheta/"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-muted-foreground hover:text-foreground text-[12px] font-mono transition-all hover:scale-[1.02]"
+            style={{
+              background: "linear-gradient(135deg, rgba(255,255,255,.04) 0%, transparent 100%)",
+              border: "1px solid rgba(255,255,255,.1)",
+            }}
+          >
+            <Package size={12} />
+            pip install runtheta
           </a>
         </div>
       </div>

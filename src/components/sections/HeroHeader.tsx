@@ -99,7 +99,7 @@ export default function HeroHeader() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7, duration: 0.4 }}
       >
-        Systems-Oriented Electrical Engineer
+        GPU Infrastructure &amp; ML-Systems Engineer
       </motion.p>
 
       {/* Status strip */}
@@ -117,7 +117,7 @@ export default function HeroHeader() {
           SYS NOMINAL
         </span>
         <span className="t-mono-xs" style={{ color: "var(--t-faint)" }}>◆</span>
-        <span className="t-mono-xs" style={{ color: "var(--t-muted)" }}>CAL POLY EE · SOPHOMORE</span>
+        <span className="t-mono-xs" style={{ color: "var(--t-muted)" }}>CAL POLY EE · RISING JUNIOR</span>
         <span className="t-mono-xs" style={{ color: "var(--t-faint)" }}>◆</span>
         <span className="t-mono-xs" style={{ color: "var(--t-blueprint-ink)" }}>YC W27 TARGET</span>
       </motion.div>

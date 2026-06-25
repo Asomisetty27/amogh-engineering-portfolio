@@ -12,6 +12,20 @@ interface SkillEntry {
 
 const skillCategories: { id: string; title: string; color: string; skills: SkillEntry[] }[] = [
   {
+    id: "gpu-ml",
+    title: "GPU & ML Systems",
+    color: "neon-green",
+    skills: [
+      { name: "Python (systems & data)", evidence: "runtheta OSS package — pip install runtheta, v0.1.10 on PyPI" },
+      { name: "GPU Telemetry (NVML / DCGM)", evidence: "Real-time R_θ = ΔT/P computed from live GPU telemetry (Theta)" },
+      { name: "Time-Series Anomaly Detection", evidence: "Peer-relative median-polish across fleet GPUs — blind-validated on 72 H100s" },
+      { name: "Statistical Modeling (NumPy / SciPy / pandas)", evidence: "Robust stats, median-polish, z-score fleet baselining" },
+      { name: "Survival Analysis (lifelines)", evidence: "Lead-time-to-failure modeling on GPU telemetry" },
+      { name: "scikit-learn / Classification", evidence: "Fault-mode classifier (RF/DT) on thermal signatures" },
+      { name: "OSS Packaging & Distribution (PyPI)", evidence: "runtheta published, versioned, and installable on PyPI" },
+    ],
+  },
+  {
     id: "test",
     title: "Test & Validation",
     color: "neon-green",
@@ -64,7 +78,7 @@ const skillCategories: { id: string; title: string; color: string; skills: Skill
 
 export default function SkillsSection() {
   const { mode } = useViewMode();
-  const [expandedCategory, setExpandedCategory] = useState<string | null>("test");
+  const [expandedCategory, setExpandedCategory] = useState<string | null>("gpu-ml");
 
   return (
     <section className="max-w-3xl mx-auto fx-blur-reveal">
