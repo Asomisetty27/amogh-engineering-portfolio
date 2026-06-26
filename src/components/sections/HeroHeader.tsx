@@ -78,7 +78,7 @@ export default function HeroHeader() {
               }}
               style={{
                 display: "inline-block",
-                background: ch === " " ? "none" : "linear-gradient(160deg, hsl(43 75% 78%) 0%, hsl(43 68% 50%) 50%, hsl(34 60% 40%) 100%)",
+                background: ch === " " ? "none" : "linear-gradient(165deg, hsl(160 30% 97%) 0%, hsl(167 42% 86%) 52%, hsl(170 58% 70%) 100%)",
                 WebkitBackgroundClip: ch === " " ? "unset" : "text",
                 WebkitTextFillColor: ch === " " ? "transparent" : "transparent",
                 backgroundClip: ch === " " ? "unset" : "text",
@@ -119,7 +119,7 @@ export default function HeroHeader() {
         <span className="t-mono-xs" style={{ color: "var(--t-faint)" }}>◆</span>
         <span className="t-mono-xs" style={{ color: "var(--t-muted)" }}>CAL POLY EE · RISING JUNIOR</span>
         <span className="t-mono-xs" style={{ color: "var(--t-faint)" }}>◆</span>
-        <span className="t-mono-xs" style={{ color: "var(--t-blueprint-ink)" }}>YC W27 TARGET</span>
+        <span className="t-mono-xs" style={{ color: "var(--t-healthy)" }}>OPEN TO SUMMER 2027</span>
         <span className="t-mono-xs" style={{ color: "var(--t-faint)" }}>◆</span>
         <span className="t-mono-xs hidden sm:inline" style={{ color: "var(--t-muted)" }}>
           <kbd style={{ fontFamily: "var(--t-font-mono)", border: "1px solid var(--t-faint)", borderRadius: 4, padding: "0 4px" }}>⌘K</kbd> to navigate

@@ -142,12 +142,12 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
               {mode === "recruiter" ? (
                 <>
                   <Eye size={12} className="text-neon-cyan" />
-                  <span className="text-neon-cyan">REC</span>
+                  <span className="text-neon-cyan">RECRUITER</span>
                 </>
               ) : (
                 <>
                   <Wrench size={12} className="text-neon-magenta" />
-                  <span className="text-neon-magenta">ENG</span>
+                  <span className="text-neon-magenta">ENGINEER</span>
                 </>
               )}
             </button>

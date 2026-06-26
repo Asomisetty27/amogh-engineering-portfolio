@@ -403,7 +403,7 @@ export const projects: Project[] = [
             "Models time-to-failure from telemetry trajectories to estimate a pre-throttle warning window.",
           details: [
             "lifelines survival analysis on peer-z trajectories with fixed healthy-window robust sigma + rolling-median smoothing",
-            "Gradual-degradation lead time ~2.5, 7.7 days at 0 false alarms in simulation",
+            "Gradual-degradation lead time ~2.5-7.7 days at 0 false alarms in simulation",
             "Hardware validation pending the fall-2026 E-LT testbed (see limitations)",
           ],
           confidence: "CONCEPTUAL",
@@ -477,7 +477,7 @@ export const projects: Project[] = [
       systemOverview:
         "End-to-end analog→digital→analog pipeline built across nine EE 143 labs (chassis CAD, soldering, instrumentation, op-amps, PCB design, reflow, integration). Capstone delivered a fabricated 4-bit binary-weighted DAC validated in standalone (binary counter) and system-level (Arduino ADC + audio source + speaker) tests.",
       systemArchitecture:
-        "Audio Source → Level-Shifting Op-Amp (LM1458, AC→0, 1 V) → Arduino ADC (10-bit, mapped to 4-bit via ×0.014663) → PORTB digital lines → Custom 4-bit Binary-Weighted DAC PCB (LM1458, 80k/40k/20k/10k + 10k feedback, second stage ×, 0.1) → Speaker / Oscilloscope",
+        "Audio Source → Level-Shifting Op-Amp (LM1458, AC→0-1 V) → Arduino ADC (10-bit, mapped to 4-bit via ×0.014663) → PORTB digital lines → Custom 4-bit Binary-Weighted DAC PCB (LM1458, 80k/40k/20k/10k + 10k feedback, second stage ×, 0.1) → Speaker / Oscilloscope",
       subsystems: [
         {
           id: "chassis",
@@ -525,10 +525,10 @@ export const projects: Project[] = [
           id: "analog-conditioning",
           title: "Analog Conditioning, Op-Amp Systems (Exp 5, 7)",
           description:
-            "Built voltage-follower buffer to defeat loading effects, then a summing-amp audio level-shifter that translates a ±250 mV AC source into the 0, 1 V window the Arduino ADC expects.",
+            "Built voltage-follower buffer to defeat loading effects, then a summing-amp audio level-shifter that translates a ±250 mV AC source into the 0-1 V window the Arduino ADC expects.",
           details: [
             "Voltage follower (unity-gain buffer) eliminates loading from finite ADC input impedance",
-            "Summing amplifier with DC offset shifts AC audio to 0, 1 V at op-amp output",
+            "Summing amplifier with DC offset shifts AC audio to 0-1 V at op-amp output",
             "Practical current source design from Exp 7 used as bias for downstream stages",
             "Datasheet-driven design: rail-to-rail behaviour, slew rate, input offset, CMRR",
           ],
@@ -545,7 +545,7 @@ export const projects: Project[] = [
             "First op-amp stage:, 0.625 V per LSB into summing node",
             "Second op-amp stage: gain =, 0.1 → flips polarity, scales to +62.5 mV/LSB",
             "Full-scale output ≈ 0.94 V at code 15; resolution = 62.5 mV/step",
-            "LTspice PULSE sources (0, 5 V, 2 s period on bit 0) swept all 16 input combinations",
+            "LTspice PULSE sources (0-5 V, 2 s period on bit 0) swept all 16 input combinations",
             "PCB: 2-layer FR-4, 1 oz Cu, OshPark purple solder mask, $20.10 total ($10.10 boards + $10 ship)",
           ],
           confidence: "VERIFIED",
@@ -582,9 +582,9 @@ export const projects: Project[] = [
           confidence: "VERIFIED",
         },
         {
-          problem: "Signal outside 0, 5 V ADC window",
+          problem: "Signal outside 0-5 V ADC window",
           cause: "Bipolar AC audio swing centred on 0 V cannot be sampled by single-ended Arduino ADC",
-          fix: "Summing amplifier with DC offset (Exp 7) shifts AC into 0, 1 V band before ADC",
+          fix: "Summing amplifier with DC offset (Exp 7) shifts AC into 0-1 V band before ADC",
           systemImpact: "Clipping at rails would have destroyed half-cycles of the reconstructed output",
           confidence: "VERIFIED",
         },
@@ -1660,7 +1660,7 @@ export const projects: Project[] = [
             "Long-range rail: constant speed operation → cost-effectiveness of aluminum may dominate",
             "Lifecycle considerations: CFRP repair costs vs aluminum recyclability",
             "Density: CFRP ~1.6 g/cm³ vs 6061-T6 ~2.7 g/cm³",
-            "Tensile strength: CFRP ~600, 3000 MPa vs 6061-T6 ~310 MPa",
+            "Tensile strength: CFRP ~600-3000 MPa vs 6061-T6 ~310 MPa",
           ],
           confidence: "CONCEPTUAL",
           evidenceSource: "CFRP vs Aluminum white paper, upload pending for VERIFIED status",
@@ -1758,7 +1758,7 @@ export const projects: Project[] = [
             "Four 0804 12000KV brushless motors with 40 mm tri-blade propellers driven by 4×20A ESC channels with Bluejay 48 kHz firmware.",
           details: [
             "0804 motors: 8 mm stator diameter, 4 mm stator height, micro-class brushless",
-            "12000KV: high RPM-per-volt rating suited for 2S (7.4, 8.4V) low-voltage operation",
+            "12000KV: high RPM-per-volt rating suited for 2S (7.4-8.4V) low-voltage operation",
             "High KV + small stator = very high RPM operation, requiring quality bearings",
             "40 mm tri-blade props: increased blade area for thrust at the cost of efficiency",
             "Tri-blade tradeoff: better low-speed control feel and responsiveness vs bi-blade efficiency",
@@ -1828,7 +1828,7 @@ export const projects: Project[] = [
           description:
             "Multi-rail regulated power distribution from 2S LiPo through XT30 connector, with dedicated BECs for O3 and logic systems.",
           details: [
-            "Battery input: 1, 2S LiPo (typically 2S 450, 550 mAh for HD builds)",
+            "Battery input: 1-2S LiPo (typically 2S 450-550 mAh for HD builds)",
             "XT30 connector: rated for continuous current demands of 4×20A ESC channels",
             "High-current path: battery → ESC power stage → motors (unregulated, direct battery voltage)",
             "10V 2A BEC: dedicated regulated rail for DJI O3, critical for stable video",
@@ -1922,7 +1922,7 @@ export const projects: Project[] = [
         confidence: "CONCEPTUAL",
         derivedFrom: ["Known BEC specs", "Standard multi-rail UAV power design"],
         description:
-          "Power distribution: battery → high-current ESC stage (unregulated), 10V BEC → O3, 5V BEC → logic. Architecture diagram, not exact manufacturer schematic.",
+          "Power distribution: battery → high-current ESC stage (unregulated), 10V BEC → O3-5V BEC → logic. Architecture diagram, not exact manufacturer schematic.",
         conceptualNote:
           "RECONSTRUCTED, likely power distribution based on known BEC specifications and standard practice",
       },
@@ -1975,7 +1975,7 @@ export const experiences: ExperienceItem[] = [
     period: "Summer 2025",
     bullets: [
       {
-        text: "Reduced validation and packaging cycle time from ~20 min to ~10, 12 min by mapping the workflow, identifying bottlenecks, and eliminating redundant verification steps",
+        text: "Reduced validation and packaging cycle time from ~20 min to ~10-12 min by mapping the workflow, identifying bottlenecks, and eliminating redundant verification steps",
         confidence: "CONCEPTUAL",
         evidence_source: "Observed estimate, formal time study pending",
       },
@@ -1987,7 +1987,7 @@ export const experiences: ExperienceItem[] = [
     ],
     processImprovement: {
       before: "~20 min per validation + packaging cycle (observed estimate)",
-      after: "~10, 12 min per cycle (observed estimate)",
+      after: "~10-12 min per cycle (observed estimate)",
       whatChanged: [
         "Identified bottleneck in sequential verification steps",
         "Removed redundant checks that didn't affect quality",
