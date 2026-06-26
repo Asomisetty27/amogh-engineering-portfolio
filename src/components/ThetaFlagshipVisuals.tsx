@@ -60,8 +60,8 @@ function ChartCard({ title, sub, children, foot }: { title: string; sub: string;
 export default function ThetaFlagshipVisuals() {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.5, ease: [0.22, 0.68, 0, 1.0] }}
       className="mb-10"
