@@ -26,7 +26,7 @@ export const recruiterSummaries: Record<string, RecruiterSummary> = {
     keyOutcomes: [
       "Blind-validated on 72 production Princeton H100s: flagged 3 degraded units (one at robust-z +15.6, two invisible to temperature thresholds) at zero false positives",
       "Decision-Tree classifier 100% 5-fold CV on steady-state data; steady-state gating took accuracy 84% → 99.8%",
-      "Published to PyPI as runtheta (v0.1.10) with Docker, CI on Python 3.10, 3.12, and a one-command reproduce script",
+      "Published to PyPI as runtheta (v0.1.10) with Docker, CI on Python 3.10/3.11/3.12, and a one-command reproduce script",
       "Honest scope: lead-time-before-throttle is simulation-validated, with hardware validation on a DGX B200 cluster in fall 2026",
     ],
     skillsDemonstrated: ["Python", "GPU Telemetry (NVML/DCGM)", "Time-Series Anomaly Detection", "Statistical Modeling", "Survival Analysis", "scikit-learn", "OSS Packaging / CI", "Systems Design"],

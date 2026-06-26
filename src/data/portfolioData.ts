@@ -436,7 +436,7 @@ export const projects: Project[] = [
         { parameter: "Top anomaly robust-z", value: "+15.6", unit: "σ", evidence_source: "E009", confidence: "VERIFIED" },
         { parameter: "Classifier 5-fold CV", value: "100", unit: "% (T4 steady-state)", evidence_source: "models/train", confidence: "VERIFIED" },
         { parameter: "Ambient sensitivity", value: "3.5×", unit: "recovery delta / 2 °C", evidence_source: "Stage 1, F2", confidence: "VERIFIED" },
-        { parameter: "Lead time (gradual, sim)", value: "2.5, 7.7", unit: "days @ 0 false alarms", evidence_source: "survival sim", confidence: "CONCEPTUAL" },
+        { parameter: "Lead time (gradual, sim)", value: "2.5-7.7", unit: "days @ 0 false alarms", evidence_source: "survival sim", confidence: "CONCEPTUAL" },
       ],
       ownershipDisclosure: {
         owned: [
