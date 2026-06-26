@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import BootAnimation from "@/components/BootAnimation";
 import MissionNav from "@/components/MissionNav";
 import { ViewModeProvider } from "@/contexts/ViewModeContext";
 import OverviewSection from "@/components/sections/OverviewSection";
@@ -11,18 +10,14 @@ import ContactSection from "@/components/sections/ContactSection";
 import QuickviewSection from "@/components/sections/QuickviewSection";
 import GradientOrbs from "@/components/visual/GradientOrbs";
 import FilmGrain from "@/components/visual/FilmGrain";
-import CustomCursor from "@/components/visual/CustomCursor";
-import ParticleField from "@/components/visual/ParticleField";
 import ThermalField from "@/components/visual/ThermalField";
 import CursorHeat from "@/components/visual/CursorHeat";
 import CommandPalette from "@/components/CommandPalette";
 
 export default function Index() {
-  const [booted, setBooted] = useState(false);
+  const [booted] = useState(true);
   const [activeSection, setActiveSection] = useState("overview");
   const [targetProjectId, setTargetProjectId] = useState<string | null>(null);
-
-  const handleBootComplete = useCallback(() => setBooted(true), []);
 
   const handleNavigateToProject = useCallback((projectId: string) => {
     setTargetProjectId(projectId);
@@ -50,15 +45,11 @@ export default function Index() {
 
   return (
     <ViewModeProvider>
-      <CustomCursor />
-      {!booted && <BootAnimation onComplete={handleBootComplete} />}
-
       {booted && (
         <div className="min-h-screen bg-background relative">
           {/* Ambient layers */}
           <ThermalField />
           <CursorHeat />
-          <ParticleField count={48} />
           <GradientOrbs variant="mixed" fixed />
           <FilmGrain fixed opacity={0.02} />
 

@@ -12,11 +12,10 @@ function LiveClock() {
       const h = String(now.getHours()).padStart(2, "0");
       const m = String(now.getMinutes()).padStart(2, "0");
       const s = String(now.getSeconds()).padStart(2, "0");
-      const ms = String(Math.floor(now.getMilliseconds() / 10)).padStart(2, "0");
-      setTime(`${h}:${m}:${s}.${ms}`);
+      setTime(`${h}:${m}:${s}`);
     };
     tick();
-    const id = setInterval(tick, 50);
+    const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
   return <span className="t-mono-xs t-tabular" style={{ color: "var(--t-faint)" }}>{time}</span>;
