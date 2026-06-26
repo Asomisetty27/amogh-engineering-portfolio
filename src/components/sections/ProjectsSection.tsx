@@ -425,6 +425,36 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
                         </div>
                       )}
 
+                      {/* Implementation */}
+                      {selectedProject.module.implementationNotes && selectedProject.module.implementationNotes.length > 0 && (
+                        <div>
+                          <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-1.5 uppercase">Implementation</h4>
+                          <div className="space-y-1">
+                            {selectedProject.module.implementationNotes.map((r, i) => (
+                              <div key={i} className="flex items-start gap-2 text-xs text-secondary-foreground">
+                                <span className="text-primary/60 mt-0.5">▸</span>
+                                <span>{r}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Roadmap / Next */}
+                      {selectedProject.module.improvements && selectedProject.module.improvements.length > 0 && (
+                        <div>
+                          <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-1.5 uppercase">Roadmap / Next</h4>
+                          <div className="space-y-1">
+                            {selectedProject.module.improvements.map((r, i) => (
+                              <div key={i} className="flex items-start gap-2 text-xs text-secondary-foreground">
+                                <span className="text-primary/60 mt-0.5">→</span>
+                                <span>{r}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Ownership */}
                       {selectedProject.module.ownershipDisclosure && (
                         <div>
