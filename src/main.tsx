@@ -11,7 +11,7 @@ try {
     "color:#9FE1CB;font-size:12px"
   );
   console.log(
-    "%cR_θ = ΔT / P  — the one signal that separates a busy-hot GPU from a failing-hot one.\nTheta: pip install runtheta · github.com/Asomisetty27/theta\nYou opened the console — you're exactly who this site is built for.  → asomisetty27@gmail.com",
+    "%cR_θ = ΔT / P. The signal that separates a busy-hot GPU from a failing one.\nTheta: pip install runtheta · github.com/Asomisetty27/theta\nIf you read console output, we should probably talk: asomisetty27@gmail.com",
     "color:#8a8f98;font-family:ui-monospace,monospace;font-size:11px;line-height:1.6"
   );
 } catch {

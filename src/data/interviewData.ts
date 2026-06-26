@@ -20,9 +20,9 @@ export interface ResumeHighlight {
 
 export const recruiterSummaries: Record<string, RecruiterSummary> = {
   "theta-thermalos": {
-    whatIsIt: "An open-source GPU reliability agent (pip install runtheta) that computes effective thermal resistance R_θ = ΔT/P in real time from existing NVML/DCGM telemetry to separate a busy-hot GPU from a failing-hot one — a signal no incumbent computes.",
+    whatIsIt: "An open-source GPU reliability agent (pip install runtheta) that computes effective thermal resistance R_θ = ΔT/P in real time from existing NVML/DCGM telemetry to separate a busy-hot GPU from a failing-hot one. No incumbent computes it.",
     whyItMatters: "Genuine GPU + ML-systems depth on production hardware: it caught real degrading H100s that temperature thresholds missed, the exact failure mode that throttles training runs and triggers RMAs in AI data centers.",
-    whatYouBuilt: "Designed the R_θ method and virtual-ambient baseline, a peer-relative median-polish anomaly detector, a survival-analysis lead-time model, and a fault-state classifier — shipped as a packaged OSS agent (PyPI, Docker, CI) with Prometheus/Slack/PagerDuty exporters and a live dashboard.",
+    whatYouBuilt: "Designed the R_θ method and virtual-ambient baseline, a peer-relative median-polish anomaly detector, a survival-analysis lead-time model, and a fault-state classifier. Shipped as a packaged OSS agent (PyPI, Docker, CI) with Prometheus/Slack/PagerDuty exporters and a live dashboard.",
     keyOutcomes: [
       "Blind-validated on 72 production Princeton H100s: flagged 3 degraded units (one at robust-z +15.6, two invisible to temperature thresholds) at zero false positives",
       "Decision-Tree classifier 100% 5-fold CV on steady-state data; steady-state gating took accuracy 84% → 99.8%",

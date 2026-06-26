@@ -345,7 +345,7 @@ export const projects: Project[] = [
   // ===== DOMAIN: AI & GPU SYSTEMS =====
   {
     id: "theta-thermalos",
-    name: "Theta / ThermalOS — GPU Thermal-Power Forensics",
+    name: "Theta / ThermalOS: GPU Thermal-Power Forensics",
     codename: "THETA",
     domain: "ai-systems",
     status: "ACTIVE",
@@ -366,7 +366,7 @@ export const projects: Project[] = [
     ],
     module: {
       problemStatement:
-        "A GPU at 82 °C is ambiguous: it could be busy and healthy, or its cooling path could be failing. nvidia-smi, DCGM, and NVIDIA Mission Control all expose temperature and power as separate fields — none divide the two. Fleet operators have no software-only signal that separates load-driven heat from degrading cooling, so cooling faults are caught late, after throttling or failure.",
+        "A GPU at 82 °C is ambiguous: it could be busy and healthy, or its cooling path could be failing. nvidia-smi, DCGM, and NVIDIA Mission Control all expose temperature and power as separate fields. None divides the two. Fleet operators have no software-only signal that separates load-driven heat from degrading cooling, so cooling faults are caught late, after throttling or failure.",
       systemOverview:
         "Theta is a software-only agent that computes effective thermal resistance R_θ = (T_junction − T_ref) / P_GPU from existing telemetry, no extra hardware. Rising R_θ at steady power means cooling degradation. A peer-relative detector compares each GPU to its matched-power node-mates (robust median-polish z-score) to flag units degraded before the agent started, and a survival-analysis model estimates lead-time-to-failure. Shipped as an OSS Python package on PyPI with a live dashboard.",
       systemArchitecture:
@@ -391,7 +391,7 @@ export const projects: Project[] = [
             "Cross-sectional detector comparing each GPU to matched-power node-mates via robust median-polish z-score; needs no warm-up, so it catches units degraded before the agent started.",
           details: [
             "Two-way (node × baseboard-ordinal) median polish removes HGX position structure (±11% of mean R_θ)",
-            "Blind-flagged 3 degraded units on 72 production H100s — one at robust-z +15.6, two invisible to temperature thresholds",
+            "Blind-flagged 3 degraded units on 72 production H100s: one at robust-z +15.6, two invisible to temperature thresholds",
             "Position-conditioned cross-node scan recovers all 3 at zero false positives (within-node alone finds 1)",
           ],
           confidence: "VERIFIED",
@@ -410,26 +410,26 @@ export const projects: Project[] = [
         },
       ],
       implementationNotes: [
-        "Packaged and published to PyPI as `runtheta` (v0.1.10) — one-line install; Dockerfile + docker-compose (agent + Prometheus + Grafana) included",
+        "Packaged and published to PyPI as `runtheta` (v0.1.10); one-line install, plus Dockerfile and docker-compose (agent + Prometheus + Grafana)",
         "Hardware-abstraction layer (hal.py) supports NVIDIA (NVML), AMD (amdsmi), DCGM, and Redfish BMC behind one seam",
         "Alert governor holds inferential alerts while a GPU is warming and circuit-breaks noisy GPUs to earn trust on a stranger's fleet",
         "Characterization tests pin real incidents (e.g. the 72-H100 blind-flag) so regressions are caught; CI runs pytest on Python 3.10/3.11/3.12 + ruff",
       ],
       failureModes: [],
       improvements: [
-        "Per-GPU calibration for B200/H100/A100 (Stage 2, Cal Poly DGX B200 AI Factory) — the bundled classifier is currently Tesla T4-trained",
+        "Per-GPU calibration for B200/H100/A100 (Stage 2, Cal Poly DGX B200 AI Factory); the bundled classifier is currently Tesla T4-trained",
         "Lower-level GPU instrumentation toward kernel/NCCL-aware signals (the ML-performance-engineering frontier)",
         "Error-bar / variance reporting across runs and GPUs on the peer-relative thresholds",
       ],
       validationResults: [
         "Peer-relative method blind-flagged 3 degraded units on 72 production Princeton H100s; cross-node scan recovered all 3 at 0 false positives",
         "Decision-Tree classifier: 100% 5-fold CV accuracy on Tesla T4 steady-state data (steady-state gating takes Naive Bayes 84% → 99.8%)",
-        "Controlled Stage-1 study (Tesla T4, n=7, within-condition CV 1.8%): a 2 °C ambient delta drives a 3.5× change in power-recovery time — direct evidence of GPU thermal memory",
+        "Controlled Stage-1 study (Tesla T4, n=7, within-condition CV 1.8%): a 2 °C ambient delta drives a 3.5× change in power-recovery time, direct evidence of GPU thermal memory",
         "Reproduce the blind-flag result: `python tools/validate_e009_princeton.py <export.json>`",
         "NOT yet validated: lead-time-before-throttle on real hardware (simulation only until the fall-2026 E-LT testbed); B200/H100/A100 classifier generalization (calibration required); AMD MI300 silicon (implemented + unit-tested, not yet run on real hardware)",
       ],
       keyInsight:
-        "A hot GPU is ambiguous; the ratio of temperature rise to power is not. R_θ at steady power is the one software signal that separates load from degradation — and no incumbent (DCGM, Mission Control, Phaidra) computes it.",
+        "A hot GPU is ambiguous; the ratio of temperature rise to power is not. R_θ at steady power separates load from degradation, and no incumbent (DCGM, Mission Control, Phaidra) computes it.",
       verificationSummary: [
         { parameter: "R_θ idle vs load (Tesla T4)", value: "1.28 vs 0.72", unit: "°C/W", evidence_source: "Stage 1, F1", confidence: "VERIFIED" },
         { parameter: "Blind-flagged degraded units", value: "3 / 72", unit: "H100s", evidence_source: "E009 production validation", confidence: "VERIFIED" },
@@ -453,7 +453,7 @@ export const projects: Project[] = [
     },
     diagrams: [],
     evidence: [
-      { id: "theta-pypi", fileName: "runtheta on PyPI", type: "link", description: "pip install runtheta — live package (v0.1.10)", url: "https://pypi.org/project/runtheta/" },
+      { id: "theta-pypi", fileName: "runtheta on PyPI", type: "link", description: "Live PyPI package, v0.1.10", url: "https://pypi.org/project/runtheta/" },
       { id: "theta-github", fileName: "Asomisetty27/theta", type: "link", description: "Open-source agent: code, README, CI, reproduce script", url: "https://github.com/Asomisetty27/theta" },
       { id: "theta-dashboard", fileName: "Live dashboard", type: "link", description: "ThermalOS research & telemetry dashboard", url: "https://amogh.site/thermalos" },
     ],

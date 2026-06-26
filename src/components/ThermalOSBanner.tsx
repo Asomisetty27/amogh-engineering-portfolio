@@ -59,7 +59,7 @@ export default function ThermalOSBanner() {
         <h2 className="font-display text-lg md:text-xl tracking-wide text-foreground mb-1">
           <span className="fx-grad-text-green font-semibold">ThermalOS</span>{" "}
           <span className="text-secondary-foreground text-base md:text-lg">
-            — Open-source GPU thermal-power forensics
+            · Open-source GPU thermal-power forensics
           </span>
         </h2>
 
@@ -68,9 +68,9 @@ export default function ThermalOSBanner() {
         </p>
 
         <p className="text-sm text-secondary-foreground leading-relaxed mb-4">
-          The peer-relative thermal-resistance method flags degrading GPUs that fixed temperature thresholds miss —
+          The peer-relative thermal-resistance method flags degrading GPUs that fixed temperature thresholds miss. It was
           <span className="text-[#9FE1CB] font-semibold"> blind-validated on 72 Princeton H100s</span>. A controlled Stage-1 study
-          (Tesla T4, n=7, CV 1.8%) showed a 2°C ambient delta drives a 3.5× change in power-recovery time — direct evidence of
+          (Tesla T4, n=7, CV 1.8%) showed a 2 °C ambient delta drives a 3.5× change in power-recovery time, direct evidence of
           GPU thermal memory. Hardware lead-time validation runs on a DGX B200 cluster in fall 2026.
         </p>
 

@@ -11,7 +11,7 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 const strengths = [
   {
     title: "GPU & ML Infrastructure",
-    description: "Theta/ThermalOS — open-source GPU reliability agent: real-time thermal-resistance (R_θ) anomaly detection from NVML/DCGM telemetry, peer-relative method blind-validated on 72 Princeton H100s, survival-analysis lead-time modeling, shipped on PyPI",
+    description: "Theta: open-source GPU reliability agent. Real-time thermal-resistance (R_θ) anomaly detection from NVML/DCGM telemetry; peer-relative method blind-validated on 72 Princeton H100s; survival-analysis lead-time modeling; shipped on PyPI",
     icon: Cpu,
     color: "neon-green",
   },
@@ -56,7 +56,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
             }}
           />
           <p className="text-sm leading-relaxed text-secondary-foreground pl-1">
-            I build GPU and ML-infrastructure software. My main project, Theta/ThermalOS, is an open-source GPU reliability agent (<span className="font-mono text-primary">pip install runtheta</span>) whose peer-relative thermal-resistance method was blind-validated on 72 Princeton H100s. I back it with a full-stack hardware foundation — analog signal chains, embedded control, RISC-V/FPGA digital systems — and the measurement discipline to know when a number is real.
+            I build GPU and ML-infrastructure software. My main project, Theta (<span className="font-mono text-primary">pip install runtheta</span>), is an open-source GPU reliability agent: it computes effective thermal resistance R_θ from NVML/DCGM telemetry to tell a busy-hot GPU from a failing one, and its peer-relative detector was blind-validated on 72 Princeton H100s. Underneath sits a hardware foundation: analog signal chains, embedded control, and RISC-V/FPGA digital systems, with the measurement discipline to know when a number is real.
           </p>
         </div>
 
