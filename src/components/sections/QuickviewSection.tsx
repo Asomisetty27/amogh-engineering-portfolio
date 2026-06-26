@@ -4,10 +4,10 @@ export default function QuickviewSection() {
   const handlePrint = () => window.print();
 
   const topProjects = [
+    projects.find((p) => p.id === "theta-thermalos")!,
+    projects.find((p) => p.id === "digital-systems")!,
     projects.find((p) => p.id === "ee143-signal-system")!,
     projects.find((p) => p.id === "rgm-machine")!,
-    projects.find((p) => p.id === "digital-systems")!,
-    projects.find((p) => p.id === "fpv-drone")!,
   ].filter(Boolean);
 
   return (
@@ -31,11 +31,14 @@ export default function QuickviewSection() {
           <h1 className="text-2xl font-bold text-foreground print:text-black">
             {personalInfo.name}
           </h1>
-          <p className="text-sm text-muted-foreground print:text-gray-600">
-            {personalInfo.title} — {personalInfo.university}
+          <p className="text-sm text-primary print:text-black font-medium">
+            GPU Infrastructure &amp; ML-Systems Engineer
+          </p>
+          <p className="text-xs text-muted-foreground print:text-gray-600">
+            {personalInfo.title}, {personalInfo.university}
           </p>
           <p className="text-xs font-mono text-muted-foreground print:text-gray-500 mt-1">
-            {personalInfo.email} · {personalInfo.phone}
+            {personalInfo.email} · github.com/Asomisetty27 · pypi.org/project/runtheta
           </p>
         </div>
 
@@ -75,7 +78,7 @@ export default function QuickviewSection() {
             <div key={i}>
               <div className="flex items-baseline justify-between">
                 <span className="text-sm font-semibold text-foreground print:text-black">
-                  {exp.company} — {exp.role}
+                  {exp.company}, {exp.role}
                 </span>
                 <span className="text-[10px] font-mono text-muted-foreground print:text-gray-500">
                   {exp.period}

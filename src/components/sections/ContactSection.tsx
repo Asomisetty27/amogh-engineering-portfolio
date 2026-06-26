@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { personalInfo } from "@/data/portfolioData";
 import { SectionTitle } from "@/components/ui/mission-ui";
-import { Mail, Phone, Copy, Check } from "lucide-react";
+import { Mail, Phone, Copy, Check, Github, Package, ExternalLink } from "lucide-react";
 import { useState } from "react";
 
 export default function ContactSection() {
@@ -89,6 +89,38 @@ export default function ContactSection() {
           >
             {copied === "phone" ? <Check size={14} className="text-neon-green" /> : <Copy size={14} />}
           </button>
+        </div>
+
+        <div className="h-px" style={{ background: "linear-gradient(90deg, transparent, hsl(var(--border)), transparent)" }} />
+
+        <div className="space-y-3 relative">
+          {[
+            { Icon: Github, label: "GitHub", value: "github.com/Asomisetty27", href: "https://github.com/Asomisetty27" },
+            { Icon: Package, label: "PyPI", value: "pip install runtheta", href: "https://pypi.org/project/runtheta/" },
+            { Icon: ExternalLink, label: "Live dashboard", value: "amogh.site/thermalos", href: "/thermalos" },
+          ].map(({ Icon, label, value, href }) => (
+            <a
+              key={label}
+              href={href}
+              target={href.startsWith("http") ? "_blank" : undefined}
+              rel={href.startsWith("http") ? "noreferrer" : undefined}
+              className="flex items-center gap-3 group"
+            >
+              <div
+                className="p-2 rounded-md"
+                style={{
+                  background: "linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--primary) / 0.04))",
+                  border: "1px solid hsl(var(--primary) / 0.18)",
+                }}
+              >
+                <Icon size={16} className="text-primary" />
+              </div>
+              <div>
+                <p className="text-xs font-mono text-muted-foreground tracking-wider uppercase">{label}</p>
+                <span className="text-sm text-foreground group-hover:text-primary transition-colors">{value}</span>
+              </div>
+            </a>
+          ))}
         </div>
       </motion.div>
     </section>
