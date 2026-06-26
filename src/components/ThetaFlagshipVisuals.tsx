@@ -100,7 +100,7 @@ export default function ThetaFlagshipVisuals() {
           <ResponsiveContainer width="100%" height={170}>
             <BarChart data={STATES} margin={{ top: 18, right: 8, left: -14, bottom: 0 }}>
               <XAxis dataKey="state" tick={{ fontSize: 10, fill: "#8a8f98" }} axisLine={false} tickLine={false} interval={0} />
-              <YAxis tick={{ fontSize: 10, fill: "#8a8f98" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: "#8a8f98" }} axisLine={false} tickLine={false} domain={[0, 2.4]} ticks={[0, 0.6, 1.2, 1.8, 2.4]} />
               <Bar dataKey="rtheta" radius={[3, 3, 0, 0]} isAnimationActive={false}>
                 {STATES.map((s, i) => (
                   <Cell key={i} fill={s.fill} />
@@ -119,7 +119,7 @@ export default function ThetaFlagshipVisuals() {
           <ResponsiveContainer width="100%" height={170}>
             <ScatterChart margin={{ top: 18, right: 16, left: -14, bottom: 0 }}>
               <XAxis type="number" dataKey="x" hide domain={[0, 4]} />
-              <YAxis type="number" dataKey="z" tick={{ fontSize: 10, fill: "#8a8f98" }} axisLine={false} tickLine={false} domain={[-4, 18]} />
+              <YAxis type="number" dataKey="z" tick={{ fontSize: 10, fill: "#8a8f98" }} axisLine={false} tickLine={false} domain={[-2, 18]} ticks={[0, 5, 10, 15]} />
               <ReferenceArea y1={-3} y2={3} fill="#35C792" fillOpacity={0.1} />
               <ReferenceLine y={3} stroke="#E0A33E" strokeDasharray="3 3" />
               <Scatter data={FLAGGED} fill="#E0A33E" isAnimationActive={false}>
