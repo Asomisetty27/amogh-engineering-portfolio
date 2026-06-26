@@ -13,6 +13,7 @@ import GradientOrbs from "@/components/visual/GradientOrbs";
 import FilmGrain from "@/components/visual/FilmGrain";
 import CustomCursor from "@/components/visual/CustomCursor";
 import ParticleField from "@/components/visual/ParticleField";
+import ThermalField from "@/components/visual/ThermalField";
 
 export default function Index() {
   const [booted, setBooted] = useState(false);
@@ -53,6 +54,7 @@ export default function Index() {
       {booted && (
         <div className="min-h-screen bg-background relative">
           {/* Ambient layers */}
+          <ThermalField />
           <ParticleField count={48} />
           <GradientOrbs variant="mixed" fixed />
           <FilmGrain fixed opacity={0.02} />
