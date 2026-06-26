@@ -41,7 +41,7 @@ export default function HeroHeader() {
         transition={{ delay: 0.1, duration: 0.4 }}
       >
         <span className="t-mono-xs" style={{ color: "var(--t-blueprint-ink)", letterSpacing: "0.14em" }}>
-          {COORDS} — SLO, CA
+          {COORDS}, SLO, CA
         </span>
         <LiveClock />
       </motion.div>
@@ -52,7 +52,7 @@ export default function HeroHeader() {
         style={{ background: "linear-gradient(90deg, hsl(170 80% 50% / 0.25), hsl(170 80% 50% / 0.06) 60%, transparent)" }}
       />
 
-      {/* Name — character-by-character spring reveal */}
+      {/* Name, character-by-character spring reveal */}
       <div className="overflow-hidden">
         <h1
           style={{
@@ -111,8 +111,8 @@ export default function HeroHeader() {
       >
         <span className="flex items-center gap-1.5 t-mono-xs" style={{ color: "var(--t-healthy)" }}>
           <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4AF37] opacity-60" />
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#D4AF37]" style={{ boxShadow: "0 0 6px #D4AF37" }} />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#35C792] opacity-60" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#35C792]" style={{ boxShadow: "0 0 6px #35C792" }} />
           </span>
           SYS NOMINAL
         </span>

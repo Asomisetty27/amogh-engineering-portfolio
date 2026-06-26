@@ -16,9 +16,9 @@ const skillCategories: { id: string; title: string; color: string; skills: Skill
     title: "GPU & ML Systems",
     color: "neon-green",
     skills: [
-      { name: "Python (systems & data)", evidence: "runtheta OSS package — pip install runtheta, v0.1.10 on PyPI" },
+      { name: "Python (systems & data)", evidence: "runtheta OSS package, pip install runtheta, v0.1.10 on PyPI" },
       { name: "GPU Telemetry (NVML / DCGM)", evidence: "Real-time R_θ = ΔT/P computed from live GPU telemetry (Theta)" },
-      { name: "Time-Series Anomaly Detection", evidence: "Peer-relative median-polish across fleet GPUs — blind-validated on 72 Princeton H100s" },
+      { name: "Time-Series Anomaly Detection", evidence: "Peer-relative median-polish across fleet GPUs, blind-validated on 72 Princeton H100s" },
       { name: "Statistical Modeling (NumPy / SciPy / pandas)", evidence: "Robust stats, median-polish, z-score fleet baselining" },
       { name: "Survival Analysis (lifelines)", evidence: "Lead-time-to-failure modeling on GPU telemetry" },
       { name: "scikit-learn / Classification", evidence: "Fault-mode classifier (RF/DT) on thermal signatures" },
@@ -44,7 +44,7 @@ const skillCategories: { id: string; title: string; color: string; skills: Skill
     skills: [
       { name: "Op-Amp Circuit Design", evidence: "Summing amp, voltage follower, Schmitt trigger (EE 241/143)", projectLink: "ee143-signal-system" },
       { name: "Sensor Integration", evidence: "Capacitive touch, photoresistor, inductance sensing (EE 241)", projectLink: "rgm-machine" },
-      { name: "555 Timer / Oscillator Design", evidence: "LC oscillator metal detector — 8,760 Hz baseline", projectLink: "detect-7" },
+      { name: "555 Timer / Oscillator Design", evidence: "LC oscillator metal detector, 8,760 Hz baseline", projectLink: "detect-7" },
       { name: "PCB Design & Reflow Soldering", evidence: "4-bit DAC PCB via Fusion 360 → reflow", projectLink: "ee143-signal-system" },
       { name: "LTSpice Simulation", evidence: "Pre-fabrication DAC verification", projectLink: "ee143-signal-system" },
       { name: "Soldering & Prototyping", evidence: "Breadboard + PCB assembly across EE 241 labs", projectLink: "rgm-machine" },
@@ -55,7 +55,7 @@ const skillCategories: { id: string; title: string; color: string; skills: Skill
     title: "Digital Systems",
     color: "neon-magenta",
     skills: [
-      { name: "SystemVerilog / HDL", evidence: "OTTER MCU — full RV32I CPU (CPE 233)", projectLink: "digital-systems" },
+      { name: "SystemVerilog / HDL", evidence: "OTTER MCU, full RV32I CPU (CPE 233)", projectLink: "digital-systems" },
       { name: "RISC-V Architecture", evidence: "Instruction fetch/decode/execute pipeline", projectLink: "digital-systems" },
       { name: "FPGA Synthesis (Vivado)", evidence: "CPU synthesized and verified on FPGA", projectLink: "digital-systems" },
       { name: "FSM Design", evidence: "FETCH→EXEC control unit, Moore/Mealy machines", projectLink: "digital-systems" },
@@ -70,7 +70,7 @@ const skillCategories: { id: string; title: string; color: string; skills: Skill
       { name: "CAD (SolidWorks, Fusion 360)", evidence: "IME 144 air motor + RGM custom parts", projectLink: "manufacturing-systems" },
       { name: "GD&T / Engineering Drawings (ASME Y14.5)", evidence: "All IME 144 production drawings", projectLink: "manufacturing-systems" },
       { name: "Manual Machining (Lathe & Mill)", evidence: "6 precision parts for air motor", projectLink: "manufacturing-systems" },
-      { name: "React / TypeScript / Web Development", evidence: "Funck platform — funck.live", projectLink: "funck" },
+      { name: "React / TypeScript / Web Development", evidence: "Funck platform, funck.live", projectLink: "funck" },
       { name: "Git / Version Control", evidence: "All software projects", projectLink: "funck" },
     ],
   },
@@ -89,7 +89,7 @@ export default function SkillsSection() {
           const isOpen = expandedCategory === cat.id;
           return (
             <div key={cat.id} className="fx-glass rounded-lg overflow-hidden relative">
-              {/* Top gradient accent — color-coded per category */}
+              {/* Top gradient accent, color-coded per category */}
               <div className="absolute top-0 left-0 right-0 h-px"
                 style={{
                   background: `linear-gradient(90deg, transparent, hsl(var(--${cat.color}) / ${isOpen ? 0.6 : 0.3}), transparent)`,

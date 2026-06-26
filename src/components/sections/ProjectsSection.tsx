@@ -107,7 +107,7 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
 
   return (
     <section className="max-w-7xl mx-auto fx-blur-reveal">
-      {/* Domain Selector — fx-card hover + active gradient glow */}
+      {/* Domain Selector, fx-card hover + active gradient glow */}
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-2 mb-6">
         {systemDomains.map((domain) => {
           const Icon = domainIcons[domain.icon] || Zap;
@@ -161,7 +161,7 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
 
       {/* Three-panel layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Left: Project Navigator — fx-glass + active gradient state */}
+        {/* Left: Project Navigator, fx-glass + active gradient state */}
         <div className="lg:col-span-2 fx-glass rounded-lg overflow-hidden">
           <PanelHeader>
             {systemDomains.find((d) => d.id === activeDomain)?.name || "Projects"}
@@ -205,12 +205,12 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
 
         {/* Center + Right: Hologram-first layout */}
         <div className="lg:col-span-10 space-y-4">
-          {/* RECRUITER VIEW — always shown first in recruiter mode */}
+          {/* RECRUITER VIEW, always shown first in recruiter mode */}
           {mode === "recruiter" && (
             <RecruiterProjectView project={selectedProject} />
           )}
 
-          {/* HOLOGRAM — always visible (but after recruiter summary in recruiter mode) */}
+          {/* HOLOGRAM, always visible (but after recruiter summary in recruiter mode) */}
           {selectedProject.has3D && (mode === "engineer" || detailTab === "brief") && (
             <AnimatePresence mode="wait">
               <motion.div
@@ -225,7 +225,7 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
             </AnimatePresence>
           )}
 
-          {/* RGM full view button — shimmer + gradient */}
+          {/* RGM full view button, shimmer + gradient */}
           {selectedProject.id === "rgm-machine" && (
             <button
               onClick={() => setRgmFullView(true)}
@@ -244,7 +244,7 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
             </button>
           )}
 
-          {/* Detail tabs — gradient active state */}
+          {/* Detail tabs, gradient active state */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => setDetailTab("brief")}
@@ -299,7 +299,7 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
                     <div className="absolute top-0 left-0 right-0 h-px"
                       style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.4), transparent)" }}
                     />
-                    <PanelHeader>System Brief — {selectedProject.codename}</PanelHeader>
+                    <PanelHeader>System Brief, {selectedProject.codename}</PanelHeader>
                     <div className="p-4 space-y-5 max-h-[60vh] overflow-y-auto">
                       {/* Hero */}
                       <div>
@@ -453,7 +453,7 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
                     </div>
                   </div>
 
-                  {/* Right: Evidence — fx-glass + accent */}
+                  {/* Right: Evidence, fx-glass + accent */}
                   <div className="lg:col-span-2 fx-glass rounded-lg overflow-hidden relative">
                     <div className="absolute top-0 left-0 right-0 h-px"
                       style={{ background: "linear-gradient(90deg, transparent, hsl(var(--neon-green) / 0.4), transparent)" }}
