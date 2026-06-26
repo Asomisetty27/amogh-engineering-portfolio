@@ -81,10 +81,10 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
     : undefined;
 
   const [activeDomain, setActiveDomain] = useState<SystemDomain>(
-    initialProject?.domain || "ai-systems"
+    initialProject?.domain || "signal-systems"
   );
   const [selectedProject, setSelectedProject] = useState<Project>(
-    initialProject || projects.find((p) => p.id === "theta-thermalos")!
+    initialProject || projects.find((p) => p.id === "ee143-signal-system")!
   );
   const [detailTab, setDetailTab] = useState<DetailTab>("brief");
   const [expandedSubsystems, setExpandedSubsystems] = useState<Set<string>>(new Set());

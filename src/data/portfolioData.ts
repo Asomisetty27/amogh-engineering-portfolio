@@ -123,13 +123,6 @@ export interface SystemDomainInfo {
 
 export const systemDomains: SystemDomainInfo[] = [
   {
-    id: "ai-systems",
-    name: "AI & GPU Systems",
-    subtitle: "GPU reliability & telemetry, R_θ thermal forensics, ML anomaly detection, OSS tooling",
-    icon: "cpu",
-    color: "neon-green",
-  },
-  {
     id: "signal-systems",
     name: "System Integration & Signal Pipelines",
     subtitle: "End-to-end analog↔digital systems, signal conditioning, ADC/DAC",
@@ -149,6 +142,13 @@ export const systemDomains: SystemDomainInfo[] = [
     subtitle: "CPU architecture, FSMs, FPGA implementation, HDL design",
     icon: "cpu",
     color: "neon-magenta",
+  },
+  {
+    id: "ai-systems",
+    name: "AI & GPU Systems",
+    subtitle: "GPU reliability & telemetry, R_θ thermal forensics, ML anomaly detection, OSS tooling",
+    icon: "cpu",
+    color: "neon-green",
   },
   {
     id: "manufacturing",
