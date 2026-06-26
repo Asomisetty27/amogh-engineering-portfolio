@@ -4,6 +4,7 @@ import { recruiterSummaries } from "@/data/interviewData";
 import { useViewMode } from "@/contexts/ViewModeContext";
 import { Cpu, Radio, Zap, ArrowRight, Shield } from "lucide-react";
 import ThermalOSBanner from "@/components/ThermalOSBanner";
+import ThetaFlagshipVisuals from "@/components/ThetaFlagshipVisuals";
 import HeroHeader from "@/components/sections/HeroHeader";
 import TiltCard from "@/components/ui/TiltCard";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -69,6 +70,8 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
           </h3>
         </div>
         <ThermalOSBanner />
+
+        <ThetaFlagshipVisuals />
 
         {/* 3 Core Strengths — fx-card hover + top radial glow */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
