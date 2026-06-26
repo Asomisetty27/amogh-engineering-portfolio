@@ -41,7 +41,7 @@ export default function ExperienceSection() {
                   </div>
                   {exp.company}
                 </h3>
-                <p className="text-sm text-muted-foreground mt-1">{exp.role} — {exp.location}</p>
+                <p className="text-sm text-muted-foreground mt-1">{exp.role}, {exp.location}</p>
               </div>
               <span className="text-xs font-mono text-muted-foreground flex items-center gap-1 px-2 py-1 rounded"
                 style={{
