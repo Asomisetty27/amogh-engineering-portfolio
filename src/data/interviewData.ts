@@ -55,6 +55,50 @@ export const recruiterSummaries: Record<string, RecruiterSummary> = {
     ],
     skillsDemonstrated: ["Analog Design", "Embedded Programming", "Sensor Integration", "Root Cause Analysis", "System Integration", "CAD"],
   },
+  "pec-nexus": {
+    whatIsIt: "A role-aware internal operating system for Poly-Engineering Consulting that unifies project execution, training, scheduling, messaging, and permissions in one platform.",
+    whyItMatters: "Shows product ownership and systems design: modeling how an organization actually runs and shipping it to real users, with a real permissions model and role-based workflows.",
+    whatYouBuilt: "Three operating modes (Purpose, Competition, Contract) with role-aware workflows for PMs, tech leads, and members; a Mission Control command surface; unified Training; scheduling; and stage-based project execution on React + Supabase (Auth + RLS).",
+    keyOutcomes: [
+      "Replaced a fragmented set of club tools with one role-aware platform",
+      "Designed a permissions model with row-level security and self-healing admin logic",
+      "Built and rolled it out to the organization end to end",
+    ],
+    skillsDemonstrated: ["Product Architecture", "Role-Based Access Control", "React / TypeScript", "Supabase (Auth + RLS)", "Workflow Design", "Systems Thinking"],
+  },
+  "materials-phases": {
+    whatIsIt: "Materials analysis tying phase diagrams, deformation history, and heat treatment to the microstructure and mechanical properties of alloys.",
+    whyItMatters: "Demonstrates structure-property-processing reasoning, the core of materials and reliability engineering: predicting how processing choices change how a material behaves and fails.",
+    whatYouBuilt: "Worked binary eutectic (Pb-Sn) phase-diagram interpretation, the cold-work to recrystallization to grain-growth progression, and Fe-C transformations / steel heat treatment, with an interactive phase-diagram tool.",
+    keyOutcomes: [
+      "Read phase fractions from tie lines via the lever rule across two-phase regions",
+      "Mapped cold work to recovery to recrystallization to grain growth and its property effects",
+      "Related cooling rate to pearlite/bainite/martensite and the hardness/ductility tradeoff",
+    ],
+    skillsDemonstrated: ["Phase Diagrams", "Microstructure Analysis", "Heat Treatment", "Structure-Property Reasoning", "Materials Selection"],
+  },
+  "materials-corrosion": {
+    whatIsIt: "An electrochemical-corrosion analysis: the anode/cathode/electrolyte/path failure model, galvanic-series reasoning, and design strategies to prevent corrosion.",
+    whyItMatters: "Corrosion is a systems-level failure mode; the same reliability mindset (find the mechanism, interrupt it by design) transfers directly to hardware reliability work.",
+    whatYouBuilt: "Modeled corrosion as four required elements (anode, cathode, electrolyte, electrical path), used the galvanic series for material selection, and specified prevention strategies, with an interactive corrosion visualization.",
+    keyOutcomes: [
+      "Modeled the full oxidation/reduction corrosion cell and its required elements",
+      "Used the galvanic series to reason about material pairings and risk",
+      "Specified design strategies that interrupt the corrosion mechanism",
+    ],
+    skillsDemonstrated: ["Electrochemistry", "Failure Analysis", "Materials Selection", "Corrosion Prevention", "Reliability Reasoning"],
+  },
+  "materials-polymers": {
+    whatIsIt: "Polymer mechanical-behavior analysis plus a CFRP vs 6061-T6 aluminum material-selection study for lightweight transit-vehicle design.",
+    whyItMatters: "Shows quantitative material selection under real constraints (weight, strength, cost, lifecycle), the kind of tradeoff analysis engineering decisions actually turn on.",
+    whatYouBuilt: "Linked thermoplastic molecular structure and secondary bonding to mechanical properties, then compared CFRP against 6061-T6 aluminum for bus-rapid-transit and rail applications, with interactive stress-strain and comparison visuals.",
+    keyOutcomes: [
+      "Related chain architecture and bonding to modulus, yield, and ductility",
+      "Compared CFRP (~600-3000 MPa) vs 6061-T6 (~310 MPa) on specific strength and cost",
+      "Framed the selection around specific strength, cost, and lifecycle",
+    ],
+    skillsDemonstrated: ["Materials Selection", "Mechanical Testing", "Composites", "Structure-Property Analysis", "Engineering Tradeoffs"],
+  },
   "digital-systems": {
     whatIsIt: "A multi-cycle RISC-V CPU designed from logic gates up and synthesized onto an FPGA, full instruction fetch, decode, execute, and memory access.",
     whyItMatters: "Demonstrates understanding of computer architecture at the hardware level, not just writing code, but building the machine that runs it.",

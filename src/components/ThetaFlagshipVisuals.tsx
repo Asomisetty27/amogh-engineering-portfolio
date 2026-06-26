@@ -45,7 +45,7 @@ const FLAGGED = [
 
 function ChartCard({ title, sub, children, foot }: { title: string; sub: string; children: ReactNode; foot?: string }) {
   return (
-    <div className="fx-glass rounded-lg p-4 relative overflow-hidden">
+    <motion.div whileHover={{ y: -3 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className="fx-glass rounded-lg p-4 relative overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(53,199,146,.35), transparent)" }} />
       <div className="flex items-baseline justify-between mb-2">
         <h4 className="text-sm font-semibold text-foreground leading-tight">{title}</h4>
@@ -53,7 +53,7 @@ function ChartCard({ title, sub, children, foot }: { title: string; sub: string;
       </div>
       {children}
       {foot && <p className="text-[10px] text-muted-foreground leading-relaxed mt-1.5">{foot}</p>}
-    </div>
+    </motion.div>
   );
 }
 
@@ -75,13 +75,15 @@ export default function ThetaFlagshipVisuals() {
         <div className="flex flex-col md:flex-row md:items-center gap-2">
           {PIPE.map((n, i) => (
             <div key={n.k} className="flex items-center gap-2 md:flex-1">
-              <div
-                className="flex-1 rounded-md px-3 py-2 border"
+              <motion.div
+                whileHover={{ scale: 1.04 }}
+                transition={{ type: "spring", stiffness: 400, damping: 18 }}
+                className="flex-1 rounded-md px-3 py-2 border cursor-default"
                 style={{ borderColor: "rgba(53,199,146,0.22)", background: "linear-gradient(135deg, rgba(15,110,86,0.12) 0%, transparent 100%)" }}
               >
                 <div className="text-[11px] font-mono text-[#9FE1CB] leading-tight">{n.k}</div>
                 <div className="text-[10px] text-muted-foreground leading-tight mt-0.5">{n.d}</div>
-              </div>
+              </motion.div>
               {i < PIPE.length - 1 && (
                 <ArrowRight size={12} className="text-muted-foreground/60 flex-shrink-0 rotate-90 md:rotate-0" />
               )}
