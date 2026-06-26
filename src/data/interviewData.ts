@@ -19,6 +19,18 @@ export interface ResumeHighlight {
 }
 
 export const recruiterSummaries: Record<string, RecruiterSummary> = {
+  "theta-thermalos": {
+    whatIsIt: "An open-source GPU reliability agent (pip install runtheta) that computes effective thermal resistance R_θ = ΔT/P in real time from existing NVML/DCGM telemetry to separate a busy-hot GPU from a failing-hot one — a signal no incumbent computes.",
+    whyItMatters: "Genuine GPU + ML-systems depth on production hardware: it caught real degrading H100s that temperature thresholds missed, the exact failure mode that throttles training runs and triggers RMAs in AI data centers.",
+    whatYouBuilt: "Designed the R_θ method and virtual-ambient baseline, a peer-relative median-polish anomaly detector, a survival-analysis lead-time model, and a fault-state classifier — shipped as a packaged OSS agent (PyPI, Docker, CI) with Prometheus/Slack/PagerDuty exporters and a live dashboard.",
+    keyOutcomes: [
+      "Blind-validated on 72 production Princeton H100s: flagged 3 degraded units (one at robust-z +15.6, two invisible to temperature thresholds) at zero false positives",
+      "Decision-Tree classifier 100% 5-fold CV on steady-state data; steady-state gating took accuracy 84% → 99.8%",
+      "Published to PyPI as runtheta (v0.1.10) with Docker, CI on Python 3.10–3.12, and a one-command reproduce script",
+      "Honest scope: lead-time-before-throttle is simulation-validated, with hardware validation on a DGX B200 cluster in fall 2026",
+    ],
+    skillsDemonstrated: ["Python", "GPU Telemetry (NVML/DCGM)", "Time-Series Anomaly Detection", "Statistical Modeling", "Survival Analysis", "scikit-learn", "OSS Packaging / CI", "Systems Design"],
+  },
   "ee143-signal-system": {
     whatIsIt: "A complete analog-to-digital-to-analog signal system — designed, built, and validated from raw input through conditioning, conversion, and reconstruction.",
     whyItMatters: "Demonstrates end-to-end systems ownership: designing across analog and digital boundaries, debugging loading effects, and validating output against simulation.",
