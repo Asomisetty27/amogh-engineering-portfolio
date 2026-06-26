@@ -26,13 +26,13 @@ export const recruiterSummaries: Record<string, RecruiterSummary> = {
     keyOutcomes: [
       "Blind-validated on 72 production Princeton H100s: flagged 3 degraded units (one at robust-z +15.6, two invisible to temperature thresholds) at zero false positives",
       "Decision-Tree classifier 100% 5-fold CV on steady-state data; steady-state gating took accuracy 84% → 99.8%",
-      "Published to PyPI as runtheta (v0.1.10) with Docker, CI on Python 3.10–3.12, and a one-command reproduce script",
+      "Published to PyPI as runtheta (v0.1.10) with Docker, CI on Python 3.10, 3.12, and a one-command reproduce script",
       "Honest scope: lead-time-before-throttle is simulation-validated, with hardware validation on a DGX B200 cluster in fall 2026",
     ],
     skillsDemonstrated: ["Python", "GPU Telemetry (NVML/DCGM)", "Time-Series Anomaly Detection", "Statistical Modeling", "Survival Analysis", "scikit-learn", "OSS Packaging / CI", "Systems Design"],
   },
   "ee143-signal-system": {
-    whatIsIt: "A complete analog-to-digital-to-analog signal system — designed, built, and validated from raw input through conditioning, conversion, and reconstruction.",
+    whatIsIt: "A complete analog-to-digital-to-analog signal system, designed, built, and validated from raw input through conditioning, conversion, and reconstruction.",
     whyItMatters: "Demonstrates end-to-end systems ownership: designing across analog and digital boundaries, debugging loading effects, and validating output against simulation.",
     whatYouBuilt: "Full signal chain: op-amp conditioning → Arduino ADC → 4-bit digital processing → custom PCB DAC → reconstructed analog output. Verified each stage independently.",
     keyOutcomes: [
@@ -44,7 +44,7 @@ export const recruiterSummaries: Record<string, RecruiterSummary> = {
     skillsDemonstrated: ["Circuit Design", "PCB Fabrication", "Signal Conditioning", "System Integration", "Debugging", "LTSpice"],
   },
   "rgm-machine": {
-    whatIsIt: "A 9-stage electromechanical chain reaction — each stage must reliably trigger the next. One failure anywhere halts the entire system.",
+    whatIsIt: "A 9-stage electromechanical chain reaction, each stage must reliably trigger the next. One failure anywhere halts the entire system.",
     whyItMatters: "Proves ability to debug complex multi-domain systems with sequential dependencies spanning electrical, mechanical, and software boundaries.",
     whatYouBuilt: "Capacitive piano → relay isolation → 580V strobe → Schmitt trigger light detector → solenoid launcher → 555 metal detector → electromagnet release → tilt switch → LCD display. Resolved 6 failure modes.",
     keyOutcomes: [
@@ -56,7 +56,7 @@ export const recruiterSummaries: Record<string, RecruiterSummary> = {
     skillsDemonstrated: ["Analog Design", "Embedded Programming", "Sensor Integration", "Root Cause Analysis", "System Integration", "CAD"],
   },
   "detect-7": {
-    whatIsIt: "A 555-timer-based metal detection system with automated electromagnet release — frequency-domain sensing under noise.",
+    whatIsIt: "A 555-timer-based metal detection system with automated electromagnet release, frequency-domain sensing under noise.",
     whyItMatters: "Shows precision in frequency-domain sensing and robust threshold logic under real-world noise conditions.",
     whatYouBuilt: "LC oscillator metal detector with Arduino-based frequency monitoring and MOSFET-controlled electromagnet.",
     keyOutcomes: [
@@ -67,9 +67,9 @@ export const recruiterSummaries: Record<string, RecruiterSummary> = {
     skillsDemonstrated: ["555 Timer Design", "Frequency Analysis", "MOSFET Switching", "Arduino Programming", "Debugging"],
   },
   "digital-systems": {
-    whatIsIt: "A multi-cycle RISC-V CPU designed from logic gates up and synthesized onto an FPGA — full instruction fetch, decode, execute, and memory access.",
-    whyItMatters: "Demonstrates understanding of computer architecture at the hardware level — not just writing code, but building the machine that runs it.",
-    whatYouBuilt: "Complete OTTER MCU: RV32I ISA, 10 ALU operations, 2-state FSM control, 32×32 register file, dual-port memory — synthesized and verified on Basys-3 FPGA via Vivado.",
+    whatIsIt: "A multi-cycle RISC-V CPU designed from logic gates up and synthesized onto an FPGA, full instruction fetch, decode, execute, and memory access.",
+    whyItMatters: "Demonstrates understanding of computer architecture at the hardware level, not just writing code, but building the machine that runs it.",
+    whatYouBuilt: "Complete OTTER MCU: RV32I ISA, 10 ALU operations, 2-state FSM control, 32×32 register file, dual-port memory, synthesized and verified on Basys-3 FPGA via Vivado.",
     keyOutcomes: [
       "Designed full RV32I instruction set in SystemVerilog",
       "10 ALU operations with branch condition generation",
@@ -79,7 +79,7 @@ export const recruiterSummaries: Record<string, RecruiterSummary> = {
     skillsDemonstrated: ["SystemVerilog / HDL", "RISC-V Architecture", "FPGA Synthesis", "FSM Design", "Digital Logic", "Timing Analysis"],
   },
   "manufacturing-systems": {
-    whatIsIt: "A pneumatic air motor built through the complete CAD-to-fabrication pipeline — 6 machined parts, all dimensioned per GD&T.",
+    whatIsIt: "A pneumatic air motor built through the complete CAD-to-fabrication pipeline, 6 machined parts, all dimensioned per GD&T.",
     whyItMatters: "Demonstrates hands-on manufacturing ownership: from digital design to physical parts with measured tolerances and functional assembly.",
     whatYouBuilt: "6 precision-machined components on manual lathe and mill, with engineering drawings per ASME Y14.5 GD&T. Inspected with calipers and micrometers, assembled into a working motor.",
     keyOutcomes: [
@@ -91,9 +91,9 @@ export const recruiterSummaries: Record<string, RecruiterSummary> = {
     skillsDemonstrated: ["Manual Machining (Lathe & Mill)", "CAD (SolidWorks)", "GD&T / Engineering Drawings", "Metrology", "Production Planning"],
   },
   "funck": {
-    whatIsIt: "A production event ticketing platform with real payments, authentication, fraud prevention, and automated email — deployed and serving real users.",
+    whatIsIt: "A production event ticketing platform with real payments, authentication, fraud prevention, and automated email, deployed and serving real users.",
     whyItMatters: "Demonstrates ability to ship production-grade software with integrated payment processing, database management, and operational reliability.",
-    whatYouBuilt: "React/TypeScript platform with Supabase backend, Stripe payment processing with webhook verification, automated emails via Resend — live at funck.live.",
+    whatYouBuilt: "React/TypeScript platform with Supabase backend, Stripe payment processing with webhook verification, automated emails via Resend, live at funck.live.",
     keyOutcomes: [
       "Shipped production system at funck.live serving real users and real transactions",
       "Integrated Stripe payment processing with server-side webhook verification",
@@ -103,7 +103,7 @@ export const recruiterSummaries: Record<string, RecruiterSummary> = {
     skillsDemonstrated: ["React / TypeScript", "Supabase / PostgreSQL", "Stripe Integration", "API Design", "Full-Stack Development"],
   },
   "fpv-drone": {
-    whatIsIt: "A 75 mm HD brushless FPV drone analyzed as a densely integrated electromechanical and RF system — six tightly coupled subsystems at 70 g.",
+    whatIsIt: "A 75 mm HD brushless FPV drone analyzed as a densely integrated electromechanical and RF system, six tightly coupled subsystems at 70 g.",
     whyItMatters: "Demonstrates ability to reason about a highly constrained system where power, control, RF, packaging, vibration, and performance all interact.",
     whatYouBuilt: "Comprehensive systems-level analysis: six interconnected subsystems, power architecture mapping, control-link integration analysis, and failure mode identification.",
     keyOutcomes: [
@@ -133,13 +133,13 @@ export const interviewQuestions: Record<string, InterviewQA[]> = {
     },
     {
       question: "How does quantization error affect the output?",
-      answer: "With 4 bits, the continuous analog signal is approximated by only 16 discrete levels, giving ±½ LSB (±31.25 mV) quantization error. This creates audible staircase artifacts in the speaker output — the fundamental tradeoff between bit depth and signal fidelity.",
+      answer: "With 4 bits, the continuous analog signal is approximated by only 16 discrete levels, giving ±½ LSB (±31.25 mV) quantization error. This creates audible staircase artifacts in the speaker output, the fundamental tradeoff between bit depth and signal fidelity.",
     },
   ],
   "rgm-machine": [
     {
       question: "What failed and how did you fix it?",
-      answer: "Six distinct failures. The most critical was a ground reference mismatch — the MOSFET controlling the electromagnet had no common ground between the Arduino (USB 5V) and external 9V supply, causing undefined gate-source voltage. Connecting both grounds fixed it immediately.",
+      answer: "Six distinct failures. The most critical was a ground reference mismatch, the MOSFET controlling the electromagnet had no common ground between the Arduino (USB 5V) and external 9V supply, causing undefined gate-source voltage. Connecting both grounds fixed it immediately.",
     },
     {
       question: "How did you ensure reliable metal detection?",
@@ -147,11 +147,11 @@ export const interviewQuestions: Record<string, InterviewQA[]> = {
     },
     {
       question: "How did you debug across 9 sequential stages?",
-      answer: "I isolated each stage independently first, verifying input/output at every boundary. The strobe (Stage 3) was the hardest — a broken transistor lead in the oscillator blocked the entire downstream chain. I systematically tested each component until I found the failed lead.",
+      answer: "I isolated each stage independently first, verifying input/output at every boundary. The strobe (Stage 3) was the hardest, a broken transistor lead in the oscillator blocked the entire downstream chain. I systematically tested each component until I found the failed lead.",
     },
     {
       question: "What's the most important lesson from this project?",
-      answer: "Sequential dependency amplifies risk. Any single failure halts the entire chain. This taught me to design for testability — each stage needs independent verification points. It's the same principle used in production test engineering.",
+      answer: "Sequential dependency amplifies risk. Any single failure halts the entire chain. This taught me to design for testability, each stage needs independent verification points. It's the same principle used in production test engineering.",
     },
   ],
   "digital-systems": [
@@ -165,7 +165,7 @@ export const interviewQuestions: Record<string, InterviewQA[]> = {
     },
     {
       question: "Why multi-cycle instead of pipelined?",
-      answer: "Multi-cycle was the pedagogical starting point — it simplifies control by using a 2-state FSM (FETCH/EXEC). The natural next step would be a 5-stage pipeline, which I'd implement by adding IF/ID/EX/MEM/WB stages with hazard detection and forwarding logic.",
+      answer: "Multi-cycle was the pedagogical starting point, it simplifies control by using a 2-state FSM (FETCH/EXEC). The natural next step would be a 5-stage pipeline, which I'd implement by adding IF/ID/EX/MEM/WB stages with hazard detection and forwarding logic.",
     },
   ],
   "manufacturing-systems": [
@@ -175,7 +175,7 @@ export const interviewQuestions: Record<string, InterviewQA[]> = {
     },
     {
       question: "What's the gap between CAD and reality?",
-      answer: "Tolerances. Real manufacturing introduces variation from tool wear, thermal expansion, fixturing, and operator technique. GD&T communicates design intent so manufacturing and inspection can verify parts independently. The CAD model is the ideal — the drawing defines what's acceptable.",
+      answer: "Tolerances. Real manufacturing introduces variation from tool wear, thermal expansion, fixturing, and operator technique. GD&T communicates design intent so manufacturing and inspection can verify parts independently. The CAD model is the ideal, the drawing defines what's acceptable.",
     },
   ],
   "funck": [
@@ -191,11 +191,11 @@ export const interviewQuestions: Record<string, InterviewQA[]> = {
   "fpv-drone": [
     {
       question: "Why is this more than just a hobby drone?",
-      answer: "It's a 70-gram system where six tightly coupled subsystems — propulsion, flight control, power regulation, RF control, digital video, and mechanical packaging — all impose constraints on each other. Battery sag affects motor authority and video stability. Motor vibration degrades gyro accuracy and camera output. Antenna placement inside a carbon fiber frame creates RF dead zones. Every design choice has system-level consequences.",
+      answer: "It's a 70-gram system where six tightly coupled subsystems, propulsion, flight control, power regulation, RF control, digital video, and mechanical packaging, all impose constraints on each other. Battery sag affects motor authority and video stability. Motor vibration degrades gyro accuracy and camera output. Antenna placement inside a carbon fiber frame creates RF dead zones. Every design choice has system-level consequences.",
     },
     {
       question: "Why does the control-link mismatch matter?",
-      answer: "The onboard ELRS receiver and TBS Mambo transmitter (Tracer protocol) use incompatible RF protocols. This isn't a binding issue — it's a fundamental serial/RF architecture mismatch. Resolving it requires either an ELRS transmitter module or an external Tracer receiver, each with different UART allocation, packaging, and antenna routing implications.",
+      answer: "The onboard ELRS receiver and TBS Mambo transmitter (Tracer protocol) use incompatible RF protocols. This isn't a binding issue, it's a fundamental serial/RF architecture mismatch. Resolving it requires either an ELRS transmitter module or an external Tracer receiver, each with different UART allocation, packaging, and antenna routing implications.",
     },
     {
       question: "Why does the DJI O3 change the design trade space?",
@@ -203,7 +203,7 @@ export const interviewQuestions: Record<string, InterviewQA[]> = {
     },
     {
       question: "What role does bidirectional DShot play?",
-      answer: "Bidirectional DShot600 enables motors to report RPM back to the flight controller. This allows RPM-based notch filtering in Betaflight — critical on micro platforms where motor vibration frequencies directly overlap with gyro measurement bandwidth. Without it, gyro noise degrades PID control quality.",
+      answer: "Bidirectional DShot600 enables motors to report RPM back to the flight controller. This allows RPM-based notch filtering in Betaflight, critical on micro platforms where motor vibration frequencies directly overlap with gyro measurement bandwidth. Without it, gyro noise degrades PID control quality.",
     },
     {
       question: "What are the most likely failure points?",
@@ -225,14 +225,14 @@ export const resumeHighlights: Record<string, ResumeHighlight[]> = {
     { resumeBullet: "Designed multi-cycle RISC-V CPU (RV32I) in SystemVerilog with 10 ALU operations, synthesized on FPGA", projectEvidence: "OTTER MCU: full datapath + FSM control synthesized on Basys-3 FPGA" },
   ],
   "manufacturing-systems": [
-    { resumeBullet: "Machined 6 precision parts for pneumatic air motor on manual lathe and mill per ASME Y14.5 GD&T", projectEvidence: "Crank disk, cylinder, flywheel, frame, mainshaft, piston — all per GD&T specs" },
+    { resumeBullet: "Machined 6 precision parts for pneumatic air motor on manual lathe and mill per ASME Y14.5 GD&T", projectEvidence: "Crank disk, cylinder, flywheel, frame, mainshaft, piston, all per GD&T specs" },
   ],
   "funck": [
     { resumeBullet: "Built and deployed full-stack event platform with Stripe payment processing at funck.live", projectEvidence: "Live production system with auth, payments, email, and role-based access" },
   ],
   "fpv-drone": [
     { resumeBullet: "Analyzed and documented tightly integrated FPV flight system across 6 coupled subsystems", projectEvidence: "Propulsion, flight control, power, RF, video, and structure analyzed as coupled system" },
-    { resumeBullet: "Identified control-link architecture mismatch and evaluated integration paths", projectEvidence: "ELRS vs Tracer protocol incompatibility — serial/RF architecture analysis" },
+    { resumeBullet: "Identified control-link architecture mismatch and evaluated integration paths", projectEvidence: "ELRS vs Tracer protocol incompatibility, serial/RF architecture analysis" },
     { resumeBullet: "Mapped multi-rail power distribution with failure propagation analysis", projectEvidence: "2S → ESC (unregulated) + 10V BEC (O3) + 5V BEC (logic) with 5 documented failure hotspots" },
   ],
 };

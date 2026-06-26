@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-// Console easter egg — for the engineer/quant who opens devtools (they will).
+// Console easter egg, for the engineer/quant who opens devtools (they will).
 // A quiet attention-to-detail signal; harmless in production.
 try {
   console.log(

@@ -120,6 +120,10 @@ export default function HeroHeader() {
         <span className="t-mono-xs" style={{ color: "var(--t-muted)" }}>CAL POLY EE · RISING JUNIOR</span>
         <span className="t-mono-xs" style={{ color: "var(--t-faint)" }}>◆</span>
         <span className="t-mono-xs" style={{ color: "var(--t-blueprint-ink)" }}>YC W27 TARGET</span>
+        <span className="t-mono-xs" style={{ color: "var(--t-faint)" }}>◆</span>
+        <span className="t-mono-xs hidden sm:inline" style={{ color: "var(--t-muted)" }}>
+          <kbd style={{ fontFamily: "var(--t-font-mono)", border: "1px solid var(--t-faint)", borderRadius: 4, padding: "0 4px" }}>⌘K</kbd> to navigate
+        </span>
       </motion.div>
     </div>
   );

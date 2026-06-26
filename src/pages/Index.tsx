@@ -15,6 +15,7 @@ import CustomCursor from "@/components/visual/CustomCursor";
 import ParticleField from "@/components/visual/ParticleField";
 import ThermalField from "@/components/visual/ThermalField";
 import CursorHeat from "@/components/visual/CursorHeat";
+import CommandPalette from "@/components/CommandPalette";
 
 export default function Index() {
   const [booted, setBooted] = useState(false);
@@ -82,6 +83,7 @@ export default function Index() {
           />
 
           <MissionNav activeSection={activeSection} onNavigate={(s) => { setActiveSection(s); if (s !== "projects") setTargetProjectId(null); }} />
+          <CommandPalette onNavigate={(s) => { setActiveSection(s); if (s !== "projects") setTargetProjectId(null); }} />
 
           <main className="pt-20 pb-16 px-4 relative" style={{ zIndex: 10 }}>
             <AnimatePresence mode="wait">

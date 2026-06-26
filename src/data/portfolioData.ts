@@ -160,7 +160,7 @@ export const systemDomains: SystemDomainInfo[] = [
   {
     id: "materials",
     name: "Materials Engineering & Material Selection",
-    subtitle: "Structure–property–processing reasoning, phase transformations, degradation",
+    subtitle: "Structure, property, processing reasoning, phase transformations, degradation",
     icon: "flask",
     color: "neon-magenta",
   },
@@ -183,14 +183,14 @@ const rgmStages: RGMStage[] = [
       "Input trigger for the entire RGM. User inputs correct 5-note sequence (keys 1, 3, 2, 4, 1) using four copper foil touch pads connected to Arduino Mega.",
     howItWorks:
       "Each pad uses RC circuit with 2.2 MΩ resistor. Touch increases capacitance beyond 1000 counts (CapacitiveSensor library). Unique tones (C4, D4, E4, F4) play via buzzer. After correct 5-note sequence, relay on pin 8 activates.",
-    input: "Human touch — correct 5-note sequence",
+    input: "Human touch, correct 5-note sequence",
     output: "Relay activation (pin 8 HIGH)",
     evidenceSource: "Lab_Final_Report, p3",
     keyComponents: ["Arduino Mega", "Copper foil pads", "2.2 MΩ resistors", "Buzzer", "CapacitiveSensor library"],
   },
   {
     number: 2,
-    name: "Relay — Piano to Strobe Light",
+    name: "Relay, Piano to Strobe Light",
     labSource: "Labs 2 & 4",
     whatItDoes: "Provides electrical isolation between the 5V Arduino and the 9V strobe light circuit.",
     howItWorks:
@@ -221,12 +221,12 @@ const rgmStages: RGMStage[] = [
       "Photoresistor and VR1 form voltage divider. Strobe flash causes V2 > V1 at Schmitt trigger input. Hysteresis prevents oscillation from ambient light. Output drives solenoid circuit.",
     input: "Strobe light flash",
     output: "Digital trigger signal to solenoid",
-    evidenceSource: "Lab_Final_Report, p3–4",
+    evidenceSource: "Lab_Final_Report, p3, 4",
     keyComponents: ["Photoresistor", "LM324 Op-Amp", "Schmitt trigger", "VR1 threshold pot"],
   },
   {
     number: 5,
-    name: "Solenoid — Launches Steel Marble",
+    name: "Solenoid, Launches Steel Marble",
     labSource: "Lab 7",
     whatItDoes: "Physically launches steel marble into metal detector coil when triggered by light detector.",
     howItWorks:
@@ -251,7 +251,7 @@ const rgmStages: RGMStage[] = [
   },
   {
     number: 7,
-    name: "Electromagnet Turns OFF — Ball Released",
+    name: "Electromagnet Turns OFF, Ball Released",
     labSource: "Lab 7",
     whatItDoes: "Holds steel ball above tilt switch. Releases when metal detection confirmed.",
     howItWorks:
@@ -277,12 +277,12 @@ const rgmStages: RGMStage[] = [
     number: 9,
     name: "LCD Displays 2 Rows of 16 White Blocks",
     labSource: "Last Step (Team Designed)",
-    whatItDoes: "Displays confirmation — 2 rows of 16 white blocks each — completing the RGM sequence.",
+    whatItDoes: "Displays confirmation, 2 rows of 16 white blocks each, completing the RGM sequence.",
     howItWorks:
       "Tilt switch connected to Arduino with INPUT_PULLUP. Default HIGH, switch closure pulls LOW. Arduino polls pin state, writes custom 0xFF block character to all 32 positions of I2C LCD (address 0x27). Clear visual confirmation of successful RGM completion.",
     input: "Tilt switch LOW signal",
     output: "LCD shows 2×16 white blocks (RGM complete)",
-    evidenceSource: "Lab_Final_Report, p5–6",
+    evidenceSource: "Lab_Final_Report, p5, 6",
     keyComponents: ["Arduino Mega", "Inland 16×2 I2C LCD (PCF8574)", "INPUT_PULLUP", "Custom block char"],
   },
 ];
@@ -294,12 +294,12 @@ const rgmFailureModes: FailureMode[] = [
     cause: "Broken transistor lead in oscillator stage of strobe PCB",
     fix: "Replaced transistor and verified correct orientation; oscillator resumed and strobe flashed",
     systemImpact: "Entire downstream chain (light detector → solenoid → detection → release) was blocked",
-    evidence_source: "Lab_Final_Report, p10–11",
+    evidence_source: "Lab_Final_Report, p10, 11",
     confidence: "VERIFIED",
   },
   {
     problem: "Light detector triggered by ambient light",
-    cause: "Photoresistor/VR1 voltage divider reference too low — room lighting exceeded threshold",
+    cause: "Photoresistor/VR1 voltage divider reference too low, room lighting exceeded threshold",
     fix: "Adjusted VR1 to raise threshold so only high-intensity strobe flash triggers Schmitt trigger",
     systemImpact: "False triggering caused premature solenoid activation without strobe input",
     evidence_source: "Lab_Final_Report, p11",
@@ -315,7 +315,7 @@ const rgmFailureModes: FailureMode[] = [
   },
   {
     problem: "MOSFET not switching reliably",
-    cause: "No common ground between Arduino (USB 5V) and external 9V supply — undefined gate-source voltage",
+    cause: "No common ground between Arduino (USB 5V) and external 9V supply, undefined gate-source voltage",
     fix: "Connected both grounds together; MOSFET functioned correctly afterward",
     systemImpact: "Electromagnet could not be controlled, preventing ball release",
     evidence_source: "Lab_Final_Report, p12",
@@ -332,7 +332,7 @@ const rgmFailureModes: FailureMode[] = [
   {
     problem: "RC time constant discrepancy (Lab 4)",
     cause:
-      "38.5% error in charging, 12.8% in discharging — due to oscilloscope cursor positioning, component tolerances, breadboard contact resistance",
+      "38.5% error in charging, 12.8% in discharging, due to oscilloscope cursor positioning, component tolerances, breadboard contact resistance",
     fix: "Changed resistor to 20 kΩ which decreased percent error; documented tolerance effects",
     systemImpact: "Affected timing accuracy of capacitive touch detection",
     evidence_source: "Lab_Final_Report, p12",
@@ -368,7 +368,7 @@ export const projects: Project[] = [
       problemStatement:
         "A GPU at 82 °C is ambiguous: it could be busy and healthy, or its cooling path could be failing. nvidia-smi, DCGM, and NVIDIA Mission Control all expose temperature and power as separate fields. None divides the two. Fleet operators have no software-only signal that separates load-driven heat from degrading cooling, so cooling faults are caught late, after throttling or failure.",
       systemOverview:
-        "Theta is a software-only agent that computes effective thermal resistance R_θ = (T_junction − T_ref) / P_GPU from existing telemetry, no extra hardware. Rising R_θ at steady power means cooling degradation. A peer-relative detector compares each GPU to its matched-power node-mates (robust median-polish z-score) to flag units degraded before the agent started, and a survival-analysis model estimates lead-time-to-failure. Shipped as an OSS Python package on PyPI with a live dashboard.",
+        "Theta is a software-only agent that computes effective thermal resistance R_θ = (T_junction, T_ref) / P_GPU from existing telemetry, no extra hardware. Rising R_θ at steady power means cooling degradation. A peer-relative detector compares each GPU to its matched-power node-mates (robust median-polish z-score) to flag units degraded before the agent started, and a survival-analysis model estimates lead-time-to-failure. Shipped as an OSS Python package on PyPI with a live dashboard.",
       systemArchitecture:
         "GPU telemetry (pynvml / DCGM) → steady-state window gate (σ < 0.03 C/W) → R_θ computed against a virtual ambient T_ref learned from the GPU's own idle windows → Decision-Tree state classifier → temporal drift detector (rolling baseline + k·σ) plus cross-sectional peer detector (median-polish robust-z) → alert governor (trust / false-positive budget) → exporters (Prometheus / OTLP / Slack / PagerDuty / JSONL).",
       subsystems: [
@@ -378,8 +378,8 @@ export const projects: Project[] = [
           description:
             "Computes effective thermal resistance from telemetry with no thermocouple, deriving T_ref from the GPU's own stable idle windows.",
           details: [
-            "R_θ = (T_junction − T_ref) / P_GPU, sampled every 5 s",
-            "Steady-state σ-gate (< 0.03 C/W) so classification runs only on stable windows — takes classifier accuracy 84% → 99.8%",
+            "R_θ = (T_junction, T_ref) / P_GPU, sampled every 5 s",
+            "Steady-state σ-gate (< 0.03 C/W) so classification runs only on stable windows, takes classifier accuracy 84% → 99.8%",
             "Virtual ambient T_ref learned per-GPU; no rack modification or added sensors",
           ],
           confidence: "VERIFIED",
@@ -403,7 +403,7 @@ export const projects: Project[] = [
             "Models time-to-failure from telemetry trajectories to estimate a pre-throttle warning window.",
           details: [
             "lifelines survival analysis on peer-z trajectories with fixed healthy-window robust sigma + rolling-median smoothing",
-            "Gradual-degradation lead time ~2.5–7.7 days at 0 false alarms in simulation",
+            "Gradual-degradation lead time ~2.5, 7.7 days at 0 false alarms in simulation",
             "Hardware validation pending the fall-2026 E-LT testbed (see limitations)",
           ],
           confidence: "CONCEPTUAL",
@@ -436,7 +436,7 @@ export const projects: Project[] = [
         { parameter: "Top anomaly robust-z", value: "+15.6", unit: "σ", evidence_source: "E009", confidence: "VERIFIED" },
         { parameter: "Classifier 5-fold CV", value: "100", unit: "% (T4 steady-state)", evidence_source: "models/train", confidence: "VERIFIED" },
         { parameter: "Ambient sensitivity", value: "3.5×", unit: "recovery delta / 2 °C", evidence_source: "Stage 1, F2", confidence: "VERIFIED" },
-        { parameter: "Lead time (gradual, sim)", value: "2.5–7.7", unit: "days @ 0 false alarms", evidence_source: "survival sim", confidence: "CONCEPTUAL" },
+        { parameter: "Lead time (gradual, sim)", value: "2.5, 7.7", unit: "days @ 0 false alarms", evidence_source: "survival sim", confidence: "CONCEPTUAL" },
       ],
       ownershipDisclosure: {
         owned: [
@@ -473,11 +473,11 @@ export const projects: Project[] = [
     hologramType: "system",
     module: {
       problemStatement:
-        "How do you convert an analog audio signal to digital, process it, and reconstruct it through a hand-fabricated 4-bit DAC — accounting for loading, level-shifting, quantization, and sampling distortion at every stage?",
+        "How do you convert an analog audio signal to digital, process it, and reconstruct it through a hand-fabricated 4-bit DAC, accounting for loading, level-shifting, quantization, and sampling distortion at every stage?",
       systemOverview:
         "End-to-end analog→digital→analog pipeline built across nine EE 143 labs (chassis CAD, soldering, instrumentation, op-amps, PCB design, reflow, integration). Capstone delivered a fabricated 4-bit binary-weighted DAC validated in standalone (binary counter) and system-level (Arduino ADC + audio source + speaker) tests.",
       systemArchitecture:
-        "Audio Source → Level-Shifting Op-Amp (LM1458, AC→0–1 V) → Arduino ADC (10-bit, mapped to 4-bit via ×0.014663) → PORTB digital lines → Custom 4-bit Binary-Weighted DAC PCB (LM1458, 80k/40k/20k/10k + 10k feedback, second stage ×–0.1) → Speaker / Oscilloscope",
+        "Audio Source → Level-Shifting Op-Amp (LM1458, AC→0, 1 V) → Arduino ADC (10-bit, mapped to 4-bit via ×0.014663) → PORTB digital lines → Custom 4-bit Binary-Weighted DAC PCB (LM1458, 80k/40k/20k/10k + 10k feedback, second stage ×, 0.1) → Speaker / Oscilloscope",
       subsystems: [
         {
           id: "chassis",
@@ -501,7 +501,7 @@ export const projects: Project[] = [
           details: [
             "Oscilloscope trigger modes: edge / auto / normal / single",
             "50 Ω source impedance: amplitude doubles when terminated Hi-Z vs 50 Ω load",
-            "5½-digit DMM accuracy: 0.25 % + 1 count on 10 kΩ range — propagated through error analysis",
+            "5½-digit DMM accuracy: 0.25 % + 1 count on 10 kΩ range, propagated through error analysis",
             "Reverse-engineered PCB topology from in-circuit ohmmeter readings + isolation test",
           ],
           confidence: "VERIFIED",
@@ -523,12 +523,12 @@ export const projects: Project[] = [
         },
         {
           id: "analog-conditioning",
-          title: "Analog Conditioning — Op-Amp Systems (Exp 5, 7)",
+          title: "Analog Conditioning, Op-Amp Systems (Exp 5, 7)",
           description:
-            "Built voltage-follower buffer to defeat loading effects, then a summing-amp audio level-shifter that translates a ±250 mV AC source into the 0–1 V window the Arduino ADC expects.",
+            "Built voltage-follower buffer to defeat loading effects, then a summing-amp audio level-shifter that translates a ±250 mV AC source into the 0, 1 V window the Arduino ADC expects.",
           details: [
             "Voltage follower (unity-gain buffer) eliminates loading from finite ADC input impedance",
-            "Summing amplifier with DC offset shifts AC audio to 0–1 V at op-amp output",
+            "Summing amplifier with DC offset shifts AC audio to 0, 1 V at op-amp output",
             "Practical current source design from Exp 7 used as bias for downstream stages",
             "Datasheet-driven design: rail-to-rail behaviour, slew rate, input offset, CMRR",
           ],
@@ -541,23 +541,23 @@ export const projects: Project[] = [
           description:
             "Binary-weighted resistor DAC built around an LM1458 op-amp on a 1×1\" 2-layer OshPark PCB. Verified in LTspice (universal Op-Amp2, ±12 V) before fabrication; PCB designed in Autodesk Fusion.",
           details: [
-            "Resistor ladder: 80 kΩ (LSB) / 40 kΩ / 20 kΩ / 10 kΩ + 10 kΩ feedback — all 1206 SMD",
-            "First op-amp stage: −0.625 V per LSB into summing node",
-            "Second op-amp stage: gain = −0.1 → flips polarity, scales to +62.5 mV/LSB",
+            "Resistor ladder: 80 kΩ (LSB) / 40 kΩ / 20 kΩ / 10 kΩ + 10 kΩ feedback, all 1206 SMD",
+            "First op-amp stage:, 0.625 V per LSB into summing node",
+            "Second op-amp stage: gain =, 0.1 → flips polarity, scales to +62.5 mV/LSB",
             "Full-scale output ≈ 0.94 V at code 15; resolution = 62.5 mV/step",
-            "LTspice PULSE sources (0–5 V, 2 s period on bit 0) swept all 16 input combinations",
-            "PCB: 2-layer FR-4, 1 oz Cu, OshPark purple solder mask — $20.10 total ($10.10 boards + $10 ship)",
+            "LTspice PULSE sources (0, 5 V, 2 s period on bit 0) swept all 16 input combinations",
+            "PCB: 2-layer FR-4, 1 oz Cu, OshPark purple solder mask, $20.10 total ($10.10 boards + $10 ship)",
           ],
           confidence: "VERIFIED",
           evidenceSource: "Final project report (Han & Somisetty) + EE 143 Exp 6 lab manual",
         },
         {
           id: "system-integration",
-          title: "System Integration — Audio → ADC → DAC → Speaker (Exp 9)",
+          title: "System Integration, Audio → ADC → DAC → Speaker (Exp 9)",
           description:
             "Capstone integration: audio source → level-shifter → Arduino Uno (10-bit ADC, mapped to 4-bit via PORTB) → fabricated DAC → oscilloscope + speaker. Validated against function-generator reference signal.",
           details: [
-            "Arduino sketch: analogRead(A0) × 0.014663 → PORTB = output & 0x0F (DDRB = 0x0F on pins 8–11)",
+            "Arduino sketch: analogRead(A0) × 0.014663 → PORTB = output & 0x0F (DDRB = 0x0F on pins 8, 11)",
             "Standalone DAC test driven by 74163 binary counter to confirm monotonic 4-bit transfer",
             "System test: function-generator sinusoid → DAC staircase reconstruction on scope",
             "Final stage: music source → speaker, audibly demonstrating 4-bit quantization artefacts",
@@ -570,7 +570,7 @@ export const projects: Project[] = [
         "Co-designed and co-authored with Joyce Han (EE, Cal Poly SLO); IEEE-format final report submitted Dec 2025",
         "Chose binary-weighted topology over R-2R: 4 input resistors + 1 feedback at standard 1206 values, lowest part count for 4-bit",
         "LTspice simulation values matched bench oscilloscope measurements within ±1 LSB across all 16 codes",
-        "Continuity-checked PCB before powering ±12 V — caught one solder bridge prior to first power-on",
+        "Continuity-checked PCB before powering ±12 V, caught one solder bridge prior to first power-on",
         "Component placement minimised trace length: LM1458 centred, digital inputs left, analog output + audio jack right, single-point analog ground",
       ],
       failureModes: [
@@ -582,9 +582,9 @@ export const projects: Project[] = [
           confidence: "VERIFIED",
         },
         {
-          problem: "Signal outside 0–5 V ADC window",
+          problem: "Signal outside 0, 5 V ADC window",
           cause: "Bipolar AC audio swing centred on 0 V cannot be sampled by single-ended Arduino ADC",
-          fix: "Summing amplifier with DC offset (Exp 7) shifts AC into 0–1 V band before ADC",
+          fix: "Summing amplifier with DC offset (Exp 7) shifts AC into 0, 1 V band before ADC",
           systemImpact: "Clipping at rails would have destroyed half-cycles of the reconstructed output",
           confidence: "VERIFIED",
         },
@@ -603,7 +603,7 @@ export const projects: Project[] = [
         "Increase Arduino sampling rate via direct ADC register access (skip analogRead overhead)",
       ],
       keyInsight:
-        "A working signal pipeline is a chain of impedance and resolution decisions. Loading effects, level-shifting, quantization step size, and analog reconstruction each compound — and the only way to know your system actually works is to instrument it end-to-end with a known reference (binary counter for the DAC, function-generator sinusoid for the full chain) and compare measured output to LTspice prediction within ±1 LSB.",
+        "A working signal pipeline is a chain of impedance and resolution decisions. Loading effects, level-shifting, quantization step size, and analog reconstruction each compound, and the only way to know your system actually works is to instrument it end-to-end with a known reference (binary counter for the DAC, function-generator sinusoid for the full chain) and compare measured output to LTspice prediction within ±1 LSB.",
     },
     diagrams: [],
     evidence: [
@@ -612,7 +612,7 @@ export const projects: Project[] = [
         fileName: "Final_Project_EE143_Post-lab_9.pdf",
         type: "pdf",
         description:
-          "IEEE-format final report (Han & Somisetty) — schematic, LTspice simulation, Fusion PCB design, OshPark fabrication, assembly, and Exp 9 system-level integration test of the 4-bit binary-weighted DAC.",
+          "IEEE-format final report (Han & Somisetty), schematic, LTspice simulation, Fusion PCB design, OshPark fabrication, assembly, and Exp 9 system-level integration test of the 4-bit binary-weighted DAC.",
       },
       {
         id: "ee143-lab-sequence",
@@ -654,7 +654,7 @@ export const projects: Project[] = [
       problemStatement:
         "Design a nine-stage Rube Goldberg Machine where each stage must reliably trigger the next with no manual intervention. Any single failure breaks the entire chain.",
       systemOverview:
-        "Nine-stage electromechanical chain reaction integrating circuits from EE 241 Labs 2–7 plus a team-designed final step. The system spans capacitive sensing, power switching, high-voltage generation, optical detection, electromagnetic actuation, frequency-based metal detection, and digital I/O — all sequentially dependent.",
+        "Nine-stage electromechanical chain reaction integrating circuits from EE 241 Labs 2, 7 plus a team-designed final step. The system spans capacitive sensing, power switching, high-voltage generation, optical detection, electromagnetic actuation, frequency-based metal detection, and digital I/O, all sequentially dependent.",
       systemArchitecture:
         "Piano (capacitive touch) → Relay (5V→9V isolation) → Strobe (~580V flash) → Light Detector (Schmitt trigger) → Solenoid (marble launch) → 555 Metal Detector (8,760→8,310 Hz) → Electromagnet (MOSFET release) → Tilt Switch → LCD (2×16 white blocks)",
       subsystems: [
@@ -845,7 +845,7 @@ export const projects: Project[] = [
         "LCD displayed 2 rows of 16 white blocks",
       ],
       keyInsight:
-        "Each stage must correctly produce an output that triggers the next. A single failure anywhere in the chain halts the entire system. Debugging required understanding signal propagation across domain boundaries — capacitive, optical, mechanical, electromagnetic, and digital.",
+        "Each stage must correctly produce an output that triggers the next. A single failure anywhere in the chain halts the entire system. Debugging required understanding signal propagation across domain boundaries, capacitive, optical, mechanical, electromagnetic, and digital.",
     },
     diagrams: [
       {
@@ -867,7 +867,7 @@ export const projects: Project[] = [
       },
       {
         id: "rgm-last-step-schematic",
-        title: "Last Step Schematic — Tilt Switch + I2C LCD",
+        title: "Last Step Schematic, Tilt Switch + I2C LCD",
         confidence: "VERIFIED",
         derivedFrom: ["Lab_Final_Report_Amogh_Somisetty.pdf, p6"],
         description:
@@ -938,19 +938,19 @@ export const projects: Project[] = [
   // ===== DOMAIN: DIGITAL SYSTEMS =====
   {
     id: "digital-systems",
-    name: "Digital Systems — FPGA & CPU Architecture",
+    name: "Digital Systems, FPGA & CPU Architecture",
     codename: "DIGI-SYS",
     domain: "digital-systems",
     course: "CPE 233 / CPE 133",
     status: "COMPLETE",
     statusColor: "neon-green",
     heroSummary:
-      "Designed a multi-cycle RISC-V CPU (OTTER MCU) from gates up in SystemVerilog — full RV32I ISA, 10 ALU operations, 2-state FSM control unit, 32×32 register file. Synthesized and verified on Basys-3 FPGA via Vivado.",
+      "Designed a multi-cycle RISC-V CPU (OTTER MCU) from gates up in SystemVerilog, full RV32I ISA, 10 ALU operations, 2-state FSM control unit, 32×32 register file. Synthesized and verified on Basys-3 FPGA via Vivado.",
     has3D: true,
     hologramType: "interactive",
     module: {
       problemStatement:
-        "How do you design a complete CPU from gates up — implementing instruction fetch, decode, execute, and memory access cycles with correct timing and control?",
+        "How do you design a complete CPU from gates up, implementing instruction fetch, decode, execute, and memory access cycles with correct timing and control?",
       systemOverview:
         "Comprehensive digital systems work spanning CPU architecture (OTTER MCU in SystemVerilog), finite state machines, and FPGA implementation of combinational and sequential logic.",
       systemArchitecture:
@@ -984,7 +984,7 @@ export const projects: Project[] = [
             "Output logic and state transition tables",
           ],
           confidence: "CONCEPTUAL",
-          evidenceSource: "CPE 133 / CPE 233 coursework — evidence upload pending",
+          evidenceSource: "CPE 133 / CPE 233 coursework, evidence upload pending",
         },
         {
           id: "fpga-implementation",
@@ -998,7 +998,7 @@ export const projects: Project[] = [
             "Synthesis and place-and-route via Vivado",
           ],
           confidence: "CONCEPTUAL",
-          evidenceSource: "CPE 133 labs — evidence upload pending",
+          evidenceSource: "CPE 133 labs, evidence upload pending",
         },
       ],
       implementationNotes: [
@@ -1008,7 +1008,7 @@ export const projects: Project[] = [
         "Branch: br_eq, br_lt, br_ltu signals to CU_DCDR",
         "RF: dual-read (rs1, rs2), single-write with rf_wr_sel MUX",
         "Memory: dual-port BRAM, byte/half/word access with sign extension",
-        "FSM states: FETCH, EXEC — minimum 2 cycles per instruction",
+        "FSM states: FETCH, EXEC, minimum 2 cycles per instruction",
       ],
       failureModes: [
         {
@@ -1027,7 +1027,7 @@ export const projects: Project[] = [
         "Expand to RV32IM (multiply/divide)",
       ],
       keyInsight:
-        "Timing is everything in digital systems. The difference between combinational and sequential logic determines when data is valid. State machines control the system — every instruction's execution is a sequence of precisely-timed control signals that must be generated in the correct order.",
+        "Timing is everything in digital systems. The difference between combinational and sequential logic determines when data is valid. State machines control the system, every instruction's execution is a sequence of precisely-timed control signals that must be generated in the correct order.",
       verificationSummary: [
         {
           parameter: "ISA",
@@ -1088,7 +1088,7 @@ export const projects: Project[] = [
         id: "riscv-asm-manual",
         fileName: "RISC-V_Assembler_Manual.pdf",
         type: "pdf",
-        description: "RISC-V OTTER Assembly Manual v4.04 — ISA formats, opcodes, instructions",
+        description: "RISC-V OTTER Assembly Manual v4.04, ISA formats, opcodes, instructions",
       },
     ],
     techStack: ["SystemVerilog", "Vivado", "RISC-V ISA", "FPGA", "FSM Design"],
@@ -1109,7 +1109,7 @@ export const projects: Project[] = [
     hologramType: "physical",
     module: {
       problemStatement:
-        "How do you take a design from CAD model to physical part — accounting for tolerances, material properties, and manufacturing constraints at every step?",
+        "How do you take a design from CAD model to physical part, accounting for tolerances, material properties, and manufacturing constraints at every step?",
       systemOverview:
         "Complete design-to-manufacturing pipeline for a pneumatic air motor. Covers parametric CAD modeling, engineering drawings with GD&T per ASME Y14.5, manual machining on lathe and mill, metrology, and final assembly.",
       systemArchitecture:
@@ -1221,7 +1221,7 @@ export const projects: Project[] = [
   // ===== FUNCK (cross-domain: web/systems) =====
   {
     id: "funck",
-    name: "FUNCK — Mobile-First Event Operating System",
+    name: "FUNCK, Mobile-First Event Operating System",
     codename: "FUNCK",
     domain: "signal-systems",
     course: undefined,
@@ -1235,7 +1235,7 @@ export const projects: Project[] = [
       problemStatement:
         "How do you turn a feature-focused event app into a conversion-optimized operating system that hosts can trust to create, fill, and run real events on mobile?",
       systemOverview:
-        "Mobile-first event OS spanning host onboarding, event creation, share-oriented RSVP funnel, lifecycle operations (before/during/after), Stripe-backed ticketing, QR issuance, and admin tooling — engineered for real-device reliability.",
+        "Mobile-first event OS spanning host onboarding, event creation, share-oriented RSVP funnel, lifecycle operations (before/during/after), Stripe-backed ticketing, QR issuance, and admin tooling, engineered for real-device reliability.",
       systemArchitecture:
         "Client (React, mobile-first) → Lovable App → Supabase (PostgreSQL + Auth + Edge Functions) → Stripe (payments + Connect payouts) → Resend (verification + transactional email) → Edge functions (OG preview rendering, keep-alive)",
       implementationNotes: [
@@ -1280,7 +1280,7 @@ export const projects: Project[] = [
           "Integration architecture (Stripe, Supabase, Resend, edge functions)",
           "Deployment and production operations",
         ],
-        aiAssisted: ["Code generation via Lovable AI — used for implementation acceleration"],
+        aiAssisted: ["Code generation via Lovable AI, used for implementation acceleration"],
       },
     },
     diagrams: [
@@ -1309,21 +1309,21 @@ export const projects: Project[] = [
   // ===== PEC NEXUS (cross-domain: internal tools / systems) =====
   {
     id: "pec-nexus",
-    name: "PEC Nexus — Role-Aware Internal Operating System",
+    name: "PEC Nexus, Role-Aware Internal Operating System",
     codename: "PEC-NEXUS",
     domain: "signal-systems",
     course: undefined,
     status: "ACTIVE",
     statusColor: "neon-cyan",
     heroSummary:
-      "Role-aware internal operating system for Poly-Engineering Consulting unifying project execution, training, scheduling, messaging, and permissions. Designed around three operating modes — Purpose, Competition, and Contract — to reduce redundancy, clarify roles, and scale internal coordination.",
+      "Role-aware internal operating system for Poly-Engineering Consulting unifying project execution, training, scheduling, messaging, and permissions. Designed around three operating modes, Purpose, Competition, and Contract, to reduce redundancy, clarify roles, and scale internal coordination.",
     has3D: false,
     hologramType: "network",
     module: {
       problemStatement:
         "How do you replace a fragmented set of club tools with a single role-aware operating system that mirrors how the organization actually executes work across projects, training, and operations?",
       systemOverview:
-        "Internal OS structured around three operating modes — Purpose, Competition, and Contract — with role-aware workflows for PMs, Tech Leads, and members. Unifies project execution, training, scheduling, messaging, and permissions into one scalable platform.",
+        "Internal OS structured around three operating modes, Purpose, Competition, and Contract, with role-aware workflows for PMs, Tech Leads, and members. Unifies project execution, training, scheduling, messaging, and permissions into one scalable platform.",
       systemArchitecture:
         "Client (React, role-aware UI) → Lovable App (workflow + permissions layer) → Supabase (PostgreSQL + Auth + RLS) → Mission Control surface → Training (Learn + Grind) + Scheduling + Stage-based Project Execution",
       implementationNotes: [
@@ -1350,13 +1350,13 @@ export const projects: Project[] = [
           "Workflow architecture across projects, training, and scheduling",
           "End-to-end build, iteration, and rollout to the organization",
         ],
-        aiAssisted: ["Code generation via Lovable AI — used for implementation acceleration"],
+        aiAssisted: ["Code generation via Lovable AI, used for implementation acceleration"],
       },
     },
     diagrams: [
       {
         id: "pec-nexus-arch",
-        title: "PEC Nexus — System Architecture",
+        title: "PEC Nexus, System Architecture",
         confidence: "CONCEPTUAL",
         derivedFrom: [],
         description:
@@ -1379,7 +1379,7 @@ export const projects: Project[] = [
     status: "COMPLETE",
     statusColor: "neon-amber",
     heroSummary:
-      "Phase diagram reasoning, cold work/recrystallization mechanics, and heat treatment of steels. Structure–property–processing control from eutectic solidification through eutectoid transformation.",
+      "Phase diagram reasoning, cold work/recrystallization mechanics, and heat treatment of steels. Structure, property, processing control from eutectic solidification through eutectoid transformation.",
     has3D: true,
     hologramType: "scientific",
     module: {
@@ -1396,16 +1396,16 @@ export const projects: Project[] = [
           description:
             "Binary eutectic phase diagram interpretation: phase fields, eutectic composition/temperature, cooling paths, and primary/proeutectic phase formation. Pb-Sn system used as the model eutectic.",
           details: [
-            "Pb-Sn eutectic system: eutectic at 61.9 wt% Sn, 183°C (Lab 4, p3–4)",
+            "Pb-Sn eutectic system: eutectic at 61.9 wt% Sn, 183°C (Lab 4, p3, 4)",
             "α solvus: max solubility 18.3 wt% Sn at 183°C; β solvus: 97.8 wt% Sn at 183°C (Lab 4, p3)",
             "Pure Pb melts at 327°C, pure Sn at 232°C (Lab 4, Fig.1)",
-            "Cooling curve features: slope change (α+L region) and thermal arrest (eutectic at 183°C) (Lab 4, p4–5)",
+            "Cooling curve features: slope change (α+L region) and thermal arrest (eutectic at 183°C) (Lab 4, p4, 5)",
             "Proeutectic α forms above eutectic T; eutectic reaction L → α + β occurs at 183°C (Lab 4, p5)",
             "Lever rule calculates phase fractions from tie lines in two-phase regions (Lab 4, p2)",
             "Hypoeutectic: primary α + eutectic; Hypereutectic: primary β + eutectic (Lab 4, p5)",
           ],
           confidence: "VERIFIED",
-          evidenceSource: "Lab_4_Phase_Diagrams_Spring_2017_1.pdf, pp.1–8",
+          evidenceSource: "Lab_4_Phase_Diagrams_Spring_2017_1.pdf, pp.1, 8",
         },
         {
           id: "cold-work-recrystallization",
@@ -1413,17 +1413,17 @@ export const projects: Project[] = [
           description:
             "Dislocation mechanics linking strain hardening, recovery, recrystallization, and grain growth to mechanical property changes. Demonstrated on α-brass (70Cu-30Zn).",
           details: [
-            "Cold work creates and multiplies dislocations → 'dislocation traffic jam' resists further deformation (Lab 7, p1–2)",
+            "Cold work creates and multiplies dislocations → 'dislocation traffic jam' resists further deformation (Lab 7, p1, 2)",
             "Strain hardening: each successive bend requires more force as dislocation density increases (Lab 7, p2)",
             "Recovery: atoms rearrange to lower-strain config at elevated T; minimal property change (Lab 7, p3)",
-            "Recrystallization: nucleation and growth of new strain-free grains from cold-worked structure (Lab 7, p3–4)",
+            "Recrystallization: nucleation and growth of new strain-free grains from cold-worked structure (Lab 7, p3, 4)",
             "Grain growth: continued heating causes recrystallized grains to coarsen (Lab 7, p3)",
-            "α-brass micrographs show progression: slip lines → tiny new grains → partial recrystallization → fully recrystallized (Lab 7, Fig.2A–D, 75x)",
-            "TRex ≈ 0.3–0.5 × melting temperature (K), also depends on amount of cold work (Lab 7, p5)",
+            "α-brass micrographs show progression: slip lines → tiny new grains → partial recrystallization → fully recrystallized (Lab 7, Fig.2A, D, 75x)",
+            "TRex ≈ 0.3, 0.5 × melting temperature (K), also depends on amount of cold work (Lab 7, p5)",
             "Property reversal: annealing restores ductility and reduces yield strength back toward pre-cold-worked state (Lab 7, Fig.3)",
           ],
           confidence: "VERIFIED",
-          evidenceSource: "Lab_7_Cold_Work_and_Annealing_SPR_2017.pdf, pp.1–8",
+          evidenceSource: "Lab_7_Cold_Work_and_Annealing_SPR_2017.pdf, pp.1, 8",
         },
         {
           id: "heat-treatment-steels",
@@ -1432,37 +1432,37 @@ export const projects: Project[] = [
             "Fe-C eutectoid transformation: austenite → pearlite/ferrite/cementite. Steels used: 1018, 1050, 1095 (plain carbon). TTT diagram interpretation for non-equilibrium structures.",
           details: [
             "Eutectoid composition: 0.77 wt% C at 727°C (Lab 8, Fig.1, p2)",
-            "Austenite (γ-FCC) is the high-temperature starting phase — all C dissolved interstitially (Lab 8, p2)",
-            "Ferrite (α-BCC): nearly pure Fe, max 0.022 wt% C — soft and deformable (Lab 8, p3)",
-            "Cementite (Fe₃C): 6.67 wt% C — extremely hard and brittle (Lab 8, p3)",
-            "Eutectoid reaction: γ → α + Fe₃C produces pearlite — alternating lamellae of ferrite and cementite (Lab 8, p3, Fig.2)",
+            "Austenite (γ-FCC) is the high-temperature starting phase, all C dissolved interstitially (Lab 8, p2)",
+            "Ferrite (α-BCC): nearly pure Fe, max 0.022 wt% C, soft and deformable (Lab 8, p3)",
+            "Cementite (Fe₃C): 6.67 wt% C, extremely hard and brittle (Lab 8, p3)",
+            "Eutectoid reaction: γ → α + Fe₃C produces pearlite, alternating lamellae of ferrite and cementite (Lab 8, p3, Fig.2)",
             "Hypoeutectoid (<0.77%C): proeutectoid ferrite + pearlite (Lab 8, p4, Fig.3)",
             "Hypereutectoid (>0.77%C): proeutectoid cementite 'ribbons' + pearlite (Lab 8, p5, Fig.4)",
-            "Rapid cooling (quench) → martensite (BCT, hard, brittle) — C trapped, no time for diffusion (Lab 8, p5–6)",
+            "Rapid cooling (quench) → martensite (BCT, hard, brittle), C trapped, no time for diffusion (Lab 8, p5, 6)",
             "IT/TTT diagrams map transformation products vs time at constant temperature (Lab 8, p6, Fig.5)",
-            "Bainite forms at intermediate cooling rates — finer than pearlite (Lab 8, p6)",
+            "Bainite forms at intermediate cooling rates, finer than pearlite (Lab 8, p6)",
           ],
           confidence: "VERIFIED",
-          evidenceSource: "Lab_8_Steel_Heat_Treatment_SPR_2017.pdf, pp.1–10",
+          evidenceSource: "Lab_8_Steel_Heat_Treatment_SPR_2017.pdf, pp.1, 10",
         },
       ],
       implementationNotes: [
         "Phase diagram interpretation requires understanding of Gibbs phase rule: F = C - P + 1 (for constant pressure)",
         "Lever rule provides quantitative phase fractions at any T and composition",
-        "Recrystallization temperature typically 0.3–0.5 × melting point (K)",
+        "Recrystallization temperature typically 0.3, 0.5 × melting point (K)",
         "TTT diagrams are isothermal; CCT diagrams better represent continuous cooling",
       ],
       failureModes: [
         {
           problem: "Unexpected brittleness after cold working",
-          cause: "Excessive cold work without intermediate annealing — ductility exhausted",
+          cause: "Excessive cold work without intermediate annealing, ductility exhausted",
           fix: "Introduce intermediate annealing steps to restore ductility before further deformation",
           systemImpact: "Part fractures during forming or in service",
           confidence: "CONCEPTUAL",
         },
         {
           problem: "Inconsistent hardness after heat treatment",
-          cause: "Non-uniform cooling rate — section thickness variations cause different transformation products",
+          cause: "Non-uniform cooling rate, section thickness variations cause different transformation products",
           fix: "Control quench severity and part geometry; consider jominy hardenability analysis",
           systemImpact: "Mixed martensite/pearlite regions with unpredictable mechanical behavior",
           confidence: "CONCEPTUAL",
@@ -1482,19 +1482,19 @@ export const projects: Project[] = [
         id: "lab4-pdf",
         fileName: "Lab_4_Phase_Diagrams_Spring_2017_1.pdf",
         type: "pdf",
-        description: "Pb-Sn eutectic phase diagram lab — cooling curves, phase fields, lever rule, microstructure",
+        description: "Pb-Sn eutectic phase diagram lab, cooling curves, phase fields, lever rule, microstructure",
       },
       {
         id: "lab7-pdf",
         fileName: "Lab_7_Cold_Work_and_Annealing_SPR_2017.pdf",
         type: "pdf",
-        description: "α-brass cold work and annealing — dislocation mechanics, recrystallization, micrographs",
+        description: "α-brass cold work and annealing, dislocation mechanics, recrystallization, micrographs",
       },
       {
         id: "lab8-pdf",
         fileName: "Lab_8_Steel_Heat_Treatment_SPR_2017.pdf",
         type: "pdf",
-        description: "Fe-C heat treatment — austenite transformation, pearlite, martensite, TTT diagrams",
+        description: "Fe-C heat treatment, austenite transformation, pearlite, martensite, TTT diagrams",
       },
     ],
     techStack: ["Phase Diagrams", "Metallography", "Heat Treatment", "Mechanical Testing", "Microstructure Analysis"],
@@ -1527,21 +1527,21 @@ export const projects: Project[] = [
           description:
             "Four required elements for corrosion: anode, cathode, electrolyte, and electrical path. Remove any one to stop corrosion.",
           details: [
-            "Anode: metal that undergoes oxidation — Fe⁰ → Fe²⁺ + 2e⁻ (Lab 5, p2, Eq.1)",
-            "Cathode: site where reduction occurs — ½O₂ + H₂O + 2e⁻ → 2(OH)⁻ (Lab 5, p2, Eq.2)",
+            "Anode: metal that undergoes oxidation, Fe⁰ → Fe²⁺ + 2e⁻ (Lab 5, p2, Eq.1)",
+            "Cathode: site where reduction occurs, ½O₂ + H₂O + 2e⁻ → 2(OH)⁻ (Lab 5, p2, Eq.2)",
             "Electrolyte: ionic conduction medium (water) transporting ions between anode and cathode (Lab 5, p2, Fig.1)",
             "Electrical path: metallic connection for electron flow from anode to cathode (Lab 5, p4)",
-            "Combined: Fe + ½O₂ + H₂O → Fe²⁺ + 2(OH)⁻ → Fe(OH)₂ → Fe(OH)₃ (rust) (Lab 5, p3, Eqs.3–5)",
-            "All four components must be present — remove any one and corrosion stops (Lab 5, p4)",
+            "Combined: Fe + ½O₂ + H₂O → Fe²⁺ + 2(OH)⁻ → Fe(OH)₂ → Fe(OH)₃ (rust) (Lab 5, p3, Eqs.3, 5)",
+            "All four components must be present, remove any one and corrosion stops (Lab 5, p4)",
           ],
           confidence: "VERIFIED",
-          evidenceSource: "Lab_5_Corrosion_SPR_2017_Materials_Lab.pdf, pp.1–6",
+          evidenceSource: "Lab_5_Corrosion_SPR_2017_Materials_Lab.pdf, pp.1, 6",
         },
         {
           id: "galvanic-series",
           title: "Corrosion Potential & Galvanic Series",
           description:
-            "Why some metals corrode preferentially when coupled — electrode potential determines anodic/cathodic behavior",
+            "Why some metals corrode preferentially when coupled, electrode potential determines anodic/cathodic behavior",
           details: [
             "Corrosion potential measured by interrupting external circuit with voltmeter (Lab 5, p5, Fig.3)",
             "More negative potential → more anodic → preferentially corrodes (Lab 5, p5)",
@@ -1550,7 +1550,7 @@ export const projects: Project[] = [
             "Area ratio effect: small anode + large cathode → accelerated attack at anode (Lab 5, p3)",
           ],
           confidence: "VERIFIED",
-          evidenceSource: "Lab_5_Corrosion_SPR_2017_Materials_Lab.pdf, pp.4–6",
+          evidenceSource: "Lab_5_Corrosion_SPR_2017_Materials_Lab.pdf, pp.4, 6",
         },
         {
           id: "corrosion-prevention",
@@ -1565,7 +1565,7 @@ export const projects: Project[] = [
             "Break electrical path: insulating gaskets between dissimilar metals (Lab 5, p4)",
           ],
           confidence: "VERIFIED",
-          evidenceSource: "Lab_5_Corrosion_SPR_2017_Materials_Lab.pdf, pp.3–6",
+          evidenceSource: "Lab_5_Corrosion_SPR_2017_Materials_Lab.pdf, pp.3, 6",
         },
       ],
       implementationNotes: [
@@ -1577,7 +1577,7 @@ export const projects: Project[] = [
       failureModes: [
         {
           problem: "Accelerated galvanic corrosion at fastener joints",
-          cause: "Steel fasteners in aluminum structure with moisture ingress — large cathode/small anode ratio",
+          cause: "Steel fasteners in aluminum structure with moisture ingress, large cathode/small anode ratio",
           fix: "Use insulating washers, select compatible alloys, or apply protective coatings",
           systemImpact: "Rapid localized metal loss at fastener holes, structural integrity compromised",
           confidence: "CONCEPTUAL",
@@ -1588,7 +1588,7 @@ export const projects: Project[] = [
         "Include real corrosion sample images when evidence uploaded",
       ],
       keyInsight:
-        "Corrosion is not random — it is a predictable electrochemical process. Every corrosion failure can be traced to the presence of all four elements: anode, cathode, electrolyte, and electrical path. Engineering prevention means deliberately eliminating at least one.",
+        "Corrosion is not random, it is a predictable electrochemical process. Every corrosion failure can be traced to the presence of all four elements: anode, cathode, electrolyte, and electrical path. Engineering prevention means deliberately eliminating at least one.",
     },
     diagrams: [],
     evidence: [
@@ -1597,7 +1597,7 @@ export const projects: Project[] = [
         fileName: "Lab_5_Corrosion_SPR_2017_Materials_Lab.pdf",
         type: "pdf",
         description:
-          "Metal corrosion lab — electrochemical fundamentals, galvanic series, 4-component model, prevention",
+          "Metal corrosion lab, electrochemical fundamentals, galvanic series, 4-component model, prevention",
       },
     ],
     techStack: [
@@ -1619,7 +1619,7 @@ export const projects: Project[] = [
     status: "COMPLETE",
     statusColor: "neon-amber",
     heroSummary:
-      "Thermoplastic structure–property relationships and CFRP vs 6061-T6 aluminum analysis for transit vehicle design. Structure–properties–processing–performance framework applied to real transport engineering decisions.",
+      "Thermoplastic structure, property relationships and CFRP vs 6061-T6 aluminum analysis for transit vehicle design. Structure, properties, processing, performance framework applied to real transport engineering decisions.",
     has3D: true,
     hologramType: "scientific",
     module: {
@@ -1636,23 +1636,23 @@ export const projects: Project[] = [
           description:
             "How molecular structure, secondary bonding, and chain motion control stiffness, strength, and ductility in engineering polymers",
           details: [
-            "PE: simple –(CH₂–CH₂)– backbone, no side groups → chains slide easily → weak, ductile (Lab 6, p1–2)",
+            "PE: simple, (CH₂, CH₂), backbone, no side groups → chains slide easily → weak, ductile (Lab 6, p1, 2)",
             "PVC: Cl substitution creates dipole-dipole forces → strength up to 3× PE (Lab 6, p2, Fig.2)",
             "PS: bulky phenyl pendant group severely restricts chain rotation → rigid, brittle (Lab 6, p3, Fig.4a)",
             "PC: carbonate linkages → balanced stiffness + ductility, high impact resistance (Lab 6, p4, Fig.4b)",
             "PMMA: methyl + ester polar side groups → dipole interactions → stiff, brittle, optically clear (Lab 6, p4, Fig.5)",
-            "Secondary bonds (van der Waals, H-bond) control TP properties — not primary backbone bonds (Lab 6, p2–3)",
-            "Tensile test: modulus (E) from elastic slope, yield strength (σY), % elongation for ductility (Lab 6, p4–5, Fig.7)",
+            "Secondary bonds (van der Waals, H-bond) control TP properties, not primary backbone bonds (Lab 6, p2, 3)",
+            "Tensile test: modulus (E) from elastic slope, yield strength (σY), % elongation for ductility (Lab 6, p4, 5, Fig.7)",
             "Chain mobility analogy: smooth ropes (PE) slide easily; ropes with bumps (PS) resist sliding (Lab 6, p3)",
           ],
           confidence: "VERIFIED",
-          evidenceSource: "Lab_6_Polymer_Mechanical_Properties_SPR_2017.pdf, pp.1–6",
+          evidenceSource: "Lab_6_Polymer_Mechanical_Properties_SPR_2017.pdf, pp.1, 6",
         },
         {
           id: "cfrp-vs-aluminum",
           title: "CFRP vs 6061-T6 Aluminum for Transit",
           description:
-            "Structure–properties–processing–performance comparison for short-haul BRT and longer-range rail applications",
+            "Structure, properties, processing, performance comparison for short-haul BRT and longer-range rail applications",
           details: [
             "CFRP: high specific strength (σ/ρ), excellent fatigue, but high cost and complex repair",
             "6061-T6: moderate specific strength, well-understood processing, lower cost, easier repair",
@@ -1660,31 +1660,31 @@ export const projects: Project[] = [
             "Long-range rail: constant speed operation → cost-effectiveness of aluminum may dominate",
             "Lifecycle considerations: CFRP repair costs vs aluminum recyclability",
             "Density: CFRP ~1.6 g/cm³ vs 6061-T6 ~2.7 g/cm³",
-            "Tensile strength: CFRP ~600–3000 MPa vs 6061-T6 ~310 MPa",
+            "Tensile strength: CFRP ~600, 3000 MPa vs 6061-T6 ~310 MPa",
           ],
           confidence: "CONCEPTUAL",
-          evidenceSource: "CFRP vs Aluminum white paper — upload pending for VERIFIED status",
+          evidenceSource: "CFRP vs Aluminum white paper, upload pending for VERIFIED status",
         },
       ],
       implementationNotes: [
-        "Structure–properties–processing–performance is the central framework",
+        "Structure, properties, processing, performance is the central framework",
         "Specific strength (σ/ρ) is the critical metric for weight-sensitive transport",
-        "Material selection is always application-dependent — no universally 'best' material",
+        "Material selection is always application-dependent, no universally 'best' material",
         "CFRP advantages diminish when weight savings don't significantly affect energy consumption",
       ],
       failureModes: [
         {
           problem: "Polymer creep under sustained load",
-          cause: "Viscoelastic behavior — chain sliding under stress at temperatures near Tg",
+          cause: "Viscoelastic behavior, chain sliding under stress at temperatures near Tg",
           fix: "Select polymer with Tg well above service temperature; reduce sustained stress",
           systemImpact: "Dimensional instability and eventual failure under constant load",
           confidence: "CONCEPTUAL",
         },
         {
           problem: "CFRP delamination under impact",
-          cause: "Interlaminar shear failure — weak matrix-dominated property in through-thickness direction",
+          cause: "Interlaminar shear failure, weak matrix-dominated property in through-thickness direction",
           fix: "Add interleaved toughening layers; design for damage tolerance inspection",
-          systemImpact: "Hidden internal damage not visible on surface — requires NDT for detection",
+          systemImpact: "Hidden internal damage not visible on surface, requires NDT for detection",
           confidence: "CONCEPTUAL",
         },
       ],
@@ -1694,7 +1694,7 @@ export const projects: Project[] = [
         "Add Ashby chart exploration module",
       ],
       keyInsight:
-        "Material selection is never about finding the 'strongest' material — it's about matching the structure–properties–processing–performance chain to application requirements. CFRP wins on specific strength; aluminum wins on cost and repairability. The right choice depends on the system context.",
+        "Material selection is never about finding the 'strongest' material, it's about matching the structure, properties, processing, performance chain to application requirements. CFRP wins on specific strength; aluminum wins on cost and repairability. The right choice depends on the system context.",
     },
     diagrams: [],
     evidence: [
@@ -1703,7 +1703,7 @@ export const projects: Project[] = [
         fileName: "Lab_6_Polymer_Mechanical_Properties_SPR_2017.pdf",
         type: "pdf",
         description:
-          "Thermoplastic polymer mechanical properties — tensile testing, structure-property relationships, PE/PVC/PS/PC/PMMA",
+          "Thermoplastic polymer mechanical properties, tensile testing, structure-property relationships, PE/PVC/PS/PC/PMMA",
       },
     ],
     techStack: [
@@ -1723,14 +1723,14 @@ export const projects: Project[] = [
     status: "ACTIVE",
     statusColor: "neon-cyan",
     heroSummary:
-      "Analyzed a 75 mm HD FPV drone as a densely integrated electromechanical system — six coupled subsystems (propulsion, flight control, power regulation, RF control, digital video, structure) with documented failure modes and cross-subsystem constraint propagation at 70 g dry weight.",
+      "Analyzed a 75 mm HD FPV drone as a densely integrated electromechanical system, six coupled subsystems (propulsion, flight control, power regulation, RF control, digital video, structure) with documented failure modes and cross-subsystem constraint propagation at 70 g dry weight.",
     has3D: true,
     hologramType: "system",
     module: {
       problemStatement:
         "How do you integrate propulsion, flight control, power regulation, RF control, and HD digital video into a 75 mm airframe weighing ~70 g while managing thermal, vibration, packaging, and performance constraints?",
       systemOverview:
-        "NewBeeDrone AcroBee75 G4 BNF HD with DJI O3 — a tightly constrained micro FPV platform where every subsystem (structure, propulsion, flight control, radio control, digital video, power) interacts and imposes constraints on every other subsystem. This project analyzes the platform at the systems integration level.",
+        "NewBeeDrone AcroBee75 G4 BNF HD with DJI O3, a tightly constrained micro FPV platform where every subsystem (structure, propulsion, flight control, radio control, digital video, power) interacts and imposes constraints on every other subsystem. This project analyzes the platform at the systems integration level.",
       systemArchitecture:
         "Battery (2S LiPo) → XT30 → BeeBrain HD G4 AIO [STM32G474 FC + 4×20A ESC + ELRS 3.0 Rx] → 4× 0804 12000KV Motors → 40mm Tri-blade Props\n                         → 10V 2A BEC → DJI O3 Air Unit (HD Video + OSD)\n                         → 5V 2A BEC → Logic/Peripherals\nCockroach75 Frame + AcroBee75 HD O3 Canopy → Packaging / Antenna / Crash Geometry",
       subsystems: [
@@ -1746,7 +1746,7 @@ export const projects: Project[] = [
             "Canopy geometry: camera tilt angle, O3 unit mounting, antenna exit paths",
             "Compact packaging forces vertical stacking: frame → AIO → O3 → canopy",
             "Center of gravity managed by battery mount position (typically bottom or rear)",
-            "Dry weight ~70.19 g — every gram affects thrust-to-weight ratio",
+            "Dry weight ~70.19 g, every gram affects thrust-to-weight ratio",
           ],
           confidence: "VERIFIED",
           evidenceSource: "Platform specification / known hardware stack",
@@ -1757,8 +1757,8 @@ export const projects: Project[] = [
           description:
             "Four 0804 12000KV brushless motors with 40 mm tri-blade propellers driven by 4×20A ESC channels with Bluejay 48 kHz firmware.",
           details: [
-            "0804 motors: 8 mm stator diameter, 4 mm stator height — micro-class brushless",
-            "12000KV: high RPM-per-volt rating suited for 2S (7.4–8.4V) low-voltage operation",
+            "0804 motors: 8 mm stator diameter, 4 mm stator height, micro-class brushless",
+            "12000KV: high RPM-per-volt rating suited for 2S (7.4, 8.4V) low-voltage operation",
             "High KV + small stator = very high RPM operation, requiring quality bearings",
             "40 mm tri-blade props: increased blade area for thrust at the cost of efficiency",
             "Tri-blade tradeoff: better low-speed control feel and responsiveness vs bi-blade efficiency",
@@ -1773,9 +1773,9 @@ export const projects: Project[] = [
           id: "flight-control",
           title: "Flight Control & Processing",
           description:
-            "BeeBrain HD G4 AIO board with STM32G474 MCU running Betaflight — the coordination core for all motor control, sensor fusion, and peripheral management.",
+            "BeeBrain HD G4 AIO board with STM32G474 MCU running Betaflight, the coordination core for all motor control, sensor fusion, and peripheral management.",
           details: [
-            "STM32G474: ARM Cortex-M4F, 170 MHz, FPU — substantial processing for a micro FC",
+            "STM32G474: ARM Cortex-M4F, 170 MHz, FPU, substantial processing for a micro FC",
             "PID control loop: gyroscope → error calculation → motor speed adjustment at kHz rates",
             "FC as timing and coordination core: manages ESC commands, receiver input, OSD data",
             "DShot600 protocol: digital motor command at 600 kbit/s, no calibration needed",
@@ -1797,22 +1797,22 @@ export const projects: Project[] = [
             "Diversity antenna logic: selects stronger signal path during rapid reorientation",
             "RF link robustness critical: 75 mm craft reorients rapidly during acrobatic flight",
             "Alternative control-link analysis: TBS Mambo transmitter uses Tracer protocol",
-            "Tracer ≠ ELRS — different RF protocol, different receiver hardware required",
+            "Tracer ≠ ELRS, different RF protocol, different receiver hardware required",
             "Integration challenge: serial/RF architecture mismatch, not just a binding issue",
             "External receiver integration would require: UART reassignment, physical mounting, antenna routing within canopy constraints",
           ],
           confidence: "VERIFIED",
           evidenceSource:
-            "Platform specification / known hardware stack — Tracer integration is analysis only, not completed",
+            "Platform specification / known hardware stack, Tracer integration is analysis only, not completed",
         },
         {
           id: "digital-video",
-          title: "Digital Video — DJI O3 Air Unit",
+          title: "Digital Video, DJI O3 Air Unit",
           description:
-            "DJI O3 as premium HD video payload — transforms platform design constraints due to its weight, power draw, and thermal output.",
+            "DJI O3 as premium HD video payload, transforms platform design constraints due to its weight, power draw, and thermal output.",
           details: [
             "DJI O3: HD digital video transmission with low-latency FPV feed",
-            "O3 is the heaviest single component on the platform — dominant mass contributor",
+            "O3 is the heaviest single component on the platform, dominant mass contributor",
             "Requires dedicated 10V 2A BEC: substantial regulated power draw",
             "Thermal output from O3 affects canopy airflow design and component placement",
             "Video quality directly affected by motor vibration → prop balance → frame stiffness chain",
@@ -1828,10 +1828,10 @@ export const projects: Project[] = [
           description:
             "Multi-rail regulated power distribution from 2S LiPo through XT30 connector, with dedicated BECs for O3 and logic systems.",
           details: [
-            "Battery input: 1–2S LiPo (typically 2S 450–550 mAh for HD builds)",
+            "Battery input: 1, 2S LiPo (typically 2S 450, 550 mAh for HD builds)",
             "XT30 connector: rated for continuous current demands of 4×20A ESC channels",
             "High-current path: battery → ESC power stage → motors (unregulated, direct battery voltage)",
-            "10V 2A BEC: dedicated regulated rail for DJI O3 — critical for stable video",
+            "10V 2A BEC: dedicated regulated rail for DJI O3, critical for stable video",
             "5V 2A BEC: logic rail for FC, receiver, peripherals",
             "Regulator stability matters: O3 power dips cause video artifacts or brownouts",
             "Battery tradeoff: 450 mAh (lighter, more agile) vs 550 mAh (longer flight, heavier)",
@@ -1845,7 +1845,7 @@ export const projects: Project[] = [
         "Platform analyzed as six tightly coupled subsystems, not isolated components",
         "Every subsystem imposes constraints on every other: weight, power, vibration, RF, thermal, packaging",
         "Stock ELRS receiver is integrated; TBS Tracer integration is an analyzed modification path, not a completed build",
-        "All specifications from known platform hardware — no fabricated measurements or test results",
+        "All specifications from known platform hardware, no fabricated measurements or test results",
       ],
       failureModes: [
         {
@@ -1871,9 +1871,9 @@ export const projects: Project[] = [
         },
         {
           problem: "Receiver ecosystem mismatch (ELRS vs Tracer)",
-          cause: "TBS Mambo transmitter uses Tracer protocol; onboard receiver is ELRS — incompatible RF protocols",
+          cause: "TBS Mambo transmitter uses Tracer protocol; onboard receiver is ELRS, incompatible RF protocols",
           fix: "Either bind an ELRS transmitter module to Mambo, or install external Tracer receiver",
-          systemImpact: "Cannot fly without resolving control-link architecture — fundamental system integration issue",
+          systemImpact: "Cannot fly without resolving control-link architecture, fundamental system integration issue",
           confidence: "VERIFIED",
         },
         {
@@ -1891,7 +1891,7 @@ export const projects: Project[] = [
         "Photograph actual assembly stack and wiring for VERIFIED visual evidence",
       ],
       keyInsight:
-        "This platform demonstrates that even a 70-gram drone is a complex integrated system where power, control, RF, thermal, vibration, and packaging all interact. Engineering reasoning — not just component selection — determines whether the system works reliably.",
+        "This platform demonstrates that even a 70-gram drone is a complex integrated system where power, control, RF, thermal, vibration, and packaging all interact. Engineering reasoning, not just component selection, determines whether the system works reliably.",
       ownershipDisclosure: {
         owned: [
           "Platform analysis and systems-level documentation",
@@ -1912,9 +1912,9 @@ export const projects: Project[] = [
         confidence: "CONCEPTUAL",
         derivedFrom: ["Known platform components", "Standard UAV integration practice"],
         description:
-          "Likely relationships between battery, AIO flight controller, ESC channels, motors, receiver, DJI O3, BEC rails, and frame/canopy assembly. Derived from known components and standard engineering integration logic — not an original manufacturer schematic.",
+          "Likely relationships between battery, AIO flight controller, ESC channels, motors, receiver, DJI O3, BEC rails, and frame/canopy assembly. Derived from known components and standard engineering integration logic, not an original manufacturer schematic.",
         conceptualNote:
-          "RECONSTRUCTED FROM KNOWN COMPONENTS — derived from platform specs and standard engineering practice",
+          "RECONSTRUCTED FROM KNOWN COMPONENTS, derived from platform specs and standard engineering practice",
       },
       {
         id: "fpv-power-map",
@@ -1924,7 +1924,7 @@ export const projects: Project[] = [
         description:
           "Power distribution: battery → high-current ESC stage (unregulated), 10V BEC → O3, 5V BEC → logic. Architecture diagram, not exact manufacturer schematic.",
         conceptualNote:
-          "RECONSTRUCTED — likely power distribution based on known BEC specifications and standard practice",
+          "RECONSTRUCTED, likely power distribution based on known BEC specifications and standard practice",
       },
       {
         id: "fpv-assembly-stack",
@@ -1934,7 +1934,7 @@ export const projects: Project[] = [
         description:
           "Physical layering: frame base → motor mounts → AIO board (centered) → O3 (upper/front) → canopy → battery (external). Most plausible layout given known component dimensions.",
         conceptualNote:
-          "LIKELY ASSEMBLY ARCHITECTURE — based on known form factors, not verified from disassembly photos",
+          "LIKELY ASSEMBLY ARCHITECTURE, based on known form factors, not verified from disassembly photos",
       },
     ],
     evidence: [],
@@ -1975,9 +1975,9 @@ export const experiences: ExperienceItem[] = [
     period: "Summer 2025",
     bullets: [
       {
-        text: "Reduced validation and packaging cycle time from ~20 min to ~10–12 min by mapping the workflow, identifying bottlenecks, and eliminating redundant verification steps",
+        text: "Reduced validation and packaging cycle time from ~20 min to ~10, 12 min by mapping the workflow, identifying bottlenecks, and eliminating redundant verification steps",
         confidence: "CONCEPTUAL",
-        evidence_source: "Observed estimate — formal time study pending",
+        evidence_source: "Observed estimate, formal time study pending",
       },
       {
         text: "Standardized packaging workflow and authored reference documentation adopted by the team for consistency",
@@ -1987,7 +1987,7 @@ export const experiences: ExperienceItem[] = [
     ],
     processImprovement: {
       before: "~20 min per validation + packaging cycle (observed estimate)",
-      after: "~10–12 min per cycle (observed estimate)",
+      after: "~10, 12 min per cycle (observed estimate)",
       whatChanged: [
         "Identified bottleneck in sequential verification steps",
         "Removed redundant checks that didn't affect quality",
@@ -2002,10 +2002,10 @@ export const experiences: ExperienceItem[] = [
     company: "CVS Pharmacy",
     role: "Pharmacy Technician",
     location: "Dublin, CA",
-    period: "June 2023 – June 2024",
+    period: "June 2023, June 2024",
     bullets: [
       {
-        text: "California state certified pharmacy technician — processed prescriptions, managed controlled substance inventory, and handled patient consultations in a high-volume retail pharmacy",
+        text: "California state certified pharmacy technician, processed prescriptions, managed controlled substance inventory, and handled patient consultations in a high-volume retail pharmacy",
         confidence: "VERIFIED",
       },
       {
@@ -2015,7 +2015,7 @@ export const experiences: ExperienceItem[] = [
     ],
   },
   {
-    company: "EPIC 2026 — Arduino Instructor",
+    company: "EPIC 2026, Arduino Instructor",
     role: "Noyce School outreach (Prof. Souvik Kundu)",
     location: "",
     period: "Summer 2026",
@@ -2082,9 +2082,9 @@ export const personalInfo = {
   phone: "(925) 236-2600",
   email: "somisett@calpoly.edu",
   extras: [
-    "Varsity wrestling — 4 years",
+    "Varsity wrestling, 4 years",
     "California state certified pharmacy technician",
-    "Eagle Scout candidate — 11 years in Boy Scouts",
+    "Eagle Scout candidate, 11 years in Boy Scouts",
     "CPR/First Aid certified (open to recertification)",
   ],
 };
