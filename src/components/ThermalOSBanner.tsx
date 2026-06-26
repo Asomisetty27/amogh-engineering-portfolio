@@ -1,8 +1,17 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Github, Zap, Package } from "lucide-react";
+import { ArrowRight, Github, Zap, Package, Copy, Check } from "lucide-react";
+
+const BTN_SPRING = { type: "spring" as const, stiffness: 400, damping: 22 };
 
 export default function ThermalOSBanner() {
+  const [copied, setCopied] = useState(false);
+  const copyInstall = () => {
+    navigator.clipboard?.writeText("pip install runtheta");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1600);
+  };
   return (
     <motion.div
       initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
@@ -109,23 +118,46 @@ export default function ThermalOSBanner() {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Link
-            to="/thermalos"
-            className="fx-shimmer inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-white text-[12px] font-mono font-semibold transition-all hover:scale-[1.02]"
+          <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.96 }} transition={BTN_SPRING} className="inline-flex">
+            <Link
+              to="/thermalos"
+              className="fx-shimmer inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-white text-[12px] font-mono font-semibold"
+              style={{
+                background: "linear-gradient(135deg, #0F6E56 0%, #1D9E75 100%)",
+                boxShadow: "0 4px 16px rgba(53,199,146,.18), 0 0 0 0.5px rgba(53,199,146,.2) inset",
+              }}
+            >
+              <Zap size={12} />
+              Open Dashboard
+              <ArrowRight size={12} />
+            </Link>
+          </motion.div>
+          <motion.button
+            onClick={copyInstall}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.96 }}
+            transition={BTN_SPRING}
+            aria-label="Copy install command"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-[12px] font-mono text-muted-foreground hover:text-foreground"
             style={{
-              background: "linear-gradient(135deg, #0F6E56 0%, #1D9E75 100%)",
-              boxShadow: "0 4px 16px rgba(53,199,146,.18), 0 0 0 0.5px rgba(53,199,146,.2) inset",
+              background: copied
+                ? "linear-gradient(135deg, rgba(15,110,86,.30) 0%, rgba(15,110,86,.12) 100%)"
+                : "linear-gradient(135deg, rgba(255,255,255,.04) 0%, transparent 100%)",
+              border: copied ? "1px solid rgba(29,158,117,.5)" : "1px solid rgba(255,255,255,.1)",
+              ...(copied ? { color: "#9FE1CB" } : {}),
             }}
           >
-            <Zap size={12} />
-            Open Dashboard
-            <ArrowRight size={12} />
-          </Link>
-          <a
+            {copied ? <Check size={12} /> : <Copy size={12} />}
+            {copied ? "copied" : "pip install runtheta"}
+          </motion.button>
+          <motion.a
             href="https://github.com/Asomisetty27/theta"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-muted-foreground hover:text-foreground text-[12px] font-mono transition-all hover:scale-[1.02]"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.96 }}
+            transition={BTN_SPRING}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-muted-foreground hover:text-foreground text-[12px] font-mono"
             style={{
               background: "linear-gradient(135deg, rgba(255,255,255,.04) 0%, transparent 100%)",
               border: "1px solid rgba(255,255,255,.1)",
@@ -133,20 +165,23 @@ export default function ThermalOSBanner() {
           >
             <Github size={12} />
             GitHub
-          </a>
-          <a
+          </motion.a>
+          <motion.a
             href="https://pypi.org/project/runtheta/"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-muted-foreground hover:text-foreground text-[12px] font-mono transition-all hover:scale-[1.02]"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.96 }}
+            transition={BTN_SPRING}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-muted-foreground hover:text-foreground text-[12px] font-mono"
             style={{
               background: "linear-gradient(135deg, rgba(255,255,255,.04) 0%, transparent 100%)",
               border: "1px solid rgba(255,255,255,.1)",
             }}
           >
             <Package size={12} />
-            pip install runtheta
-          </a>
+            PyPI
+          </motion.a>
         </div>
       </div>
     </motion.div>
