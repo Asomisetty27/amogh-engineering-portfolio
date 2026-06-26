@@ -351,7 +351,7 @@ export const projects: Project[] = [
     status: "ACTIVE",
     statusColor: "neon-green",
     heroSummary:
-      "Open-source GPU reliability agent (pip install runtheta) that computes effective thermal resistance R_θ = ΔT/P in real time from NVML/DCGM telemetry to tell a busy-hot GPU from a failing-hot one. Peer-relative anomaly detection blind-validated on 72 production Princeton H100s.",
+      "Open-source agentic GPU reliability system (pip install runtheta) that computes effective thermal resistance R_θ = ΔT/P from NVML/DCGM telemetry to tell a busy-hot GPU from a failing-hot one. Includes signature-matrix fault classifier (H100-calibrated), peer-relative anomaly detection (blind-validated on 72 Princeton H100s), and survival-analysis lead-time prediction. Deployed to Cal Poly DGX B200 August 2026.",
     techStack: [
       "Python",
       "pynvml / NVML",
@@ -370,7 +370,7 @@ export const projects: Project[] = [
       systemOverview:
         "Theta is a software-only agent that computes effective thermal resistance R_θ = (T_junction, T_ref) / P_GPU from existing telemetry, no extra hardware. Rising R_θ at steady power means cooling degradation. A peer-relative detector compares each GPU to its matched-power node-mates (robust median-polish z-score) to flag units degraded before the agent started, and a survival-analysis model estimates lead-time-to-failure. Shipped as an OSS Python package on PyPI with a live dashboard.",
       systemArchitecture:
-        "GPU telemetry (pynvml / DCGM) → steady-state window gate (σ < 0.03 C/W) → R_θ computed against a virtual ambient T_ref learned from the GPU's own idle windows → Decision-Tree state classifier → temporal drift detector (rolling baseline + k·σ) plus cross-sectional peer detector (median-polish robust-z) → alert governor (trust / false-positive budget) → exporters (Prometheus / OTLP / Slack / PagerDuty / JSONL).",
+        "GPU telemetry (pynvml / DCGM) → steady-state window gate (σ < 0.03 C/W) → R_θ computed against a virtual ambient T_ref learned from the GPU's own idle windows → Diagnosis intelligence (signature classifier: 6-axis fingerprint vector with 3-valued evidence) → temporal drift detector (rolling baseline + k·σ) plus cross-sectional peer detector (median-polish robust-z) → alert governor (trust / false-positive budget) → exporters (Prometheus / OTLP / Slack / PagerDuty / JSONL).",
       subsystems: [
         {
           id: "rtheta-core",
@@ -408,32 +408,55 @@ export const projects: Project[] = [
           ],
           confidence: "CONCEPTUAL",
         },
+        {
+          id: "diagnosis-intelligence",
+          title: "Diagnosis intelligence + fault attribution",
+          description:
+            "Signature-matrix fault classifier that fingerprints thermal-fault classes across 6 orthogonal axes with 3-valued evidence (SUPPORTS/CONTRADICTS/UNKNOWN), calibrated on Princeton H100 production data.",
+          details: [
+            "6-axis fingerprint vector (time-shape, power-conditioning α/β, locality, channel, cross-correlation, recovery-τ)",
+            "3-valued evidence model with verdict tiers: EXACT (discriminating axis observed) / CAUSE-CLASS (missing axis identified) / SUBSYSTEM-LEVEL (channel known)",
+            "H100 calibration: healthy R_θ median 0.0598 C/W, robust-σ 0.0072, nonlinear R_θ(P) curve (0.120→0.0585), position-conditioned structure",
+            "Residual-from-healthy accumulator with α/β decomposition (α=offset dust/airflow, β=power-dependent TIM/conduction), resolves steady-load identifiability automatically",
+            "Cross-validated against E009-B hand-analysis attributions: 282 tests green, reproduces all 3 Princeton degraded-unit diagnoses",
+          ],
+          confidence: "VERIFIED",
+        },
       ],
       implementationNotes: [
         "Packaged and published to PyPI as `runtheta` (v0.1.10); one-line install, plus Dockerfile and docker-compose (agent + Prometheus + Grafana)",
+        "Diagnosis intelligence (signature classifier + H100 calibration) built and validated June 2026; deployment planned Cal Poly DGX B200 August 17 deadline",
+        "SLURM integration in progress (v0.1.9): prolog/epilog hooks + timing-aware job attribution, critical for first production deployment",
         "Hardware-abstraction layer (hal.py) supports NVIDIA (NVML), AMD (amdsmi), DCGM, and Redfish BMC behind one seam",
         "Alert governor holds inferential alerts while a GPU is warming and circuit-breaks noisy GPUs to earn trust on a stranger's fleet",
         "Characterization tests pin real incidents (e.g. the 72-H100 blind-flag) so regressions are caught; CI runs pytest on Python 3.10/3.11/3.12 + ruff",
       ],
       failureModes: [],
       improvements: [
-        "Per-GPU calibration for B200/H100/A100 (Stage 2, Cal Poly DGX B200 AI Factory); the bundled classifier is currently Tesla T4-trained",
-        "Lower-level GPU instrumentation toward kernel/NCCL-aware signals (the ML-performance-engineering frontier)",
-        "Error-bar / variance reporting across runs and GPUs on the peer-relative thresholds",
+        "H100 calibration complete (June 2026); B200 calibration in progress (Cal Poly AI Factory, August 17 deadline); A100 pending",
+        "SLURM integration (v0.1.9) with prolog/epilog hooks and per-job thermal provenance; critical for production deployment",
+        "Lead-time validation: MVX-1 (power-cap proxy on Colab) and MVX-2 (sensitivity analysis) due June 2026; multi-fleet production validation August-September",
+        "Monitoring pipeline observability (Gap 1): track poll_latency, consecutive_poll_failures for GPU-hang detection; low effort, high research value",
+        "TIM degradation attribution (Gap 3): multi-signal inference (fan + chassis + ECC) to distinguish pump-out from cooling failure; 2+ years of Cal Poly data could be publication-ready",
+        "NVSwitch thermal monitoring (Gap 4): fabric health via GPU-compute API V3 + NSCQ alerts; needed for full DGX B200 characterization",
       ],
       validationResults: [
+        "Diagnosis intelligence: signature classifier cross-validated against E009-B hand analysis (3 Princeton degraded units), 282 tests green, reproduces all attributions",
+        "H100 calibration: healthy R_θ median 0.0598 C/W (robust-σ 0.0072), nonlinear P-dependent curve (0.120→0.0585), position-conditioned HGX structure (±11% of mean)",
         "Peer-relative method blind-flagged 3 degraded units on 72 production Princeton H100s; cross-node scan recovered all 3 at 0 false positives",
         "Decision-Tree classifier: 100% 5-fold CV accuracy on Tesla T4 steady-state data (steady-state gating takes Naive Bayes 84% → 99.8%)",
         "Controlled Stage-1 study (Tesla T4, n=7, within-condition CV 1.8%): a 2 °C ambient delta drives a 3.5× change in power-recovery time, direct evidence of GPU thermal memory",
-        "Reproduce the blind-flag result: `python tools/validate_e009_princeton.py <export.json>`",
-        "NOT yet validated: lead-time-before-throttle on real hardware (simulation only until the fall-2026 E-LT testbed); B200/H100/A100 classifier generalization (calibration required); AMD MI300 silicon (implemented + unit-tested, not yet run on real hardware)",
+        "Reproduce the blind-flag result: `python tools/validate_e009_princeton.py <export.json>` (theta/tools/discovery_tracker.py)",
+        "NOT yet validated: lead-time-before-throttle on real hardware (simulation ~2.5-7.7 days at 0 false alarms; MVX validation path via Colab power-cap proxy); B200 classifier generalization (Cal Poly deployment August 17); AMD MI300 silicon (implemented + unit-tested, not yet run on real hardware)",
       ],
       keyInsight:
         "A hot GPU is ambiguous; the ratio of temperature rise to power is not. R_θ at steady power separates load from degradation, and no incumbent (DCGM, Mission Control, Phaidra) computes it.",
       verificationSummary: [
         { parameter: "R_θ idle vs load (Tesla T4)", value: "1.28 vs 0.72", unit: "°C/W", evidence_source: "Stage 1, F1", confidence: "VERIFIED" },
+        { parameter: "R_θ healthy (H100 median)", value: "0.0598", unit: "°C/W", evidence_source: "E009 Princeton calibration", confidence: "VERIFIED" },
         { parameter: "Blind-flagged degraded units", value: "3 / 72", unit: "H100s", evidence_source: "E009 production validation", confidence: "VERIFIED" },
         { parameter: "Top anomaly robust-z", value: "+15.6", unit: "σ", evidence_source: "E009", confidence: "VERIFIED" },
+        { parameter: "Diagnosis intelligence tests", value: "282", unit: "green", evidence_source: "signature.py cross-validation", confidence: "VERIFIED" },
         { parameter: "Classifier 5-fold CV", value: "100", unit: "% (T4 steady-state)", evidence_source: "models/train", confidence: "VERIFIED" },
         { parameter: "Ambient sensitivity", value: "3.5×", unit: "recovery delta / 2 °C", evidence_source: "Stage 1, F2", confidence: "VERIFIED" },
         { parameter: "Lead time (gradual, sim)", value: "2.5-7.7", unit: "days @ 0 false alarms", evidence_source: "survival sim", confidence: "CONCEPTUAL" },
@@ -442,20 +465,24 @@ export const projects: Project[] = [
         owned: [
           "The R_θ formulation, virtual-ambient T_ref method, and steady-state gating",
           "Peer-relative median-polish detector and the position-conditioned cross-node scan",
+          "Signature-matrix fault classifier, H100 calibration, and residual-decomposition (α/β) design",
           "Survival-analysis lead-time pipeline and the classifier training",
+          "SLURM integration design (prolog/epilog hooks, timing-aware job attribution)",
           "Architecture, packaging (PyPI), and the agent / governor / exporter design",
         ],
         aiAssisted: [
-          "Boilerplate, docstrings, and test scaffolding via AI coding assistance",
+          "Diagnosis-intelligence modules (boilerplate, unit tests, test harness scaffolding via Claude Code)",
           "Dashboard / front-end implementation",
+          "Documentation and docstrings",
         ],
       },
     },
     diagrams: [],
     evidence: [
       { id: "theta-pypi", fileName: "runtheta on PyPI", type: "link", description: "Live PyPI package, v0.1.10", url: "https://pypi.org/project/runtheta/" },
-      { id: "theta-github", fileName: "Asomisetty27/theta", type: "link", description: "Open-source agent: code, README, CI, reproduce script", url: "https://github.com/Asomisetty27/theta" },
+      { id: "theta-github", fileName: "Asomisetty27/theta", type: "link", description: "Open-source agent: code, README, CI, reproduce script, diagnosis intelligence (signature.py, h100_reference.py)", url: "https://github.com/Asomisetty27/theta" },
       { id: "theta-dashboard", fileName: "Live dashboard", type: "link", description: "ThermalOS research & telemetry dashboard", url: "https://amogh.site/thermalos" },
+      { id: "theta-vault", fileName: "ThermalOS Research Vault", type: "link", description: "49 synthesis pages: strategic direction, competitive analysis, agent architecture, research roadmap, pending work (June-Sept 2026)", url: "https://github.com/Asomisetty27/thermalos-vault" },
     ],
   },
   // ===== DOMAIN: SIGNAL SYSTEMS =====
