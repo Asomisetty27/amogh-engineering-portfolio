@@ -32,7 +32,7 @@ export default function QuickviewSection() {
             {personalInfo.name}
           </h1>
           <p className="text-sm text-primary print:text-black font-medium">
-            GPU Infrastructure &amp; ML-Systems Engineer
+            Electrical Engineer · Hardware, Embedded &amp; Systems
           </p>
           <p className="text-xs text-muted-foreground print:text-gray-600">
             {personalInfo.title}, {personalInfo.university}

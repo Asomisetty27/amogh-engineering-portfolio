@@ -98,7 +98,7 @@ export default function HeroHeader() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7, duration: 0.4 }}
       >
-        GPU Infrastructure &amp; ML-Systems Engineer
+        Electrical Engineer · Hardware, Embedded &amp; Systems
       </motion.p>
 
       {/* Status strip */}

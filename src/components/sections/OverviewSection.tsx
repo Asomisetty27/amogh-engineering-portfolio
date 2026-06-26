@@ -11,22 +11,22 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const strengths = [
   {
-    title: "GPU & ML Infrastructure",
-    description: "Theta: open-source GPU reliability agent. Real-time thermal-resistance (R_θ) anomaly detection from NVML/DCGM telemetry; peer-relative method blind-validated on 72 Princeton H100s; survival-analysis lead-time modeling; shipped on PyPI",
-    icon: Cpu,
-    color: "neon-green",
-  },
-  {
-    title: "Data & Statistical Modeling",
-    description: "Python (NumPy/SciPy/pandas/scikit-learn/lifelines), robust statistics, time-series anomaly detection, fault-mode classification, reproducible analysis pipelines",
-    icon: Zap,
+    title: "Hardware & Embedded",
+    description: "Analog signal chains, op-amp and sensor circuits, PCB design and reflow, and embedded C++ for real-time sensing and motor/actuator control",
+    icon: Radio,
     color: "neon-cyan",
   },
   {
-    title: "Signal, Embedded & Digital Systems",
-    description: "RISC-V CPU architecture, FPGA synthesis, FSM control, embedded C++ for real-time sensing, analog signal chains, hardware-validated measurement discipline",
-    icon: Radio,
+    title: "Digital & Computer Architecture",
+    description: "A RISC-V CPU built from logic gates up, FPGA synthesis (Vivado), FSM and HDL design, and computer-architecture fundamentals",
+    icon: Cpu,
     color: "neon-magenta",
+  },
+  {
+    title: "Software, Data & ML",
+    description: "Python, statistical modeling, and Theta, a self-built open-source GPU-reliability tool (NVML/DCGM, peer-relative anomaly detection) shipped on PyPI",
+    icon: Zap,
+    color: "neon-green",
   },
 ];
 
@@ -57,21 +57,9 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
             }}
           />
           <p className="text-sm leading-relaxed text-secondary-foreground pl-1">
-            I build GPU and ML-infrastructure software. My main project, Theta (<span className="font-mono text-primary">pip install runtheta</span>), is an open-source GPU reliability agent: it computes effective thermal resistance R_θ from NVML/DCGM telemetry to tell a busy-hot GPU from a failing one, and its peer-relative detector was blind-validated on 72 Princeton H100s. Underneath sits a hardware foundation: analog signal chains, embedded control, and RISC-V/FPGA digital systems, with the measurement discipline to know when a number is real.
+            I'm an electrical engineer who builds across the whole stack: analog signal chains, embedded control, and RISC-V/FPGA digital systems, plus the software and data work on top. What ties it together is measurement discipline, knowing when a number is real. On my own I built Theta (<span className="font-mono text-primary">pip install runtheta</span>), an open-source GPU-reliability tool validated on 72 H100s, because GPUs and AI are where I like to push myself.
           </p>
         </div>
-
-        {/* Active Project — ThermalOS (flagship, leads the page) */}
-        <div className="flex items-center gap-2 mb-3">
-          <span className="inline-block w-1.5 h-1.5 rounded-full animate-glow-pulse"
-            style={{ background: "#35C792", boxShadow: "0 0 8px #35C792" }} />
-          <h3 className="text-xs font-mono font-semibold tracking-wider uppercase fx-grad-text-green">
-            Flagship Project
-          </h3>
-        </div>
-        <ThermalOSBanner />
-
-        <ThetaFlagshipVisuals />
 
         {/* 3 Core Strengths — fx-card hover + top radial glow */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
@@ -108,6 +96,18 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
             );
           })}
         </div>
+
+        {/* Flagship Project — Theta (self-built standout) */}
+        <div className="flex items-center gap-2 mb-3">
+          <span className="inline-block w-1.5 h-1.5 rounded-full animate-glow-pulse"
+            style={{ background: "#35C792", boxShadow: "0 0 8px #35C792" }} />
+          <h3 className="text-xs font-mono font-semibold tracking-wider uppercase fx-grad-text-green">
+            Flagship Project
+          </h3>
+        </div>
+        <ThermalOSBanner />
+
+        <ThetaFlagshipVisuals />
 
         {/* Coursework & Hardware Systems — fx-card hover with shimmer */}
         <h3 className="text-xs font-mono font-semibold tracking-wider uppercase mb-3 fx-grad-text-cyan">
