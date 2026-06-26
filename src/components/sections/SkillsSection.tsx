@@ -44,7 +44,7 @@ const skillCategories: { id: string; title: string; color: string; skills: Skill
     skills: [
       { name: "Op-Amp Circuit Design", evidence: "Summing amp, voltage follower, Schmitt trigger (EE 241/143)", projectLink: "ee143-signal-system" },
       { name: "Sensor Integration", evidence: "Capacitive touch, photoresistor, inductance sensing (EE 241)", projectLink: "rgm-machine" },
-      { name: "555 Timer / Oscillator Design", evidence: "LC oscillator metal detector, 8,760 Hz baseline", projectLink: "detect-7" },
+      { name: "555 Timer / Oscillator Design", evidence: "LC oscillator metal detector, 8,760 Hz baseline", projectLink: "rgm-machine" },
       { name: "PCB Design & Reflow Soldering", evidence: "4-bit DAC PCB via Fusion 360 → reflow", projectLink: "ee143-signal-system" },
       { name: "LTSpice Simulation", evidence: "Pre-fabrication DAC verification", projectLink: "ee143-signal-system" },
       { name: "Soldering & Prototyping", evidence: "Breadboard + PCB assembly across EE 241 labs", projectLink: "rgm-machine" },

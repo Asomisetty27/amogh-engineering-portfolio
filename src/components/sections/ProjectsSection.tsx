@@ -19,7 +19,6 @@ const OtterInteractive = lazy(() => import("@/components/holograms/OtterInteract
 const FunckNetworkHologram = lazy(() => import("@/components/holograms/FunckNetworkHologram"));
 const AirMotorHologram = lazy(() => import("@/components/holograms/AirMotorHologram"));
 const RGMHologram = lazy(() => import("@/components/holograms/RGMHologram"));
-const MetalDetectorHologram = lazy(() => import("@/components/holograms/MetalDetectorHologram"));
 const PhaseDiagramInteractive = lazy(() => import("@/components/materials/PhaseDiagramInteractive"));
 const CorrosionInteractive = lazy(() => import("@/components/materials/CorrosionInteractive"));
 const PolymerStressStrain = lazy(() => import("@/components/materials/PolymerStressStrain"));
@@ -27,6 +26,7 @@ const CFRPComparison = lazy(() => import("@/components/materials/CFRPComparison"
 const DroneSystemHologram = lazy(() => import("@/components/holograms/DroneSystemHologram"));
 
 import RecruiterProjectView from "@/components/sections/RecruiterProjectView";
+import ThetaFlagshipVisuals from "@/components/ThetaFlagshipVisuals";
 
 type DetailTab = "brief" | "subsystems";
 
@@ -55,7 +55,6 @@ function ProjectHologram({ project }: { project: Project }) {
       {project.id === "funck" && <FunckNetworkHologram />}
       {project.id === "manufacturing-systems" && <AirMotorHologram />}
       {project.id === "rgm-machine" && <RGMHologram />}
-      {project.id === "detect-7" && <MetalDetectorHologram />}
       {project.id === "materials-phases" && <PhaseDiagramInteractive />}
       {project.id === "materials-corrosion" && <CorrosionInteractive />}
       {project.id === "materials-polymers" && (
@@ -224,6 +223,9 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
               </motion.div>
             </AnimatePresence>
           )}
+
+          {/* Flagship visuals for Theta (architecture + results, in place of a 3D hologram) */}
+          {selectedProject.id === "theta-thermalos" && <ThetaFlagshipVisuals />}
 
           {/* RGM full view button, shimmer + gradient */}
           {selectedProject.id === "rgm-machine" && (

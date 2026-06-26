@@ -55,17 +55,6 @@ export const recruiterSummaries: Record<string, RecruiterSummary> = {
     ],
     skillsDemonstrated: ["Analog Design", "Embedded Programming", "Sensor Integration", "Root Cause Analysis", "System Integration", "CAD"],
   },
-  "detect-7": {
-    whatIsIt: "A 555-timer-based metal detection system with automated electromagnet release, frequency-domain sensing under noise.",
-    whyItMatters: "Shows precision in frequency-domain sensing and robust threshold logic under real-world noise conditions.",
-    whatYouBuilt: "LC oscillator metal detector with Arduino-based frequency monitoring and MOSFET-controlled electromagnet.",
-    keyOutcomes: [
-      "Achieved 5.1% frequency drop detection (8,760 Hz → 8,310 Hz)",
-      "Implemented streak-based filtering to eliminate false triggers",
-      "Resolved MOSFET common ground issue for reliable switching",
-    ],
-    skillsDemonstrated: ["555 Timer Design", "Frequency Analysis", "MOSFET Switching", "Arduino Programming", "Debugging"],
-  },
   "digital-systems": {
     whatIsIt: "A multi-cycle RISC-V CPU designed from logic gates up and synthesized onto an FPGA, full instruction fetch, decode, execute, and memory access.",
     whyItMatters: "Demonstrates understanding of computer architecture at the hardware level, not just writing code, but building the machine that runs it.",
