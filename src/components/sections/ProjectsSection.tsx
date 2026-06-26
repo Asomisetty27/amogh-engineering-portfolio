@@ -113,8 +113,10 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
           const isActive = activeDomain === domain.id;
           const count = projects.filter((p) => p.domain === domain.id).length;
           return (
-            <button
+            <motion.button
               key={domain.id}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 24 }}
               onClick={() => {
                 setActiveDomain(domain.id);
                 const firstProject = projects.find((p) => p.domain === domain.id);
@@ -153,7 +155,7 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
                 <div className="text-xs font-semibold text-foreground leading-tight">{domain.name}</div>
                 <div className="text-[10px] text-muted-foreground mt-0.5 hidden sm:block">{domain.subtitle}</div>
               </div>
-            </button>
+            </motion.button>
           );
         })}
       </div>
@@ -169,9 +171,12 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
             {domainProjects.map((p) => {
               const isSelected = selectedProject.id === p.id;
               return (
-                <button
+                <motion.button
                   key={p.id}
                   onClick={() => { setSelectedProject(p); setDetailTab("brief"); setExpandedSubsystems(new Set()); }}
+                  whileHover={{ x: 2 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 26 }}
                   className={`w-full flex items-center gap-2 px-2 py-2 rounded text-left transition-all duration-200 relative ${
                     isSelected
                       ? "border border-primary/30"
@@ -196,7 +201,7 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
                     <div className="text-[9px] text-muted-foreground truncate">{p.name}</div>
                   </div>
                   {p.has3D && <Box size={9} className={`flex-shrink-0 transition-colors ${isSelected ? "text-primary" : "text-primary/50"}`} />}
-                </button>
+                </motion.button>
               );
             })}
           </div>
