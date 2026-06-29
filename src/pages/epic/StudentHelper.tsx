@@ -421,7 +421,10 @@ export default function StudentHelper() {
             <>
               {activity.lib && (
                 <div className="rounded-md border border-[#F2B01E]/40 bg-[#F2B01E]/10 text-[#F2B01E] px-3 py-2 text-sm">
-                  Install <code className="font-mono">{activity.lib}</code> first: Sketch → Include Library → Add .ZIP Library
+                  <div className="mb-2">Install <code className="font-mono">{activity.lib}</code> first: Sketch → Include Library → Add .ZIP Library</div>
+                  <a href={`/libraries/${activity.lib}`} download className="inline-flex items-center gap-2 bg-[#F2B01E]/20 hover:bg-[#F2B01E]/30 px-2 py-1 rounded text-xs font-medium transition-colors">
+                    ↓ Download {activity.lib}
+                  </a>
                 </div>
               )}
 
