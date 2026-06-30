@@ -38,10 +38,29 @@ export const CURRICULUM: Activity[] = [
     materials:["Arduino UNO","active buzzer (sealed)","passive buzzer (open green)","jumper wires"],
     wiring:[["Active +","pin 12"],["Active −","GND"],["Passive +","pin 8"],["Passive −","GND"]],
     code:
-`// Part A — Active buzzer (pin 12): already beeps on its own when powered.
-// Just wire it and plug in — no code needed for Part A.
+`// Part A — Active buzzer (sealed, pin 12). Upload this first.
+// Wire: + (long leg) → pin 12, − → GND.
 
-// Part B — Passive buzzer: play Happy Birthday (pin 8).
+int buzzer = 12;
+
+void setup() { pinMode(buzzer, OUTPUT); }
+
+void loop() {
+  int d = 500;
+  for (int i = 0; i < 20; i++) {
+    if (i < 5)       d = 500;   // slow
+    else if (i < 10) d = 300;   // faster
+    else             d = 100;   // fast
+    digitalWrite(buzzer, HIGH); delay(d);
+    digitalWrite(buzzer, LOW);  delay(d);
+  }
+  digitalWrite(buzzer, HIGH);
+  delay(5000);   // one long tone
+}
+
+// ─── Upload Part A above first, then replace with Part B below. ───────────
+
+// Part B — Passive buzzer (open green, pin 8): plays Happy Birthday.
 // All songs from https://github.com/robsoncouto/arduino-songs use pin 11 by default.
 // Change  int buzzer = 11;  to  int buzzer = 8;  before uploading.
 
@@ -87,12 +106,12 @@ void setup() {
 
 void loop() {}   // plays once on startup`,
     test:[
-      "Part A: active (sealed) buzzer beeps as soon as you plug in USB.",
-      "Part B: passive (open green) buzzer plays Happy Birthday.",
+      "Part A: upload the top code → buzzer beeps, speeding up, then holds one 5-second tone, repeats.",
+      "Part B: upload the bottom code → passive (open green) buzzer plays Happy Birthday.",
       "Try another song: go to github.com/robsoncouto/arduino-songs, open any folder, copy the .ino file, change pin 11 to pin 8.",
     ],
     trouble:[
-      "Active silent → sealed buzzer must be on pin 12.",
+      "Active silent → upload Part A code first; sealed buzzer long leg to pin 12.",
       "Passive silent → open green buzzer must be on pin 8.",
       "Song sounds wrong → make sure you changed buzzer = 11 to buzzer = 8.",
     ],
