@@ -644,6 +644,184 @@ if (digitalRead(9) == ___) {    // INPUT_PULLUP: LOW when pressed, or HIGH?
 // 2. What would happen if you set IN1=HIGH and IN2=HIGH at the same time?
 //    (Check the L293D datasheet if you're curious)`,
     },
+  },
+
+  // ── Lesson 24 ──────────────────────────────────────────────
+  {
+    id:"servo", day:5, lesson:"Lesson 24", title:"Servo Motor (SG90)",
+    goal:"Sweep a servo arm back and forth, then steer it with a potentiometer.",
+    materials:["Arduino UNO","SG90 servo motor","jumper wires","(optional) 10kΩ potentiometer"],
+    wiring:[
+      ["Servo signal (orange)","pin 9"],
+      ["Servo VCC (red)","5V"],
+      ["Servo GND (brown)","GND"],
+    ],
+    code:
+`#include <Servo.h>   // built into the Arduino IDE — no .ZIP needed
+
+Servo myServo;
+
+void setup() {
+  myServo.attach(9);   // servo signal wire on pin 9
+}
+
+void loop() {
+  // sweep from 0 to 180 degrees
+  for (int angle = 0; angle <= 180; angle++) {
+    myServo.write(angle);
+    delay(15);
+  }
+  // sweep back from 180 to 0
+  for (int angle = 180; angle >= 0; angle--) {
+    myServo.write(angle);
+    delay(15);
+  }
+}`,
+    test:[
+      "The servo arm sweeps smoothly from one side to the other and back, forever.",
+      "Change delay(15) to delay(5) — the sweep gets faster.",
+    ],
+    trouble:[
+      "Servo jitters or the board resets → a servo pulls a lot of current; unplug other parts, or ask for a separate 5V supply.",
+      "No movement → signal (orange) on pin 9, red to 5V, brown to GND.",
+    ],
+    challenge:{
+      prompt:"Add a potentiometer (middle leg → A0, outer legs → 5V and GND) and steer the servo by hand. Fill in the blanks:",
+      code:
+`// Replace loop() with this:
+void loop() {
+  int knob = analogRead(A0);              // 0 to ___
+  int angle = map(knob, 0, ___, 0, 180);  // scale the knob to a servo angle
+  myServo.write(angle);
+  delay(15);
+}
+
+// Think about it: a servo listens to pulse WIDTH, not voltage.
+// write(0) sends a ~1 ms pulse, write(180) a ~2 ms pulse. Why pulses?`,
+    },
+  },
+
+  // ── Lesson 26 ──────────────────────────────────────────────
+  {
+    id:"stepper", day:5, lesson:"Lesson 26", title:"Stepper Motor (28BYJ-48)",
+    goal:"Turn a stepper motor an exact amount using the ULN2003 driver board.",
+    materials:["Arduino UNO","28BYJ-48 stepper motor","ULN2003 driver board","jumper wires"],
+    wiring:[
+      ["ULN2003 IN1","pin 8"],
+      ["ULN2003 IN2","pin 9"],
+      ["ULN2003 IN3","pin 10"],
+      ["ULN2003 IN4","pin 11"],
+      ["ULN2003 + (VCC)","5V"],
+      ["ULN2003 − (GND)","GND"],
+      ["Motor plug","into the ULN2003 white socket"],
+    ],
+    code:
+`#include <Stepper.h>   // built into the Arduino IDE — no .ZIP needed
+
+// The 28BYJ-48 takes about 2048 steps for one full turn.
+const int stepsPerRev = 2048;
+
+// NOTE the pin order: IN1, IN3, IN2, IN4  (8, 10, 9, 11).
+// That order gives the motor the correct step sequence.
+Stepper myStepper(stepsPerRev, 8, 10, 9, 11);
+
+void setup() {
+  myStepper.setSpeed(10);   // 10 RPM
+  Serial.begin(9600);
+}
+
+void loop() {
+  Serial.println("One full turn clockwise");
+  myStepper.step(stepsPerRev);
+  delay(1000);
+
+  Serial.println("One full turn back");
+  myStepper.step(-stepsPerRev);
+  delay(1000);
+}`,
+    test:[
+      "The motor turns one full revolution one way, pauses, then turns back.",
+      "The four LEDs on the ULN2003 board chase in a circle as it steps.",
+    ],
+    trouble:[
+      "Motor buzzes but doesn't turn → the pin order must be 8, 10, 9, 11 (IN1, IN3, IN2, IN4).",
+      "Nothing happens → the motor plug must be fully seated in the white socket; + and − to 5V/GND.",
+    ],
+    challenge:{
+      prompt:"A full turn is 2048 steps. Work out the steps for part-turns and fill in the blanks:",
+      code:
+`// Quarter turn (90 degrees):
+myStepper.step(2048 / ___);   // how many steps?
+
+// Half turn (180 degrees):
+myStepper.step(2048 / ___);
+
+// A negative number turns the other way. Turn exactly 45 degrees:
+myStepper.step(___);
+
+// Think about it: why is a stepper better than a plain DC motor when you
+// need to stop at an EXACT position (like the hand of a clock)?`,
+    },
+  },
+
+  // ── Lesson 16 ──────────────────────────────────────────────
+  {
+    id:"shift_register", day:5, lesson:"Lesson 16", title:"Shift Register (74HC595) — 8 LEDs, 3 pins",
+    goal:"Control 8 LEDs with only 3 Arduino pins, and watch them count in binary.",
+    materials:["Arduino UNO","breadboard","74HC595 shift register IC","8 LEDs","8× 220Ω resistors","jumper wires"],
+    wiring:[
+      ["74HC595 pin 14 (DS, data)","pin 4"],
+      ["74HC595 pin 11 (SHCP, clock)","pin 6"],
+      ["74HC595 pin 12 (STCP, latch)","pin 5"],
+      ["74HC595 pin 16 (VCC) & pin 10 (MR)","5V"],
+      ["74HC595 pin 8 (GND) & pin 13 (OE)","GND"],
+      ["Outputs Q0–Q7","each → 220Ω → an LED → GND"],
+    ],
+    code:
+`// A shift register turns 3 pins into 8 outputs.
+// You send 8 bits one at a time (shift), then "latch" them to the LEDs.
+
+int dataPin  = 4;   // DS   (chip pin 14)
+int clockPin = 6;   // SHCP (chip pin 11)
+int latchPin = 5;   // STCP (chip pin 12)
+
+void setup() {
+  pinMode(dataPin, OUTPUT);
+  pinMode(clockPin, OUTPUT);
+  pinMode(latchPin, OUTPUT);
+}
+
+void loop() {
+  // count 0 to 255 — the LEDs show each number in binary
+  for (int number = 0; number < 256; number++) {
+    digitalWrite(latchPin, LOW);                    // hold the outputs
+    shiftOut(dataPin, clockPin, MSBFIRST, number);  // push all 8 bits
+    digitalWrite(latchPin, HIGH);                   // show them at once
+    delay(200);
+  }
+}`,
+    test:[
+      "The 8 LEDs count up in binary: 1, 10, 11, 100, … like a binary odometer.",
+      "The rightmost LED toggles every step; the next toggles half as often, and so on.",
+    ],
+    trouble:[
+      "Random or no pattern → re-check pins 16 & 10 to 5V and pins 8 & 13 to GND.",
+      "LEDs dim or dark → each LED needs its own 220Ω resistor, long leg toward the chip output.",
+    ],
+    challenge:{
+      prompt:"Instead of counting, show your own patterns. A byte is 8 bits — one per LED (1 = on). Fill in the blanks:",
+      code:
+`// Every OTHER LED on (binary 10101010):
+shiftOut(dataPin, clockPin, MSBFIRST, 0b________);  // 8 digits
+
+// Only the two end LEDs (binary 10000001):
+shiftOut(dataPin, clockPin, MSBFIRST, 0b________);
+
+// Questions:
+// 1. What number (0-255) lights ALL eight LEDs?  ___
+// 2. MSBFIRST sends the biggest bit first. What changes with LSBFIRST?
+// 3. How can 3 wires control 8 LEDs? What is the clock pin actually doing?`,
+    },
   }
 ];
 

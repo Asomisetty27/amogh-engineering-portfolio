@@ -264,6 +264,54 @@ export const SCENES = {
     g += tapM('J60');
     return { bb: true, fg: g };
   },
+
+  // ── Lesson 24: servo ──────────────────────────────────────────────────
+  servo() {
+    const b = place(3, { top: 440 });
+    const m = module({ ...b, fill: '#1f6b52', label: 'SG90 servo', side: 'left',
+      pins: [{ name: 'SIG', label: 'signal' }, { name: 'VCC', label: '+5V' }, { name: 'GND', label: 'GND' }] });
+    const px = b.x + b.w - 54, py = b.y + b.h / 2;
+    const arm = `<rect x="${px}" y="${py - 6}" width="46" height="12" rx="3" fill="#e8e8ea" stroke="#888"/>`
+              + `<circle cx="${px}" cy="${py}" r="7" fill="#444"/>`;
+    return mod(m, [['~9', m.at('SIG'), C.orange], ['5V', m.at('VCC'), C.red], ['GND', m.at('GND'), C.black]], arm);
+  },
+
+  // ── Lesson 26: stepper + ULN2003 ──────────────────────────────────────
+  stepper() {
+    const b = place(6, { w: 200, top: 360 });
+    const m = module({ ...b, fill: '#0f2233', label: 'ULN2003', sub: 'driver', side: 'left',
+      pins: [{ name: 'IN1', label: 'IN1' }, { name: 'IN2', label: 'IN2' }, { name: 'IN3', label: 'IN3' },
+             { name: 'IN4', label: 'IN4' }, { name: '+', label: '+' }, { name: '-', label: '−' }] });
+    const mx = b.x + b.w + 96, my = b.y + b.h / 2;
+    const motor = `<rect x="${b.x + b.w - 4}" y="${my - 7}" width="${mx - 44 - (b.x + b.w - 4)}" height="14" fill="#d8b98c" stroke="#a5824f"/>`
+                + `<circle cx="${mx}" cy="${my}" r="44" fill="#c9ccd1" stroke="#6a6d73" stroke-width="2"/>`
+                + `<circle cx="${mx}" cy="${my}" r="15" fill="#8a8d93"/>`;
+    return mod(m, [['8', m.at('IN1'), C.blue], ['~9', m.at('IN2'), C.green], ['~10', m.at('IN3'), C.yellow],
+                   ['~11', m.at('IN4'), C.orange], ['5V', m.at('+'), C.red], ['GND', m.at('-'), C.black]], motor);
+  },
+
+  // ── Lesson 16: 74HC595 drives 8 LEDs ──────────────────────────────────
+  shift_register() {
+    const chip = dip16(7, '74HC595');
+    let g = powerRails() + chip.svg;
+    // control lines
+    g += wire('4', chip.hole(14), C.green);   // DS   (data)
+    g += wire('~6', chip.hole(11), C.yellow); // SHCP (clock)
+    g += wire('~5', chip.hole(12), C.orange);  // STCP (latch)
+    // chip power
+    g += tapP(chip.hole(16)); g += tapP(chip.hole(10)); // VCC, MR
+    g += tapM(chip.hole(8));  g += tapM(chip.hole(13)); // GND, OE
+    // 8 outputs Q0..Q7 → LED → 220Ω → − rail, in a neat row
+    const outs = [15, 1, 2, 3, 4, 5, 6, 7];
+    outs.forEach((pin, i) => {
+      const c = 22 + i * 5;                    // LED anode column
+      g += wire(chip.hole(pin), `J${c}`, C.blue, { width: 4 });
+      g += led(`J${c}`, `J${c + 1}`);
+      g += resistor(`G${c + 1}`, `A${c + 1}`, ['#d21f24','#d21f24','#6b3f14','#c9a227']);
+      g += tapM(`A${c + 1}`);
+    });
+    return { bb: true, fg: g };
+  },
 };
 
 // ── helpers ───────────────────────────────────────────────────────────────
