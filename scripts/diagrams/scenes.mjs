@@ -365,6 +365,22 @@ export const SCENES = {
     g += resistor(S.at('COM'), pin('GND'), ['#d21f24','#d21f24','#6b3f14','#c9a227']);
     return { bb: false, fg: g };
   },
+  seven_seg4() {
+    const S = fourDigit(468, 452);
+    let g = S.svg;
+    // 8 segment lines (direct)
+    const seg = [['a','~6'],['b','7'],['c','8'],['d','~9'],['e','~10'],['f','~11'],['g','12'],['dp','13']];
+    const segCols = [C.green, C.blue, C.yellow, C.orange, C.green, C.blue, C.yellow, C.orange];
+    seg.forEach(([s, p], i) => g += wire(p, S.at(s), segCols[i], { curve: 0.5 }));
+    // 4 digit lines, each through its own 220Ω resistor sitting just above its pin
+    const dig = [['D1','2'], ['D2','~3'], ['D3','4'], ['D4','~5']];
+    dig.forEach(([d, p]) => {
+      const dpt = S.at(d), midY = dpt.y - 66;
+      g += wire(pin(p), { x: dpt.x, y: midY }, '#8a8f97', { curve: 0.5 });
+      g += resistor({ x: dpt.x, y: midY }, dpt, ['#d21f24','#d21f24','#6b3f14','#c9a227']);
+    });
+    return { bb: false, fg: g };
+  },
 };
 
 // ── helpers ───────────────────────────────────────────────────────────────
@@ -412,6 +428,35 @@ function sevenSeg(x, y) {
     g += text(px, py + 16, n, { size: 8.5, fill: '#333', weight: 700 });
   });
   g += text(x + w/2, y - 8, '7-segment display', { size: 12, fill: '#333', weight: 700 });
+  g += `</g>`;
+  return { svg: g, at: (n) => at[n] };
+}
+
+// four 7-segment digits with a 12-pin header (a-g, dp, D1-D4) below
+function fourDigit(x, y) {
+  const w = 300, h = 150, on = '#e33';
+  const at = {};
+  let g = `<g>`;
+  g += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="#1a1a1e" stroke="#000"/>`;
+  for (let d = 0; d < 4; d++) {
+    const dx = x + 34 + d * 66;
+    const L = dx, R = dx + 34, T = y + 24, M = y + h/2 - 10, B = y + h - 52;
+    g += `<rect x="${L}" y="${T}" width="${R-L}" height="7" rx="3" fill="${on}"/>`;
+    g += `<rect x="${L}" y="${M}" width="${R-L}" height="7" rx="3" fill="${on}"/>`;
+    g += `<rect x="${L}" y="${B}" width="${R-L}" height="7" rx="3" fill="${on}"/>`;
+    g += `<rect x="${L-4}" y="${T}" width="7" height="${M-T}" rx="3" fill="${on}"/>`;
+    g += `<rect x="${R-3}" y="${T}" width="7" height="${M-T}" rx="3" fill="${on}"/>`;
+    g += `<rect x="${L-4}" y="${M}" width="7" height="${B-M}" rx="3" fill="${on}"/>`;
+    g += `<rect x="${R-3}" y="${M}" width="7" height="${B-M}" rx="3" fill="${on}"/>`;
+  }
+  const names = ['a','b','c','d','e','f','g','dp','D1','D2','D3','D4'];
+  names.forEach((n, i) => {
+    const px = x + 14 + i * ((w - 28) / 11), py = y + h + 6;
+    at[n] = { x: Math.round(px), y: py };
+    g += `<circle cx="${px}" cy="${py}" r="4" fill="#d9dbde" stroke="#222"/>`;
+    g += text(px, py + 15, n, { size: 8, fill: '#333', weight: 700 });
+  });
+  g += text(x + w/2, y - 8, '4-digit 7-segment display', { size: 12, fill: '#333', weight: 700 });
   g += `</g>`;
   return { svg: g, at: (n) => at[n] };
 }
