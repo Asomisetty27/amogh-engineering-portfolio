@@ -345,92 +345,110 @@ void loop() {}`,
   },
   // ── Lesson 19 ──────────────────────────────────────────────
   {
-    id:"rtc", day:5, lesson:"Lesson 19", title:"Real Time Clock (DS1302)",
-    lib:"DS1302.zip",
-    goal:"Keep real date and time running, even after the Arduino loses power.",
-    materials:["Arduino UNO","DS1302 RTC module","jumper wires"],
+    id:"rtc", day:5, lesson:"Lesson 19", title:"Real Time Clock (DS1307)",
+    goal:"Keep real date and time running with the DS1307 clock chip, even after the Arduino loses power.",
+    materials:["Arduino UNO","DS1307 RTC module","jumper wires"],
     wiring:[
-      ["RTC RST","pin 4"],
-      ["RTC CLK","pin 5"],
-      ["RTC DAT","pin 6"],
+      ["RTC SDA","A4"],
+      ["RTC SCL","A5"],
       ["RTC VCC","5V"],
       ["RTC GND","GND"],
     ],
     code:
-`#include <Ds1302.h>
+`#include <Wire.h>   // built-in I2C library — no .ZIP needed
 
-// The DS1302 uses three control pins.
-// This library's constructor order is (RST, CLK, DAT):
-Ds1302 rtc(4, 5, 6);
+// The DS1307 talks over I2C at address 0x68 (SDA→A4, SCL→A5).
+const int DS1307 = 0x68;
 
-// Names for the day-of-week number (1-7) the chip reports
-const char* dayNames[] = {
-  "Monday", "Tuesday", "Wednesday", "Thursday",
-  "Friday", "Saturday", "Sunday"
-};
+// The chip stores each number in "BCD" (each decimal digit in 4 bits).
+byte bcdToDec(byte b) { return (b >> 4) * 10 + (b & 0x0F); }
+byte decToBcd(byte d) { return ((d / 10) << 4) | (d % 10); }
+
+const char* dayNames[] = { "Sun","Mon","Tue","Wed","Thu","Fri","Sat" };
 
 void setup() {
+  Wire.begin();
   Serial.begin(9600);
-  rtc.init();
 
-  // Only set the time if the clock is not already running.
-  // A module with a good coin battery keeps time on its own.
-  if (rtc.isHalted()) {
-    Ds1302::DateTime start = {
-      .year = 26,               // 2026 -> just the last two digits
-      .month = Ds1302::MONTH_JUL,
-      .day = 1,
-      .hour = 9,
-      .minute = 0,
-      .second = 0,
-      .dow = Ds1302::DOW_WED
-    };
-    rtc.setDateTime(&start);
-  }
+  // SET THE TIME ONCE: uncomment the next line, upload, then RE-COMMENT it and
+  // upload again so the time does not reset every restart.
+  // Order: second, minute, hour, dayOfWeek(1-7), date, month, year(00-99)
+  // setTime(0, 0, 9, 4, 1, 7, 26);   // 09:00:00  Wed  1 July 2026
 }
 
 void loop() {
-  Ds1302::DateTime now;
-  rtc.getDateTime(&now);       // fill 'now' with the current time
+  // ask the chip for its 7 time registers, starting at register 0
+  Wire.beginTransmission(DS1307);
+  Wire.write(0);
+  Wire.endTransmission();
+  Wire.requestFrom(DS1307, 7);
 
-  // Print as  HH:MM:SS  DayName  (with leading zeros)
-  if (now.hour < 10)   Serial.print('0');
-  Serial.print(now.hour);   Serial.print(':');
-  if (now.minute < 10) Serial.print('0');
-  Serial.print(now.minute); Serial.print(':');
-  if (now.second < 10) Serial.print('0');
-  Serial.print(now.second);
+  byte second = bcdToDec(Wire.read() & 0x7F);   // top bit is the stop flag
+  byte minute = bcdToDec(Wire.read());
+  byte hour   = bcdToDec(Wire.read() & 0x3F);   // 24-hour mode
+  byte dow    = bcdToDec(Wire.read());
+  byte date   = bcdToDec(Wire.read());
+  byte month  = bcdToDec(Wire.read());
+  byte year   = bcdToDec(Wire.read());
+
+  if (hour < 10)   Serial.print('0');
+  Serial.print(hour);   Serial.print(':');
+  if (minute < 10) Serial.print('0');
+  Serial.print(minute); Serial.print(':');
+  if (second < 10) Serial.print('0');
+  Serial.print(second);
   Serial.print("  ");
-  Serial.println(dayNames[now.dow - 1]);
+  Serial.print(dayNames[dow - 1]);
+  Serial.print("  20"); Serial.print(year);
+  Serial.print('-'); Serial.print(month);
+  Serial.print('-'); Serial.println(date);
 
   delay(1000);
+}
+
+// Writes the time into the DS1307. Uncomment the call in setup() to use it.
+void setTime(byte s, byte m, byte h, byte dow, byte d, byte mo, byte yr) {
+  Wire.beginTransmission(DS1307);
+  Wire.write(0);
+  Wire.write(decToBcd(s));   // writing seconds also starts the clock
+  Wire.write(decToBcd(m));
+  Wire.write(decToBcd(h));
+  Wire.write(decToBcd(dow));
+  Wire.write(decToBcd(d));
+  Wire.write(decToBcd(mo));
+  Wire.write(decToBcd(yr));
+  Wire.endTransmission();
 }`,
     test:[
       "Serial Monitor at 9600 → the time advances one second at a time.",
-      "Unplug USB, wait 10 seconds, plug back in → the clock kept counting (the coin battery kept it alive).",
+      "First run shows a frozen or odd time? Set it: uncomment the setTime(...) line, upload, then re-comment it and upload again.",
+      "Unplug USB, wait 10 seconds, plug back in → the clock kept counting (the coin battery keeps it alive).",
     ],
     trouble:[
-      "\"'Ds1302' does not name a type\" → install DS1302.zip (download button above).",
-      "Time is stuck or wrong on the first run → seat the module's coin battery; it sets the time once on first power-up.",
-      "Day name looks wrong → dow is 1-7, and dayNames[now.dow - 1] shifts it to start at 0.",
+      "Time stuck at 00:00:00 or wild numbers → the clock is stopped/unset. Run the setTime(...) line once, then re-comment it.",
+      "Nothing prints, or the same wrong values every time → SDA must be on A4 and SCL on A5 (those are the Arduino's I2C pins).",
+      "Time resets every time you open the Serial Monitor → the setTime(...) line is still uncommented; comment it out and re-upload.",
+      "Loses time after unplugging → the coin battery is dead or missing; seat a fresh CR2032.",
     ],
     challenge:{
-      prompt:"Inside loop() you already have now.hour, now.minute, now.second (numbers). Fill in the blanks to print a greeting that depends on the time of day:",
+      prompt:"Inside loop() you already have the numbers hour, minute, second. Add a greeting that changes with the time of day — fill in the blanks:",
       code:
-`if (now.hour >= ___ && now.hour < 12) {
+`if (hour >= ___ && hour < 12) {
   Serial.println("Good morning!");
-} else if (now.hour >= 12 && now.hour < ___) {
+} else if (hour >= 12 && hour < ___) {
   Serial.println("Good afternoon!");
 } else {
   Serial.println("___");
 }
 
-// Bonus: unplug the USB, wait, then plug it back in.
-// Which part of the module keeps the time running with no USB power?`,
+// Think about it:
+// 1. Why does the chip store numbers in BCD instead of plain binary?
+// 2. SDA and SCL are shared by MANY I2C chips at once. How does the Arduino
+//    know it is talking to THIS clock and not some other chip?  (hint: 0x68)`,
     },
   },
 
-  // ── Lesson 20 ──────────────────────────────────────────────
+    // ── Lesson 20 ──────────────────────────────────────────────
   {
     id:"sound_sensor", day:5, lesson:"Lesson 20", title:"Sound Sensor — Volume Bar",
     goal:"Read sound level two ways (analog and digital) and visualize volume.",

@@ -164,11 +164,11 @@ export const SCENES = {
     return mod(m, [['5V', m.at('VCC'), C.red], ['GND', m.at('GND'), C.black], ['12', m.at('DIN'), C.green], ['~10', m.at('CS'), C.yellow], ['~11', m.at('CLK'), C.blue]], grid);
   },
   rtc() {
-    const b = place(5, { w: 240, top: 380 });
-    const m = module({ ...b, fill: '#1f6b52', label: 'DS1302 RTC', side: 'left',
-      pins: [{ name: 'VCC', label: 'VCC' }, { name: 'GND', label: 'GND' }, { name: 'CLK', label: 'CLK' }, { name: 'DAT', label: 'DAT' }, { name: 'RST', label: 'RST' }] });
+    const b = place(4, { w: 240, top: 400 });
+    const m = module({ ...b, fill: '#1f6b52', label: 'DS1307 RTC', side: 'left',
+      pins: [{ name: 'VCC', label: 'VCC' }, { name: 'GND', label: 'GND' }, { name: 'SDA', label: 'SDA' }, { name: 'SCL', label: 'SCL' }] });
     const batt = `<circle cx="${b.x + b.w - 58}" cy="${b.y + b.h/2}" r="34" fill="#c9ccd1" stroke="#8a8d93" stroke-width="2"/><text x="${b.x + b.w - 58}" y="${b.y + b.h/2 + 4}" font-family="Arial" font-size="11" text-anchor="middle" fill="#555">CR2032</text>`;
-    return mod(m, [['5V', m.at('VCC'), C.red], ['GND', m.at('GND'), C.black], ['~5', m.at('CLK'), C.blue], ['~6', m.at('DAT'), C.green], ['4', m.at('RST'), C.yellow]], batt);
+    return mod(m, [['5V', m.at('VCC'), C.red], ['GND', m.at('GND'), C.black], ['AN4', m.at('SDA'), C.green], ['AN5', m.at('SCL'), C.blue]], batt);
   },
   keypad() {
     const b = { x: 820, y: 360, w: 300, h: 300 };
