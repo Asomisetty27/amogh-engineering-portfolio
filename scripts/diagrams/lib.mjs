@@ -83,6 +83,7 @@ export function wire(aRef, bRef, color, { width = 6, curve = 0.5 } = {}) {
 }
 // resolve pin name OR hole ref into {x,y}
 export function resolve(ref) {
+  if (typeof ref !== 'string') return ref;   // already an {x,y} point
   if (/^[A-J]\d+$/.test(ref) || /^(TP|TM|BP|BM):/.test(ref)) return hole(ref);
   return pin(ref);
 }

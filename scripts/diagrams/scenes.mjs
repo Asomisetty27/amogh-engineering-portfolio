@@ -1,7 +1,7 @@
 // Per-exercise scenes. Each returns { bb, fg }: bb=false hides the breadboard
 // (module wiring), fg is the foreground SVG. All endpoints resolve to exact
 // Arduino pins / breadboard holes.
-import { wire, led, resistor, text, COLORS, colX, ROWY, RAILY } from './lib.mjs';
+import { wire, led, resistor, text, COLORS, colX, ROWY, RAILY, pin } from './lib.mjs';
 import { module, disc, dip16, motorGlyph, lcd16 } from './components.mjs';
 
 const C = COLORS;
@@ -312,6 +312,59 @@ export const SCENES = {
     });
     return { bb: true, fg: g };
   },
+
+  // ── new module exercises ──────────────────────────────────────────────
+  pir() {
+    const b = place(3, { top: 440 });
+    const m = module({ ...b, fill: '#0f5132', label: 'PIR HC-SR501', side: 'left',
+      pins: [{ name: 'OUT', label: 'OUT' }, { name: 'VCC', label: 'VCC' }, { name: 'GND', label: 'GND' }] });
+    const dome = `<circle cx="${b.x + b.w - 50}" cy="${b.y + b.h/2}" r="34" fill="#f2f2f4" stroke="#c9ccd1" stroke-width="2"/><circle cx="${b.x + b.w - 50}" cy="${b.y + b.h/2}" r="19" fill="#fafafa" stroke="#ddd"/>`;
+    return mod(m, [['2', m.at('OUT'), C.green], ['5V', m.at('VCC'), C.red], ['GND', m.at('GND'), C.black]], dome);
+  },
+  relay() {
+    const b = place(3, { top: 440 });
+    const m = module({ ...b, fill: '#1c63d6', label: '5V Relay', side: 'left',
+      pins: [{ name: 'IN', label: 'IN' }, { name: 'VCC', label: 'VCC' }, { name: 'GND', label: 'GND' }] });
+    const box = `<rect x="${b.x + b.w - 74}" y="${b.y + b.h/2 - 24}" width="50" height="48" rx="3" fill="#2a7" stroke="#063" stroke-width="1.5"/>`;
+    return mod(m, [['7', m.at('IN'), C.yellow], ['5V', m.at('VCC'), C.red], ['GND', m.at('GND'), C.black]], box);
+  },
+  tilt() {
+    const b = place(2, { w: 190, top: 470 });
+    const m = module({ ...b, fill: '#3a3f47', label: 'Tilt switch', side: 'left',
+      pins: [{ name: 'L1', label: 'leg 1' }, { name: 'L2', label: 'leg 2' }] });
+    const can = `<rect x="${b.x + b.w - 56}" y="${b.y + b.h/2 - 13}" width="34" height="26" rx="12" fill="#b8bcc2" stroke="#888"/>`;
+    return mod(m, [['2', m.at('L1'), C.green], ['GND', m.at('L2'), C.black]], can);
+  },
+  encoder() {
+    const b = place(5, { w: 210, top: 380 });
+    const m = module({ ...b, fill: '#1f6b52', label: 'Rotary Encoder', side: 'left',
+      pins: [{ name: 'CLK', label: 'CLK' }, { name: 'DT', label: 'DT' }, { name: 'SW', label: 'SW' }, { name: '+', label: '+' }, { name: 'GND', label: 'GND' }] });
+    const knob = `<circle cx="${b.x + b.w - 52}" cy="${b.y + b.h/2}" r="30" fill="#c9ccd1" stroke="#888" stroke-width="2"/><rect x="${b.x + b.w - 56}" y="${b.y + b.h/2 - 30}" width="8" height="16" rx="2" fill="#888"/>`;
+    return mod(m, [['2', m.at('CLK'), C.green], ['~3', m.at('DT'), C.blue], ['4', m.at('SW'), C.yellow], ['5V', m.at('+'), C.red], ['GND', m.at('GND'), C.black]], knob);
+  },
+  mpu6050() {
+    const b = place(4, { w: 220, top: 400 });
+    const m = module({ ...b, fill: '#1c63d6', label: 'GY-521', sub: 'MPU6050', side: 'left',
+      pins: [{ name: 'VCC', label: 'VCC' }, { name: 'GND', label: 'GND' }, { name: 'SDA', label: 'SDA' }, { name: 'SCL', label: 'SCL' }] });
+    return mod(m, [['5V', m.at('VCC'), C.red], ['GND', m.at('GND'), C.black], ['AN4', m.at('SDA'), C.green], ['AN5', m.at('SCL'), C.blue]]);
+  },
+  rfid() {
+    const b = place(7, { w: 230, top: 340 });
+    const m = module({ ...b, fill: '#0d3b66', label: 'RC522 RFID', side: 'left',
+      pins: [{ name: 'V33', label: '3.3V' }, { name: 'GND', label: 'GND' }, { name: 'RST', label: 'RST' }, { name: 'SDA', label: 'SDA' }, { name: 'MOSI', label: 'MOSI' }, { name: 'MISO', label: 'MISO' }, { name: 'SCK', label: 'SCK' }] });
+    const coil = `<rect x="${b.x + b.w - 78}" y="${b.y + 22}" width="60" height="${b.h - 44}" rx="8" fill="none" stroke="#c9a227" stroke-width="3"/>`;
+    const note = text(b.x + b.w/2 + 14, b.y + b.h + 22, '3.3V — NOT 5V', { size: 11, fill: '#d21f24', weight: 700 });
+    return mod(m, [['3.3V', m.at('V33'), C.red], ['GND', m.at('GND'), C.black], ['~9', m.at('RST'), C.yellow], ['~10', m.at('SDA'), C.green], ['~11', m.at('MOSI'), C.blue], ['12', m.at('MISO'), C.orange], ['13', m.at('SCK'), C.green]], coil + note);
+  },
+  seven_seg() {
+    const S = sevenSeg(556, 448);
+    let g = S.svg;
+    const map = [['a','2'],['b','~3'],['c','4'],['d','~5'],['e','~6'],['f','7'],['g','8']];
+    const cols = [C.green, C.blue, C.yellow, C.orange, C.green, C.blue, C.yellow];
+    map.forEach(([seg, p], i) => g += wire(p, S.at(seg), cols[i], { curve: 0.5 }));
+    g += resistor(S.at('COM'), pin('GND'), ['#d21f24','#d21f24','#6b3f14','#c9a227']);
+    return { bb: false, fg: g };
+  },
 };
 
 // ── helpers ───────────────────────────────────────────────────────────────
@@ -335,6 +388,32 @@ function spare(x, y, bands, label) {
   g += `<rect x="${x+52}" y="${y-15}" width="60" height="30" rx="4" fill="#f6e58d" stroke="#d9c76a"/>`;
   g += text(x+82, y+7, label, { size: 18, weight: 800 });
   return g;
+}
+
+// a single 7-segment digit glyph with an 8-pin header (a-g, COM) below
+function sevenSeg(x, y) {
+  const w = 132, h = 168, on = '#e33';
+  const at = {};
+  let g = `<g>`;
+  g += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="#1a1a1e" stroke="#000"/>`;
+  const L = x + 34, R = x + w - 34, T = y + 26, M = y + h/2 - 10, B = y + h - 52;
+  g += `<rect x="${L}" y="${T}" width="${R-L}" height="9" rx="4" fill="${on}"/>`;        // a
+  g += `<rect x="${L}" y="${M}" width="${R-L}" height="9" rx="4" fill="${on}"/>`;        // g
+  g += `<rect x="${L}" y="${B}" width="${R-L}" height="9" rx="4" fill="${on}"/>`;        // d
+  g += `<rect x="${L-5}" y="${T}" width="9" height="${M-T}" rx="4" fill="${on}"/>`;      // f
+  g += `<rect x="${R-4}" y="${T}" width="9" height="${M-T}" rx="4" fill="${on}"/>`;      // b
+  g += `<rect x="${L-5}" y="${M}" width="9" height="${B-M}" rx="4" fill="${on}"/>`;      // e
+  g += `<rect x="${R-4}" y="${M}" width="9" height="${B-M}" rx="4" fill="${on}"/>`;      // c
+  const names = ['a','b','c','d','e','f','g','COM'];
+  names.forEach((n, i) => {
+    const px = x + 12 + i * ((w - 24) / 7), py = y + h + 6;
+    at[n] = { x: Math.round(px), y: py };
+    g += `<circle cx="${px}" cy="${py}" r="4.2" fill="#d9dbde" stroke="#222"/>`;
+    g += text(px, py + 16, n, { size: 8.5, fill: '#333', weight: 700 });
+  });
+  g += text(x + w/2, y - 8, '7-segment display', { size: 12, fill: '#333', weight: 700 });
+  g += `</g>`;
+  return { svg: g, at: (n) => at[n] };
 }
 
 // potentiometer body (3 legs down into breadboard)

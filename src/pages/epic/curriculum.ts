@@ -40,17 +40,17 @@ export const CURRICULUM: Activity[] = [
   // ── Day 1 ────────────────────────────────────────────────
   {id:"intro", day:1, lesson:"Intro", title:"Arduino & the IDE", goal:"Meet the board and learn to upload a program.", materials:["Arduino UNO","USB cable"], wiring:[], code:"// Tools > Board > Arduino UNO\n// Tools > Port > (pick the port)\n// Paste code, click Verify (check), then Upload (arrow).", test:["The IDE shows \"Done uploading.\""], trouble:["Upload error → check Board and Port under Tools."]},
   {id:"blink", day:1, lesson:"Lesson 2", title:"LED Blink", goal:"Blink the Arduino's built-in light to prove your setup works.", materials:["Arduino UNO","USB cable"], wiring:[["Nothing to wire","built-in LED is on pin 13"]], code:"const int ledPin = 13;\nvoid setup() { pinMode(ledPin, OUTPUT); }\nvoid loop() {\n  digitalWrite(ledPin, HIGH);\n  delay(1000);\n  digitalWrite(ledPin, LOW);\n  delay(1000);\n}", test:["The \"L\" LED blinks on 1s, off 1s.","Change 1000 to 200 to blink faster."], trouble:["No blink → re-check Board and Port.","Port not found → replug USB, pick the port again."], extension:"Make the LED blink SOS in Morse code (... --- ...). Short = 200ms on, long = 600ms on, gaps of 200ms, then a longer pause before repeating."},
-  {id:"led_resistor", day:1, lesson:"Lesson 3", title:"Brightness with Resistors", goal:"See how a resistor controls brightness. No code needed.", materials:["Arduino UNO","breadboard","LED","220Ω, 1kΩ, 10kΩ resistors","jumper wires"], wiring:[["Arduino 5V","\"+\" rail"],["Arduino GND","\"−\" rail"],["\"+\" rail","LED long leg"],["LED short leg","resistor"],["resistor","\"−\" rail"]], code:"// No code. Swap the resistor and compare brightness.", test:["220Ω = bright, 1kΩ = dimmer, 10kΩ = dimmest."], trouble:["Dark with every resistor → LED is backwards, flip it.","Unplug USB before swapping resistors."]},
-  {id:"pot", day:1, lesson:"Lesson 3", title:"Brightness with a Potentiometer", goal:"Use a knob to fade an LED smoothly.", materials:["Arduino UNO","breadboard","LED","220Ω resistor","10kΩ potentiometer","jumper wires"], wiring:[["Pot left leg","5V"],["Pot right leg","GND"],["Pot middle leg","A0"],["Pin ~9","220Ω → LED long leg"],["LED short leg","GND"]], code:"const int potPin = A0;\nconst int ledPin = 9;   // must be a ~ (PWM) pin\nvoid setup() { pinMode(ledPin, OUTPUT); }\nvoid loop() {\n  int v = analogRead(potPin);          // 0..1023\n  analogWrite(ledPin, map(v,0,1023,0,255));\n  delay(10);\n}", test:["Turn the knob: the LED fades up and down."], trouble:["Only on/off → use pin ~9, not a plain pin.","No change → middle leg to A0."], extension:"Map the knob so the LED stays fully off for the bottom third of the range (0–340), then fades from there. Hint: if v < 341, write 0."},
-  {id:"rgb", day:1, lesson:"Lesson 4", title:"RGB LED", optional:true, goal:"Mix red, green, blue to fade through colors.", materials:["Arduino UNO","breadboard","RGB LED","three 220Ω resistors","jumper wires"], wiring:[["Longest leg","GND"],["Red leg → 220Ω","pin 6"],["Green leg → 220Ω","pin 5"],["Blue leg → 220Ω","pin 3"]], code:"#define BLUE 3\n#define GREEN 5\n#define RED 6\nvoid setup(){pinMode(RED,OUTPUT);pinMode(GREEN,OUTPUT);pinMode(BLUE,OUTPUT);}\nvoid loop(){\n  for(int i=0;i<255;i++){analogWrite(RED,255-i);analogWrite(GREEN,i);delay(10);}\n  for(int i=0;i<255;i++){analogWrite(GREEN,255-i);analogWrite(BLUE,i);delay(10);}\n  for(int i=0;i<255;i++){analogWrite(BLUE,255-i);analogWrite(RED,i);delay(10);}\n}", test:["Colors cycle red→green→blue→red."], trouble:["One color only → each leg needs its own resistor & pin.","Dark → longest leg to GND."], extension:"Make the LED breathe one single color — fade its brightness smoothly up and then back down in a loop, instead of cycling through colors."},
+  {id:"led_resistor", day:1, lesson:"Lesson 3", title:"Brightness with Resistors", goal:"See how a resistor controls brightness. No code needed.", materials:["Arduino UNO","breadboard","an LED (any color)","220Ω (red-red-brown), 1kΩ (brown-black-red), 10kΩ (brown-black-orange) resistors","jumper wires"], wiring:[["Arduino 5V","\"+\" rail"],["Arduino GND","\"−\" rail"],["\"+\" rail","LED long leg"],["LED short leg","resistor"],["resistor","\"−\" rail"]], code:"// No code. Swap the resistor and compare brightness.", test:["220Ω = bright, 1kΩ = dimmer, 10kΩ = dimmest."], trouble:["Dark with every resistor → LED is backwards, flip it.","Unplug USB before swapping resistors."]},
+  {id:"pot", day:1, lesson:"Lesson 3", title:"Brightness with a Potentiometer", goal:"Use a knob to fade an LED smoothly.", materials:["Arduino UNO","breadboard","an LED (any color)","220Ω resistor (red-red-brown)","10K potentiometer (the blue knob marked 10K)","jumper wires"], wiring:[["Pot left leg","5V"],["Pot right leg","GND"],["Pot middle leg","A0"],["Pin ~9","220Ω → LED long leg"],["LED short leg","GND"]], code:"const int potPin = A0;\nconst int ledPin = 9;   // must be a ~ (PWM) pin\nvoid setup() { pinMode(ledPin, OUTPUT); }\nvoid loop() {\n  int v = analogRead(potPin);          // 0..1023\n  analogWrite(ledPin, map(v,0,1023,0,255));\n  delay(10);\n}", test:["Turn the knob: the LED fades up and down."], trouble:["Only on/off → use pin ~9, not a plain pin.","No change → middle leg to A0."], extension:"Map the knob so the LED stays fully off for the bottom third of the range (0–340), then fades from there. Hint: if v < 341, write 0."},
+  {id:"rgb", day:1, lesson:"Lesson 4", title:"RGB LED (the clear LED with 4 legs)", optional:true, goal:"Mix red, green, blue to fade through colors.", materials:["Arduino UNO","breadboard","RGB LED (the clear LED with 4 legs)","three 220Ω resistors (red-red-brown)","jumper wires"], wiring:[["Longest leg","GND"],["Red leg → 220Ω","pin 6"],["Green leg → 220Ω","pin 5"],["Blue leg → 220Ω","pin 3"]], code:"#define BLUE 3\n#define GREEN 5\n#define RED 6\nvoid setup(){pinMode(RED,OUTPUT);pinMode(GREEN,OUTPUT);pinMode(BLUE,OUTPUT);}\nvoid loop(){\n  for(int i=0;i<255;i++){analogWrite(RED,255-i);analogWrite(GREEN,i);delay(10);}\n  for(int i=0;i<255;i++){analogWrite(GREEN,255-i);analogWrite(BLUE,i);delay(10);}\n  for(int i=0;i<255;i++){analogWrite(BLUE,255-i);analogWrite(RED,i);delay(10);}\n}", test:["Colors cycle red→green→blue→red."], trouble:["One color only → each leg needs its own resistor & pin.","Dark → longest leg to GND."], extension:"Make the LED breathe one single color — fade its brightness smoothly up and then back down in a loop, instead of cycling through colors."},
 
   // ── Day 2 ────────────────────────────────────────────────
-  {id:"digital", day:2, lesson:"Lesson 5", title:"Push Buttons", goal:"One button turns an LED on, the other off.", materials:["Arduino UNO","breadboard","LED","220Ω resistor","two push buttons","jumper wires"], wiring:[["Pin 5 → 220Ω","LED long leg; short → GND"],["Button A","pin 9; other side GND"],["Button B","pin 8; other side GND"]], code:"int ledPin=5, buttonApin=9, buttonBpin=8;\nvoid setup(){\n  pinMode(ledPin,OUTPUT);\n  pinMode(buttonApin,INPUT_PULLUP);\n  pinMode(buttonBpin,INPUT_PULLUP);\n}\nvoid loop(){\n  if(digitalRead(buttonApin)==LOW) digitalWrite(ledPin,HIGH);\n  if(digitalRead(buttonBpin)==LOW) digitalWrite(ledPin,LOW);\n}", test:["Button A: LED on. Button B: LED off."], trouble:["No light → LED long leg toward pin 5.","Buttons dead → other side must go to GND."], extension:"Make ONE button toggle the LED — press once for on, press again for off — instead of needing two buttons. Hint: track the LED state in a variable and flip it on each press (watch for bounce with a short delay)."},
-  {id:"water", day:2, lesson:"Lesson 18", title:"Water Level Detection", goal:"Read a water sensor; the value rises as it gets wet.", materials:["Arduino UNO","water level sensor","jumper wires","cup of water"], wiring:[["Sensor S","A0"],["Sensor +","5V"],["Sensor −","GND"]], code:"int adc_id=0, last=0; char buf[128];\nvoid setup(){ Serial.begin(9600); }\nvoid loop(){\n  int v=analogRead(adc_id);\n  if(abs(v-last)>10){ sprintf(buf,\"level %d\\n\",v); Serial.print(buf); last=v; }\n}", test:["Serial Monitor at 9600; dip in water, the number rises."], trouble:["No numbers → set baud to 9600.","Wet only the striped lines."]},
+  {id:"digital", day:2, lesson:"Lesson 5", title:"Push Buttons", goal:"One button turns an LED on, the other off.", materials:["Arduino UNO","breadboard","an LED (any color)","220Ω resistor (red-red-brown)","2 push buttons (the little square 4-leg buttons)","jumper wires"], wiring:[["Pin 5 → 220Ω","LED long leg; short → GND"],["Button A","pin 9; other side GND"],["Button B","pin 8; other side GND"]], code:"int ledPin=5, buttonApin=9, buttonBpin=8;\nvoid setup(){\n  pinMode(ledPin,OUTPUT);\n  pinMode(buttonApin,INPUT_PULLUP);\n  pinMode(buttonBpin,INPUT_PULLUP);\n}\nvoid loop(){\n  if(digitalRead(buttonApin)==LOW) digitalWrite(ledPin,HIGH);\n  if(digitalRead(buttonBpin)==LOW) digitalWrite(ledPin,LOW);\n}", test:["Button A: LED on. Button B: LED off."], trouble:["No light → LED long leg toward pin 5.","Buttons dead → other side must go to GND."], extension:"Make ONE button toggle the LED — press once for on, press again for off — instead of needing two buttons. Hint: track the LED state in a variable and flip it on each press (watch for bounce with a short delay)."},
+  {id:"water", day:2, lesson:"Lesson 18", title:"Water Level Detection", goal:"Read a water sensor; the value rises as it gets wet.", materials:["Arduino UNO","Water Level Detection Sensor Module (red board with comb-like lines)","jumper wires","cup of water"], wiring:[["Sensor S","A0"],["Sensor +","5V"],["Sensor −","GND"]], code:"int adc_id=0, last=0; char buf[128];\nvoid setup(){ Serial.begin(9600); }\nvoid loop(){\n  int v=analogRead(adc_id);\n  if(abs(v-last)>10){ sprintf(buf,\"level %d\\n\",v); Serial.print(buf); last=v; }\n}", test:["Serial Monitor at 9600; dip in water, the number rises."], trouble:["No numbers → set baud to 9600.","Wet only the striped lines."]},
   {
     id:"active_buzzer", day:2, lesson:"Lesson 6", title:"Active Buzzer",
     goal:"Make the sealed buzzer beep in a pattern that speeds up.",
-    materials:["Arduino UNO","active buzzer (the sealed one)","jumper wires"],
+    materials:["Arduino UNO","active buzzer (the SEALED one — has a sticker on top)","jumper wires"],
     wiring:[["Buzzer + (long leg)","Arduino pin 12"],["Buzzer − (short leg)","GND"]],
     code:
 `int buzzerPin = 12;
@@ -87,7 +87,7 @@ void loop() {
   {
     id:"passive_buzzer", day:2, lesson:"Lesson 7", title:"Passive Buzzer — Happy Birthday",
     goal:"Play Happy Birthday on the open green passive buzzer.",
-    materials:["Arduino UNO","passive buzzer (the open green one)","jumper wires"],
+    materials:["Arduino UNO","passive buzzer (the OPEN one — you can see the green board underneath)","jumper wires"],
     wiring:[["Buzzer + (long leg)","Arduino pin 8"],["Buzzer − (short leg)","GND"]],
     code:
 `// Songs from github.com/robsoncouto/arduino-songs use pin 11 by default.
@@ -149,18 +149,18 @@ void loop() {}   // song plays once when you plug in`,
   },
 
   // ── Day 3 ────────────────────────────────────────────────
-  {id:"dht11", day:3, lesson:"Lesson 12", title:"Temperature & Humidity (DHT11)", lib:"DHT_nonblocking.zip", goal:"Read room temperature and humidity from a DHT11.", materials:["Arduino UNO","DHT11 sensor","jumper wires"], wiring:[["Sensor data (S)","pin 2"],["Sensor +","5V"],["Sensor −","GND"]], code:"#include <dht_nonblocking.h>\n#define DHT_SENSOR_TYPE DHT_TYPE_11\nstatic const int PIN=2;\nDHT_nonblocking dht(PIN, DHT_SENSOR_TYPE);\nvoid setup(){ Serial.begin(9600); }\nvoid loop(){\n  float t,h;\n  if(dht.measure(&t,&h)){\n    Serial.print(\"T=\"); Serial.print(t,1);\n    Serial.print(\"C  H=\"); Serial.print(h,1); Serial.println(\"%\");\n  }\n}", test:["Serial Monitor at 9600 shows T and H.","Breathe near it; humidity rises."], trouble:["\"No such file\" → install DHT_nonblocking.zip (download button above).","No readings → data pin to 2; wait a few seconds."]},
-  {id:"ultrasonic", day:3, lesson:"Lesson 10", title:"Ultrasonic Distance", lib:"HC-SR04.zip", goal:"Measure distance with sound pulses, like a parking sensor.", materials:["Arduino UNO","HC-SR04 sensor","jumper wires"], wiring:[["Sensor VCC","5V"],["Sensor Trig","pin 12"],["Sensor Echo","pin 11"],["Sensor GND","GND"]], code:"#include \"SR04.h\"\n#define TRIG 12\n#define ECHO 11\nSR04 sr04 = SR04(ECHO, TRIG);\nvoid setup(){ Serial.begin(9600); }\nvoid loop(){\n  Serial.print(sr04.Distance());\n  Serial.println(\"cm\");\n  delay(1000);\n}", test:["Serial Monitor at 9600 prints cm.","Move your hand; the number changes."], trouble:["\"No such file\" → install HC-SR04.zip (download button above).","Always 0 → re-check Trig 12 / Echo 11."], extension:"Light the on-board LED (pin 13) only when something is closer than 10 cm — a simple proximity alarm. Hint: pinMode(13, OUTPUT) and digitalWrite based on sr04.Distance() < 10."},
+  {id:"dht11", day:3, lesson:"Lesson 12", title:"Temperature & Humidity (DHT11)", lib:"DHT_nonblocking.zip", goal:"Read room temperature and humidity from a DHT11.", materials:["Arduino UNO","DHT11 module (the light-blue grid box on a small board)","jumper wires"], wiring:[["Sensor data (S)","pin 2"],["Sensor +","5V"],["Sensor −","GND"]], code:"#include <dht_nonblocking.h>\n#define DHT_SENSOR_TYPE DHT_TYPE_11\nstatic const int PIN=2;\nDHT_nonblocking dht(PIN, DHT_SENSOR_TYPE);\nvoid setup(){ Serial.begin(9600); }\nvoid loop(){\n  float t,h;\n  if(dht.measure(&t,&h)){\n    Serial.print(\"T=\"); Serial.print(t,1);\n    Serial.print(\"C  H=\"); Serial.print(h,1); Serial.println(\"%\");\n  }\n}", test:["Serial Monitor at 9600 shows T and H.","Breathe near it; humidity rises."], trouble:["\"No such file\" → install DHT_nonblocking.zip (download button above).","No readings → data pin to 2; wait a few seconds."]},
+  {id:"ultrasonic", day:3, lesson:"Lesson 10", title:"Ultrasonic Distance", lib:"HC-SR04.zip", goal:"Measure distance with sound pulses, like a parking sensor.", materials:["Arduino UNO","Ultrasonic Sensor (HC-SR04 — the two round silver eyes)","jumper wires"], wiring:[["Sensor VCC","5V"],["Sensor Trig","pin 12"],["Sensor Echo","pin 11"],["Sensor GND","GND"]], code:"#include \"SR04.h\"\n#define TRIG 12\n#define ECHO 11\nSR04 sr04 = SR04(ECHO, TRIG);\nvoid setup(){ Serial.begin(9600); }\nvoid loop(){\n  Serial.print(sr04.Distance());\n  Serial.println(\"cm\");\n  delay(1000);\n}", test:["Serial Monitor at 9600 prints cm.","Move your hand; the number changes."], trouble:["\"No such file\" → install HC-SR04.zip (download button above).","Always 0 → re-check Trig 12 / Echo 11."], extension:"Light the on-board LED (pin 13) only when something is closer than 10 cm — a simple proximity alarm. Hint: pinMode(13, OUTPUT) and digitalWrite based on sr04.Distance() < 10."},
 
   // ── Day 4 ────────────────────────────────────────────────
-  {id:"final", day:4, lesson:"Final Project", title:"Light-Controlled Motor (LED + LDR)", goal:"Motor spins when light hits the LDR, stops when you block it.", materials:["Arduino UNO","breadboard","DC motor","L293D driver","LDR","LED","220Ω + 10kΩ resistors","jumper wires"], wiring:[["L293D 1","D5"],["L293D 2","D6"],["L293D 7","D7"],["L293D 3 / 6","motor wires"],["L293D 8 & 16","5V"],["L293D 4,5,12,13","GND"],["LDR","5V + A0, 10kΩ A0→GND"],["LED","D3 → 220Ω → LED → GND"]], code:"int ldr=A0, en=5, in1=6, in2=7, led=3;\nint threshold=765;\nvoid setup(){\n  pinMode(en,OUTPUT);pinMode(in1,OUTPUT);pinMode(in2,OUTPUT);pinMode(led,OUTPUT);\n  digitalWrite(led,HIGH); digitalWrite(in1,HIGH); digitalWrite(in2,LOW);\n}\nvoid loop(){\n  int v=analogRead(ldr);\n  analogWrite(en, v>threshold ? 255 : 0);\n  delay(20);\n}", test:["Light on LDR → spins. Block it → stops."], trouble:["No spin → check L293D pin 8 & 16 to 5V.","Wrong way → swap motor wires.","Never stops → re-calibrate threshold.","Board resets → ask about a separate motor battery."], extension:"Add a second, lower threshold so the motor runs at HALF speed in dim light and full speed in bright light. Hint: analogWrite(en, 128) between the two thresholds, 255 above the top one."},
-  {id:"sound", day:4, lesson:"Lesson 20", title:"Sound Sensor", optional:true, goal:"Detect a clap and read how loud it is.", materials:["Arduino UNO","sound sensor module","jumper wires"], wiring:[["Sensor +","5V"],["Sensor G","GND"],["Sensor A0","A0"],["Sensor D0","pin 3"]], code:"int a=A0, d=3, led=13;\nvoid setup(){ Serial.begin(9600); pinMode(d,INPUT); pinMode(led,OUTPUT); }\nvoid loop(){\n  Serial.println(analogRead(a));\n  digitalWrite(led, digitalRead(d)==HIGH ? HIGH : LOW);\n  delay(50);\n}", test:["Serial Monitor jumps on a clap.","Turn the blue dial to set sensitivity."], trouble:["LED never reacts → turn the blue dial.","No numbers → baud 9600."]},
+  {id:"final", day:4, lesson:"Final Project", title:"Light-Controlled Motor (LED + LDR)", goal:"Motor spins when light hits the LDR, stops when you block it.", materials:["Arduino UNO","breadboard","DC motor (the 'Fan Blade and 3-6V Motor')","L293D (16-pin chip stamped L293D)","photoresistor (LDR / photocell)","an LED (any color)","220Ω (red-red-brown) + 10kΩ (brown-black-orange) resistors","jumper wires"], wiring:[["L293D 1","D5"],["L293D 2","D6"],["L293D 7","D7"],["L293D 3 / 6","motor wires"],["L293D 8 & 16","5V"],["L293D 4,5,12,13","GND"],["photoresistor (LDR / photocell)","5V + A0, 10kΩ A0→GND"],["an LED (any color)","D3 → 220Ω → LED → GND"]], code:"int ldr=A0, en=5, in1=6, in2=7, led=3;\nint threshold=765;\nvoid setup(){\n  pinMode(en,OUTPUT);pinMode(in1,OUTPUT);pinMode(in2,OUTPUT);pinMode(led,OUTPUT);\n  digitalWrite(led,HIGH); digitalWrite(in1,HIGH); digitalWrite(in2,LOW);\n}\nvoid loop(){\n  int v=analogRead(ldr);\n  analogWrite(en, v>threshold ? 255 : 0);\n  delay(20);\n}", test:["Light on LDR → spins. Block it → stops."], trouble:["No spin → check L293D pin 8 & 16 to 5V.","Wrong way → swap motor wires.","Never stops → re-calibrate threshold.","Board resets → ask about a separate motor battery."], extension:"Add a second, lower threshold so the motor runs at HALF speed in dim light and full speed in bright light. Hint: analogWrite(en, 128) between the two thresholds, 255 above the top one."},
+  {id:"sound", day:4, lesson:"Lesson 20", title:"Sound Sensor", optional:true, goal:"Detect a clap and read how loud it is.", materials:["Arduino UNO","Sound Sensor Module (small red board with a round microphone)","jumper wires"], wiring:[["Sensor +","5V"],["Sensor G","GND"],["Sensor A0","A0"],["Sensor D0","pin 3"]], code:"int a=A0, d=3, led=13;\nvoid setup(){ Serial.begin(9600); pinMode(d,INPUT); pinMode(led,OUTPUT); }\nvoid loop(){\n  Serial.println(analogRead(a));\n  digitalWrite(led, digitalRead(d)==HIGH ? HIGH : LOW);\n  delay(50);\n}", test:["Serial Monitor jumps on a clap.","Turn the blue dial to set sensitivity."], trouble:["LED never reacts → turn the blue dial.","No numbers → baud 9600."]},
 
   // ── Additional Exercises (fast finishers) ────────────────
   {
     id:"joystick", day:5, lesson:"Lesson 13", title:"Analog Joystick Module",
     goal:"Read X/Y position and the click button from a joystick.",
-    materials:["Arduino UNO","analog joystick module","jumper wires"],
+    materials:["Arduino UNO","Joystick Module (the black thumb-stick on a board)","jumper wires"],
     wiring:[["VRx","A0"],["VRy","A1"],["SW","pin 2"],["VCC","5V"],["GND","GND"]],
     code:
 `void setup() {
@@ -185,7 +185,7 @@ void loop() {
     id:"ir_receiver", day:5, lesson:"Lesson 14", title:"IR Receiver Module",
     goal:"Decode button presses from a TV remote using infrared.",
     lib:"IRremote.zip",
-    materials:["Arduino UNO","IR receiver module","TV/device remote","jumper wires"],
+    materials:["Arduino UNO","IR Receiver Module (tiny black dome on a small board)","Remote Control (the kit's black remote, or any TV remote)","jumper wires"],
     wiring:[["Receiver signal (S)","pin 11"],["Receiver +","5V"],["Receiver −","GND"]],
     code:
 `#include <IRremote.hpp>   // this kit ships IRremote version 4
@@ -220,7 +220,7 @@ void loop() {
     id:"keypad", day:5, lesson:"Lesson 11", title:"Membrane Switch Module (Keypad)",
     goal:"Read which key is pressed on a 4×4 membrane keypad.",
     lib:"Keypad.zip",
-    materials:["Arduino UNO","4×4 membrane keypad","jumper wires"],
+    materials:["Arduino UNO","Membrane Switch Module (the flat 4×4 keypad with a ribbon)","jumper wires"],
     wiring:[
       ["Row pins (4)","pins 9, 8, 7, 6 (top to bottom)"],
       ["Col pins (4)","pins 5, 4, 3, 2 (left to right)"],
@@ -258,7 +258,7 @@ void loop(){
     id:"dot_matrix", day:5, lesson:"Lesson 15", title:"LED Dot Matrix Module",
     goal:"Display a pattern on an 8×8 LED dot matrix using the MAX7219 driver.",
     lib:"LedControl.zip",
-    materials:["Arduino UNO","8×8 LED dot matrix module (MAX7219)","jumper wires"],
+    materials:["Arduino UNO","MAX7219 Module (the 8×8 red dot-grid board)","jumper wires"],
     wiring:[
       ["DIN","pin 12"],
       ["CLK","pin 11"],
@@ -302,7 +302,7 @@ void loop() {}`,
     id:"lcd", day:5, lesson:"Lesson 22", title:"LCD Display",
     goal:"Show text on a 16×2 LCD screen.",
     lib:"LiquidCrystal.zip",
-    materials:["Arduino UNO","16×2 LCD","10kΩ potentiometer","jumper wires"],
+    materials:["Arduino UNO","LCD1602 Module (the blue text screen)","10K potentiometer (the blue knob marked 10K)","jumper wires"],
     wiring:[
       ["LCD VSS","GND"],
       ["LCD VDD","5V"],
@@ -347,7 +347,7 @@ void loop() {}`,
   {
     id:"rtc", day:5, lesson:"Lesson 19", title:"Real Time Clock (DS1307)",
     goal:"Keep real date and time running with the DS1307 clock chip, even after the Arduino loses power.",
-    materials:["Arduino UNO","DS1307 RTC module","jumper wires"],
+    materials:["Arduino UNO","DS1307 RTC Module (the board with a round coin battery)","jumper wires"],
     wiring:[
       ["RTC SDA","A4"],
       ["RTC SCL","A5"],
@@ -452,7 +452,7 @@ void setTime(byte s, byte m, byte h, byte dow, byte d, byte mo, byte yr) {
   {
     id:"sound_sensor", day:5, lesson:"Lesson 20", title:"Sound Sensor — Volume Bar",
     goal:"Read sound level two ways (analog and digital) and visualize volume.",
-    materials:["Arduino UNO","sound sensor module","jumper wires"],
+    materials:["Arduino UNO","Sound Sensor Module (small red board with a round microphone)","jumper wires"],
     wiring:[
       ["Sensor + (VCC)","5V"],
       ["Sensor G (GND)","GND"],
@@ -522,11 +522,11 @@ Serial.println("___");   // what character makes it look like a percent?
   {
     id:"thermometer", day:5, lesson:"Lesson 23", title:"Thermometer (Thermistor)",
     goal:"Turn a thermistor's changing resistance into a real temperature in C and F.",
-    materials:["Arduino UNO","breadboard","thermistor (little black bead)","10kΩ resistor","jumper wires"],
+    materials:["Arduino UNO","breadboard","thermistor (tiny black bead with 2 legs — kit label: Thermistor)","10kΩ resistor (brown-black-orange)","jumper wires"],
     wiring:[
       ["Thermistor leg 1","5V"],
       ["Thermistor leg 2","A0 row"],
-      ["10kΩ resistor","that same A0 row → GND"],
+      ["10kΩ resistor (brown-black-orange)","that same A0 row → GND"],
     ],
     code:
 `#include <math.h>   // gives us log()
@@ -600,7 +600,7 @@ if (tempC > ___) {
   {
     id:"dc_motor", day:5, lesson:"Lesson 29", title:"DC Motor — Speed & Direction",
     goal:"Control motor speed with a knob and understand how the L293D driver works.",
-    materials:["Arduino UNO","L293D motor driver","DC motor","10kΩ potentiometer","breadboard","jumper wires"],
+    materials:["Arduino UNO","L293D (16-pin chip stamped L293D)","DC motor (the 'Fan Blade and 3-6V Motor')","10K potentiometer (the blue knob marked 10K)","breadboard","jumper wires"],
     wiring:[
       ["L293D pin 1 (Enable A)","Arduino D5 (PWM ~)"],
       ["L293D pin 2 (IN1)","Arduino D6"],
@@ -685,7 +685,7 @@ if (digitalRead(9) == ___) {    // INPUT_PULLUP: LOW when pressed, or HIGH?
   {
     id:"servo", day:5, lesson:"Lesson 24", title:"Servo Motor (SG90)",
     goal:"Sweep a servo arm back and forth, then steer it with a potentiometer.",
-    materials:["Arduino UNO","SG90 servo motor","jumper wires","(optional) 10kΩ potentiometer"],
+    materials:["Arduino UNO","Servo Motor SG90 (small blue servo with a white arm)","jumper wires","(optional) 10K potentiometer — the blue knob marked 10K"],
     wiring:[
       ["Servo signal (orange)","pin 9"],
       ["Servo VCC (red)","5V"],
@@ -740,7 +740,7 @@ void loop() {
   {
     id:"stepper", day:5, lesson:"Lesson 26", title:"Stepper Motor (28BYJ-48)",
     goal:"Turn a stepper motor an exact amount using the ULN2003 driver board.",
-    materials:["Arduino UNO","28BYJ-48 stepper motor","ULN2003 driver board","jumper wires"],
+    materials:["Arduino UNO","Stepper Motor (the silver can, 28BYJ-48)","ULN2003 Stepper Motor Driver Module (green board with 4 LEDs)","jumper wires"],
     wiring:[
       ["ULN2003 IN1","pin 8"],
       ["ULN2003 IN2","pin 9"],
@@ -803,7 +803,7 @@ myStepper.step(___);
   {
     id:"shift_register", day:5, lesson:"Lesson 16", title:"Shift Register (74HC595) — 8 LEDs, 3 pins",
     goal:"Control 8 LEDs with only 3 Arduino pins, and watch them count in binary.",
-    materials:["Arduino UNO","breadboard","74HC595 shift register IC","8 LEDs","8× 220Ω resistors","jumper wires"],
+    materials:["Arduino UNO","breadboard","74HC595 IC (16-pin chip stamped 74HC595)","8 LEDs (any colors)","8× 220Ω resistors (red-red-brown)","jumper wires"],
     wiring:[
       ["74HC595 pin 14 (DS, data)","pin 4"],
       ["74HC595 pin 11 (SHCP, clock)","pin 6"],
@@ -856,6 +856,522 @@ shiftOut(dataPin, clockPin, MSBFIRST, 0b________);
 // 1. What number (0-255) lights ALL eight LEDs?  ___
 // 2. MSBFIRST sends the biggest bit first. What changes with LSBFIRST?
 // 3. How can 3 wires control 8 LEDs? What is the clock pin actually doing?`,
+    },
+  },
+
+  // ── Lesson 8: 1-digit 7-segment ───────────────────────────
+  {
+    id:"seven_seg", day:5, lesson:"Lesson 8", title:"7-Segment Display (1 digit)",
+    goal:"Light the seven bars of a digit to show the numbers 0-9.",
+    materials:["Arduino UNO","breadboard","1 Digit 7-Segment Display (a single red digit block)","220Ω resistor (red-red-brown)","jumper wires"],
+    wiring:[
+      ["Segment a","pin 2"],
+      ["Segment b","pin 3"],
+      ["Segment c","pin 4"],
+      ["Segment d","pin 5"],
+      ["Segment e","pin 6"],
+      ["Segment f","pin 7"],
+      ["Segment g","pin 8"],
+      ["Common (either COM pin) → 220Ω →","GND"],
+    ],
+    code:
+`// A 7-segment digit is just 7 little bars named a-g. Turn on the right
+// bars and you draw any number. This display is "common cathode":
+// a segment lights when its pin is HIGH and the common pin is at GND.
+
+int seg[7] = {2, 3, 4, 5, 6, 7, 8};   // pins for a, b, c, d, e, f, g
+
+// 1 = that bar ON, for each digit 0-9  (order: a b c d e f g)
+byte pattern[10][7] = {
+  {1,1,1,1,1,1,0}, // 0
+  {0,1,1,0,0,0,0}, // 1
+  {1,1,0,1,1,0,1}, // 2
+  {1,1,1,1,0,0,1}, // 3
+  {0,1,1,0,0,1,1}, // 4
+  {1,0,1,1,0,1,1}, // 5
+  {1,0,1,1,1,1,1}, // 6
+  {1,1,1,0,0,0,0}, // 7
+  {1,1,1,1,1,1,1}, // 8
+  {1,1,1,1,0,1,1}, // 9
+};
+
+void setup() {
+  for (int i = 0; i < 7; i++) pinMode(seg[i], OUTPUT);
+}
+
+void show(int n) {
+  for (int i = 0; i < 7; i++) digitalWrite(seg[i], pattern[n][i]);
+}
+
+void loop() {
+  for (int n = 0; n <= 9; n++) {   // count 0..9
+    show(n);
+    delay(1000);
+  }
+}`,
+    test:[
+      "The display counts 0, 1, 2 … up to 9, one per second, then repeats.",
+      "Look closely: each number is just a different set of the seven bars lit.",
+    ],
+    trouble:[
+      "Some bars never light → that segment's wire is loose, or a-g are not on pins 2-8 in order.",
+      "Whole display dark → the common pin must go through the 220Ω resistor to GND (this is a common-cathode display).",
+      "It shows a mirror/garbled number → your segment order is off; re-check which pin is a, b, c …",
+    ],
+    challenge:{
+      prompt:"Add your own symbol. Fill in a pattern (1 = bar on) for the letter that looks like the number — e.g. draw a capital 'C':",
+      code:
+`void showC() {
+  // a=1, b=0, c=0, d=1, e=1, f=1, g=0  draws a C
+  byte c[7] = { ___, ___, ___, ___, ___, ___, ___ };
+  for (int i = 0; i < 7; i++) digitalWrite(seg[i], c[i]);
+}
+
+// Which bars make an 'H'? An 'E'? Sketch the 7 bars on paper first.`,
+    },
+  },
+
+  // ── Lesson 9: 4-digit 7-segment (advanced) ────────────────
+  {
+    id:"seven_seg4", day:5, lesson:"Lesson 9", title:"4-Digit 7-Segment Display (advanced)",
+    lib:"SevSeg.zip",
+    goal:"Show a whole 4-digit number. This one has the most wiring in the kit — go slow and check twice.",
+    materials:["Arduino UNO","breadboard","4 Digit 7-Segment Display (four red digits in one block)","4× 220Ω resistors (red-red-brown)","jumper wires"],
+    wiring:[
+      ["Segment a","pin 6"],
+      ["Segment b","pin 7"],
+      ["Segment c","pin 8"],
+      ["Segment d","pin 9"],
+      ["Segment e","pin 10"],
+      ["Segment f","pin 11"],
+      ["Segment g","pin 12"],
+      ["Segment dp","pin 13"],
+      ["Digit 1 (leftmost) → 220Ω →","pin 2"],
+      ["Digit 2 → 220Ω →","pin 3"],
+      ["Digit 3 → 220Ω →","pin 4"],
+      ["Digit 4 (rightmost) → 220Ω →","pin 5"],
+    ],
+    code:
+`#include "SevSeg.h"   // install SevSeg.zip first
+SevSeg sevseg;
+
+void setup() {
+  byte numDigits = 4;
+  byte digitPins[]   = {2, 3, 4, 5};                 // the 4 digit-select pins
+  byte segmentPins[] = {6, 7, 8, 9, 10, 11, 12, 13}; // a,b,c,d,e,f,g,dp
+  // COMMON_CATHODE display; the 220Ω resistors are on the digit pins (false).
+  sevseg.begin(COMMON_CATHODE, numDigits, digitPins, segmentPins, false);
+  sevseg.setBrightness(90);
+}
+
+void loop() {
+  sevseg.setNumber(2026, -1);   // show 2026 (-1 = no decimal point)
+  sevseg.refreshDisplay();      // MUST run every loop to keep all 4 digits lit
+}`,
+    test:[
+      "All four digits show 2026, steady and bright.",
+      "The trick: only ONE digit is truly lit at any instant — refreshDisplay() flashes them so fast your eye blends all four. That is called multiplexing.",
+    ],
+    trouble:[
+      "\"SevSeg.h: No such file\" → install SevSeg.zip (download button above).",
+      "Digits flicker or only one lights → refreshDisplay() must run every loop, with NO long delay() in loop().",
+      "Wrong or missing segments → a bare 4-digit display's pin order is not obvious; ask an instructor to help match segments a-g and digits 1-4 to the pins above.",
+      "Dim or uneven → raise setBrightness, and make sure a 220Ω resistor is on each of the 4 digit pins.",
+    ],
+    challenge:{
+      prompt:"Turn it into a rough stopwatch that counts seconds since power-on. Fill in the blanks:",
+      code:
+`void loop() {
+  int seconds = millis() / ______;   // milliseconds per second?
+  sevseg.setNumber(seconds, -1);
+  sevseg.refreshDisplay();
+}
+
+// Why can't we use delay(1000) to count seconds here?
+// (hint: what happens to refreshDisplay() while the code is delaying?)`,
+    },
+  },
+
+  // ── Lesson 21: PIR motion sensor ──────────────────────────
+  {
+    id:"pir", day:5, lesson:"Lesson 21", title:"PIR Motion Sensor (HC-SR501)",
+    goal:"Detect movement with a passive-infrared sensor and light the on-board LED.",
+    materials:["Arduino UNO","HC-SR501 PIR Motion Sensor (the white half-dome lens)","jumper wires"],
+    wiring:[
+      ["PIR OUT (middle pin)","pin 2"],
+      ["PIR VCC","5V"],
+      ["PIR GND","GND"],
+    ],
+    code:
+`// The HC-SR501 outputs HIGH when it sees warm movement (like a person),
+// and LOW when everything is still.
+
+int pirPin = 2;
+int led = 13;   // the Arduino's built-in LED
+
+void setup() {
+  pinMode(pirPin, INPUT);
+  pinMode(led, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  if (digitalRead(pirPin) == HIGH) {
+    digitalWrite(led, HIGH);
+    Serial.println("Motion detected!");
+  } else {
+    digitalWrite(led, LOW);
+  }
+  delay(200);
+}`,
+    test:[
+      "Wave a hand in front of the white dome → the on-board LED lights and \"Motion detected!\" prints.",
+      "Hold completely still → after a moment the LED turns back off.",
+      "The two orange knobs set sensitivity and how long it stays on. Turn them slowly to explore.",
+    ],
+    trouble:[
+      "LED stuck on right after upload → a PIR needs about 30-60 seconds to settle when first powered; wait, then keep still.",
+      "Never triggers → OUT is the MIDDLE pin; VCC and GND are the outer two (check the tiny labels under the sensor).",
+      "Triggers at everything or only briefly → adjust the two orange trim knobs on the back.",
+    ],
+    challenge:{
+      prompt:"Count each NEW motion event (not every loop) and print the total. Fill in the blanks:",
+      code:
+`int count = 0;
+int lastState = LOW;
+
+void loop() {
+  int state = digitalRead(pirPin);
+  if (state == HIGH && lastState == ____) {   // only the moment it turns on
+    count = count + ___;
+    Serial.print("Motion events: ");
+    Serial.println(count);
+  }
+  lastState = _____;                           // remember for next loop
+  delay(50);
+}
+
+// Why count only when it JUST changed, instead of every HIGH reading?`,
+    },
+  },
+
+  // ── Lesson 30: relay ──────────────────────────────────────
+  {
+    id:"relay", day:5, lesson:"Lesson 30", title:"5V Relay — Switch Big Things",
+    goal:"Use a tiny Arduino signal to flip a relay (a remote-controlled switch) on and off — you will hear it click.",
+    materials:["Arduino UNO","5V Relay (the blue box with a clicking switch)","jumper wires"],
+    wiring:[
+      ["Relay IN (signal)","pin 7"],
+      ["Relay VCC","5V"],
+      ["Relay GND","GND"],
+    ],
+    code:
+`// A relay is an electrically-controlled switch. The Arduino cannot power a
+// lamp or motor directly, but it CAN tell a relay to switch one on.
+
+int relayPin = 7;
+
+void setup() {
+  pinMode(relayPin, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(relayPin, HIGH);   // relay ON  — you hear a click
+  delay(1000);
+  digitalWrite(relayPin, LOW);    // relay OFF — click again
+  delay(1000);
+}`,
+    test:[
+      "The relay clicks once per second and its little LED blinks with it.",
+      "That click is a metal contact opening and closing — the same contact that would switch a real lamp.",
+    ],
+    trouble:[
+      "No click → VCC to 5V, GND to GND, IN to pin 7.",
+      "Clicks the opposite of what you expect → some relay boards are \"active LOW\"; swap HIGH and LOW in the code.",
+      "Do NOT wire wall/mains power. This exercise is only the low-voltage clicking. Ask an instructor before switching anything real.",
+    ],
+    challenge:{
+      prompt:"Make the relay beat like a heart: two quick clicks, then a long pause. Fill in the blanks:",
+      code:
+`void loop() {
+  for (int i = 0; i < ___; i++) {   // how many quick clicks per beat?
+    digitalWrite(relayPin, HIGH);
+    delay(120);
+    digitalWrite(relayPin, LOW);
+    delay(120);
+  }
+  delay(_____);                      // long pause (ms) before the next beat
+}
+
+// A 5V relay lets the Arduino control a 120V lamp. Why keep the Arduino
+// side and the switched side completely separate?`,
+    },
+  },
+
+  // ── Lesson 31: tilt ball switch ───────────────────────────
+  {
+    id:"tilt", day:5, lesson:"Lesson 31", title:"Tilt Ball Switch",
+    goal:"Detect when the board is tipped over, using a tiny rolling ball inside a switch.",
+    materials:["Arduino UNO","Tilt Ball Switch (small metal can with 2 legs)","jumper wires"],
+    wiring:[
+      ["Tilt switch leg 1","pin 2"],
+      ["Tilt switch leg 2","GND"],
+    ],
+    code:
+`// Inside the tilt switch is a metal ball. Level, it bridges the two legs
+// (closed); tipped, the ball rolls away (open).
+// INPUT_PULLUP makes an OPEN pin read HIGH.
+
+int tiltPin = 2;
+int led = 13;
+
+void setup() {
+  pinMode(tiltPin, INPUT_PULLUP);
+  pinMode(led, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  if (digitalRead(tiltPin) == HIGH) {
+    Serial.println("Tilted!");
+    digitalWrite(led, HIGH);
+  } else {
+    Serial.println("Level");
+    digitalWrite(led, LOW);
+  }
+  delay(150);
+}`,
+    test:[
+      "Hold it upright/level → \"Level\". Tip it over → \"Tilted!\" and the LED lights.",
+      "It is really just an on/off switch that gravity controls.",
+    ],
+    trouble:[
+      "Always the same reading → the switch has no + or −; just check one leg is on pin 2 and the other on GND.",
+      "Flips back and forth quickly → the ball bounces; the challenge below shows how to handle that.",
+    ],
+    challenge:{
+      prompt:"Count tips, but ignore the bounces. Fill in the blanks:",
+      code:
+`int tips = 0;
+int last = LOW;
+
+void loop() {
+  int now = digitalRead(tiltPin);
+  if (now == HIGH && last == ____) {
+    tips++;
+    Serial.println(tips);
+    delay(___);          // ignore bounces for a moment
+  }
+  last = now;
+}
+
+// Waiting a moment after a change is called "debouncing." Why is it needed?`,
+    },
+  },
+
+  // ── Lesson 32: rotary encoder ─────────────────────────────
+  {
+    id:"encoder", day:5, lesson:"Lesson 32", title:"Rotary Encoder",
+    goal:"Read which way you turn a knob, and how far — the kind of endless knob used for volume dials.",
+    materials:["Arduino UNO","Rotary Encoder Module (a knob you turn AND can press)","jumper wires"],
+    wiring:[
+      ["Encoder CLK","pin 2"],
+      ["Encoder DT","pin 3"],
+      ["Encoder SW (push)","pin 4"],
+      ["Encoder +","5V"],
+      ["Encoder GND","GND"],
+    ],
+    code:
+`// An encoder has two signals, CLK and DT. At the instant CLK changes, DT
+// tells us the DIRECTION the knob turned.
+
+int clkPin = 2, dtPin = 3, swPin = 4;
+int counter = 0;
+int lastClk;
+
+void setup() {
+  pinMode(clkPin, INPUT);
+  pinMode(dtPin, INPUT);
+  pinMode(swPin, INPUT_PULLUP);
+  Serial.begin(9600);
+  lastClk = digitalRead(clkPin);
+}
+
+void loop() {
+  int clk = digitalRead(clkPin);
+  if (clk != lastClk) {                       // knob moved one notch
+    if (digitalRead(dtPin) != clk) counter++;  // clockwise
+    else counter--;                            // counter-clockwise
+    Serial.println(counter);
+  }
+  lastClk = clk;
+
+  if (digitalRead(swPin) == LOW) {            // press the knob = reset
+    counter = 0;
+    Serial.println("reset");
+    delay(200);
+  }
+}`,
+    test:[
+      "Turn the knob one way → the number counts up; the other way → it counts down.",
+      "Press the knob straight down → it resets to 0.",
+    ],
+    trouble:[
+      "Number jumps by 2 or skips → normal for cheap encoders; turn slowly. CLK on pin 2, DT on pin 3.",
+      "Counts the wrong direction → swap the CLK and DT wires (or swap counter++ and counter--).",
+      "Button does nothing → SW to pin 4; it uses INPUT_PULLUP so a press reads LOW.",
+    ],
+    challenge:{
+      prompt:"Keep the counter between 0 and 20, like a volume knob that stops at the ends. Fill in the blanks:",
+      code:
+`if (digitalRead(dtPin) != clk) counter++;
+else counter--;
+
+if (counter > ___) counter = 20;   // don't go above the top
+if (counter < ___) counter = 0;    // don't go below the bottom
+
+// The knob spins forever, but the value stops at 0 and 20. This "clamping"
+// is everywhere in software. Where have you seen a value that can't go past a limit?`,
+    },
+  },
+
+  // ── Lesson 33: MPU6050 accelerometer / gyro ───────────────
+  {
+    id:"mpu6050", day:5, lesson:"Lesson 33", title:"Accelerometer / Gyro (GY-521)",
+    goal:"Read tilt and motion as real numbers from the GY-521 (MPU6050) over I2C.",
+    materials:["Arduino UNO","GY-521 Module (small blue board, aka MPU6050)","jumper wires"],
+    wiring:[
+      ["GY-521 SDA","A4"],
+      ["GY-521 SCL","A5"],
+      ["GY-521 VCC","5V"],
+      ["GY-521 GND","GND"],
+    ],
+    code:
+`#include <Wire.h>   // built-in I2C library — no .ZIP needed
+
+const int MPU = 0x68;   // the chip's I2C address
+
+void setup() {
+  Wire.begin();
+  Wire.beginTransmission(MPU);
+  Wire.write(0x6B);   // power-management register
+  Wire.write(0);      // 0 = wake the chip up
+  Wire.endTransmission();
+  Serial.begin(9600);
+}
+
+void loop() {
+  // ask for the 6 acceleration bytes, starting at register 0x3B
+  Wire.beginTransmission(MPU);
+  Wire.write(0x3B);
+  Wire.endTransmission();
+  Wire.requestFrom(MPU, 6);
+
+  // read the bytes IN ORDER, then join each high+low pair into one number
+  byte xHigh = Wire.read();
+  byte xLow  = Wire.read();
+  byte yHigh = Wire.read();
+  byte yLow  = Wire.read();
+  byte zHigh = Wire.read();
+  byte zLow  = Wire.read();
+
+  int x = (xHigh << 8) | xLow;
+  int y = (yHigh << 8) | yLow;
+  int z = (zHigh << 8) | zLow;
+
+  Serial.print("X="); Serial.print(x);
+  Serial.print("  Y="); Serial.print(y);
+  Serial.print("  Z="); Serial.println(z);
+  delay(200);
+}`,
+    test:[
+      "Serial Monitor at 9600 → three numbers X, Y, Z.",
+      "Tilt the board different ways → the numbers change. Lying flat, Z is a big value — that is gravity pulling straight down.",
+      "Tap or shake it → the numbers jump.",
+    ],
+    trouble:[
+      "All zeros or no output → SDA to A4, SCL to A5 (the I2C pins); VCC to 5V, GND to GND.",
+      "Numbers frozen → keep the two wake-up lines in setup() (writing 0 to register 0x6B).",
+      "Values swing between +32767 and -32768 → that axis is at its limit; that is normal.",
+    ],
+    challenge:{
+      prompt:"Print SHAKE! only when the board is moved hard. The values are about 16384 per 1 g. Fill in the blanks:",
+      code:
+`// abs() gives the size of a number, ignoring its sign.
+if (abs(x) > _____ || abs(y) > _____ || abs(z) > _____) {
+  Serial.println("SHAKE!");
+}
+
+// 1. What threshold means roughly 2 g of force?
+// 2. Sitting still, one axis reads about 16384 and the others near 0.
+//    Which axis is it, and why?`,
+    },
+  },
+
+  // ── Lesson 34: RC522 RFID reader ──────────────────────────
+  {
+    id:"rfid", day:5, lesson:"Lesson 34", title:"RFID Card Reader (RC522)",
+    lib:"MFRC522.zip",
+    goal:"Read the unique ID number stored inside an RFID card or keychain tag.",
+    materials:["Arduino UNO","RC522 RFID Module (flat board with a copper coil)","the white RFID card + blue keytag (came with the RC522)","jumper wires"],
+    wiring:[
+      ["RC522 3.3V","3.3V  (NOT 5V!)"],
+      ["RC522 GND","GND"],
+      ["RC522 RST","pin 9"],
+      ["RC522 SDA (SS)","pin 10"],
+      ["RC522 MOSI","pin 11"],
+      ["RC522 MISO","pin 12"],
+      ["RC522 SCK","pin 13"],
+    ],
+    code:
+`#include <SPI.h>
+#include <MFRC522.h>   // install MFRC522.zip first
+
+MFRC522 rfid(10, 9);   // SS (SDA) on pin 10, RST on pin 9
+
+void setup() {
+  Serial.begin(9600);
+  SPI.begin();
+  rfid.PCD_Init();
+  Serial.println("Tap an RFID card or tag on the reader...");
+}
+
+void loop() {
+  if (!rfid.PICC_IsNewCardPresent()) return;   // no card yet
+  if (!rfid.PICC_ReadCardSerial())  return;    // couldn't read it
+
+  Serial.print("Card UID:");
+  for (byte i = 0; i < rfid.uid.size; i++) {
+    Serial.print(rfid.uid.uidByte[i] < 0x10 ? " 0" : " ");
+    Serial.print(rfid.uid.uidByte[i], HEX);
+  }
+  Serial.println();
+
+  rfid.PICC_HaltA();   // wait for the next tap
+}`,
+    test:[
+      "Open Serial Monitor at 9600 — it prints \"Tap an RFID card...\".",
+      "Tap the white card → its UID (a row of hex numbers) prints.",
+      "Tap the blue keytag → a DIFFERENT UID prints. Every tag has its own permanent ID.",
+    ],
+    trouble:[
+      "\"MFRC522.h: No such file\" → install MFRC522.zip (download button above).",
+      "Nothing ever prints → the RC522 runs on 3.3V, NOT 5V. Wiring it to 5V can damage it and it will not read.",
+      "Reads only sometimes → hold the card flat and close (about 1-3 cm) over the reader for a moment.",
+      "Still nothing → SPI is picky: SDA→10, SCK→13, MOSI→11, MISO→12, RST→9 exactly.",
+    ],
+    challenge:{
+      prompt:"Make an access badge that greets ONE specific card. Run it once to see your card's first UID byte, then fill in the blank:",
+      code:
+`// Add this right after the UID printout:
+if (rfid.uid.uidByte[0] == 0x____) {   // put YOUR card's first byte here
+  Serial.println("Access granted — welcome!");
+} else {
+  Serial.println("Unknown card — access denied.");
+}
+
+// Real key-card systems keep a whole list of allowed IDs and check every
+// byte. Why is matching just ONE byte not safe in real life?`,
     },
   }
 ];
