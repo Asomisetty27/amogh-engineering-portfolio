@@ -30,6 +30,7 @@ export default function StudentHelper() {
   const [setupCopied, setSetupCopied] = useState(false);
   const [troubleOpen, setTroubleOpen] = useState(false);
   const [extOpen, setExtOpen] = useState(false);
+  const [challengeOpen, setChallengeOpen] = useState(false);
   const [notified, setNotified] = useState<HelpType | null>(null);
   const [imgOk, setImgOk] = useState(true);
   const [broadcast, setBroadcast] = useState<Broadcast | null>(null);
@@ -91,6 +92,7 @@ export default function StudentHelper() {
     setCopied(false);
     setTroubleOpen(false);
     setExtOpen(false);
+    setChallengeOpen(false);
     setNotified(null);
     setImgOk(true);
   }, [activeId]);
@@ -519,7 +521,7 @@ export default function StudentHelper() {
                 </section>
               )}
 
-              {/* Extension challenge for fast finishers (Part 4) */}
+              {/* Extension challenge for fast finishers */}
               {activity.extension && (
                 <section>
                   <button onClick={() => setExtOpen(o => !o)}
@@ -529,6 +531,25 @@ export default function StudentHelper() {
                   </button>
                   {extOpen && (
                     <p className="mt-2 px-1 text-sm text-secondary-foreground leading-relaxed">{activity.extension}</p>
+                  )}
+                </section>
+              )}
+
+              {/* Fill-in-the-blank challenge (additional exercises) */}
+              {activity.challenge && (
+                <section>
+                  <button onClick={() => setChallengeOpen(o => !o)}
+                    className="w-full text-left text-sm px-3 py-2 rounded border border-violet-500/30 bg-violet-500/5 hover:bg-violet-500/10 flex items-center justify-between">
+                    <span className="font-mono uppercase tracking-wider text-[11px] text-violet-400">Challenge: fill in the blanks</span>
+                    <span className="text-violet-400">{challengeOpen ? "−" : "+"}</span>
+                  </button>
+                  {challengeOpen && (
+                    <div className="mt-2 space-y-2">
+                      <p className="px-1 text-sm text-secondary-foreground leading-relaxed">{activity.challenge.prompt}</p>
+                      <pre className="text-xs font-mono leading-relaxed bg-black/60 border border-violet-500/20 rounded-md p-3 overflow-x-auto text-secondary-foreground">
+{activity.challenge.code}
+                      </pre>
+                    </div>
                   )}
                 </section>
               )}

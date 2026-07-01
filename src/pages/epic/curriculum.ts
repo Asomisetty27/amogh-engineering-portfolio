@@ -15,6 +15,7 @@ export interface Activity {
   test: string[];
   trouble: string[];
   extension?: string;
+  challenge?: { prompt: string; code: string };
 }
 
 // Recipients for the end-of-lab thank-you email step (StudentHelper "Wrap up"):
@@ -33,89 +34,105 @@ export const CURRICULUM: Activity[] = [
   {id:"digital", day:2, lesson:"Lesson 5", title:"Push Buttons", goal:"One button turns an LED on, the other off.", materials:["Arduino UNO","breadboard","LED","220Ω resistor","two push buttons","jumper wires"], wiring:[["Pin 5 → 220Ω","LED long leg; short → GND"],["Button A","pin 9; other side GND"],["Button B","pin 8; other side GND"]], code:"int ledPin=5, buttonApin=9, buttonBpin=8;\nvoid setup(){\n  pinMode(ledPin,OUTPUT);\n  pinMode(buttonApin,INPUT_PULLUP);\n  pinMode(buttonBpin,INPUT_PULLUP);\n}\nvoid loop(){\n  if(digitalRead(buttonApin)==LOW) digitalWrite(ledPin,HIGH);\n  if(digitalRead(buttonBpin)==LOW) digitalWrite(ledPin,LOW);\n}", test:["Button A: LED on. Button B: LED off."], trouble:["No light → LED long leg toward pin 5.","Buttons dead → other side must go to GND."], extension:"Make ONE button toggle the LED — press once for on, press again for off — instead of needing two buttons. Hint: track the LED state in a variable and flip it on each press (watch for bounce with a short delay)."},
   {id:"water", day:2, lesson:"Lesson 18", title:"Water Level Detection", goal:"Read a water sensor; the value rises as it gets wet.", materials:["Arduino UNO","water level sensor","jumper wires","cup of water"], wiring:[["Sensor S","A0"],["Sensor +","5V"],["Sensor −","GND"]], code:"int adc_id=0, last=0; char buf[128];\nvoid setup(){ Serial.begin(9600); }\nvoid loop(){\n  int v=analogRead(adc_id);\n  if(abs(v-last)>10){ sprintf(buf,\"level %d\\n\",v); Serial.print(buf); last=v; }\n}", test:["Serial Monitor at 9600; dip in water, the number rises."], trouble:["No numbers → set baud to 9600.","Wet only the striped lines."]},
   {
-    id:"active_buzzer", day:2, lesson:"Lessons 6 & 7", title:"Active & Passive Buzzers",
-    goal:"Beep with an active buzzer; play a song with a passive one.",
-    materials:["Arduino UNO","active buzzer (sealed)","passive buzzer (open green)","jumper wires"],
-    wiring:[["Active +","pin 12"],["Active −","GND"],["Passive +","pin 8"],["Passive −","GND"]],
+    id:"active_buzzer", day:2, lesson:"Lesson 6", title:"Active Buzzer",
+    goal:"Make the sealed buzzer beep in a pattern that speeds up.",
+    materials:["Arduino UNO","active buzzer (the sealed one)","jumper wires"],
+    wiring:[["Buzzer + (long leg)","Arduino pin 12"],["Buzzer − (short leg)","GND"]],
     code:
-`// Part A — Active buzzer (sealed, pin 12). Upload this first.
-// Wire: + (long leg) → pin 12, − → GND.
+`int buzzerPin = 12;
 
-int buzzer = 12;
-
-void setup() { pinMode(buzzer, OUTPUT); }
-
-void loop() {
-  int d = 500;
-  for (int i = 0; i < 20; i++) {
-    if (i < 5)       d = 500;   // slow
-    else if (i < 10) d = 300;   // faster
-    else             d = 100;   // fast
-    digitalWrite(buzzer, HIGH); delay(d);
-    digitalWrite(buzzer, LOW);  delay(d);
-  }
-  digitalWrite(buzzer, HIGH);
-  delay(5000);   // one long tone
+void setup() {
+  pinMode(buzzerPin, OUTPUT);
 }
 
-// ─── Upload Part A above first, then replace with Part B below. ───────────
+void loop() {
+  // 20 beeps that get faster and faster, then one long tone
+  for (int i = 0; i < 20; i++) {
+    int pauseTime;
+    if (i < 5)       pauseTime = 500;   // slow
+    else if (i < 10) pauseTime = 300;   // medium
+    else             pauseTime = 100;   // fast
 
-// Part B — Passive buzzer (open green, pin 8): plays Happy Birthday.
-// All songs from https://github.com/robsoncouto/arduino-songs use pin 11 by default.
-// Change  int buzzer = 11;  to  int buzzer = 8;  before uploading.
+    digitalWrite(buzzerPin, HIGH);
+    delay(pauseTime);
+    digitalWrite(buzzerPin, LOW);
+    delay(pauseTime);
+  }
 
-#define NOTE_C4 262
-#define NOTE_D4 294
-#define NOTE_E4 330
-#define NOTE_F4 349
-#define NOTE_G4 392
-#define NOTE_A4 440
+  digitalWrite(buzzerPin, HIGH);
+  delay(5000);   // hold one long tone for 5 seconds, then repeat
+}`,
+    test:[
+      "The buzzer beeps slowly, then speeds up, then holds a 5-second tone, then repeats.",
+    ],
+    trouble:[
+      "No sound → are you using the sealed buzzer (not the open green one)?",
+      "Still silent → long leg (+) must go to pin 12.",
+    ],
+  },
+  {
+    id:"passive_buzzer", day:2, lesson:"Lesson 7", title:"Passive Buzzer — Happy Birthday",
+    goal:"Play Happy Birthday on the open green passive buzzer.",
+    materials:["Arduino UNO","passive buzzer (the open green one)","jumper wires"],
+    wiring:[["Buzzer + (long leg)","Arduino pin 8"],["Buzzer − (short leg)","GND"]],
+    code:
+`// Songs from github.com/robsoncouto/arduino-songs use pin 11 by default.
+// We changed  int buzzer = 11;  to  int buzzer = 8;  for our kit.
+
+#define NOTE_C4  262
+#define NOTE_D4  294
+#define NOTE_E4  330
+#define NOTE_F4  349
+#define NOTE_G4  392
+#define NOTE_A4  440
 #define NOTE_AS4 466
-#define NOTE_C5 523
-#define REST 0
+#define NOTE_C5  523
 
 int tempo = 140;
-int buzzer = 8;   // our passive buzzer is on pin 8
+int buzzer = 8;
 
 int melody[] = {
-  NOTE_C4,4, NOTE_C4,8,
+  NOTE_C4,4,  NOTE_C4,8,
   NOTE_D4,-4, NOTE_C4,-4, NOTE_F4,-4,
-  NOTE_E4,-2, NOTE_C4,4, NOTE_C4,8,
+  NOTE_E4,-2, NOTE_C4,4,  NOTE_C4,8,
   NOTE_D4,-4, NOTE_C4,-4, NOTE_G4,-4,
-  NOTE_F4,-2, NOTE_C4,4, NOTE_C4,8,
+  NOTE_F4,-2, NOTE_C4,4,  NOTE_C4,8,
   NOTE_C5,-4, NOTE_A4,-4, NOTE_F4,-4,
   NOTE_E4,-4, NOTE_D4,-4, NOTE_AS4,4, NOTE_AS4,8,
   NOTE_A4,-4, NOTE_F4,-4, NOTE_G4,-4,
   NOTE_F4,-2,
 };
 
-int notes = sizeof(melody) / sizeof(melody[0]) / 2;
+int notes     = sizeof(melody) / sizeof(melody[0]) / 2;
 int wholenote = (60000 * 4) / tempo;
 
 void setup() {
   for (int i = 0; i < notes * 2; i += 2) {
     int divider = melody[i + 1];
     int noteDuration;
-    if (divider > 0) noteDuration = wholenote / divider;
-    else { noteDuration = wholenote / abs(divider); noteDuration *= 1.5; }
+    if (divider > 0) {
+      noteDuration = wholenote / divider;
+    } else {
+      noteDuration = wholenote / abs(divider);
+      noteDuration *= 1.5;
+    }
     tone(buzzer, melody[i], noteDuration * 0.9);
     delay(noteDuration);
     noTone(buzzer);
   }
 }
 
-void loop() {}   // plays once on startup`,
+void loop() {}   // song plays once when you plug in`,
     test:[
-      "Part A: upload the top code → buzzer beeps, speeding up, then holds one 5-second tone, repeats.",
-      "Part B: upload the bottom code → passive (open green) buzzer plays Happy Birthday.",
-      "Try another song: go to github.com/robsoncouto/arduino-songs, open any folder, copy the .ino file, change pin 11 to pin 8.",
+      "The open green buzzer plays Happy Birthday once when you plug in.",
+      "Want another song? Go to github.com/robsoncouto/arduino-songs, open any .ino file, change pin 11 to pin 8.",
     ],
     trouble:[
-      "Active silent → upload Part A code first; sealed buzzer long leg to pin 12.",
-      "Passive silent → open green buzzer must be on pin 8.",
-      "Song sounds wrong → make sure you changed buzzer = 11 to buzzer = 8.",
+      "No sound → are you using the open green passive buzzer (not the sealed one)?",
+      "Still silent → long leg (+) must go to pin 8.",
+      "Wrong notes → make sure you changed buzzer = 11 to buzzer = 8.",
     ],
-  },
+  }
 
   // ── Day 3 ────────────────────────────────────────────────
   {id:"dht11", day:3, lesson:"Lesson 12", title:"Temperature & Humidity (DHT11)", lib:"DHT_nonblocking.zip", goal:"Read room temperature and humidity from a DHT11.", materials:["Arduino UNO","DHT11 sensor","jumper wires"], wiring:[["Sensor data (S)","pin 2"],["Sensor +","5V"],["Sensor −","GND"]], code:"#include <dht_nonblocking.h>\n#define DHT_SENSOR_TYPE DHT_TYPE_11\nstatic const int PIN=2;\nDHT_nonblocking dht(PIN, DHT_SENSOR_TYPE);\nvoid setup(){ Serial.begin(9600); }\nvoid loop(){\n  float t,h;\n  if(dht.measure(&t,&h)){\n    Serial.print(\"T=\"); Serial.print(t,1);\n    Serial.print(\"C  H=\"); Serial.print(h,1); Serial.println(\"%\");\n  }\n}", test:["Serial Monitor at 9600 shows T and H.","Breathe near it; humidity rises."], trouble:["\"No such file\" → install DHT_nonblocking.zip (download button above).","No readings → data pin to 2; wait a few seconds."]},
@@ -307,7 +324,301 @@ void loop() {}`,
       "No backlight → LCD A to 5V, K to GND.",
       "Garbled text → check D4–D7 match pins 5,4,3,2 exactly.",
     ],
+  },,
+  // ── Lesson 19 ──────────────────────────────────────────────
+  {
+    id:"rtc", day:5, lesson:"Lesson 19", title:"Real Time Clock (DS1302)",
+    lib:"DS1302.zip",
+    goal:"Keep track of real date and time that survives a power cut.",
+    materials:["Arduino UNO","DS1302 RTC module","jumper wires"],
+    wiring:[
+      ["RTC CLK","pin 6"],
+      ["RTC DAT","pin 5"],
+      ["RTC RST","pin 4"],
+      ["RTC VCC","5V"],
+      ["RTC GND","GND"],
+    ],
+    code:
+`#include <DS1302.h>
+
+// Tell the library which Arduino pins connect to CLK, DAT, RST
+DS1302 rtc(6, 5, 4);
+
+void setup() {
+  Serial.begin(9600);
+
+  // SET THE TIME ONCE here, then comment these three lines out and re-upload.
+  // If you leave them in, the clock resets every time the board powers up.
+  rtc.setDOW(MONDAY);         // day of week: MONDAY, TUESDAY, ... SUNDAY
+  rtc.setTime(9, 0, 0);       // 24-hour format  (9:00:00 AM)
+  rtc.setDate(1, 7, 2026);    // day, month, year
+}
+
+void loop() {
+  // getTimeStr() gives a string like "09:00:05"
+  // getDateStr() gives a string like "01.07.2026"
+  Serial.print(rtc.getTimeStr());
+  Serial.print("   ");
+  Serial.println(rtc.getDateStr());
+  delay(1000);   // print once per second
+}`,
+    test:[
+      "Serial Monitor at 9600 → time advances every second.",
+      "After it works: comment out the three set lines and re-upload. Time keeps running (the RTC has its own battery).",
+      "Unplug USB and plug back in → time is still correct.",
+    ],
+    trouble:[
+      "Garbage output → install DS1302.zip (download button above).",
+      "Time resets to 00:00:00 every power-up → comment out the setDOW/setTime/setDate lines after the first upload.",
+      "Clock runs too fast/slow → the crystal on the module may need replacing.",
+    ],
+    challenge:{
+      prompt:"The time struct has fields .hour, .min, .sec (all integers). Finish this code to print a greeting that changes throughout the day:",
+      code:
+`Time t = rtc.getTime();
+
+if (t.hour >= ___ && t.hour < 12) {
+  Serial.println("Good morning!");
+} else if (t.hour >= 12 && t.hour < ___) {
+  Serial.println("Good afternoon!");
+} else {
+  Serial.println("___");
+}
+
+// Bonus: what does the RTC module's coin cell battery do?
+// What would happen if you removed it and cut the power?`,
+    },
   },
+
+  // ── Lesson 20 ──────────────────────────────────────────────
+  {
+    id:"sound_sensor", day:5, lesson:"Lesson 20", title:"Sound Sensor — Volume Bar",
+    goal:"Read sound level two ways (analog and digital) and visualize volume.",
+    materials:["Arduino UNO","sound sensor module","jumper wires"],
+    wiring:[
+      ["Sensor + (VCC)","5V"],
+      ["Sensor G (GND)","GND"],
+      ["Sensor A0","Arduino A0"],
+      ["Sensor D0","Arduino pin 3"],
+    ],
+    code:
+`// The sound sensor has TWO outputs:
+//   A0 (analog)  → a number 0–1023 showing volume level
+//   D0 (digital) → HIGH or LOW (is it louder than the dial threshold?)
+
+int analogPin = A0;
+int digitalPin = 3;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(digitalPin, INPUT);
+}
+
+void loop() {
+  int volume = analogRead(analogPin);   // 0 = silence, 1023 = loudest possible
+
+  // Build a simple bar chart using # characters
+  // map() scales 0–1023 to 0–20 (bar length)
+  int barLength = map(volume, 0, 1023, 0, 20);
+
+  Serial.print("Volume: [");
+  for (int i = 0; i < 20; i++) {
+    Serial.print(i < barLength ? "#" : " ");
+  }
+  Serial.print("] ");
+  Serial.print(volume);
+
+  // D0 tells us if the sound crossed the threshold set by the blue dial
+  if (digitalRead(digitalPin) == HIGH) {
+    Serial.print("  << CLAP!");
+  }
+  Serial.println();
+
+  delay(80);
+}`,
+    test:[
+      "Serial Monitor at 9600 → a bar of # characters grows when you speak or clap.",
+      "Turn the blue dial on the sensor to adjust sensitivity.",
+      "Clap loudly → '<< CLAP!' appears at the end of the line.",
+    ],
+    trouble:[
+      "Bar never moves → A0 (analog out) must go to Arduino A0.",
+      "CLAP never triggers → turn the blue dial and clap closer to the sensor.",
+    ],
+    challenge:{
+      prompt:"Right now the bar uses 20 slots. Change it to show a percentage (0–100%) instead, and add a label so the output looks like  'Volume: 47%':",
+      code:
+`// Replace the bar section with this:
+int percent = map(volume, 0, ___, 0, ___);   // scale to 0–100
+
+Serial.print("Volume: ");
+Serial.print(percent);
+Serial.println("___");   // what character makes it look like a percent?
+
+// Now try: at what percent does a normal speaking voice land?
+// At what percent does a clap land?`,
+    },
+  },
+
+  // ── Lesson 23 ──────────────────────────────────────────────
+  {
+    id:"thermometer", day:5, lesson:"Lesson 23", title:"Thermometer (LM35)",
+    goal:"Read room temperature using the LM35 analog sensor and convert raw numbers to degrees.",
+    materials:["Arduino UNO","LM35 temperature sensor","jumper wires"],
+    wiring:[
+      ["LM35 left leg (flat side facing you)","5V"],
+      ["LM35 middle leg","A0"],
+      ["LM35 right leg","GND"],
+    ],
+    code:
+`// LM35 outputs 10 millivolts per degree Celsius.
+// Example: 25°C → 250 mV = 0.25 V
+
+// Arduino analogRead maps 0 V → 0  and  5 V → 1023.
+
+// So to convert raw → temperature:
+//   Step 1: raw → volts:    voltage = raw * (5.0 / 1023.0)
+//   Step 2: volts → °C:   tempC   = voltage * 100.0
+//   Step 3: °C → °F:   tempF   = (tempC * 9.0 / 5.0) + 32.0
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  int raw = analogRead(A0);                       // 0–1023
+
+  float voltage = raw * (5.0 / 1023.0);           // volts (0–5 V)
+  float tempC   = voltage * 100.0;                // degrees Celsius
+  float tempF   = (tempC * 9.0 / 5.0) + 32.0;   // degrees Fahrenheit
+
+  Serial.print("Raw: ");
+  Serial.print(raw);
+  Serial.print("   ");
+  Serial.print(tempC, 1);   // 1 decimal place
+  Serial.print(" C  /  ");
+  Serial.print(tempF, 1);
+  Serial.println(" F");
+
+  delay(1000);
+}`,
+    test:[
+      "Serial Monitor at 9600 → temperature prints every second.",
+      "Pinch the LM35 between your fingers → temperature slowly rises.",
+      "Room temperature should be roughly 20–25 C (68–77 F).",
+    ],
+    trouble:[
+      "Reading is 0 or negative → left leg (flat side) must go to 5V, not GND.",
+      "Temperature looks way off → check left/middle/right leg order again.",
+    ],
+    challenge:{
+      prompt:"The formulas are in the code above. Use them to answer these first, then check your answers with the Serial Monitor:",
+      code:
+`// Math questions (fill in the blanks with your calculated answers):
+
+// 1. If analogRead returns 102, what is the temperature in C?
+//    voltage = 102 * (5.0 / 1023.0) = ___ V
+//    tempC   = ___ * 100.0          = ___ C
+
+// 2. What raw reading would correspond to exactly 30 C?
+//    (Work backwards from Step 2, then Step 1)
+//    voltage = 30 / 100.0           = ___ V
+//    raw     = ___ / (5.0 / 1023.0) = ___
+
+// 3. Now add a heat warning to the loop():
+if (tempC > ___) {
+  Serial.println("Warning: it is getting warm!");
+}
+
+// Why does the formula use 5.0 and not just 5?
+// (Hint: try changing it and watch what happens to tempC)`,
+    },
+  },
+
+  // ── Lesson 29 ──────────────────────────────────────────────
+  {
+    id:"dc_motor", day:5, lesson:"Lesson 29", title:"DC Motor — Speed & Direction",
+    goal:"Control motor speed with a knob and understand how the L293D driver works.",
+    materials:["Arduino UNO","L293D motor driver","DC motor","10kΩ potentiometer","breadboard","jumper wires"],
+    wiring:[
+      ["L293D pin 1 (Enable A)","Arduino D5 (PWM ~)"],
+      ["L293D pin 2 (IN1)","Arduino D6"],
+      ["L293D pin 7 (IN2)","Arduino D7"],
+      ["L293D pins 3 & 6 (OUT)","motor wires"],
+      ["L293D pins 8 & 16","5V"],
+      ["L293D pins 4,5,12,13","GND"],
+      ["Pot middle leg","A0"],
+      ["Pot outer legs","5V and GND"],
+    ],
+    code:
+`// The L293D is a "motor driver chip" that lets a small Arduino signal
+// control the large current a motor needs.
+//
+// Enable pin (5): controls SPEED via PWM
+//   analogWrite(5, 0)   → stopped
+//   analogWrite(5, 128) → half speed
+//   analogWrite(5, 255) → full speed
+//
+// IN1 & IN2 (6 & 7): control DIRECTION
+//   IN1=HIGH, IN2=LOW  → forward
+//   IN1=LOW,  IN2=HIGH → reverse
+
+int enablePin = 5;   // speed  (must be a ~ PWM pin)
+int in1 = 6;         // direction A
+int in2 = 7;         // direction B
+int potPin = A0;     // knob
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(enablePin, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+
+  digitalWrite(in1, HIGH);   // spin forward
+  digitalWrite(in2, LOW);
+}
+
+void loop() {
+  int knob  = analogRead(potPin);           // 0–1023
+  int speed = map(knob, 0, 1023, 0, 255);  // scale to PWM range
+
+  analogWrite(enablePin, speed);
+
+  Serial.print("Knob: "); Serial.print(knob);
+  Serial.print("   Speed (0-255): "); Serial.println(speed);
+  delay(100);
+}`,
+    test:[
+      "Turn the knob slowly from 0 to max → motor speeds up smoothly.",
+      "Knob at zero → motor stops completely.",
+      "Serial Monitor shows knob value and speed side by side.",
+      "Try swapping the IN1/IN2 wires → motor spins the other way.",
+    ],
+    trouble:[
+      "Motor doesn’t spin at all → check L293D pins 8 and 16 are both on 5V.",
+      "Motor starts then board resets → ask your instructor for a separate motor power supply.",
+      "Motor only runs at full speed → make sure enablePin is on a ~ (PWM) pin.",
+    ],
+    challenge:{
+      prompt:"Add a push button on pin 9 to flip the motor direction when pressed. Fill in the blanks:",
+      code:
+`// Add to setup():
+pinMode(9, INPUT_PULLUP);
+
+// Add inside loop(), before the analogWrite:
+if (digitalRead(9) == ___) {    // INPUT_PULLUP: LOW when pressed, or HIGH?
+  digitalWrite(in1, ___);       // to reverse, swap these two values
+  digitalWrite(in2, ___);
+  delay(300);                    // short pause so one press = one direction flip
+}
+
+// Questions to think about:
+// 1. Why does analogWrite(enablePin, 50) still not move the motor sometimes?
+//    (Think about static friction vs kinetic friction)
+// 2. What would happen if you set IN1=HIGH and IN2=HIGH at the same time?
+//    (Check the L293D datasheet if you're curious)`,
+    },
+  }
 ];
 
 export const DAY_TITLES: Record<number, string> = {
