@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { CURRICULUM, DAY_TITLES, WIRE, GROUP_COUNT, THANKYOU_EMAIL, type Activity, type HelpType } from "./curriculum";
+import { CURRICULUM, DAY_TITLES, WIRE, GROUP_COUNT, THANKYOU_EMAIL, FIRST_AID, type Activity, type HelpType } from "./curriculum";
 import { readCohort, COHORT_LABEL } from "./cohort";
 
 const LS_GROUP = "epic_group";
@@ -29,6 +29,7 @@ export default function StudentHelper() {
   const [copied, setCopied] = useState(false);
   const [setupCopied, setSetupCopied] = useState(false);
   const [troubleOpen, setTroubleOpen] = useState(false);
+  const [firstAid, setFirstAid] = useState<boolean[]>([]);   // "before you call a professor" checklist
   const [extOpen, setExtOpen] = useState(false);
   const [challengeOpen, setChallengeOpen] = useState(false);
   const [notified, setNotified] = useState<HelpType | null>(null);
@@ -95,6 +96,7 @@ export default function StudentHelper() {
   useEffect(() => {
     setCopied(false);
     setTroubleOpen(false);
+    setFirstAid([]);
     setExtOpen(false);
     setChallengeOpen(false);
     setNotified(null);
@@ -557,22 +559,54 @@ export default function StudentHelper() {
                 </section>
               )}
 
-              {activity.trouble.length > 0 && (
-                <section>
-                  <button onClick={() => setTroubleOpen(o => !o)}
-                    className="w-full text-left text-sm px-3 py-2 rounded border border-[#E5484D]/30 bg-[#E5484D]/5 hover:bg-[#E5484D]/10 flex items-center justify-between">
-                    <span className="font-mono uppercase tracking-wider text-[11px] text-[#E5484D]">It's not working — troubleshooter</span>
-                    <span className="text-[#E5484D]">{troubleOpen ? "−" : "+"}</span>
-                  </button>
-                  {troubleOpen && (
-                    <ul className="mt-2 space-y-1 px-1">
-                      {activity.trouble.map((t, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm"><span className="text-[#E5484D] mt-0.5">▸</span><span className="text-secondary-foreground">{t}</span></li>
-                      ))}
-                    </ul>
-                  )}
-                </section>
-              )}
+              <section>
+                <button onClick={() => setTroubleOpen(o => !o)}
+                  className="w-full text-left text-sm px-3 py-2.5 rounded border border-[#E5484D]/30 bg-[#E5484D]/5 hover:bg-[#E5484D]/10 flex items-center justify-between">
+                  <span className="font-medium text-[#E5484D]">Not working? Try this before calling a professor</span>
+                  <span className="text-[#E5484D] text-lg leading-none">{troubleOpen ? "−" : "+"}</span>
+                </button>
+                {troubleOpen && (
+                  <div className="mt-3 space-y-4">
+                    {/* Universal first-aid checklist — tick each as you check it */}
+                    <div>
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">
+                        Step 1 — check these on ANY project ({firstAid.filter(Boolean).length}/{FIRST_AID.length})
+                      </div>
+                      <ol className="space-y-1.5">
+                        {FIRST_AID.map((step, i) => (
+                          <li key={i}>
+                            <button onClick={() => setFirstAid(prev => { const n = prev.slice(); n[i] = !n[i]; return n; })}
+                              className={`w-full text-left flex items-start gap-2.5 px-2.5 py-2 rounded border transition-colors ${
+                                firstAid[i] ? "border-[#30A46C]/40 bg-[#30A46C]/[0.06]" : "border-panel-border bg-white/[0.02] hover:bg-white/[0.05]"
+                              }`}>
+                              <span className={`mt-0.5 inline-flex items-center justify-center w-4 h-4 rounded border text-[10px] shrink-0 ${
+                                firstAid[i] ? "border-[#30A46C] text-[#30A46C]" : "border-panel-border text-transparent"
+                              }`}>✓</span>
+                              <span className={`text-sm ${firstAid[i] ? "text-muted-foreground line-through" : "text-secondary-foreground"}`}>{step}</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+
+                    {/* Exercise-specific fixes */}
+                    {activity.trouble.length > 0 && (
+                      <div>
+                        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Step 2 — for THIS project specifically</div>
+                        <ul className="space-y-1 px-1">
+                          {activity.trouble.map((t, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm"><span className="text-[#E5484D] mt-0.5">▸</span><span className="text-secondary-foreground">{t}</span></li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    <p className="text-xs text-muted-foreground border-t border-panel-border pt-3">
+                      Worked through all of this and it's still not right? Now tap the red <span className="text-[#E5484D] font-medium">"It's not working"</span> button below and a professor will come over.
+                    </p>
+                  </div>
+                )}
+              </section>
 
               {/* Extension challenge for fast finishers */}
               {activity.extension && (

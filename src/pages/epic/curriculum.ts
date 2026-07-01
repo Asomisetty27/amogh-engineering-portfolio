@@ -22,6 +22,20 @@ export interface Activity {
 // Professor Kundu + Maria (EPIC organizer). Comma-separated for mailto / Gmail.
 export const THANKYOU_EMAIL = "sokundu@calpoly.edu,msmanzan@calpoly.edu";
 
+// Universal "try this before calling a professor" checklist — shown on every
+// activity's troubleshooter. These catch the great majority of beginner issues.
+export const FIRST_AID: string[] = [
+  "Is the USB cable pushed all the way into BOTH the Arduino and the computer? The little ON light on the board should be lit.",
+  "Did the code actually upload? You must see \"Done uploading.\" at the bottom. If there is an orange error, set Tools → Board to \"Arduino UNO\", pick your Port under Tools → Port, then click Upload again.",
+  "Unplug the USB and gently push EVERY wire and part all the way into the breadboard. A leg that looks seated but is a little loose is the #1 reason a circuit does nothing. Then plug back in.",
+  "Trace each wire with your finger against the diagram above. Is every end in the EXACT hole shown? Being even one row off connects it to the wrong place.",
+  "Power check: ONE red wire from 5V to the red (+) rail, ONE black wire from GND to the blue (−) rail, and each part taps those rails — not a second wire back to the Arduino pin.",
+  "LED staying dark? LEDs only work one way — long leg is + and short leg is − (to GND). Try turning it around.",
+  "Serial Monitor blank or garbled? Set the baud dropdown (bottom-right of the Serial Monitor) to 9600.",
+  "Press the RESET button on the Arduino, or unplug and replug the USB, to run your program again from the very start.",
+  "Swap ONE part at a time — a single dead LED or a bent jumper wire does happen. Try a different one and see if it changes.",
+];
+
 export const CURRICULUM: Activity[] = [
   // ── Day 1 ────────────────────────────────────────────────
   {id:"intro", day:1, lesson:"Intro", title:"Arduino & the IDE", goal:"Meet the board and learn to upload a program.", materials:["Arduino UNO","USB cable"], wiring:[], code:"// Tools > Board > Arduino UNO\n// Tools > Port > (pick the port)\n// Paste code, click Verify (check), then Upload (arrow).", test:["The IDE shows \"Done uploading.\""], trouble:["Upload error → check Board and Port under Tools."]},
