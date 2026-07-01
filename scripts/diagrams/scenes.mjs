@@ -7,6 +7,19 @@ import { module, disc, dip16, motorGlyph, lcd16 } from './components.mjs';
 const C = COLORS;
 const cx = (list) => list.map((c) => wire(c[0], c[1], c[2], c[3])).join('');
 
+// ── power distribution: ONE wire from 5V→red rail, ONE from GND→blue rail,
+// two short bridges carrying power to the bottom rails, then every part taps
+// the nearest rail (never multiple wires back to the Arduino pin). ───────────
+const colOf = (ref) => +(/\d+/.exec(ref)[0]);
+const isBot = (ref) => /^[A-E]\d/.test(ref);
+const tapP = (ref) => wire(`${isBot(ref) ? 'BP' : 'TP'}:${colOf(ref)}`, ref, C.red, { width: 5 });
+const tapM = (ref) => wire(`${isBot(ref) ? 'BM' : 'TM'}:${colOf(ref)}`, ref, C.black, { width: 5 });
+const railToPin = (railRef, pin, color) => wire(railRef, pin, color, { width: 5 });
+function powerRails() {
+  return wire('5V', 'TP:14', C.red) + wire('GND', 'TM:17', C.black)
+       + wire('BP:3', 'TP:3', C.red, { width: 5 }) + wire('BM:6', 'TM:6', C.black, { width: 5 });
+}
+
 // standard module placement (to the right of the board) sized by pin count
 function place(nPins, { w = 210, pitch = 34, top = 400 } = {}) {
   const h = (nPins - 1) * pitch + 44;
@@ -31,18 +44,17 @@ export const SCENES = {
 
   // ── Lesson 3: potentiometer fades an LED ──────────────────────────────
   pot() {
-    let g = '';
-    // potentiometer body sitting across bottom-group cols 8/10/12
+    let g = powerRails();
+    // potentiometer across bottom-group cols 8/10/12
     g += potBody(colX(10), ROWY.C - 30, [colX(8), colX(10), colX(12)], ROWY.B);
-    g += wire('5V', 'B8', C.red);
-    g += wire('AN0', 'B10', C.green);
-    g += wire('GND', 'B12', C.black);
-    // pin 9 → 220Ω → LED anode ; cathode → GND
+    g += tapP('B8');                  // left leg → + rail
+    g += wire('AN0', 'B10', C.green); // wiper → A0
+    g += tapM('B12');                 // right leg → − rail
+    // pin 9 → 220Ω → LED → − rail
     g += wire('~9', 'J38', C.blue);
     g += resistor('J38', 'J40', ['#d21f24','#d21f24','#6b3f14','#c9a227']);
     g += led('J40', 'J42');
-    g += wire('J42', 'TM:44', C.black);
-    g += wire('GND', 'TM:40', C.black, { curve: 0.6 });
+    g += tapM('J42');
     g += text(colX(39), ROWY.F + 40, '220Ω', { size: 14, weight: 700 });
     return { bb: true, fg: g };
   },
@@ -66,21 +78,19 @@ export const SCENES = {
 
   // ── Lesson 5: two push buttons ────────────────────────────────────────
   digital() {
-    let g = '';
-    // LED on pin 5 through 220Ω
+    let g = powerRails();
+    // LED on pin 5 through 220Ω, cathode → − rail
     g += wire('~5', 'J10', C.green);
     g += resistor('J10', 'J12', ['#d21f24','#d21f24','#6b3f14','#c9a227']);
     g += led('J12', 'J14');
-    g += wire('J14', 'TM:16', C.black);
-    g += wire('GND', 'TM:12', C.black);
+    g += tapM('J14');
     // two buttons straddling the center gap
-    g += button(colX(30));  // legs in F30/F32 (top) and A30/A32 (bottom)
+    g += button(colX(30));
     g += button(colX(40));
     g += wire('~9', 'F30', C.blue);   // button A → pin 9
-    g += wire('A30', 'BM:30', C.black);
+    g += tapM('A30');                 // other side → − rail
     g += wire('8', 'F40', C.yellow);  // button B → pin 8
-    g += wire('A40', 'BM:40', C.black);
-    g += wire('GND', 'BM:24', C.black, { curve: 0.6 });
+    g += tapM('A40');
     g += text(colX(31), ROWY.J - 30, 'A', { size: 13, weight: 700 });
     g += text(colX(41), ROWY.J - 30, 'B', { size: 13, weight: 700 });
     return { bb: true, fg: g };
@@ -88,15 +98,12 @@ export const SCENES = {
 
   // ── Lesson 23: thermistor thermometer (voltage divider) ───────────────
   thermometer() {
-    let g = '';
-    // thermistor (bead) from +5V column to the A0 junction column
+    let g = powerRails();
     g += thermistor(colX(20), ROWY.H - 26, [colX(20), colX(24)], ROWY.G);
-    g += wire('5V', 'J20', C.red);
-    // junction col24 → A0, and 10k from col24 → GND rail
-    g += wire('J24', 'AN0', C.green);
+    g += tapP('J20');                 // thermistor top → + rail
+    g += wire('J24', 'AN0', C.green); // junction → A0
     g += resistor('F24', 'A24', ['#8a5a2b','#000','#e2731b','#c9a227']); // 10k across gap
-    g += wire('A24', 'BM:24', C.black);
-    g += wire('GND', 'BM:20', C.black);
+    g += tapM('A24');                 // 10k bottom → − rail
     g += text(colX(22), ROWY.J - 26, 'thermistor', { size: 12, weight: 700 });
     g += text(colX(24) + 40, ROWY.C, '10kΩ', { size: 13, weight: 700 });
     return { bb: true, fg: g };
@@ -184,15 +191,18 @@ export const SCENES = {
   // ── Lesson 22: 16×2 LCD + contrast pot ────────────────────────────────
   lcd() {
     const L = lcd16({ x: 470, y: 384 });
-    let g = L.svg;
-    // contrast pot on breadboard cols 6/8/10
+    let g = powerRails() + L.svg;
+    // contrast pot cols 6/8/10 (bottom group)
     g += potBody(colX(8), ROWY.C - 30, [colX(6), colX(8), colX(10)], ROWY.B);
-    g += wire('5V', 'B6', C.red); g += wire('GND', 'B10', C.black);
-    g += wire(L.at('V0'), 'B8', C.orange);
-    // power + contrast
-    g += wire('5V', L.at('VDD'), C.red); g += wire('GND', L.at('VSS'), C.black);
-    g += wire('GND', L.at('RW'), C.black); g += wire('5V', L.at('A'), C.red); g += wire('GND', L.at('K'), C.black);
-    // control + data lines
+    g += tapP('B6'); g += tapM('B10');
+    g += wire(L.at('V0'), 'B8', C.orange);   // wiper → V0 (contrast)
+    // LCD power comes off the rails (not the Arduino pin)
+    g += railToPin('TP:22', L.at('VDD'), C.red);
+    g += railToPin('TM:20', L.at('VSS'), C.black);
+    g += railToPin('TM:24', L.at('RW'), C.black);
+    g += railToPin('TP:40', L.at('A'), C.red);
+    g += railToPin('TM:42', L.at('K'), C.black);
+    // control + data lines (direct from digital pins)
     g += wire('12', L.at('RS'), C.green);
     g += wire('~11', L.at('E'), C.yellow);
     g += wire('~5', L.at('D4'), C.blue);
@@ -205,20 +215,21 @@ export const SCENES = {
   // ── Lesson 29: DC motor via L293D + speed knob ────────────────────────
   dc_motor() {
     const chip = dip16(24, 'L293D');
-    let g = chip.svg;
+    let g = powerRails() + chip.svg;
     const mtr = motorGlyph(colX(40), ROWY.C + 30);
     g += mtr.svg;
-    // motor knob (pot) on cols 6/8/10
+    // speed knob (pot) cols 6/8/10 (top group)
     g += potBody(colX(8), ROWY.H - 30, [colX(6), colX(8), colX(10)], ROWY.G);
-    g += wire('5V', 'J6', C.red); g += wire('GND', 'J10', C.black); g += wire('AN0', 'J8', C.green);
-    // chip control
+    g += tapP('J6'); g += wire('AN0', 'J8', C.green); g += tapM('J10');
+    // control signals — direct from digital pins
     g += wire('~5', chip.hole(1), C.blue);   // EN1 (speed)
     g += wire('~6', chip.hole(2), C.yellow); // IN1
     g += wire('7',  chip.hole(7), C.orange); // IN2
-    g += wire('5V', chip.hole(8), C.red);    // VCC2
-    g += wire('5V', chip.hole(16), C.red);   // VCC1
-    g += wire(chip.hole(4), 'BM:26', C.black); g += wire(chip.hole(5), 'BM:28', C.black);
-    g += wire('GND', 'BM:20', C.black);
+    // chip power — tapped from the rails
+    g += tapP(chip.hole(8));   // VCC2
+    g += tapP(chip.hole(16));  // VCC1
+    g += tapM(chip.hole(4));   // GND
+    g += tapM(chip.hole(5));   // GND
     // outputs to motor
     g += wire(chip.hole(3), mtr.at('a'), C.green);
     g += wire(chip.hole(6), mtr.at('b'), C.green);
@@ -228,31 +239,29 @@ export const SCENES = {
   // ── Final project: LED + LDR controls a motor via L293D ───────────────
   final() {
     const chip = dip16(22, 'L293D');
-    let g = chip.svg;
+    let g = powerRails() + chip.svg;
     const mtr = motorGlyph(colX(40), ROWY.C + 30);
     g += mtr.svg;
-    // chip power + control
+    // chip control + power
     g += wire('~5', chip.hole(1), C.blue);
     g += wire('~6', chip.hole(2), C.yellow);
     g += wire('7',  chip.hole(7), C.orange);
-    g += wire('5V', chip.hole(8), C.red);
-    g += wire('5V', chip.hole(16), C.red);
-    g += wire(chip.hole(4), 'BM:24', C.black); g += wire(chip.hole(5), 'BM:26', C.black);
-    g += wire('GND', 'BM:20', C.black);
+    g += tapP(chip.hole(8)); g += tapP(chip.hole(16));
+    g += tapM(chip.hole(4)); g += tapM(chip.hole(5));
     g += wire(chip.hole(3), mtr.at('a'), C.green);
     g += wire(chip.hole(6), mtr.at('b'), C.green);
-    // LDR divider: 5V→LDR→A0, 10k A0→GND
+    // LDR divider: + rail → LDR → A0 junction, 10k → − rail
     g += thermistor(colX(50), ROWY.H - 26, [colX(50), colX(52)], ROWY.G);
-    g += wire('5V', 'J50', C.red);
+    g += tapP('J50');
     g += wire('J52', 'AN0', C.green);
     g += resistor('F52', 'A52', ['#8a5a2b','#000','#e2731b','#c9a227']);
-    g += wire('A52', 'BM:52', C.black);
+    g += tapM('A52');
     g += text(colX(51), ROWY.J - 26, 'LDR', { size: 12, weight: 700 });
     // indicator LED on D3
     g += wire('~3', 'J56', C.blue);
     g += resistor('J56', 'J58', ['#d21f24','#d21f24','#6b3f14','#c9a227']);
     g += led('J58', 'J60');
-    g += wire('J60', 'BM:60', C.black);
+    g += tapM('J60');
     return { bb: true, fg: g };
   },
 };

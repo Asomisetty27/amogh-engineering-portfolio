@@ -32,6 +32,10 @@ export default function StudentHelper() {
   const [extOpen, setExtOpen] = useState(false);
   const [challengeOpen, setChallengeOpen] = useState(false);
   const [notified, setNotified] = useState<HelpType | null>(null);
+  // Check-off gate: when a group asks to be checked off we block moving on
+  // until an instructor resolves the request from the dashboard.
+  const [awaitingCheck, setAwaitingCheck] = useState<{ id: string; activity: string } | null>(null);
+  const [approved, setApproved] = useState(false);
   const [imgOk, setImgOk] = useState(true);
   const [broadcast, setBroadcast] = useState<Broadcast | null>(null);
   const [dismissedId, setDismissedId] = useState<string | null>(null);
@@ -154,6 +158,52 @@ export default function StudentHelper() {
     setNotified(type);
     setTimeout(() => setNotified(curr => curr === type ? null : curr), 2200);
   };
+
+  // Ask to be checked off → open the blocking "waiting for instructor" gate.
+  const requestCheckoff = async () => {
+    if (group == null) return;
+    const label = currentLabel;
+    await supabase.from("help_requests")
+      .update({ status: "resolved", resolved_at: new Date().toISOString() })
+      .eq("cohort", cohort).eq("group_no", group).eq("type", "done").eq("status", "open");
+    const { data } = await supabase.from("help_requests")
+      .insert({ cohort, group_no: group, type: "done", activity: label })
+      .select("id").single();
+    if (data?.id) { setApproved(false); setAwaitingCheck({ id: data.id, activity: label }); }
+  };
+
+  // Back out of the gate ("not done yet") → withdraw the request from the queue.
+  const cancelCheckoff = async () => {
+    const pending = awaitingCheck;
+    setAwaitingCheck(null); setApproved(false);
+    if (pending) await supabase.from("help_requests").delete().eq("id", pending.id);
+  };
+
+  // After approval, release the gate and advance to the next activity.
+  const continueAfterCheck = () => {
+    const idx = CURRICULUM.findIndex(a => a.id === activeId);
+    const next = CURRICULUM[idx + 1];
+    setAwaitingCheck(null); setApproved(false);
+    setActiveId(next ? next.id : "thankyou");
+  };
+
+  // While the gate is open, listen for the instructor resolving THIS request.
+  useEffect(() => {
+    if (!awaitingCheck || approved) return;
+    const id = awaitingCheck.id;
+    const ch = supabase
+      .channel(`epic-checkoff-${id}`)
+      .on("postgres_changes",
+        { event: "UPDATE", schema: "public", table: "help_requests", filter: `id=eq.${id}` },
+        (payload) => { if ((payload.new as any)?.status === "resolved") setApproved(true); })
+      .subscribe();
+    // Fallback poll in case a realtime event is missed.
+    const poll = setInterval(async () => {
+      const { data } = await supabase.from("help_requests").select("status").eq("id", id).maybeSingle();
+      if ((data as any)?.status === "resolved") setApproved(true);
+    }, 5000);
+    return () => { supabase.removeChannel(ch); clearInterval(poll); };
+  }, [awaitingCheck, approved]);
 
   // ── Group picker ──────────────────────────────────────────────────────
   if (group == null) {
@@ -568,7 +618,7 @@ export default function StudentHelper() {
             const w = WIRE[k];
             const isNotified = notified === k;
             return (
-              <button key={k} onClick={() => sendHelp(k)}
+              <button key={k} onClick={() => k === "done" ? requestCheckoff() : sendHelp(k)}
                 className="rounded-md px-3 py-2.5 text-sm font-medium transition-colors border flex items-center justify-center gap-2"
                 style={{
                   background: isNotified ? `${w.color}22` : `${w.color}14`,
@@ -582,6 +632,46 @@ export default function StudentHelper() {
           })}
         </div>
       </div>
+
+      {/* Check-off gate — blocks moving on until an instructor resolves it */}
+      {awaitingCheck && (
+        <div className="fixed inset-0 z-50 bg-[#09090D]/95 backdrop-blur flex items-center justify-center p-6">
+          <div className="fx-glass fx-card max-w-md w-full text-center rounded-lg border border-panel-border p-8">
+            {!approved ? (
+              <>
+                <div className="text-5xl mb-4">✋</div>
+                <h2 className="text-xl font-semibold mb-2">An instructor is coming to check you off</h2>
+                <p className="text-sm text-secondary-foreground">Group {pad2(group)} · {awaitingCheck.activity}</p>
+                <p className="text-sm text-muted-foreground mt-2 mb-6">
+                  Keep your project set up so they can see it. You'll move on automatically once they mark you done.
+                </p>
+                <div className="flex items-center justify-center gap-1.5 mb-6">
+                  {[0, 1, 2].map(i => (
+                    <span key={i} className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"
+                      style={{ animationDelay: `${i * 0.2}s` }} />
+                  ))}
+                </div>
+                <button onClick={cancelCheckoff}
+                  className="text-sm font-mono px-4 py-2.5 rounded border border-panel-border bg-white/[0.03] hover:bg-white/[0.07] text-muted-foreground">
+                  ← We're not done yet — go back
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="text-5xl mb-4">✅</div>
+                <h2 className="text-xl font-semibold mb-2 text-[#30A46C]">Checked off — nice work!</h2>
+                <p className="text-sm text-secondary-foreground mb-6">
+                  An instructor approved <span className="font-medium">{awaitingCheck.activity}</span>. Ready for the next one?
+                </p>
+                <button onClick={continueAfterCheck}
+                  className="text-sm font-medium px-5 py-2.5 rounded border border-primary/40 bg-primary/10 text-foreground hover:bg-primary/20">
+                  Continue →
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
