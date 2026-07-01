@@ -331,13 +331,16 @@ void setup() {
 
 void loop() {}`,
     test:[
-      "\"Hello, EPIC!\" appears on line 1, \"Cal Poly 2026\" on line 2.",
-      "If text is invisible, adjust the contrast pot until it appears.",
+      "FIRST set the contrast: slowly turn the blue pot through its WHOLE range. The text fades in somewhere (often near one end).",
+      "When contrast is right, line 1 shows \"Hello, EPIC!\" and line 2 shows \"Cal Poly 2026\".",
+      "A blank screen — or a row of solid white/dark boxes — almost always just means the contrast isn't set yet, NOT that anything is broken.",
     ],
     trouble:[
-      "Blank screen with backlight on → turn the contrast pot slowly.",
-      "No backlight → LCD A to 5V, K to GND.",
-      "Garbled text → check D4–D7 match pins 5,4,3,2 exactly.",
+      "Blank screen, OR a row of solid boxes → this is contrast, not a broken display. Turn the blue pot slowly all the way from one side to the other; the text appears somewhere in the lower-to-middle range.",
+      "Turning the pot does nothing → V0 must go to the pot's MIDDLE leg, and the pot's TWO OUTER legs must go to 5V and GND. A loose outer leg means the knob has no effect.",
+      "Backlight is off → LCD pin A (backlight +) to 5V, pin K (−) to GND.",
+      "Random characters or only half the screen → a D4–D7 wire (pins 5, 4, 3, 2) or EN (pin 11) is loose. Unplug USB and push them all the way in.",
+      "Still nothing → RW must go to GND, and re-seat every wire. The library is the built-in \"LiquidCrystal\" — installing LiquidCrystal.zip just adds the same one, so a missing library is not the cause.",
     ],
   },
   // ── Lesson 19 ──────────────────────────────────────────────
