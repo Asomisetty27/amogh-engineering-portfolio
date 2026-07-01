@@ -472,12 +472,15 @@ export default function StudentHelper() {
               )}
 
               {imgOk && (
-                <img
-                  src={`/diagrams/${activity.id}.jpg`}
-                  alt=""
-                  onError={() => setImgOk(false)}
-                  className="rounded-md border border-panel-border max-w-full"
-                />
+                <figure className="space-y-1">
+                  <img
+                    src={`/diagrams/${activity.id}.svg`}
+                    alt={`Wiring diagram for ${activity.title}`}
+                    onError={() => setImgOk(false)}
+                    className="rounded-md border border-panel-border max-w-full bg-white"
+                  />
+                  <figcaption className="text-[11px] text-muted-foreground">Wiring diagram — put each wire and part in the exact hole shown here.</figcaption>
+                </figure>
               )}
 
               <section>
