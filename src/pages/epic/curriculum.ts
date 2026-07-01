@@ -132,7 +132,7 @@ void loop() {}   // song plays once when you plug in`,
       "Still silent → long leg (+) must go to pin 8.",
       "Wrong notes → make sure you changed buzzer = 11 to buzzer = 8.",
     ],
-  }
+  },
 
   // ── Day 3 ────────────────────────────────────────────────
   {id:"dht11", day:3, lesson:"Lesson 12", title:"Temperature & Humidity (DHT11)", lib:"DHT_nonblocking.zip", goal:"Read room temperature and humidity from a DHT11.", materials:["Arduino UNO","DHT11 sensor","jumper wires"], wiring:[["Sensor data (S)","pin 2"],["Sensor +","5V"],["Sensor −","GND"]], code:"#include <dht_nonblocking.h>\n#define DHT_SENSOR_TYPE DHT_TYPE_11\nstatic const int PIN=2;\nDHT_nonblocking dht(PIN, DHT_SENSOR_TYPE);\nvoid setup(){ Serial.begin(9600); }\nvoid loop(){\n  float t,h;\n  if(dht.measure(&t,&h)){\n    Serial.print(\"T=\"); Serial.print(t,1);\n    Serial.print(\"C  H=\"); Serial.print(h,1); Serial.println(\"%\");\n  }\n}", test:["Serial Monitor at 9600 shows T and H.","Breathe near it; humidity rises."], trouble:["\"No such file\" → install DHT_nonblocking.zip (download button above).","No readings → data pin to 2; wait a few seconds."]},
@@ -174,20 +174,21 @@ void loop() {
     materials:["Arduino UNO","IR receiver module","TV/device remote","jumper wires"],
     wiring:[["Receiver signal (S)","pin 11"],["Receiver +","5V"],["Receiver −","GND"]],
     code:
-`#include <IRremote.h>
+`#include <IRremote.hpp>   // this kit ships IRremote version 4
+
 const int RECV_PIN = 11;
-IRrecv irrecv(RECV_PIN);
-decode_results results;
 
 void setup() {
   Serial.begin(9600);
-  irrecv.enableIRIn();
+  // Start listening. ENABLE_LED_FEEDBACK blinks the on-board LED on each signal.
+  IrReceiver.begin(RECV_PIN, ENABLE_LED_FEEDBACK);
 }
 
 void loop() {
-  if (irrecv.decode(&results)) {
-    Serial.println(results.value, HEX);
-    irrecv.resume();
+  if (IrReceiver.decode()) {                          // did a code arrive?
+    // decodedRawData is the full code for the button that was pressed
+    Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
+    IrReceiver.resume();                              // ready for the next button
   }
 }`,
     test:[
@@ -196,9 +197,9 @@ void loop() {
       "A hex code appears for each button. The same button always gives the same code.",
     ],
     trouble:[
-      "\"No such file\" → install IRremote.zip (download button above).",
-      "Nothing prints → receiver signal pin must be 11; point remote directly at receiver.",
-      "FFFFFFFF repeating → you are holding the button down; press and release quickly.",
+      "\"IRremote.hpp: No such file\" → install IRremote.zip (download button above).",
+      "Nothing prints → receiver signal pin must be 11; point the remote straight at it.",
+      "Shows 0 when a button is held → that is the repeat signal; press and release quickly instead.",
     ],
   },
   {
@@ -324,69 +325,91 @@ void loop() {}`,
       "No backlight → LCD A to 5V, K to GND.",
       "Garbled text → check D4–D7 match pins 5,4,3,2 exactly.",
     ],
-  },,
+  },
   // ── Lesson 19 ──────────────────────────────────────────────
   {
     id:"rtc", day:5, lesson:"Lesson 19", title:"Real Time Clock (DS1302)",
     lib:"DS1302.zip",
-    goal:"Keep track of real date and time that survives a power cut.",
+    goal:"Keep real date and time running, even after the Arduino loses power.",
     materials:["Arduino UNO","DS1302 RTC module","jumper wires"],
     wiring:[
-      ["RTC CLK","pin 6"],
-      ["RTC DAT","pin 5"],
       ["RTC RST","pin 4"],
+      ["RTC CLK","pin 5"],
+      ["RTC DAT","pin 6"],
       ["RTC VCC","5V"],
       ["RTC GND","GND"],
     ],
     code:
-`#include <DS1302.h>
+`#include <Ds1302.h>
 
-// Tell the library which Arduino pins connect to CLK, DAT, RST
-DS1302 rtc(6, 5, 4);
+// The DS1302 uses three control pins.
+// This library's constructor order is (RST, CLK, DAT):
+Ds1302 rtc(4, 5, 6);
+
+// Names for the day-of-week number (1-7) the chip reports
+const char* dayNames[] = {
+  "Monday", "Tuesday", "Wednesday", "Thursday",
+  "Friday", "Saturday", "Sunday"
+};
 
 void setup() {
   Serial.begin(9600);
+  rtc.init();
 
-  // SET THE TIME ONCE here, then comment these three lines out and re-upload.
-  // If you leave them in, the clock resets every time the board powers up.
-  rtc.setDOW(MONDAY);         // day of week: MONDAY, TUESDAY, ... SUNDAY
-  rtc.setTime(9, 0, 0);       // 24-hour format  (9:00:00 AM)
-  rtc.setDate(1, 7, 2026);    // day, month, year
+  // Only set the time if the clock is not already running.
+  // A module with a good coin battery keeps time on its own.
+  if (rtc.isHalted()) {
+    Ds1302::DateTime start = {
+      .year = 26,               // 2026 -> just the last two digits
+      .month = Ds1302::MONTH_JUL,
+      .day = 1,
+      .hour = 9,
+      .minute = 0,
+      .second = 0,
+      .dow = Ds1302::DOW_WED
+    };
+    rtc.setDateTime(&start);
+  }
 }
 
 void loop() {
-  // getTimeStr() gives a string like "09:00:05"
-  // getDateStr() gives a string like "01.07.2026"
-  Serial.print(rtc.getTimeStr());
-  Serial.print("   ");
-  Serial.println(rtc.getDateStr());
-  delay(1000);   // print once per second
+  Ds1302::DateTime now;
+  rtc.getDateTime(&now);       // fill 'now' with the current time
+
+  // Print as  HH:MM:SS  DayName  (with leading zeros)
+  if (now.hour < 10)   Serial.print('0');
+  Serial.print(now.hour);   Serial.print(':');
+  if (now.minute < 10) Serial.print('0');
+  Serial.print(now.minute); Serial.print(':');
+  if (now.second < 10) Serial.print('0');
+  Serial.print(now.second);
+  Serial.print("  ");
+  Serial.println(dayNames[now.dow - 1]);
+
+  delay(1000);
 }`,
     test:[
-      "Serial Monitor at 9600 → time advances every second.",
-      "After it works: comment out the three set lines and re-upload. Time keeps running (the RTC has its own battery).",
-      "Unplug USB and plug back in → time is still correct.",
+      "Serial Monitor at 9600 → the time advances one second at a time.",
+      "Unplug USB, wait 10 seconds, plug back in → the clock kept counting (the coin battery kept it alive).",
     ],
     trouble:[
-      "Garbage output → install DS1302.zip (download button above).",
-      "Time resets to 00:00:00 every power-up → comment out the setDOW/setTime/setDate lines after the first upload.",
-      "Clock runs too fast/slow → the crystal on the module may need replacing.",
+      "\"'Ds1302' does not name a type\" → install DS1302.zip (download button above).",
+      "Time is stuck or wrong on the first run → seat the module's coin battery; it sets the time once on first power-up.",
+      "Day name looks wrong → dow is 1-7, and dayNames[now.dow - 1] shifts it to start at 0.",
     ],
     challenge:{
-      prompt:"The time struct has fields .hour, .min, .sec (all integers). Finish this code to print a greeting that changes throughout the day:",
+      prompt:"Inside loop() you already have now.hour, now.minute, now.second (numbers). Fill in the blanks to print a greeting that depends on the time of day:",
       code:
-`Time t = rtc.getTime();
-
-if (t.hour >= ___ && t.hour < 12) {
+`if (now.hour >= ___ && now.hour < 12) {
   Serial.println("Good morning!");
-} else if (t.hour >= 12 && t.hour < ___) {
+} else if (now.hour >= 12 && now.hour < ___) {
   Serial.println("Good afternoon!");
 } else {
   Serial.println("___");
 }
 
-// Bonus: what does the RTC module's coin cell battery do?
-// What would happen if you removed it and cut the power?`,
+// Bonus: unplug the USB, wait, then plug it back in.
+// Which part of the module keeps the time running with no USB power?`,
     },
   },
 
@@ -462,40 +485,46 @@ Serial.println("___");   // what character makes it look like a percent?
 
   // ── Lesson 23 ──────────────────────────────────────────────
   {
-    id:"thermometer", day:5, lesson:"Lesson 23", title:"Thermometer (LM35)",
-    goal:"Read room temperature using the LM35 analog sensor and convert raw numbers to degrees.",
-    materials:["Arduino UNO","LM35 temperature sensor","jumper wires"],
+    id:"thermometer", day:5, lesson:"Lesson 23", title:"Thermometer (Thermistor)",
+    goal:"Turn a thermistor's changing resistance into a real temperature in C and F.",
+    materials:["Arduino UNO","breadboard","thermistor (little black bead)","10kΩ resistor","jumper wires"],
     wiring:[
-      ["LM35 left leg (flat side facing you)","5V"],
-      ["LM35 middle leg","A0"],
-      ["LM35 right leg","GND"],
+      ["Thermistor leg 1","5V"],
+      ["Thermistor leg 2","A0 row"],
+      ["10kΩ resistor","that same A0 row → GND"],
     ],
     code:
-`// LM35 outputs 10 millivolts per degree Celsius.
-// Example: 25°C → 250 mV = 0.25 V
+`#include <math.h>   // gives us log()
 
-// Arduino analogRead maps 0 V → 0  and  5 V → 1023.
-
-// So to convert raw → temperature:
-//   Step 1: raw → volts:    voltage = raw * (5.0 / 1023.0)
-//   Step 2: volts → °C:   tempC   = voltage * 100.0
-//   Step 3: °C → °F:   tempF   = (tempC * 9.0 / 5.0) + 32.0
+int thermistorPin = A0;
 
 void setup() {
   Serial.begin(9600);
 }
 
 void loop() {
-  int raw = analogRead(A0);                       // 0–1023
+  int raw = analogRead(thermistorPin);        // 0-1023
 
-  float voltage = raw * (5.0 / 1023.0);           // volts (0–5 V)
-  float tempC   = voltage * 100.0;                // degrees Celsius
-  float tempF   = (tempC * 9.0 / 5.0) + 32.0;   // degrees Fahrenheit
+  // Step 1: the thermistor + 10k resistor form a voltage divider.
+  //         Work out the thermistor's resistance from the reading.
+  float resistance = 10000.0 * (1023.0 / raw - 1.0);
+
+  // Step 2: the Beta equation turns resistance into temperature.
+  //   R0 = 10000 ohms at 25 C (298.15 K),  Beta = 3950
+  float steinhart;
+  steinhart = resistance / 10000.0;           // R / R0
+  steinhart = log(steinhart);                 // ln(R / R0)
+  steinhart = steinhart / 3950.0;             // (1 / Beta) * ln(R / R0)
+  steinhart = steinhart + (1.0 / 298.15);     // + 1 / T0
+  steinhart = 1.0 / steinhart;                // flip to get Kelvin
+
+  float tempC = steinhart - 273.15;           // Kelvin -> Celsius
+  float tempF = tempC * 9.0 / 5.0 + 32.0;
 
   Serial.print("Raw: ");
   Serial.print(raw);
   Serial.print("   ");
-  Serial.print(tempC, 1);   // 1 decimal place
+  Serial.print(tempC, 1);
   Serial.print(" C  /  ");
   Serial.print(tempF, 1);
   Serial.println(" F");
@@ -504,34 +533,31 @@ void loop() {
 }`,
     test:[
       "Serial Monitor at 9600 → temperature prints every second.",
-      "Pinch the LM35 between your fingers → temperature slowly rises.",
-      "Room temperature should be roughly 20–25 C (68–77 F).",
+      "Pinch the thermistor between your fingers → the temperature slowly rises.",
+      "Room temperature should read roughly 20–25 C (68–77 F).",
     ],
     trouble:[
-      "Reading is 0 or negative → left leg (flat side) must go to 5V, not GND.",
-      "Temperature looks way off → check left/middle/right leg order again.",
+      "Reading is way off or 'nan' → thermistor and 10k must share the A0 row (10k: A0→GND, thermistor: 5V→A0).",
+      "Temperature moves the wrong way → the thermistor and resistor positions are swapped.",
+      "Worried about polarity → a thermistor has no + or −; either leg can face 5V.",
     ],
     challenge:{
-      prompt:"The formulas are in the code above. Use them to answer these first, then check your answers with the Serial Monitor:",
+      prompt:"The temperature is built up one line at a time. Answer these, then check with the Serial Monitor:",
       code:
-`// Math questions (fill in the blanks with your calculated answers):
+`// 1. When the room gets HOTTER, an NTC thermistor's resistance goes
+//    ___ (up / down), so the raw analogRead value goes ___ (up / down).
 
-// 1. If analogRead returns 102, what is the temperature in C?
-//    voltage = 102 * (5.0 / 1023.0) = ___ V
-//    tempC   = ___ * 100.0          = ___ C
+// 2. At the middle reading (raw = 512), roughly what resistance does
+//    Step 1 give?   resistance = 10000 * (1023/512 - 1) = about ___ ohms
+//    (Notice: near the middle, the thermistor is about equal to the 10k.)
 
-// 2. What raw reading would correspond to exactly 30 C?
-//    (Work backwards from Step 2, then Step 1)
-//    voltage = 30 / 100.0           = ___ V
-//    raw     = ___ / (5.0 / 1023.0) = ___
-
-// 3. Now add a heat warning to the loop():
+// 3. Add a "too warm" alert to the loop():
 if (tempC > ___) {
-  Serial.println("Warning: it is getting warm!");
+  Serial.println("It is getting warm in here!");
 }
 
-// Why does the formula use 5.0 and not just 5?
-// (Hint: try changing it and watch what happens to tempC)`,
+// Bonus: why does this use log()?  Hint: equal steps in temperature do
+// NOT cause equal steps in resistance — a thermistor is not linear.`,
     },
   },
 
