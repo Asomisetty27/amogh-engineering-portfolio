@@ -308,10 +308,14 @@ function button(colx) {
   g += `</g>`;
   return g;
 }
-function rgbLed(px, legXs) {
+function rgbLed(_px, legXs) {
+  const cxb = (legXs[1] + legXs[2]) / 2;
+  const cols = ['#d21f24', '#888', '#159a3f', '#1c63d6']; // R, cathode, G, B
+  const legBot = ROWY.G, bodyBot = legBot - 22, bodyCy = legBot - 46;
   let g = `<g>`;
-  legXs.forEach((lx, i) => { const col = ['#d21f24','#888','#159a3f','#1c63d6'][i]; g += `<line x1="${lx}" y1="${ROWY.F}" x2="${px}" y2="${ROWY.J-40}" stroke="${col}" stroke-width="2.2"/>`; });
-  g += `<ellipse cx="${px}" cy="${ROWY.J-56}" rx="14" ry="18" fill="#cfd8dc" stroke="#889" stroke-width="1.5" opacity="0.9"/>`;
-  g += `<ellipse cx="${px-4}" cy="${ROWY.J-60}" rx="4" ry="7" fill="#fff" opacity="0.6"/>`;
+  legXs.forEach((lx, i) => g += `<line x1="${lx}" y1="${legBot}" x2="${lx}" y2="${bodyBot}" stroke="${cols[i]}" stroke-width="3"/>`);
+  g += `<rect x="${cxb-26}" y="${bodyBot-6}" width="52" height="8" rx="3" fill="#b7c1c5"/>`;
+  g += `<ellipse cx="${cxb}" cy="${bodyCy}" rx="24" ry="28" fill="#d6dee2" stroke="#8896a0" stroke-width="1.5" opacity="0.9"/>`;
+  g += `<ellipse cx="${cxb-7}" cy="${bodyCy-8}" rx="5" ry="10" fill="#fff" opacity="0.6"/>`;
   return g;
 }
