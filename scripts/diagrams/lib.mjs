@@ -94,7 +94,22 @@ function shade(hex, amt) {
   r=Math.max(0,Math.min(255,r)); g=Math.max(0,Math.min(255,g)); b=Math.max(0,Math.min(255,b));
   return `#${((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1)}`;
 }
-export const COLORS = { red:'#d21f24', black:'#222428', green:'#159a3f', blue:'#1c63d6', yellow:'#e3b006', orange:'#e2731b', white:'#e8e8ea', gnd:'#222428', pwr:'#d21f24' };
+export const COLORS = { red:'#d21f24', black:'#222428', green:'#159a3f', blue:'#1c63d6', yellow:'#e3b006', orange:'#e2731b', purple:'#8b3fd6', teal:'#0f9a8f', white:'#e8e8ea', gnd:'#222428', pwr:'#d21f24' };
+
+// Small "red = 5V, black = GND, colors = signals" key for busy schematics.
+export function legend(x, y) {
+  const items = [['#d21f24','5V'], ['#222428','GND'], ['#8b3fd6','motor'], ['#159a3f','signal']];
+  let g = `<g>`;
+  g += `<rect x="${x-8}" y="${y-14}" width="188" height="26" rx="6" fill="#ffffff" stroke="#e0e0e4"/>`;
+  let cx = x + 4;
+  for (const [col, lbl] of items) {
+    g += `<line x1="${cx}" y1="${y-1}" x2="${cx+16}" y2="${y-1}" stroke="${col}" stroke-width="4" stroke-linecap="round"/>`;
+    g += text(cx + 20, y + 3, lbl, { size: 10, fill: '#333', anchor: 'start', weight: 600 });
+    cx += 24 + lbl.length * 6.5 + 8;
+  }
+  g += `</g>`;
+  return g;
+}
 
 // component: LED (anode = long leg, cathode = short leg / flat side)
 export function led(anodeRef, cathodeRef, color = '#e33') {

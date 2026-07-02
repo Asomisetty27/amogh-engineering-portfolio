@@ -1,7 +1,7 @@
 // Per-exercise scenes. Each returns { bb, fg }: bb=false hides the breadboard
 // (module wiring), fg is the foreground SVG. All endpoints resolve to exact
 // Arduino pins / breadboard holes.
-import { wire, led, resistor, text, COLORS, colX, ROWY, RAILY, pin } from './lib.mjs';
+import { wire, led, resistor, text, COLORS, colX, ROWY, RAILY, pin, legend } from './lib.mjs';
 import { module, disc, dip16, motorGlyph, lcd16 } from './components.mjs';
 
 const C = COLORS;
@@ -231,8 +231,9 @@ export const SCENES = {
     g += tapM(chip.hole(4));   // GND
     g += tapM(chip.hole(5));   // GND
     // outputs to motor
-    g += wire(chip.hole(3), mtr.at('a'), C.green);
-    g += wire(chip.hole(6), mtr.at('b'), C.green);
+    g += wire(chip.hole(3), mtr.at('a'), C.purple);
+    g += wire(chip.hole(6), mtr.at('b'), C.purple);
+    g += legend(788, 122);
     return { bb: true, fg: g };
   },
 
@@ -248,8 +249,8 @@ export const SCENES = {
     g += wire('7',  chip.hole(7), C.orange);
     g += tapP(chip.hole(8)); g += tapP(chip.hole(16));
     g += tapM(chip.hole(4)); g += tapM(chip.hole(5));
-    g += wire(chip.hole(3), mtr.at('a'), C.green);
-    g += wire(chip.hole(6), mtr.at('b'), C.green);
+    g += wire(chip.hole(3), mtr.at('a'), C.purple);
+    g += wire(chip.hole(6), mtr.at('b'), C.purple);
     // LDR divider: + rail → LDR → A0 junction, 10k → − rail
     g += thermistor(colX(50), ROWY.H - 26, [colX(50), colX(52)], ROWY.G);
     g += tapP('J50');
@@ -258,10 +259,11 @@ export const SCENES = {
     g += tapM('A52');
     g += text(colX(51), ROWY.J - 26, 'LDR', { size: 12, weight: 700 });
     // indicator LED on D3
-    g += wire('~3', 'J56', C.blue);
+    g += wire('~3', 'J56', C.teal);
     g += resistor('J56', 'J58', ['#d21f24','#d21f24','#6b3f14','#c9a227']);
     g += led('J58', 'J60');
     g += tapM('J60');
+    g += legend(788, 122);
     return { bb: true, fg: g };
   },
 

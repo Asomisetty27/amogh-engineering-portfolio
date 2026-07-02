@@ -64,15 +64,25 @@ export function disc({ x, y, r = 34, fill = '#1b1d22', label, legspan = 24 }) {
 import { colX, ROWY } from './lib.mjs';
 export function dip16(c0, label = 'L293D') {
   const x0 = colX(c0) - 9, x1 = colX(c0 + 7) + 9;
-  const yT = ROWY.F - 8, yB = ROWY.E + 8;
+  const yT = ROWY.F - 8, yB = ROWY.E + 8, midY = (yT + yB) / 2;
   let g = `<g>`;
   g += `<rect x="${x0}" y="${yT}" width="${x1-x0}" height="${yB-yT}" rx="4" fill="#17181c" stroke="#000" stroke-width="1.5"/>`;
-  g += `<path d="M ${(x0+x1)/2-8} ${yT} A 8 8 0 0 0 ${(x0+x1)/2+8} ${yT}" fill="#0a0a0a"/>`;
-  g += text((x0+x1)/2, (yT+yB)/2+4, label, { size: 12, fill: '#cfd2d6', weight: 700 });
+  // pin-1 end marker: half-circle notch on the LEFT edge + a dot by pin 1
+  g += `<path d="M ${x0} ${midY-8} A 8 8 0 0 1 ${x0} ${midY+8}" fill="#0a0a0a"/>`;
+  g += `<circle cx="${colX(c0)}" cy="${yB-7}" r="2.6" fill="#cfd2d6"/>`;
+  g += text((x0+x1)/2, midY + 4, label, { size: 12, fill: '#cfd2d6', weight: 700 });
   const hole = (k) => (k <= 8) ? ('D' + (c0 + k - 1)) : ('G' + (c0 + (16 - k)));
-  // little pin stubs
-  for (let k = 1; k <= 8; k++) g += `<line x1="${colX(c0+k-1)}" y1="${yB}" x2="${colX(c0+k-1)}" y2="${ROWY.E}" stroke="#aaa" stroke-width="2"/>`;
-  for (let k = 9; k <= 16; k++) g += `<line x1="${colX(c0+16-k)}" y1="${yT}" x2="${colX(c0+16-k)}" y2="${ROWY.F}" stroke="#aaa" stroke-width="2"/>`;
+  // pin stubs + printed pin numbers (bottom 1-8 left→right, top 9-16 right→left)
+  for (let k = 1; k <= 8; k++) {
+    const px = colX(c0 + k - 1);
+    g += `<line x1="${px}" y1="${yB}" x2="${px}" y2="${ROWY.E}" stroke="#aaa" stroke-width="2"/>`;
+    g += text(px, yB - 4, String(k), { size: 7, fill: '#c8ccd0', weight: 700 });
+  }
+  for (let k = 9; k <= 16; k++) {
+    const px = colX(c0 + 16 - k);
+    g += `<line x1="${px}" y1="${yT}" x2="${px}" y2="${ROWY.F}" stroke="#aaa" stroke-width="2"/>`;
+    g += text(px, yT + 10, String(k), { size: 7, fill: '#c8ccd0', weight: 700 });
+  }
   g += `</g>`;
   return { svg: g, hole };
 }
