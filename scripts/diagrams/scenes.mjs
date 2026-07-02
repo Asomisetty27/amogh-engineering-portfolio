@@ -249,6 +249,7 @@ export const SCENES = {
     g += wire('7',  chip.hole(7), C.orange);
     g += tapP(chip.hole(8)); g += tapP(chip.hole(16));
     g += tapM(chip.hole(4)); g += tapM(chip.hole(5));
+    g += tapM(chip.hole(12)); g += tapM(chip.hole(13));
     g += wire(chip.hole(3), mtr.at('a'), C.purple);
     g += wire(chip.hole(6), mtr.at('b'), C.purple);
     // LDR divider: + rail → LDR → A0 junction, 10k → − rail

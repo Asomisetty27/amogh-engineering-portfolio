@@ -153,7 +153,7 @@ void loop() {}   // song plays once when you plug in`,
   {id:"ultrasonic", day:3, lesson:"Lesson 10", title:"Ultrasonic Distance", lib:"HC-SR04.zip", goal:"Measure distance with sound pulses, like a parking sensor.", materials:["Arduino UNO","Ultrasonic Sensor (HC-SR04 — the two round silver eyes)","jumper wires"], wiring:[["Sensor VCC","5V"],["Sensor Trig","pin 12"],["Sensor Echo","pin 11"],["Sensor GND","GND"]], code:"#include \"SR04.h\"\n#define TRIG 12\n#define ECHO 11\nSR04 sr04 = SR04(ECHO, TRIG);\nvoid setup(){ Serial.begin(9600); }\nvoid loop(){\n  Serial.print(sr04.Distance());\n  Serial.println(\"cm\");\n  delay(1000);\n}", test:["Serial Monitor at 9600 prints cm.","Move your hand; the number changes."], trouble:["\"No such file\" → install HC-SR04.zip (download button above).","Always 0 → re-check Trig 12 / Echo 11."], extension:"Light the on-board LED (pin 13) only when something is closer than 10 cm — a simple proximity alarm. Hint: pinMode(13, OUTPUT) and digitalWrite based on sr04.Distance() < 10."},
 
   // ── Day 4 ────────────────────────────────────────────────
-  {id:"final", day:4, lesson:"Final Project", title:"Light-Controlled Motor (LED + LDR)", goal:"Motor spins when light hits the LDR, stops when you block it.", materials:["Arduino UNO","breadboard","DC motor (the 'Fan Blade and 3-6V Motor')","L293D (16-pin chip stamped L293D)","photoresistor (LDR / photocell)","an LED (any color)","220Ω (red-red-brown) + 10kΩ (brown-black-orange) resistors","jumper wires"], wiring:[["L293D 1","D5"],["L293D 2","D6"],["L293D 7","D7"],["L293D 3 / 6","motor wires"],["L293D 8 & 16","5V"],["L293D 4,5,12,13","GND"],["photoresistor (LDR / photocell)","5V + A0, 10kΩ A0→GND"],["an LED (any color)","D3 → 220Ω → LED → GND (aim the LED right at the LDR)"]], code:"// The LED shines on the LDR. Blocking the light drops the reading and stops\n// the motor. The right threshold depends on YOUR room's light, so this sketch\n// PRINTS the reading, and you calibrate it using the steps below.\n\nconst int lightLedPin = 3;\nconst int ldrPin = A0;\nconst int motorEnable = 5;   // L293D EN1 (speed, must be a ~ PWM pin)\nconst int motorIn1 = 6;      // L293D IN1 (direction)\nconst int motorIn2 = 7;      // L293D IN2 (direction)\n\nint threshold = 765;         // <-- set to (bright + blocked) / 2 for YOUR setup\n\nvoid setup() {\n  pinMode(lightLedPin, OUTPUT);\n  pinMode(motorEnable, OUTPUT);\n  pinMode(motorIn1, OUTPUT);\n  pinMode(motorIn2, OUTPUT);\n  digitalWrite(lightLedPin, HIGH);   // LED on, aimed at the LDR\n  digitalWrite(motorIn1, HIGH);      // set motor direction\n  digitalWrite(motorIn2, LOW);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int light = analogRead(ldrPin);\n  Serial.println(light);             // watch this number to calibrate\n  if (light > threshold) analogWrite(motorEnable, 255);  // bright: motor spins\n  else                   analogWrite(motorEnable, 0);     // blocked: motor stops\n  delay(100);\n}", test:["CALIBRATE FIRST: open the Serial Monitor at 9600. LED shining on the LDR → note the BRIGHT number. Cover the LDR → note the BLOCKED number.","Set  int threshold = (bright + blocked) / 2;  and re-upload. Example: bright 900, blocked 630 → threshold 765.","Light on the LDR → motor spins. Block the light → motor stops."], trouble:["Motor never changes (always on, or never spins) → your threshold is wrong for this room. Watch the printed numbers and set threshold halfway between the bright and blocked readings.","No spin at all → L293D pins 8 & 16 to 5V; motor wires on OUT1/OUT2 (chip pins 3 & 6).","Spins the wrong way → swap the two motor wires.","Board resets when the motor starts → ask about a separate battery for the motor."], extension:"Add a second, lower threshold so the motor runs at HALF speed in dim light and full speed in bright light. Hint: analogWrite(en, 128) between the two thresholds, 255 above the top one."},
+  {id:"final", day:4, lesson:"Final Project", title:"Light-Controlled Motor (LED + LDR)", goal:"Motor spins when light hits the LDR, stops when you block it.", materials:["Arduino UNO","breadboard","DC motor (the 'Fan Blade and 3-6V Motor')","L293D (16-pin chip stamped L293D)","photoresistor (LDR / photocell)","an LED (any color)","220Ω (red-red-brown) + 10kΩ (brown-black-orange) resistors","jumper wires"], wiring:[["L293D notch/dot","faces UP; chip straddles the center gap"],["L293D pin 1","D5"],["L293D pin 2","D6"],["L293D pin 3","motor wire 1"],["L293D pin 4","GND"],["L293D pin 5","GND"],["L293D pin 6","motor wire 2"],["L293D pin 7","D7"],["L293D pin 8","5V"],["L293D pin 12","GND"],["L293D pin 13","GND"],["L293D pin 16","5V"],["LDR one leg","5V"],["LDR other leg","A0 (also 10kΩ from A0 to GND)"],["LED: D3 → 220Ω → LED long leg","short leg → GND; aim the LED at the LDR"]], code:"// STEP 1: CALIBRATE FIRST. Copy the small sketch at the bottom into a NEW\n// sketch and upload it. Open the Serial Monitor at 9600 and read A0:\n//    LED shining on the LDR        -> write down this number (num1)\n//    block the LDR with your hand  -> write down this number (num2)\n//    your threshold = (num1 + num2) / 2\n// STEP 2: put that number in the threshold line below, then upload THIS code.\n\nconst int lightLedPin = 3;\nconst int ldrPin = A0;\nconst int motorEnable = 5;\nconst int motorIn1 = 6;\nconst int motorIn2 = 7;\nint threshold = 765;   // <-- replace with YOUR value: (num1 + num2) / 2\n\nvoid setup() {\n  pinMode(lightLedPin, OUTPUT);\n  pinMode(motorEnable, OUTPUT);\n  pinMode(motorIn1, OUTPUT);\n  pinMode(motorIn2, OUTPUT);\n  digitalWrite(lightLedPin, HIGH);\n  Serial.begin(9600);\n  digitalWrite(motorIn1, HIGH);\n  digitalWrite(motorIn2, LOW);\n}\n\nvoid loop() {\n  int lightValue = analogRead(ldrPin);\n  if (lightValue > threshold) {\n    analogWrite(motorEnable, 255);\n  } else {\n    analogWrite(motorEnable, 0);\n  }\n  delay(20);\n}\n\n/* CALIBRATION SKETCH (upload this FIRST, then switch back to the main code above)\nconst int lightLedPin = 3;\nvoid setup() {\n  pinMode(lightLedPin, OUTPUT);\n  digitalWrite(lightLedPin, HIGH);\n  Serial.begin(9600);\n}\nvoid loop() {\n  Serial.println(analogRead(A0));\n  delay(100);\n}\n*/", test:["Calibrate first (use the calibration sketch in the code): note the BRIGHT value (num1) and the BLOCKED value (num2), then set threshold = (num1 + num2) / 2.","LED shines on the LDR → the motor spins.","Block the beam with your hand → the motor stops.","Remove your hand → the motor spins again."], trouble:["LED does not light → reverse the LED (long leg toward the 220Ω / D3 side).","Motor does not spin → verify all L293D connections: pins 8 & 16 to 5V, and pins 4, 5, 12, 13 to GND.","Motor spins the wrong direction → swap the two motor wires.","Motor never changes → recalibrate: run the calibration sketch and set threshold = (num1 + num2) / 2."], extension:"Add a second, lower threshold so the motor runs at HALF speed in dim light and full speed in bright light. Hint: analogWrite(en, 128) between the two thresholds, 255 above the top one."},
   {id:"sound", day:4, lesson:"Lesson 20", title:"Sound Sensor", optional:true, goal:"Detect a clap and read how loud it is.", materials:["Arduino UNO","Sound Sensor Module (small red board with a round microphone)","jumper wires"], wiring:[["Sensor +","5V"],["Sensor G","GND"],["Sensor A0","A0"],["Sensor D0","pin 3"]], code:"int a=A0, d=3, led=13;\nvoid setup(){ Serial.begin(9600); pinMode(d,INPUT); pinMode(led,OUTPUT); }\nvoid loop(){\n  Serial.println(analogRead(a));\n  digitalWrite(led, digitalRead(d)==HIGH ? HIGH : LOW);\n  delay(50);\n}", test:["Serial Monitor jumps on a clap.","Turn the blue dial to set sensitivity."], trouble:["LED never reacts → turn the blue dial.","No numbers → baud 9600."]},
 
   // ── Additional Exercises (fast finishers) ────────────────
@@ -683,7 +683,7 @@ if (digitalRead(9) == ___) {    // INPUT_PULLUP: LOW when pressed, or HIGH?
 
   // ── Lesson 24 ──────────────────────────────────────────────
   {
-    id:"servo", day:5, lesson:"Lesson 24", title:"Servo Motor (SG90)",
+    id:"servo", day:5, lesson:"Lesson 9", title:"Servo Motor (SG90)",
     goal:"Sweep a servo arm back and forth, then steer it with a potentiometer.",
     materials:["Arduino UNO","Servo Motor SG90 (small blue servo with a white arm)","jumper wires","(optional) 10K potentiometer — the blue knob marked 10K"],
     wiring:[
@@ -738,7 +738,7 @@ void loop() {
 
   // ── Lesson 26 ──────────────────────────────────────────────
   {
-    id:"stepper", day:5, lesson:"Lesson 26", title:"Stepper Motor (28BYJ-48)",
+    id:"stepper", day:5, lesson:"Lesson 31", title:"Stepper Motor (28BYJ-48)",
     goal:"Turn a stepper motor an exact amount using the ULN2003 driver board.",
     materials:["Arduino UNO","Stepper Motor (the silver can, 28BYJ-48)","ULN2003 Stepper Motor Driver Module (green board with 4 LEDs)","jumper wires"],
     wiring:[
@@ -801,7 +801,7 @@ myStepper.step(___);
 
   // ── Lesson 16 ──────────────────────────────────────────────
   {
-    id:"shift_register", day:5, lesson:"Lesson 16", title:"Shift Register (74HC595) — 8 LEDs, 3 pins",
+    id:"shift_register", day:5, lesson:"Lesson 24", title:"Shift Register (74HC595) — 8 LEDs, 3 pins",
     goal:"Control 8 LEDs with only 3 Arduino pins, and watch them count in binary.",
     materials:["Arduino UNO","breadboard","74HC595 IC (16-pin chip stamped 74HC595)","8 LEDs (any colors)","8× 220Ω resistors (red-red-brown)","jumper wires"],
     wiring:[
@@ -861,7 +861,7 @@ shiftOut(dataPin, clockPin, MSBFIRST, 0b________);
 
   // ── Lesson 8: 1-digit 7-segment ───────────────────────────
   {
-    id:"seven_seg", day:5, lesson:"Lesson 8", title:"7-Segment Display (1 digit)",
+    id:"seven_seg", day:5, lesson:"Lesson 27", title:"7-Segment Display (1 digit)",
     goal:"Light the seven bars of a digit to show the numbers 0-9.",
     materials:["Arduino UNO","breadboard","1 Digit 7-Segment Display (a single red digit block)","220Ω resistor (red-red-brown)","jumper wires"],
     wiring:[
@@ -933,7 +933,7 @@ void loop() {
 
   // ── Lesson 9: 4-digit 7-segment (advanced) ────────────────
   {
-    id:"seven_seg4", day:5, lesson:"Lesson 9", title:"4-Digit 7-Segment Display (advanced)",
+    id:"seven_seg4", day:5, lesson:"Lesson 28", title:"4-Digit 7-Segment Display (advanced)",
     lib:"SevSeg.zip",
     goal:"Show a whole 4-digit number. This one has the most wiring in the kit — go slow and check twice.",
     materials:["Arduino UNO","breadboard","4 Digit 7-Segment Display (four red digits in one block)","4× 220Ω resistors (red-red-brown)","jumper wires"],
@@ -994,7 +994,7 @@ void loop() {
 
   // ── Lesson 21: PIR motion sensor ──────────────────────────
   {
-    id:"pir", day:5, lesson:"Lesson 21", title:"PIR Motion Sensor (HC-SR501)",
+    id:"pir", day:5, lesson:"Lesson 17", title:"PIR Motion Sensor (HC-SR501)",
     goal:"Detect movement with a passive-infrared sensor and light the on-board LED.",
     materials:["Arduino UNO","HC-SR501 PIR Motion Sensor (the white half-dome lens)","jumper wires"],
     wiring:[
@@ -1110,7 +1110,7 @@ void loop() {
 
   // ── Lesson 31: tilt ball switch ───────────────────────────
   {
-    id:"tilt", day:5, lesson:"Lesson 31", title:"Tilt Ball Switch",
+    id:"tilt", day:5, lesson:"Lesson 8", title:"Tilt Ball Switch",
     goal:"Detect when the board is tipped over, using a tiny rolling ball inside a switch.",
     materials:["Arduino UNO","Tilt Ball Switch (small metal can with 2 legs)","jumper wires"],
     wiring:[
@@ -1171,7 +1171,7 @@ void loop() {
 
   // ── Lesson 32: rotary encoder ─────────────────────────────
   {
-    id:"encoder", day:5, lesson:"Lesson 32", title:"Rotary Encoder",
+    id:"encoder", day:5, lesson:"Lesson 33", title:"Rotary Encoder",
     goal:"Read which way you turn a knob, and how far — the kind of endless knob used for volume dials.",
     materials:["Arduino UNO","Rotary Encoder Module (a knob you turn AND can press)","jumper wires"],
     wiring:[
@@ -1237,7 +1237,7 @@ if (counter < ___) counter = 0;    // don't go below the bottom
 
   // ── Lesson 33: MPU6050 accelerometer / gyro ───────────────
   {
-    id:"mpu6050", day:5, lesson:"Lesson 33", title:"Accelerometer / Gyro (GY-521)",
+    id:"mpu6050", day:5, lesson:"Lesson 16", title:"Accelerometer / Gyro (GY-521)",
     goal:"Read tilt and motion as real numbers from the GY-521 (MPU6050) over I2C.",
     materials:["Arduino UNO","GY-521 Module (small blue board, aka MPU6050)","jumper wires"],
     wiring:[
@@ -1310,7 +1310,7 @@ if (abs(x) > _____ || abs(y) > _____ || abs(z) > _____) {
 
   // ── Lesson 34: RC522 RFID reader ──────────────────────────
   {
-    id:"rfid", day:5, lesson:"Lesson 34", title:"RFID Card Reader (RC522)",
+    id:"rfid", day:5, lesson:"Lesson 21", title:"RFID Card Reader (RC522)",
     lib:"MFRC522.zip",
     goal:"Read the unique ID number stored inside an RFID card or keychain tag.",
     materials:["Arduino UNO","RC522 RFID Module (flat board with a copper coil)","the white RFID card + blue keytag (came with the RC522)","jumper wires"],
