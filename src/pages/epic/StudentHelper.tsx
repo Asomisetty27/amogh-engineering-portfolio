@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CURRICULUM, DAY_TITLES, WIRE, GROUP_COUNT, THANKYOU_EMAIL, FIRST_AID, type Activity, type HelpType } from "./curriculum";
 import { isUnlocked, additionalsUntil, gatingActive, type Completed } from "./progress";
@@ -36,8 +36,13 @@ export default function StudentHelper() {
   const [notified, setNotified] = useState<HelpType | null>(null);
   // Check-off gate: when a group asks to be checked off we block moving on
   // until an instructor resolves the request from the dashboard.
-  const [awaitingCheck, setAwaitingCheck] = useState<{ id: string; activity: string; activityId: string } | null>(null);
+  const [awaitingCheck, setAwaitingCheck] = useState<{ id: string; activity: string; activityId: string; createdAt: string } | null>(null);
   const [approved, setApproved] = useState(false);
+  // live help queue for THIS cohort (drives "N ahead of you" + resolution toast)
+  const [openReqs, setOpenReqs] = useState<{ id: string; group_no: number; type: string; created_at: string }[]>([]);
+  const [toast, setToast] = useState<string | null>(null);
+  const selfResolvedIds = useRef<Set<string>>(new Set());
+  const prevGroupOpen = useRef<{ id: string }[]>([]);
   // progressive unlocking: which activities this group has been checked off on
   const [completed, setCompleted] = useState<Completed>({});
   const [now, setNow] = useState(() => Date.now());
@@ -154,6 +159,9 @@ export default function StudentHelper() {
 
   const sendHelp = async (type: HelpType, label: string = currentLabel) => {
     if (group == null) return;
+    // We're about to auto-resolve our own prior request of this type — mark it
+    // so it doesn't fire a false "an instructor helped" toast.
+    openReqs.filter(r => r.group_no === group && r.type === type).forEach(r => selfResolvedIds.current.add(r.id));
     // Resolve any existing open request of same type+group to avoid duplicates
     await supabase.from("help_requests")
       .update({ status: "resolved", resolved_at: new Date().toISOString() })
@@ -174,8 +182,8 @@ export default function StudentHelper() {
       .eq("cohort", cohort).eq("group_no", group).eq("type", "done").eq("status", "open");
     const { data } = await supabase.from("help_requests")
       .insert({ cohort, group_no: group, type: "done", activity: label })
-      .select("id").single();
-    if (data?.id) { setApproved(false); setAwaitingCheck({ id: data.id, activity: label, activityId: activeId }); }
+      .select("id, created_at").single();
+    if (data?.id) { setApproved(false); setAwaitingCheck({ id: data.id, activity: label, activityId: activeId, createdAt: (data as any).created_at }); }
   };
 
   // Back out of the gate ("not done yet") → withdraw the request from the queue.
@@ -242,6 +250,49 @@ export default function StudentHelper() {
     const a = CURRICULUM.find(x => x.id === activeId);
     if (a && !isUnlocked(a, completed, now)) setActiveId("setup");
   }, [activeId, completed, now]);
+
+  // Live cohort help queue → "N ahead of you" + resolution toast.
+  useEffect(() => {
+    if (group == null) return;
+    let cancelled = false;
+    const load = async () => {
+      const { data } = await supabase.from("help_requests")
+        .select("id, group_no, type, created_at")
+        .eq("cohort", cohort).eq("status", "open").order("created_at", { ascending: true });
+      if (!cancelled) setOpenReqs((data ?? []) as any);
+    };
+    load();
+    const ch = supabase
+      .channel(`epic-student-queue-${cohort}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "help_requests", filter: `cohort=eq.${cohort}` }, () => load())
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(ch); };
+  }, [group, cohort]);
+
+  // Toast when an instructor resolves one of our (non-check-off) requests.
+  useEffect(() => {
+    if (group == null) return;
+    const groupOpen = openReqs.filter(r => r.group_no === group && r.type !== "done");
+    prevGroupOpen.current.forEach(p => {
+      if (groupOpen.some(g => g.id === p.id)) return;
+      if (selfResolvedIds.current.has(p.id)) { selfResolvedIds.current.delete(p.id); return; }
+      setToast("An instructor came to help ✅");
+    });
+    prevGroupOpen.current = groupOpen.map(r => ({ id: r.id }));
+  }, [openReqs, group]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 3500);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  // How many open requests are ahead of our pending check-off.
+  const checkPosition = useMemo(() => {
+    if (!awaitingCheck) return null;
+    const mine = new Date(awaitingCheck.createdAt).getTime();
+    return openReqs.filter(r => r.id !== awaitingCheck.id && new Date(r.created_at).getTime() < mine).length;
+  }, [openReqs, awaitingCheck]);
 
   // ── Group picker ──────────────────────────────────────────────────────
   if (group == null) {
@@ -740,6 +791,13 @@ export default function StudentHelper() {
         </div>
       </div>
 
+      {/* Toast: an instructor resolved one of our help requests */}
+      {toast && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40">
+          <div className="rounded-full bg-[#0b0b10] border border-[#30A46C]/40 text-[#30A46C] text-sm font-medium px-5 py-2.5 shadow-lg">{toast}</div>
+        </div>
+      )}
+
       {/* Check-off gate — blocks moving on until an instructor resolves it */}
       {awaitingCheck && (
         <div className="fixed inset-0 z-50 bg-[#09090D]/95 backdrop-blur flex items-center justify-center p-6">
@@ -749,9 +807,14 @@ export default function StudentHelper() {
                 <div className="text-5xl mb-4">✋</div>
                 <h2 className="text-xl font-semibold mb-2">An instructor is coming to check you off</h2>
                 <p className="text-sm text-secondary-foreground">Group {pad2(group)} · {awaitingCheck.activity}</p>
-                <p className="text-sm text-muted-foreground mt-2 mb-6">
+                <p className="text-sm text-muted-foreground mt-2 mb-3">
                   Keep your project set up so they can see it. You'll move on automatically once they mark you done.
                 </p>
+                {checkPosition != null && (
+                  <p className="text-sm font-medium text-primary mb-3">
+                    {checkPosition === 0 ? "You're next in line." : `${checkPosition} group${checkPosition === 1 ? "" : "s"} ahead of you.`}
+                  </p>
+                )}
                 <div className="flex items-center justify-center gap-1.5 mb-6">
                   {[0, 1, 2].map(i => (
                     <span key={i} className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"
