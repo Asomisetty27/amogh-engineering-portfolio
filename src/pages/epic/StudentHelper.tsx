@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CURRICULUM, DAY_TITLES, WIRE, GROUP_COUNT, THANKYOU_EMAIL, FIRST_AID, type Activity, type HelpType } from "./curriculum";
+import { isUnlocked, additionalsUntil, gatingActive, type Completed } from "./progress";
 import { readCohort, COHORT_LABEL } from "./cohort";
 
 const LS_GROUP = "epic_group";
@@ -35,8 +36,11 @@ export default function StudentHelper() {
   const [notified, setNotified] = useState<HelpType | null>(null);
   // Check-off gate: when a group asks to be checked off we block moving on
   // until an instructor resolves the request from the dashboard.
-  const [awaitingCheck, setAwaitingCheck] = useState<{ id: string; activity: string } | null>(null);
+  const [awaitingCheck, setAwaitingCheck] = useState<{ id: string; activity: string; activityId: string } | null>(null);
   const [approved, setApproved] = useState(false);
+  // progressive unlocking: which activities this group has been checked off on
+  const [completed, setCompleted] = useState<Completed>({});
+  const [now, setNow] = useState(() => Date.now());
   const [imgOk, setImgOk] = useState(true);
   const [broadcast, setBroadcast] = useState<Broadcast | null>(null);
   const [dismissedId, setDismissedId] = useState<string | null>(null);
@@ -171,7 +175,7 @@ export default function StudentHelper() {
     const { data } = await supabase.from("help_requests")
       .insert({ cohort, group_no: group, type: "done", activity: label })
       .select("id").single();
-    if (data?.id) { setApproved(false); setAwaitingCheck({ id: data.id, activity: label }); }
+    if (data?.id) { setApproved(false); setAwaitingCheck({ id: data.id, activity: label, activityId: activeId }); }
   };
 
   // Back out of the gate ("not done yet") → withdraw the request from the queue.
@@ -206,6 +210,38 @@ export default function StudentHelper() {
     }, 5000);
     return () => { supabase.removeChannel(ch); clearInterval(poll); };
   }, [awaitingCheck, approved]);
+
+  // Load this group's completed activities (persists all week on this PC).
+  useEffect(() => {
+    if (group == null) return;
+    try { setCompleted(JSON.parse(localStorage.getItem(`epic_completed_${cohort}_${group}`) || "{}")); }
+    catch { setCompleted({}); }
+  }, [group, cohort]);
+
+  // Clock tick — drives the 22-hour additional-projects window + go-live flip.
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(t);
+  }, []);
+
+  // When a check-off is approved, record that activity as completed.
+  useEffect(() => {
+    if (!approved || !awaitingCheck || group == null) return;
+    const aid = awaitingCheck.activityId;
+    setCompleted(prev => {
+      if (prev[aid]) return prev;
+      const next = { ...prev, [aid]: Date.now() };
+      localStorage.setItem(`epic_completed_${cohort}_${group}`, JSON.stringify(next));
+      return next;
+    });
+  }, [approved, awaitingCheck, group, cohort]);
+
+  // If the open activity is locked (e.g. once gating goes live), fall back to Setup.
+  useEffect(() => {
+    if (activeId === "setup" || activeId === "thankyou") return;
+    const a = CURRICULUM.find(x => x.id === activeId);
+    if (a && !isUnlocked(a, completed, now)) setActiveId("setup");
+  }, [activeId, completed, now]);
 
   // ── Group picker ──────────────────────────────────────────────────────
   if (group == null) {
@@ -271,6 +307,26 @@ export default function StudentHelper() {
   const byDay: Record<number, Activity[]> = {};
   CURRICULUM.forEach(a => { (byDay[a.day] ||= []).push(a); });
 
+  const fmtLeft = (ms: number) => {
+    const h = Math.floor(ms / 3_600_000), m = Math.floor((ms % 3_600_000) / 60_000);
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+  };
+  const navItem = (a: Activity) => (
+    <li key={a.id}>
+      <button onClick={() => setActiveId(a.id)}
+        className={`w-full text-left text-sm px-2.5 py-1.5 rounded border transition-colors ${
+          a.id === activeId
+            ? "border-primary/40 bg-primary/10 text-foreground"
+            : "border-transparent hover:bg-white/[0.04] text-secondary-foreground"
+        }`}>
+        <span className="font-mono text-[10px] text-muted-foreground mr-1.5">{a.lesson}</span>
+        {a.title}
+        {a.optional && <span className="ml-1 text-[10px] text-muted-foreground">(opt)</span>}
+        {completed[a.id] && <span className="ml-1.5 text-[10px] text-[#30A46C]">✓</span>}
+      </button>
+    </li>
+  );
+
   return (
     <div className="min-h-screen bg-[#09090D] text-foreground">
       <header className="sticky top-0 z-20 border-b border-panel-border bg-[#0b0b10]/90 backdrop-blur px-4 py-3 flex items-center justify-between">
@@ -317,24 +373,41 @@ export default function StudentHelper() {
           </div>
           {Object.keys(DAY_TITLES).map(k => {
             const day = Number(k);
+            const acts = byDay[day] ?? [];
+            const gated = gatingActive(now);
+
+            // Additional Exercises — gated behind the 22-hour window once live.
+            if (day === 5) {
+              const until = additionalsUntil(completed);
+              const open = !gated || (until != null && now < until);
+              return (
+                <div key={day} className="mb-4">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-2 flex-wrap">
+                    <span>{DAY_TITLES[day]}</span>
+                    {gated && open && until != null && (
+                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full border border-[#30A46C]/40 text-[#30A46C]">closes in {fmtLeft(until - now)}</span>
+                    )}
+                  </div>
+                  {open ? (
+                    <ul className="space-y-1">{acts.map(navItem)}</ul>
+                  ) : (
+                    <div className="text-[11px] leading-relaxed text-muted-foreground rounded border border-panel-border bg-white/[0.02] px-2.5 py-2">
+                      🔒 Finish today's required activities to unlock the bonus projects — they open for 22 hours.
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            const unlocked = acts.filter(a => isUnlocked(a, completed, now));
             return (
               <div key={day} className="mb-4">
                 <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">{DAY_TITLES[day]}</div>
                 <ul className="space-y-1">
-                  {(byDay[day] ?? []).map(a => (
-                    <li key={a.id}>
-                      <button onClick={() => setActiveId(a.id)}
-                        className={`w-full text-left text-sm px-2.5 py-1.5 rounded border transition-colors ${
-                          a.id === activeId
-                            ? "border-primary/40 bg-primary/10 text-foreground"
-                            : "border-transparent hover:bg-white/[0.04] text-secondary-foreground"
-                        }`}>
-                        <span className="font-mono text-[10px] text-muted-foreground mr-1.5">{a.lesson}</span>
-                        {a.title}
-                        {a.optional && <span className="ml-1 text-[10px] text-muted-foreground">(opt)</span>}
-                      </button>
-                    </li>
-                  ))}
+                  {unlocked.map(navItem)}
+                  {gated && unlocked.length < acts.length && (
+                    <li className="text-[11px] text-muted-foreground px-2.5 py-1.5">🔒 Check off the activity above to unlock the next</li>
+                  )}
                 </ul>
               </div>
             );
