@@ -539,15 +539,29 @@ function ProductionEvidence() {
             Cross-check: our simulation predicted H100 load R_θ within 3% of measurement.
           </div>
         </div>
+        <div style={{ ...card, borderColor: `${T.rising}44` }}>
+          <div style={{ fontFamily: FM, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.rising, marginBottom: 12 }}>
+            Update, 2026-07-01 — independently re-confirmed
+          </div>
+          <div style={{ fontFamily: FD, fontSize: 13, color: T.muted, lineHeight: 1.7 }}>
+            The severe unit (z = +15.6) was independently re-observed: the operator's own staff ran a
+            separate diagnostic on the same node months later, unaware of our flag, using different
+            telemetry tooling on a different workload. Same GPU, still the sole thermal outlier, now with
+            real measured ambient (not assumed) and a small correlated clock/throughput deficit — not yet
+            throttling. Two independent measurements, months apart, converging conclusion. Formal RMA-record
+            match for the two subtler units is still pending.
+          </div>
+        </div>
         <div style={{ ...card, borderColor: `${T.caution}44` }}>
           <div style={{ fontFamily: FM, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.caution, marginBottom: 12 }}>
             Status — what's confirmed, what's pending
           </div>
           <div style={{ fontFamily: FD, fontSize: 13, color: T.muted, lineHeight: 1.7 }}>
-            The three flags are <span style={{ color: T.text }}>blind predictions</span> made before seeing the
-            operator's maintenance records; confirmation against RMA records is pending.
-            This is a 3.4-hour snapshot — it demonstrates detection, not lead-time.
-            Cluster identity withheld pending operator approval.
+            All three flags began as <span style={{ color: T.text }}>blind predictions</span> made before seeing
+            the operator's maintenance records. The severe unit now has independent field re-confirmation
+            (above); the two subtler units still await RMA-record confirmation.
+            This is still a snapshot-plus-re-observation result — it demonstrates detection persistence, not
+            lead-time. Cluster identity withheld pending operator approval.
           </div>
         </div>
       </div>
@@ -832,11 +846,15 @@ function ConfidenceMap() {
     { claim: 'CUDA context retention causes lag', confidence: 'high', note: 'F6: same-process stuck at P0 for 600 s' },
     { claim: 'H100 calibration (0.0598 C/W median, nonlinear P-curve)', confidence: 'high', note: 'Princeton E009: cross-validated classifier reproduces all 3 hand-flagged units' },
     { claim: 'Signature-matrix fault classifier works on E009 data', confidence: 'high', note: '282 tests green; 6-axis fingerprint (time, α/β, locality, channel, xcorr, τ)' },
-    { claim: 'Peer-relative R_θ isolates degraded units in production', confidence: 'medium', note: 'F7/E009: 3 blind flags, bootstrap-robust; RMA confirmation pending' },
+    { claim: 'Peer-relative R_θ isolates degraded units in production', confidence: 'high', note: 'F7/E009: 3 blind flags; severe unit independently re-confirmed months later (F15, 2026-07-01), different workload' },
+    { claim: 'R_θ rank stability persists over time, not a transient', confidence: 'high', note: 'F10: ρ=0.986 within-job rank stability; F15 extends this to months-apart persistence' },
+    { claim: 'R_θ magnitude does not transfer across GPU hardware', confidence: 'high', note: 'F8 (T4→H100 ~14x too permissive), F13 (V100 breaks naive TDP-scaling) — calibrate per deployment' },
+    { claim: 'Real TIM-condition effect on actual GPU silicon', confidence: 'high', note: 'F16: real repaste study, up to 18°C hotspot / 16°C VRAM-junction swing at matched power' },
     { claim: 'Fault type is inferable from R_θ curve shape', confidence: 'medium', note: 'Slope vs offset vs tails separate 3 flagged units; classifier attribution validated' },
     { claim: 'Sim transfers to real H100 silicon', confidence: 'medium', note: 'Load R_θ predicted within 3%; calibrated on E009 production data' },
-    { claim: 'R_θ rises before throttling (lead-time)', confidence: 'low', note: 'Colab proxy (MVX-1): power-cap TBD. Real hardware: E-LT Fall 2026' },
-    { claim: 'Findings replicate on DGX B200', confidence: 'low', note: 'Stage 2 deploying Aug 17 2026 (Cal Poly AI Factory, 32 GPUs)' },
+    { claim: 'Detector has a low-power false-positive mode', confidence: 'medium', note: 'F9: R_θ=(T−amb)/P diverges as P→0; min-power gate is a real, shippable fix' },
+    { claim: 'R_θ rises before throttling (lead-time)', confidence: 'low', note: 'Load-bearing open question. No public dataset anywhere contains a real degradation-to-throttle event (confirmed 2026-07-01, exhaustive search). A production fleet’s failure incidents tested negative for lead-time, but those are electrical faults, not gradual cooling degradation — doesn’t test the claim. A simulation attempt (DCTM + Monte Carlo) was built, then retracted after its own adversarial audit found it could not produce a trustworthy number. Resolvable only on real hardware: E-LT (Fall 2026) or a faster real-silicon path.' },
+    { claim: 'Findings replicate on DGX B200', confidence: 'low', note: 'Stage 2 deploying Aug 17 2026 (Cal Poly AI Factory, 32 GPUs); B200 canary-install ask sent, scoped down to non-exclusive monitoring pending operator reply' },
     { claim: 'Method holds across vendors (AMD/Intel)', confidence: 'assumed', note: 'AMD MI300 implemented + unit-tested; cross-vendor validation pending' },
   ];
 

@@ -24,6 +24,26 @@ export default function TIMAnalysis() {
         Physical rig work — planned Fall 2026. Sam's heater-block testbed will generate ground-truth fault signatures for the anomaly detector calibration (E006).
       </div>
 
+      {/* External interim data point, 2026-07-01 */}
+      <div className="bg-[#141412] border border-[#4a9d6e]/30 rounded-xl p-4">
+        <div className="text-[9px] font-mono uppercase tracking-wider text-[#4a9d6e] mb-2">
+          Interim external data point — real GPU silicon, not our rig, found 2026-07-01
+        </div>
+        <div className="font-mono text-[11px] text-[#c8c8be] leading-relaxed mb-2">
+          A public, real-hardware TIM repaste study (RTX 3080 Ti, GA102, CC-BY-4.0) measured actual
+          degraded-vs-fresh TIM effects at matched power: hotspot temperature fell up to <span className="text-[#E6F7F1]">18.1°C</span>,
+          VRAM-junction temperature up to <span className="text-[#E6F7F1]">16.0°C</span>, after repaste. Converted to R_θ, the hotspot-based
+          metric moved <span className="text-[#E6F7F1]">29–39%</span> — larger than the standard on-die average sensor showed
+          (<span className="text-[#E6F7F1]">11–18%</span>), because the hotspot-to-average-sensor gap itself collapses from
+          ~20°C (degraded) to ~6°C (fresh).
+        </div>
+        <div className="font-mono text-[10px] text-[#5a5a55] leading-relaxed">
+          Single card, not our own rig, doesn't resolve lead-time — but it's the first REAL (not simulated)
+          TIM-degradation magnitude available to calibrate against, and it suggests the hotspot-vs-average-sensor
+          gap is itself a real, previously unmeasured degradation signal worth building into the fault classifier.
+        </div>
+      </div>
+
       {/* Methodology overview */}
       <div className="bg-[#141412] border border-white/[0.07] rounded-xl p-4">
         <div className="font-bold text-[13px] mb-3">Planned experiment matrix</div>
