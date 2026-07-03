@@ -1996,8 +1996,24 @@ export interface ExperienceItem {
 
 export const experiences: ExperienceItem[] = [
   {
+    company: "Poly UAS — Cal Poly Unmanned Aerial Systems",
+    role: "Edge-AI Hardware Designer — Carrier Boards & Sensor Modules",
+    location: "San Luis Obispo, CA",
+    period: "Apr 2026 – Present",
+    bullets: [
+      {
+        text: "Own carrier-board and sensor-module hardware design for the team's NVIDIA Jetson AGX Orin edge-AI stack, moving the aircraft from ground-controlled flight to onboard real-time computer vision and autonomous decision-making.",
+        confidence: "VERIFIED",
+      },
+      {
+        text: "Design schematics and PCB layout for the Orin carrier board and supporting sensor modules: power delivery, sensor interfacing, and size/weight/power constraints for flight hardware (in design/layout).",
+        confidence: "VERIFIED",
+      },
+    ],
+  },
+  {
     company: "Natera",
-    role: "Intern",
+    role: "Lab Operations Intern: Systems, Automation & Validation",
     location: "Pleasanton, CA",
     period: "Summer 2025",
     bullets: [
@@ -2005,6 +2021,10 @@ export const experiences: ExperienceItem[] = [
         text: "Reduced validation and packaging cycle time from ~20 min to ~10-12 min by mapping the workflow, identifying bottlenecks, and eliminating redundant verification steps",
         confidence: "CONCEPTUAL",
         evidence_source: "Observed estimate, formal time study pending",
+      },
+      {
+        text: "Built Python automation for barcode validation and pathology-report retrieval, removing manual lookups across the team",
+        confidence: "VERIFIED",
       },
       {
         text: "Standardized packaging workflow and authored reference documentation adopted by the team for consistency",
@@ -2026,22 +2046,6 @@ export const experiences: ExperienceItem[] = [
     },
   },
   {
-    company: "CVS Pharmacy",
-    role: "Pharmacy Technician",
-    location: "Dublin, CA",
-    period: "June 2023, June 2024",
-    bullets: [
-      {
-        text: "California state certified pharmacy technician, processed prescriptions, managed controlled substance inventory, and handled patient consultations in a high-volume retail pharmacy",
-        confidence: "VERIFIED",
-      },
-      {
-        text: "Maintained accuracy under time pressure while ensuring regulatory compliance across all fulfillment workflows",
-        confidence: "VERIFIED",
-      },
-    ],
-  },
-  {
     company: "EPIC 2026, Arduino Instructor",
     role: "Noyce School outreach (Prof. Souvik Kundu)",
     location: "",
@@ -2058,12 +2062,53 @@ export const experiences: ExperienceItem[] = [
     ],
     link: { label: "View live dashboard →", href: "https://epic.amogh.site/dashboard" },
   },
+  {
+    company: "CVS Pharmacy",
+    role: "Pharmacy Technician",
+    location: "Dublin, CA",
+    period: "June 2023, June 2024",
+    bullets: [
+      {
+        text: "California state certified pharmacy technician, processed prescriptions, managed controlled substance inventory, and handled patient consultations in a high-volume retail pharmacy",
+        confidence: "VERIFIED",
+      },
+      {
+        text: "Maintained accuracy under time pressure while ensuring regulatory compliance across all fulfillment workflows",
+        confidence: "VERIFIED",
+      },
+    ],
+  },
 ];
 
 // ========== SKILLS ==========
 export const skills = {
   core: ["Systems Thinking", "Test & Validation Mindset", "Technical Documentation", "Debugging & Root Cause Analysis"],
   technical: [
+    {
+      name: "GPU Telemetry (NVML / DCGM)",
+      evidence: "Theta — blind-validated on 72 Princeton H100s",
+      confidence: "VERIFIED" as ConfidenceBadge,
+    },
+    {
+      name: "Python (pandas, scikit-learn)",
+      evidence: "Theta detection stack, live on PyPI",
+      confidence: "VERIFIED" as ConfidenceBadge,
+    },
+    {
+      name: "ML Anomaly Detection",
+      evidence: "Median-polish peer z-scores, Isolation Forest, ensemble classifiers",
+      confidence: "VERIFIED" as ConfidenceBadge,
+    },
+    {
+      name: "NVIDIA Jetson (AGX Orin)",
+      evidence: "Poly UAS carrier board — schematics & layout in progress",
+      confidence: "VERIFIED" as ConfidenceBadge,
+    },
+    {
+      name: "Linux / Bash / Git",
+      evidence: "Theta development + SLURM cluster workflows",
+      confidence: "VERIFIED" as ConfidenceBadge,
+    },
     { name: "SystemVerilog / HDL", evidence: "OTTER CPU project (CPE 233)", confidence: "VERIFIED" as ConfidenceBadge },
     { name: "Analog Circuit Design", evidence: "EE 241 Labs 1-7 + RGM", confidence: "VERIFIED" as ConfidenceBadge },
     {

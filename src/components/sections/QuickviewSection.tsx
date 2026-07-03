@@ -16,12 +16,21 @@ export default function QuickviewSection() {
         <h2 className="font-display text-xl tracking-wider text-primary neon-text-cyan">
           Quickview
         </h2>
-        <button
-          onClick={handlePrint}
-          className="px-4 py-1.5 text-xs font-mono rounded border border-primary/40 text-primary hover:bg-primary/10 transition-colors"
-        >
-          PRINT / EXPORT PDF
-        </button>
+        <div className="flex items-center gap-2">
+          <a
+            href="/Amogh_Somisetty_Resume_Fall2026.pdf"
+            download
+            className="px-4 py-1.5 text-xs font-mono rounded border border-primary/40 text-primary hover:bg-primary/10 transition-colors"
+          >
+            DOWNLOAD RESUME PDF
+          </a>
+          <button
+            onClick={handlePrint}
+            className="px-4 py-1.5 text-xs font-mono rounded border border-panel-border text-muted-foreground hover:bg-primary/10 transition-colors"
+          >
+            PRINT
+          </button>
+        </div>
       </div>
 
       {/* Printable content */}
@@ -32,13 +41,13 @@ export default function QuickviewSection() {
             {personalInfo.name}
           </h1>
           <p className="text-sm text-primary print:text-black font-medium">
-            Electrical Engineer · Hardware, Embedded &amp; Systems
+            Electrical Engineer · Hardware, Embedded &amp; GPU Systems · Seeking Fall 2026 Co-op / Internship
           </p>
           <p className="text-xs text-muted-foreground print:text-gray-600">
             {personalInfo.title}, {personalInfo.university}
           </p>
           <p className="text-xs font-mono text-muted-foreground print:text-gray-500 mt-1">
-            {personalInfo.email} · github.com/Asomisetty27 · pypi.org/project/runtheta
+            {personalInfo.email} · github.com/Asomisetty27 · linkedin.com/in/amoghsomisetty · pypi.org/project/runtheta
           </p>
         </div>
 

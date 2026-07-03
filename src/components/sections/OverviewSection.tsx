@@ -12,7 +12,7 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 const strengths = [
   {
     title: "Hardware & Embedded",
-    description: "Analog signal chains, op-amp and sensor circuits, PCB design and reflow, and embedded C++ for real-time sensing and motor/actuator control",
+    description: "Carrier-board and sensor-module design for NVIDIA Jetson AGX Orin (Poly UAS), analog signal chains, PCB design and reflow, and embedded C++ for real-time sensing and control",
     icon: Radio,
     color: "neon-cyan",
   },
@@ -57,7 +57,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
             }}
           />
           <p className="text-sm leading-relaxed text-secondary-foreground pl-1">
-            I'm an electrical engineer who builds across the whole stack: analog signal chains, embedded control, and RISC-V/FPGA digital systems, plus the software and data work on top. What ties it together is measurement discipline, knowing when a number is real. On my own I built Theta (<span className="font-mono text-primary">pip install runtheta</span>), an open-source GPU-reliability tool validated on 72 H100s, because GPUs and AI are where I like to push myself.
+            I'm an electrical engineer who works the full GPU stack: I built Theta (<span className="font-mono text-primary">pip install runtheta</span>), an open-source GPU-reliability tool that blind-flagged degraded units across 72 production H100s at Princeton — a flag Princeton's own diagnostics independently re-confirmed months later at +47.8% thermal resistance. On the hardware side I design Jetson AGX Orin carrier boards and sensor modules for Cal Poly's autonomous drone team, and I've built a RISC-V CPU from the RTL up. What ties it together is measurement discipline: knowing when a number is real. Seeking a Fall 2026 GPU / ML-hardware co-op or internship.
           </p>
         </div>
 
@@ -166,7 +166,9 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               {[
                 "Peer-Relative GPU Anomaly Detection → Theta, blind-validated on 72 Princeton H100s",
+                "Blind Flag Independently Re-Confirmed → Princeton's own DCGM diagnostic, +47.8% R_θ, 3 months later",
                 "Real-Time R_θ Thermal Forensics → NVML/DCGM telemetry pipeline",
+                "Jetson AGX Orin Carrier-Board Design → Poly UAS edge-AI autonomy stack",
                 "Survival-Analysis Lead-Time Modeling → lifelines on GPU telemetry",
                 "End-to-End Signal Pipeline → EE 143 ADC/DAC System",
                 "RISC-V CPU Architecture → OTTER MCU (CPE 233)",

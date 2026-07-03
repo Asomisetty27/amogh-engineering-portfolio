@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 const NAME_CHARS = "AMOGH SOMISETTY".split("");
-const COORDS = "37.1350° N / 120.6166° W";
+const COORDS = "35.2828° N / 120.6596° W";
 
 function LiveClock() {
   const [time, setTime] = useState("");
@@ -98,7 +98,7 @@ export default function HeroHeader() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7, duration: 0.4 }}
       >
-        Electrical Engineer · Hardware, Embedded &amp; Systems
+        Electrical Engineer · Hardware, Embedded &amp; GPU Systems
       </motion.p>
 
       {/* Status strip */}
@@ -118,7 +118,16 @@ export default function HeroHeader() {
         <span className="t-mono-xs" style={{ color: "var(--t-faint)" }}>◆</span>
         <span className="t-mono-xs" style={{ color: "var(--t-muted)" }}>CAL POLY EE · RISING JUNIOR</span>
         <span className="t-mono-xs" style={{ color: "var(--t-faint)" }}>◆</span>
-        <span className="t-mono-xs" style={{ color: "var(--t-healthy)" }}>OPEN TO SUMMER 2027</span>
+        <span className="t-mono-xs" style={{ color: "var(--t-healthy)" }}>SEEKING FALL 2026 CO-OP / INTERNSHIP</span>
+        <span className="t-mono-xs" style={{ color: "var(--t-faint)" }}>◆</span>
+        <a
+          href="/Amogh_Somisetty_Resume_Fall2026.pdf"
+          download
+          className="t-mono-xs hover:opacity-80 transition-opacity"
+          style={{ color: "var(--t-blueprint-ink)", textDecoration: "underline", textUnderlineOffset: 3 }}
+        >
+          RESUME ↓
+        </a>
         <span className="t-mono-xs" style={{ color: "var(--t-faint)" }}>◆</span>
         <span className="t-mono-xs hidden sm:inline" style={{ color: "var(--t-muted)" }}>
           <kbd style={{ fontFamily: "var(--t-font-mono)", border: "1px solid var(--t-faint)", borderRadius: 4, padding: "0 4px" }}>⌘K</kbd> to navigate
