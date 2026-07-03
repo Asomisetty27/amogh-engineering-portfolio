@@ -28,6 +28,7 @@ export default function StudentHelper() {
   const [group, setGroup] = useState<number | null>(null);
   const [activeId, setActiveId] = useState<string>("setup");
   const [copied, setCopied] = useState(false);
+  const [calCopied, setCalCopied] = useState(false);
   const [setupCopied, setSetupCopied] = useState(false);
   const [troubleOpen, setTroubleOpen] = useState(false);
   const [firstAid, setFirstAid] = useState<boolean[]>([]);   // "before you call a professor" checklist
@@ -145,6 +146,10 @@ export default function StudentHelper() {
 
   const copyCode = async () => {
     try { await navigator.clipboard.writeText(activity.code); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch {}
+  };
+  const copyCalibration = async () => {
+    if (!activity.calibration) return;
+    try { await navigator.clipboard.writeText(activity.calibration.code); setCalCopied(true); setTimeout(() => setCalCopied(false), 1500); } catch {}
   };
   const copyBlink = async () => {
     try { await navigator.clipboard.writeText(blinkCode); setSetupCopied(true); setTimeout(() => setSetupCopied(false), 1500); } catch {}
@@ -671,6 +676,22 @@ export default function StudentHelper() {
 {activity.code}
                 </pre>
               </section>
+
+              {activity.calibration && (
+                <section className="rounded-md border border-[#F2B01E]/40 bg-[#F2B01E]/[0.06] p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-[11px] font-semibold text-[#F2B01E]">⚙ Calibrate the threshold first</div>
+                    <button onClick={copyCalibration}
+                      className="text-xs font-mono px-2.5 py-1 rounded border border-[#F2B01E]/40 bg-[#F2B01E]/10 hover:bg-[#F2B01E]/20 text-[#F2B01E]">
+                      {calCopied ? "Copied ✓" : "Copy"}
+                    </button>
+                  </div>
+                  <p className="text-sm text-secondary-foreground mb-2 leading-relaxed">{activity.calibration.note}</p>
+                  <pre className="text-xs font-mono leading-relaxed bg-black/60 border border-panel-border rounded-md p-3 overflow-x-auto text-secondary-foreground">
+{activity.calibration.code}
+                  </pre>
+                </section>
+              )}
 
               {activity.test.length > 0 && (
                 <section>
