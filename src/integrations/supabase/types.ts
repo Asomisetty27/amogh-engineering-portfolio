@@ -190,6 +190,27 @@ export type Database = {
         }
         Relationships: []
       }
+      lab_help_requests: {
+        Row: {
+          created_at: string
+          group_no: number
+          id: string
+          kind: string
+        }
+        Insert: {
+          created_at?: string
+          group_no: number
+          id?: string
+          kind: string
+        }
+        Update: {
+          created_at?: string
+          group_no?: number
+          id?: string
+          kind?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
