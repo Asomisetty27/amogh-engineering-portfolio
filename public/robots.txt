@@ -1,14 +1,9 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+Allow: /thermalos
+Allow: /thermalos/fleet
+Disallow: /thermalos/app/
+Disallow: /theta
+Disallow: /epic/
+
+Sitemap: https://www.amogh.site/sitemap.xml

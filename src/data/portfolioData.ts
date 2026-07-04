@@ -146,7 +146,7 @@ export const systemDomains: SystemDomainInfo[] = [
   {
     id: "ai-systems",
     name: "AI & GPU Systems",
-    subtitle: "GPU reliability & telemetry, R_θ thermal forensics, ML anomaly detection, OSS tooling",
+    subtitle: "GPU reliability & telemetry, R_θ thermal forensics, ML anomaly detection, edge-AI hardware (Jetson AGX Orin)",
     icon: "cpu",
     color: "neon-green",
   },
@@ -1974,6 +1974,95 @@ export const projects: Project[] = [
       "Betaflight",
       "System Integration",
       "Mechanical Packaging",
+    ],
+  },
+  {
+    id: "poly-uas-jetson",
+    name: "Poly UAS — Jetson AGX Orin Carrier Board & Sensor Modules",
+    codename: "EDGE-ORIN",
+    domain: "ai-systems",
+    status: "IN_PROGRESS",
+    statusColor: "neon-amber",
+    heroSummary:
+      "Designing carrier-board and sensor-module hardware for Cal Poly's Unmanned Aerial Systems team, moving the aircraft from ground-controlled flight to onboard real-time computer vision and autonomous decision-making on an NVIDIA Jetson AGX Orin.",
+    has3D: false,
+    module: {
+      problemStatement:
+        "The team's aircraft currently depends on a human operator for every decision. Standing up an NVIDIA Jetson AGX Orin as onboard edge-AI compute means the airframe needs custom carrier-board and sensor hardware, power delivery, sensor interfacing, and SWaP (size/weight/power) budgeting, none of which exists off the shelf for this airframe.",
+      systemOverview:
+        "Own the hardware layer between the airframe and the Jetson AGX Orin module: the carrier board that breaks out and regulates power to the module, and the sensor modules (camera/perception interfaces) that feed the onboard computer-vision pipeline. The Orin runs the perception and autonomy stack; my scope is making sure it gets clean power, the right I/O, and fits the aircraft's weight and space budget.",
+      systemArchitecture:
+        "Aircraft battery → power regulation (carrier board) → Jetson AGX Orin module → sensor modules (camera/perception interfaces) → onboard autonomy stack → flight controller command interface",
+      subsystems: [
+        {
+          id: "carrier-board",
+          title: "Jetson AGX Orin Carrier Board",
+          description:
+            "Custom carrier board providing power delivery, module breakout, and interfacing for the AGX Orin, replacing NVIDIA's devkit carrier with a design sized and powered for this airframe.",
+          details: [
+            "Power delivery sized to the Orin module's rail requirements from the aircraft's battery bus",
+            "Schematic capture and PCB layout in progress (Autodesk Fusion)",
+            "SWaP (size/weight/power) budget driven by the airframe, not a desktop devkit form factor",
+            "Interfacing for downstream sensor modules and flight-controller communication",
+          ],
+          confidence: "VERIFIED",
+          evidenceSource: "Active team role, Apr 2026 – present",
+        },
+        {
+          id: "sensor-modules",
+          title: "Sensor Modules",
+          description:
+            "Sensor interfacing hardware feeding the onboard computer-vision pipeline, so the aircraft can perceive its surroundings without a ground operator in the loop.",
+          details: [
+            "Camera/perception sensor interfacing for the onboard CV pipeline",
+            "Design constrained by the same SWaP budget as the carrier board",
+            "Feeds the autonomy stack that replaces manual control inputs",
+          ],
+          confidence: "VERIFIED",
+          evidenceSource: "Active team role, Apr 2026 – present",
+        },
+      ],
+      implementationNotes: [
+        "Hardware scope only: carrier board + sensor modules. The onboard autonomy/CV software stack is owned by other team members.",
+        "Boards are in schematic/layout, not yet fabricated, this is stated honestly rather than implied as complete.",
+        "First fab run and bring-up is the next milestone; bullets here will update to bring-up results once boards return from fab.",
+      ],
+      failureModes: [
+        {
+          problem: "Devkit-form-factor power delivery doesn't fit the airframe",
+          cause: "NVIDIA's reference carrier is sized for a desktop devkit, not a weight- and space-constrained aircraft",
+          fix: "Custom carrier board sized to the airframe's SWaP budget and battery bus voltage",
+          systemImpact: "Without a custom carrier, the Orin cannot be integrated into the aircraft at all",
+          confidence: "CONCEPTUAL",
+        },
+      ],
+      improvements: [
+        "Fabricate and bring up the first carrier-board revision; publish power-rail bring-up results",
+        "Characterize sensor-module signal integrity once hardware is in hand",
+        "Document SWaP budget and tradeoffs made versus the reference devkit design",
+      ],
+      keyInsight:
+        "Deploying a datacenter-class SoC (the same Orin architecture family used in NVIDIA's edge-AI line) onto a flying, weight-constrained platform is a hardware-integration problem before it's a software one: power, thermal, and SWaP constraints have to be solved in silicon-adjacent hardware before any autonomy code runs.",
+      ownershipDisclosure: {
+        owned: [
+          "Carrier-board schematic capture and PCB layout",
+          "Sensor-module hardware design and interfacing",
+          "Power-delivery sizing and SWaP budgeting",
+        ],
+        aiAssisted: [
+          "Portfolio presentation and visual layout",
+        ],
+      },
+    },
+    diagrams: [],
+    evidence: [],
+    techStack: [
+      "NVIDIA Jetson AGX Orin",
+      "PCB Design (Autodesk Fusion)",
+      "Power Delivery",
+      "Sensor Interfacing",
+      "SWaP Budgeting",
+      "Edge AI Hardware",
     ],
   },
 ];

@@ -30,7 +30,7 @@ const strengths = [
   },
 ];
 
-const topProjectIds = ["ee143-signal-system", "rgm-machine", "digital-systems", "fpv-drone"];
+const topProjectIds = ["poly-uas-jetson", "digital-systems", "ee143-signal-system", "rgm-machine"];
 
 interface OverviewSectionProps {
   onNavigateToProject?: (projectId: string) => void;

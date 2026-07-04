@@ -135,6 +135,18 @@ export const recruiterSummaries: Record<string, RecruiterSummary> = {
     ],
     skillsDemonstrated: ["React / TypeScript", "Supabase / PostgreSQL", "Stripe Integration", "API Design", "Full-Stack Development"],
   },
+  "poly-uas-jetson": {
+    whatIsIt: "Carrier-board and sensor-module hardware for Cal Poly's Unmanned Aerial Systems team's NVIDIA Jetson AGX Orin, the edge-AI compute that lets the aircraft see and decide onboard instead of depending on a human operator.",
+    whyItMatters: "Real, current hardware-design ownership on the exact compute platform (Jetson Orin) that GPU/edge-AI teams ship, not an analysis of someone else's product: schematics, PCB layout, power delivery, sized to a weight- and space-constrained aircraft rather than a desktop devkit.",
+    whatYouBuilt: "Own the hardware layer between the airframe and the Orin module: a custom carrier board sized to the aircraft's SWaP budget and battery bus, plus the sensor modules feeding the onboard computer-vision pipeline.",
+    keyOutcomes: [
+      "Designing schematics and PCB layout for a custom Jetson AGX Orin carrier board (Autodesk Fusion)",
+      "Sizing power delivery and SWaP budget against the airframe instead of the reference devkit form factor",
+      "Designing sensor-module interfacing for the onboard CV/autonomy pipeline",
+      "Honest status: boards are in design/layout, first fab + bring-up is the next milestone",
+    ],
+    skillsDemonstrated: ["NVIDIA Jetson AGX Orin", "PCB Design", "Power Electronics", "Sensor Interfacing", "SWaP Engineering", "Autodesk Fusion"],
+  },
   "fpv-drone": {
     whatIsIt: "A 75 mm HD brushless FPV drone analyzed as a densely integrated electromechanical and RF system, six tightly coupled subsystems at 70 g.",
     whyItMatters: "Demonstrates ability to reason about a highly constrained system where power, control, RF, packaging, vibration, and performance all interact.",
@@ -246,6 +258,9 @@ export const interviewQuestions: Record<string, InterviewQA[]> = {
 };
 
 export const resumeHighlights: Record<string, ResumeHighlight[]> = {
+  "poly-uas-jetson": [
+    { resumeBullet: "Own carrier-board and sensor-module hardware design for the team's NVIDIA Jetson AGX Orin edge-AI stack", projectEvidence: "Custom carrier board + sensor modules, schematic/layout in progress, sized to airframe SWaP budget" },
+  ],
   "ee143-signal-system": [
     { resumeBullet: "Designed and validated a complete analog-to-digital signal processing pipeline", projectEvidence: "Full signal chain: op-amp → ADC → 4-bit processing → DAC → output" },
     { resumeBullet: "Designed and fabricated PCB for 4-bit binary-weighted DAC using Fusion 360", projectEvidence: "LTSpice simulation → PCB layout → reflow soldering → hardware validation" },
