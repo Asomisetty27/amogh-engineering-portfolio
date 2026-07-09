@@ -12,7 +12,7 @@ interface Task {
 const TASKS: Task[] = [
   { id: "tel",  label: "TELEMETRY SYSTEMS",  sublabel: "pynvml · DCGM · 8,734 rows", ms: 820, delay: 80  },
   { id: "vlt",  label: "EVIDENCE VAULT",     sublabel: "Stage 1 · F1-F6 validated",   ms: 950, delay: 160 },
-  { id: "dp",   label: "DATAPATH MODULE",    sublabel: "R_θ pipeline · v0.1.9",        ms: 720, delay: 0   },
+  { id: "dp",   label: "DATAPATH MODULE",    sublabel: "R_θ pipeline · v0.1.12",        ms: 720, delay: 0   },
   { id: "disp", label: "DISPLAY SUBSYS",     sublabel: "Space Grotesk · JetBrains",   ms: 640, delay: 240 },
 ];
 
@@ -116,7 +116,7 @@ export default function BootAnimation({ onComplete }: { onComplete: () => void }
           className="fixed inset-0 z-50 flex items-center justify-center"
           style={{ background: "#07090E" }}
           exit={{ opacity: 0, scale: 1.01, filter: "blur(6px)" }}
-          transition={{ duration: 0.42, ease: [0.22, 0.68, 0, 1.0] }}
+          transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
         >
           {/* Scan line sweep */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">

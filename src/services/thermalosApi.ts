@@ -700,7 +700,7 @@ export async function fetchWikiSummary(): Promise<WikiSummary> {
 export function generateDemoWikiSummary(): WikiSummary {
   return {
     sync_timestamp: new Date().toISOString(),
-    overview_stage: "Stage 1 complete (Colab T4, 8,734 rows, E001–E004 v2). Agent v0.1.9 live on PyPI. Stage 3 (AI Factory) in progress — gated on Lupo meeting.",
+    overview_stage: "Stage 1 complete (Colab T4, 8,734 rows, E001–E004 v2). Agent v0.1.12 live on PyPI. Stage 3 (AI Factory) in progress — gated on Lupo meeting.",
     open_questions_count: "13",
     open_questions_list: "Q_lead_time; Q_conference_venue; Q_cross_vendor_calibration; Q_workflow_integration; Q_per_gpu_baseline; Q_university_ip_risk; Q_sensitivity_analysis; Q_ambient_measurement; Q_AI_Factory_access; Q_discovery_progress; Q_slurm_integration; Q_Kundu_email; Q_memory_store",
     experiments_complete: "E001, E002, E003, E004 (v1 + v2 controlled-variable)",

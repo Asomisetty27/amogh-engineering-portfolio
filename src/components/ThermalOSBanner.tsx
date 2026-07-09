@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Github, Zap, Package, Copy, Check } from "lucide-react";
+import { ArrowRight, Github, Zap, Package, Copy, Check, Globe } from "lucide-react";
 
 const BTN_SPRING = { type: "spring" as const, stiffness: 400, damping: 22 };
 
@@ -51,32 +51,37 @@ export default function ThermalOSBanner() {
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#D4AF37]" style={{ boxShadow: "0 0 6px rgba(212,175,55,.65)" }} />
               </span>
               <span className="text-[10px] font-mono uppercase tracking-wider text-[#EAD9A0]">
-                Live on PyPI · v0.1.10
+                Live on PyPI · v0.1.12
               </span>
             </span>
           </div>
         </div>
 
         <h2 className="font-display text-lg md:text-xl tracking-wide text-foreground mb-1">
-          <span className="fx-grad-text-green font-semibold">ThermalOS</span>{" "}
+          <span className="fx-grad-text-green font-semibold">Theta</span>{" "}
           <span className="text-secondary-foreground text-base md:text-lg">
             · Open-source GPU thermal-power forensics
           </span>
         </h2>
 
         <p className="font-mono text-[12px] text-[#EAD9A0]/80 mb-3">
-          Real-time R_θ = ΔT/P · peer-relative anomaly detection · NVML/DCGM telemetry · pip install runtheta
+          Real-time R_θ = ΔT/P · peer-relative anomaly detection · NVML + AMD amdsmi telemetry · Helm/Kubernetes deploy
+        </p>
+
+        <p className="text-[11px] font-mono text-muted-foreground mb-3">
+          Theta is the shipped agent (<a href="https://runtheta.com" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-foreground" style={{ textDecorationColor: "rgba(212,175,55,.4)" }}>runtheta.com</a>); ThermalOS is the research program behind it — same project, product face and research face.
         </p>
 
         <p className="text-sm text-secondary-foreground leading-relaxed mb-4">
           The peer-relative thermal-resistance method flags degrading GPUs that fixed temperature thresholds miss. It was
-          <span className="text-[#EAD9A0] font-semibold"> blind-validated on 72 Princeton H100s</span>. A controlled Stage-1 study
-          (Tesla T4, n=7, CV 1.8%) showed a 2 °C ambient delta drives a 3.5× change in power-recovery time, direct evidence of
-          GPU thermal memory. Hardware lead-time validation runs on a DGX B200 cluster in fall 2026.
+          <span className="text-[#EAD9A0] font-semibold"> blind-validated on 72 Princeton H100s</span>, and the top flag was
+          <span className="text-[#EAD9A0] font-semibold"> independently re-confirmed by Princeton&rsquo;s own diagnostics</span> three
+          months later at +47.8% thermal resistance, caught pre-throttle. Now cross-vendor (NVIDIA NVML + AMD amdsmi), deployed
+          via Helm on Kubernetes, with a second-fleet validation on NCSA Delta (A100 + AMD MI100) in progress.
         </p>
 
         <div className="flex flex-wrap gap-1.5 mb-4">
-          {["Python", "pynvml", "DCGM", "scikit-learn", "lifelines", "pandas/NumPy", "FastAPI", "SLURM"].map((t) => (
+          {["Python", "pynvml", "AMD amdsmi", "DCGM", "Kubernetes/Helm", "Go", "scikit-learn", "Prometheus", "SLURM"].map((t) => (
             <span
               key={t}
               className="text-[10px] font-mono px-2 py-0.5 rounded transition-colors hover:text-white"
@@ -94,8 +99,8 @@ export default function ThermalOSBanner() {
         <div className="grid grid-cols-3 gap-2 mb-4">
           {[
             { v: "72", l: "Princeton H100s · blind" },
-            { v: "3.5×", l: "recovery delta · 2°C (T4)" },
-            { v: "v0.1.10", l: "pip install runtheta" },
+            { v: "+47.8%", l: "R_θ · independently re-confirmed" },
+            { v: "v0.1.12", l: "pip install runtheta" },
           ].map((s) => (
             <div key={s.l}
               className="rounded p-2 text-center relative overflow-hidden"
@@ -119,19 +124,35 @@ export default function ThermalOSBanner() {
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <motion.a
+            href="https://runtheta.com"
+            target="_blank"
+            rel="noreferrer"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.96 }}
+            transition={BTN_SPRING}
+            className="fx-shimmer inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-[12px] font-mono font-semibold"
+            style={{
+              background: "linear-gradient(135deg, #C9A84C 0%, #D4AF37 55%, #B8952E 100%)",
+              color: "#141005",
+              boxShadow: "0 4px 16px rgba(212,175,55,.22), 0 0 0 0.5px rgba(245,217,138,.35) inset",
+            }}
+          >
+            <Globe size={12} />
+            runtheta.com
+            <ArrowRight size={12} />
+          </motion.a>
           <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.96 }} transition={BTN_SPRING} className="inline-flex">
             <Link
               to="/thermalos"
-              className="fx-shimmer inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-[12px] font-mono font-semibold"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-muted-foreground hover:text-foreground text-[12px] font-mono"
               style={{
-                background: "linear-gradient(135deg, #C9A84C 0%, #D4AF37 55%, #B8952E 100%)",
-                color: "#141005",
-                boxShadow: "0 4px 16px rgba(212,175,55,.22), 0 0 0 0.5px rgba(245,217,138,.35) inset",
+                background: "linear-gradient(135deg, rgba(255,255,255,.04) 0%, transparent 100%)",
+                border: "1px solid rgba(255,255,255,.1)",
               }}
             >
               <Zap size={12} />
-              Open Dashboard
-              <ArrowRight size={12} />
+              Research Dashboard
             </Link>
           </motion.div>
           <motion.button

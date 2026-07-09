@@ -780,8 +780,8 @@ function AgentBlock() {
           { label: 'Controlled rows',  value: '9,050',  sub: 'Stage 1 · Tesla T4 · E001–E004 v2' },
           { label: 'Production samples', value: '29k',  sub: 'E009 · 72× H100 SXM5 · H100 calibration complete' },
           { label: 'Validated findings', value: '7 + 1', sub: 'F1–F6 · F7 · diagnosis intelligence validated' },
-          { label: 'Agent version',   value: 'v0.1.10', sub: 'live on PyPI · v0.1.9 SLURM integration in progress' },
-          { label: 'Deployment target', value: 'Aug 17', sub: 'Cal Poly DGX B200 AI Factory · 32 GPUs · SLURM integration' },
+          { label: 'Agent version',   value: 'v0.1.12', sub: 'live on PyPI · Helm/K8s deploy · cross-vendor NVML + amdsmi' },
+          { label: 'Next validation', value: 'Delta', sub: 'NCSA Delta via ACCESS · A100 + AMD MI100 · first cross-vendor run' },
         ].map(({ label, value, sub }) => (
           <div key={label} style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
@@ -812,7 +812,8 @@ function AgentBlock() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {[
             { label: 'GitHub', href: 'https://github.com/Asomisetty27/theta', badge: 'source' },
-            { label: 'PyPI',   href: 'https://pypi.org/project/runtheta', badge: 'v0.1.10' },
+            { label: 'PyPI',   href: 'https://pypi.org/project/runtheta', badge: 'v0.1.12' },
+            { label: 'runtheta.com', href: 'https://runtheta.com', badge: 'product site' },
             { label: 'Research app', href: researchPath(), badge: 'internal', internal: true },
           ].map(({ label, href, badge, internal }) => (
             internal ? (
@@ -904,7 +905,7 @@ export default function ResearchLanding() {
         <div style={{ marginBottom: 72 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
             <Badge color={T.healthy}>First production validation · 72× H100</Badge>
-            <Badge color={T.accent}>v0.1.10 on PyPI</Badge>
+            <Badge color={T.accent}>v0.1.12 on PyPI</Badge>
           </div>
           <h1 style={{
             fontFamily: FD,
