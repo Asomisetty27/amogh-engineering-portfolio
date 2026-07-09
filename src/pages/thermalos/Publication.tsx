@@ -26,7 +26,7 @@ const VENUES = [
   {
     name: "IISWC",
     full: "IEEE Int'l Symposium on Workload Characterization",
-    fit: "Direct fit — workload characterization and system behavior measurement",
+    fit: "Direct fit - workload characterization and system behavior measurement",
     deadline: "TBD",
     tone: "high",
   },
@@ -40,7 +40,7 @@ const VENUES = [
   {
     name: "ISCA",
     full: "Int'l Symposium on Computer Architecture",
-    fit: "Stretch — GPU thermal forensics is adjacent but not core arch",
+    fit: "Stretch - GPU thermal forensics is adjacent but not core arch",
     deadline: "TBD",
     tone: "low",
   },
@@ -63,7 +63,7 @@ const SECTIONS = [
     status: "in_progress" as SectionStatus,
     evidence: ["E001–E004 headline numbers", "Rθ_eff definition"],
     blocker: null,
-    notes: "Draft framing exists — needs final results from Stage 2 to lock numbers.",
+    notes: "Draft framing exists - needs final results from Stage 2 to lock numbers.",
   },
   {
     name: "1. Introduction",
@@ -97,7 +97,7 @@ const SECTIONS = [
     name: "5. State Classification",
     status: "blocked" as SectionStatus,
     evidence: ["F004 rule-based classifier failure", "Bayesian model (planned)"],
-    blocker: "Bayesian classifier — needs n>=10 labeled training data",
+    blocker: "Bayesian classifier - needs n>=10 labeled training data",
     notes: "Rule-based classifier fails 47-98% of transitional phases. Bayesian model is designed but not trained.",
   },
   {

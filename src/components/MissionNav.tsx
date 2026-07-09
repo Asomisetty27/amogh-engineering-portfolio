@@ -162,7 +162,7 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
           </div>
         </div>
 
-        {/* Mobile menu — enters AND exits smoothly (height-collapsed) */}
+        {/* Mobile menu - enters AND exits smoothly (height-collapsed) */}
         <AnimatePresence>
           {mobileOpen && (
             <motion.div

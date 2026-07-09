@@ -1,10 +1,10 @@
 /**
- * Theta logo mark — Greek Θ with calibration tick marks at the bar/circle
+ * Theta logo mark - Greek Θ with calibration tick marks at the bar/circle
  * intersections, referencing R_θ as a precision measurement instrument.
  *
  * Design rules:
  *  - Circle stroke and bar are identical weight (2.2px at 40×40 base)
- *  - Bar is full diameter (chord at equator) — canonical Θ
+ *  - Bar is full diameter (chord at equator) - canonical Θ
  *  - Two perpendicular ticks at each intersection: reads as calibration marks
  *  - Monochromatic: `color` prop propagates as CSS currentColor
  *  - Scales cleanly from 14px favicon to billboard
@@ -25,7 +25,7 @@ export function ThetaMark({ size = 32, color = 'currentColor' }: { size?: number
   // Geometry (40×40 unit grid)
   // Circle: cx=20, cy=20, r=16 → touches at (4,20) and (36,20) on equator
   // Bar: full diameter chord (x1=4, x2=36, y=20)
-  // Ticks: 3.5px tall, centered on bar endpoints — calibration marks
+  // Ticks: 3.5px tall, centered on bar endpoints - calibration marks
   return (
     <svg
       width={size}
@@ -44,7 +44,7 @@ export function ThetaMark({ size = 32, color = 'currentColor' }: { size?: number
         strokeWidth="2.2"
         strokeLinecap="round"
       />
-      {/* Equatorial bar — full diameter */}
+      {/* Equatorial bar - full diameter */}
       <line
         x1="4"
         y1="20"
@@ -99,7 +99,7 @@ export default function ThetaLogo({
     );
   }
 
-  // 'full' — mark + wordmark
+  // 'full' - mark + wordmark
   return (
     <span
       style={{ display: 'inline-flex', alignItems: 'center', gap: Math.round(size * 0.28), ...style }}

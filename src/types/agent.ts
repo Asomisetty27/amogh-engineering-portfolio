@@ -1,4 +1,4 @@
-// Theta Agent system types — daemon state + API contracts
+// Theta Agent system types - daemon state + API contracts
 
 export type GPUState = 'idle' | 'load' | 'drifting' | 'critical' | 'recovery' | 'unknown';
 export type Recommendation = 'ok' | 'watch' | 'drain' | 'evacuate';

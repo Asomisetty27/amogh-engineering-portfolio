@@ -1,4 +1,4 @@
-// EPIC 2026 — Arduino lab curriculum
+// EPIC 2026 - Arduino lab curriculum
 // ids equal /public/diagrams/{id}.jpg filenames.
 
 export interface Activity {
@@ -18,7 +18,7 @@ export interface Activity {
   challenge?: { prompt: string; code: string };
   calibration?: { note: string; code: string };
   // Real photo/diagram from the Elegoo UNO Starter Kit manual for this exact
-  // lesson — /public/diagrams/manual/{manualImage}.webp. Shown as a secondary,
+  // lesson - /public/diagrams/manual/{manualImage}.webp. Shown as a secondary,
   // authoritative reference alongside the custom wiring diagram above.
   manualImage?: string;
 }
@@ -27,18 +27,18 @@ export interface Activity {
 // Professor Kundu + Maria (EPIC organizer). Comma-separated for mailto / Gmail.
 export const THANKYOU_EMAIL = "sokundu@calpoly.edu,msmanzan@calpoly.edu";
 
-// Universal "try this before calling a professor" checklist — shown on every
+// Universal "try this before calling a professor" checklist - shown on every
 // activity's troubleshooter. These catch the great majority of beginner issues.
 export const FIRST_AID: string[] = [
   "Is the USB cable pushed all the way into BOTH the Arduino and the computer? The little ON light on the board should be lit.",
   "Did the code actually upload? You must see \"Done uploading.\" at the bottom. If there is an orange error, set Tools → Board to \"Arduino UNO\", pick your Port under Tools → Port, then click Upload again.",
   "Unplug the USB and gently push EVERY wire and part all the way into the breadboard. A leg that looks seated but is a little loose is the #1 reason a circuit does nothing. Then plug back in.",
   "Trace each wire with your finger against the diagram above. Is every end in the EXACT hole shown? Being even one row off connects it to the wrong place.",
-  "Power check: ONE red wire from 5V to the red (+) rail, ONE black wire from GND to the blue (−) rail, and each part taps those rails — not a second wire back to the Arduino pin.",
-  "LED staying dark? LEDs only work one way — long leg is + and short leg is − (to GND). Try turning it around.",
+  "Power check: ONE red wire from 5V to the red (+) rail, ONE black wire from GND to the blue (−) rail, and each part taps those rails - not a second wire back to the Arduino pin.",
+  "LED staying dark? LEDs only work one way - long leg is + and short leg is − (to GND). Try turning it around.",
   "Serial Monitor blank or garbled? Set the baud dropdown (bottom-right of the Serial Monitor) to 9600.",
   "Press the RESET button on the Arduino, or unplug and replug the USB, to run your program again from the very start.",
-  "Swap ONE part at a time — a single dead LED or a bent jumper wire does happen. Try a different one and see if it changes.",
+  "Swap ONE part at a time - a single dead LED or a bent jumper wire does happen. Try a different one and see if it changes.",
 ];
 
 export const CURRICULUM: Activity[] = [
@@ -49,7 +49,7 @@ export const CURRICULUM: Activity[] = [
   {id:"pot", day:1, lesson:"Lesson 3", title:"Brightness with a Potentiometer", goal:"Use a knob to fade an LED smoothly.", materials:["Arduino UNO","breadboard","an LED (any color)","220Ω resistor (red-red-brown)","10K potentiometer (the blue knob marked 10K)","jumper wires"], wiring:[["Pot left leg","5V"],["Pot right leg","GND"],["Pot middle leg","A0"],["Pin ~9","220Ω → LED long leg"],["LED short leg","GND"]], code:"const int potPin = A0;\nconst int ledPin = 9;   // must be a ~ (PWM) pin\nvoid setup() { pinMode(ledPin, OUTPUT); }\nvoid loop() {\n  int v = analogRead(potPin);          // 0..1023\n  analogWrite(ledPin, map(v,0,1023,0,255));\n  delay(10);\n}", test:["Turn the knob: the LED fades up and down."], trouble:["Only on/off → use pin ~9, not a plain pin.","No change → middle leg to A0."], extension:"Map the knob so the LED stays fully off for the bottom third of the range (0–340), then fades from there. Hint: if v < 341, write 0."},
   {
     id:"rgb", day:1, lesson:"Lesson 4", title:"RGB LED (the clear LED with 4 legs)", optional:true,
-    goal:"Mix red, green, blue to make color patterns — 5 different patterns, back to back.",
+    goal:"Mix red, green, blue to make color patterns - 5 different patterns, back to back.",
     materials:["Arduino UNO","breadboard","RGB LED (the clear LED with 4 legs)","three 220Ω resistors (red-red-brown)","jumper wires"],
     wiring:[["Longest leg","GND"],["Red leg → 220Ω","pin 6"],["Green leg → 220Ω","pin 5"],["Blue leg → 220Ω","pin 3"]],
     manualImage:"rgb",
@@ -70,20 +70,20 @@ void setup() {
   pinMode(BLUE, OUTPUT);
 }
 
-// ── Pattern 1: color wheel — smoothly fades red -> green -> blue -> red
+// ── Pattern 1: color wheel - smoothly fades red -> green -> blue -> red
 void colorWheel() {
   for (int i = 0; i < 255; i++) { setColor(255 - i, i, 0); delay(6); }
   for (int i = 0; i < 255; i++) { setColor(0, 255 - i, i); delay(6); }
   for (int i = 0; i < 255; i++) { setColor(i, 0, 255 - i); delay(6); }
 }
 
-// ── Pattern 2: breathe — one color fades in and back out
+// ── Pattern 2: breathe - one color fades in and back out
 void breathe(int r, int g, int b) {
   for (int i = 0; i <= 255; i++) { setColor(r * i / 255, g * i / 255, b * i / 255); delay(4); }
   for (int i = 255; i >= 0; i--) { setColor(r * i / 255, g * i / 255, b * i / 255); delay(4); }
 }
 
-// ── Pattern 3: strobe — fast color-to-color flashes
+// ── Pattern 3: strobe - fast color-to-color flashes
 void strobe() {
   int colors[3][3] = { {255,0,0}, {0,255,0}, {0,0,255} };
   for (int i = 0; i < 12; i++) {
@@ -95,7 +95,7 @@ void strobe() {
   }
 }
 
-// ── Pattern 4: random flicker — a new random color every 150ms
+// ── Pattern 4: random flicker - a new random color every 150ms
 void randomFlicker() {
   for (int i = 0; i < 20; i++) {
     setColor(random(0, 256), random(0, 256), random(0, 256));
@@ -103,7 +103,7 @@ void randomFlicker() {
   }
 }
 
-// ── Pattern 5: alternate — snaps between two colors like a police light
+// ── Pattern 5: alternate - snaps between two colors like a police light
 void alternate() {
   for (int i = 0; i < 10; i++) {
     setColor(255, 0, 0); delay(200);
@@ -113,23 +113,23 @@ void alternate() {
 
 void loop() {
   colorWheel();       // pattern 1
-  breathe(0, 255, 90); // pattern 2 — breathing teal
+  breathe(0, 255, 90); // pattern 2 - breathing teal
   strobe();            // pattern 3
   randomFlicker();     // pattern 4
   alternate();         // pattern 5
   delay(500);          // pause, then the whole show repeats
 }`,
-    test:["All 5 patterns play back to back: color wheel, breathing, strobe, random flicker, red/blue alternate — then it repeats from the top."],
+    test:["All 5 patterns play back to back: color wheel, breathing, strobe, random flicker, red/blue alternate - then it repeats from the top."],
     trouble:["One color only → each leg needs its own resistor & pin.","Dark → longest leg to GND.","Colors look swapped → double-check red=pin6, green=pin5, blue=pin3."],
-    extension:"Add a 6th pattern of your own — maybe a single color that pulses in time with delay(), or a pattern that responds to a button press."},
+    extension:"Add a 6th pattern of your own - maybe a single color that pulses in time with delay(), or a pattern that responds to a button press."},
 
   // ── Day 2 ────────────────────────────────────────────────
-  {id:"digital", day:2, lesson:"Lesson 5", title:"Push Buttons", goal:"One button turns an LED on, the other off.", materials:["Arduino UNO","breadboard","an LED (any color)","220Ω resistor (red-red-brown)","2 push buttons (the little square 4-leg buttons)","jumper wires"], wiring:[["Pin 5 → 220Ω","LED long leg; short → GND"],["Button A","pin 9; other side GND"],["Button B","pin 8; other side GND"]], manualImage:"digital", code:"int ledPin=5, buttonApin=9, buttonBpin=8;\nvoid setup(){\n  pinMode(ledPin,OUTPUT);\n  pinMode(buttonApin,INPUT_PULLUP);\n  pinMode(buttonBpin,INPUT_PULLUP);\n}\nvoid loop(){\n  if(digitalRead(buttonApin)==LOW) digitalWrite(ledPin,HIGH);\n  if(digitalRead(buttonBpin)==LOW) digitalWrite(ledPin,LOW);\n}", test:["Button A: LED on. Button B: LED off."], trouble:["No light → LED long leg toward pin 5.","Buttons dead → other side must go to GND."], extension:"Make ONE button toggle the LED — press once for on, press again for off — instead of needing two buttons. Hint: track the LED state in a variable and flip it on each press (watch for bounce with a short delay)."},
+  {id:"digital", day:2, lesson:"Lesson 5", title:"Push Buttons", goal:"One button turns an LED on, the other off.", materials:["Arduino UNO","breadboard","an LED (any color)","220Ω resistor (red-red-brown)","2 push buttons (the little square 4-leg buttons)","jumper wires"], wiring:[["Pin 5 → 220Ω","LED long leg; short → GND"],["Button A","pin 9; other side GND"],["Button B","pin 8; other side GND"]], manualImage:"digital", code:"int ledPin=5, buttonApin=9, buttonBpin=8;\nvoid setup(){\n  pinMode(ledPin,OUTPUT);\n  pinMode(buttonApin,INPUT_PULLUP);\n  pinMode(buttonBpin,INPUT_PULLUP);\n}\nvoid loop(){\n  if(digitalRead(buttonApin)==LOW) digitalWrite(ledPin,HIGH);\n  if(digitalRead(buttonBpin)==LOW) digitalWrite(ledPin,LOW);\n}", test:["Button A: LED on. Button B: LED off."], trouble:["No light → LED long leg toward pin 5.","Buttons dead → other side must go to GND."], extension:"Make ONE button toggle the LED - press once for on, press again for off - instead of needing two buttons. Hint: track the LED state in a variable and flip it on each press (watch for bounce with a short delay)."},
   {id:"water", day:2, lesson:"Lesson 18", title:"Water Level Detection", goal:"Read a water sensor; the value rises as it gets wet.", materials:["Arduino UNO","Water Level Detection Sensor Module (red board with comb-like lines)","jumper wires","cup of water"], wiring:[["Sensor S","A0"],["Sensor +","5V"],["Sensor −","GND"]], manualImage:"water", code:"int adc_id=0, last=0; char buf[128];\nvoid setup(){ Serial.begin(9600); }\nvoid loop(){\n  int v=analogRead(adc_id);\n  if(abs(v-last)>10){ sprintf(buf,\"level %d\\n\",v); Serial.print(buf); last=v; }\n}", test:["Serial Monitor at 9600; dip in water, the number rises."], trouble:["No numbers → set baud to 9600.","Wet only the striped lines."]},
   {
     id:"active_buzzer", day:2, lesson:"Lesson 6", title:"Active Buzzer",
-    goal:"The sealed buzzer only knows ON and OFF — turn that into 5 different beep patterns.",
-    materials:["Arduino UNO","active buzzer (the SEALED one — has a sticker on top)","jumper wires"],
+    goal:"The sealed buzzer only knows ON and OFF - turn that into 5 different beep patterns.",
+    materials:["Arduino UNO","active buzzer (the SEALED one - has a sticker on top)","jumper wires"],
     wiring:[["Buzzer + (long leg)","Arduino pin 12"],["Buzzer − (short leg)","GND"]],
     code:
 `int buzzerPin = 12;
@@ -145,12 +145,12 @@ void setup() {
   pinMode(buzzerPin, OUTPUT);
 }
 
-// ── Pattern 1: steady — even beeps, like a metronome
+// ── Pattern 1: steady - even beeps, like a metronome
 void steadyBeeps() {
   for (int i = 0; i < 6; i++) beep(150, 350);
 }
 
-// ── Pattern 2: accelerating — starts slow, ends fast
+// ── Pattern 2: accelerating - starts slow, ends fast
 void acceleratingBeeps() {
   for (int i = 0; i < 15; i++) {
     int pause = (i < 5) ? 400 : (i < 10) ? 220 : 100;
@@ -158,14 +158,14 @@ void acceleratingBeeps() {
   }
 }
 
-// ── Pattern 3: SOS — Morse code for S-O-S (... --- ...)
+// ── Pattern 3: SOS - Morse code for S-O-S (... --- ...)
 void sosBeeps() {
   int dot = 150, dash = 450, gap = 150;
   int pattern[9] = {dot, dot, dot, dash, dash, dash, dot, dot, dot};
   for (int i = 0; i < 9; i++) beep(pattern[i], gap);
 }
 
-// ── Pattern 4: double-beep — two quick chirps, then a pause (like a car lock)
+// ── Pattern 4: double-beep - two quick chirps, then a pause (like a car lock)
 void doubleBeeps() {
   for (int i = 0; i < 4; i++) {
     beep(80, 80);
@@ -173,7 +173,7 @@ void doubleBeeps() {
   }
 }
 
-// ── Pattern 5: siren — rapid-fire alarm burst, then one long tone
+// ── Pattern 5: siren - rapid-fire alarm burst, then one long tone
 void sirenBurst() {
   for (int i = 0; i < 25; i++) beep(60, 60);
   digitalWrite(buzzerPin, HIGH);
@@ -194,22 +194,22 @@ void loop() {
   delay(1500);          // then the whole show repeats
 }`,
     test:[
-      "All 5 patterns play in order: steady beeps, accelerating beeps, SOS in Morse code, double-beeps, then a siren burst — then it repeats.",
+      "All 5 patterns play in order: steady beeps, accelerating beeps, SOS in Morse code, double-beeps, then a siren burst - then it repeats.",
     ],
     trouble:[
       "No sound → are you using the sealed buzzer (not the open green one)?",
       "Still silent → long leg (+) must go to pin 12.",
     ],
-    extension:"Add a 6th pattern of your own — try beeping out your name in Morse code (look up the letters), or a heartbeat rhythm (two quick beeps, one long pause).",
+    extension:"Add a 6th pattern of your own - try beeping out your name in Morse code (look up the letters), or a heartbeat rhythm (two quick beeps, one long pause).",
   },
   {
-    id:"passive_buzzer", day:2, lesson:"Lesson 7", title:"Passive Buzzer — 5 Songs",
+    id:"passive_buzzer", day:2, lesson:"Lesson 7", title:"Passive Buzzer - 5 Songs",
     goal:"Play 5 different songs on the open green passive buzzer, one after another.",
-    materials:["Arduino UNO","passive buzzer (the OPEN one — you can see the green board underneath)","jumper wires"],
+    materials:["Arduino UNO","passive buzzer (the OPEN one - you can see the green board underneath)","jumper wires"],
     wiring:[["Buzzer + (long leg)","Arduino pin 8"],["Buzzer − (short leg)","GND"]],
     code:
 `// Melody format (from github.com/robsoncouto/arduino-songs): each note is
-// followed by its duration — 4=quarter, 8=eighth, 2=half, -4=dotted quarter...
+// followed by its duration - 4=quarter, 8=eighth, 2=half, -4=dotted quarter...
 // We changed  int buzzer = 11;  to  int buzzer = 8;  for our kit.
 
 #define NOTE_C4  262
@@ -310,19 +310,19 @@ void loop() {
   songJingleBells();     delay(1500); // song 5, then the set repeats
 }`,
     test:[
-      "The open green buzzer plays all 5 songs in order — Happy Birthday, Twinkle Twinkle, Mary Had a Little Lamb, Ode to Joy, Jingle Bells — then starts over.",
+      "The open green buzzer plays all 5 songs in order - Happy Birthday, Twinkle Twinkle, Mary Had a Little Lamb, Ode to Joy, Jingle Bells - then starts over.",
     ],
     trouble:[
       "No sound → are you using the open green passive buzzer (not the sealed one)?",
       "Still silent → long leg (+) must go to pin 8.",
       "Wrong notes → double check each song's note names match the #define list at the top.",
     ],
-    extension:"Pick your own 6th song and encode it the same way — look up its sheet music, or search github.com/robsoncouto/arduino-songs for a melody already written out and adapt it to playMelody().",
+    extension:"Pick your own 6th song and encode it the same way - look up its sheet music, or search github.com/robsoncouto/arduino-songs for a melody already written out and adapt it to playMelody().",
   },
 
   // ── Day 3 ────────────────────────────────────────────────
   {id:"dht11", day:3, lesson:"Lesson 12", title:"Temperature & Humidity (DHT11)", lib:"DHT_nonblocking.zip", goal:"Read room temperature and humidity from a DHT11.", materials:["Arduino UNO","DHT11 module (the light-blue grid box on a small board)","jumper wires"], wiring:[["Sensor data (S)","pin 2"],["Sensor +","5V"],["Sensor −","GND"]], manualImage:"dht11", code:"#include <dht_nonblocking.h>\n#define DHT_SENSOR_TYPE DHT_TYPE_11\nstatic const int DHT_SENSOR_PIN = 2;\nDHT_nonblocking dht_sensor(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\n// returns true only when a fresh reading is ready (about every 3 seconds)\nstatic bool measure_environment(float *temperature, float *humidity) {\n  static unsigned long timestamp = millis();\n  if (millis() - timestamp > 3000ul) {\n    if (dht_sensor.measure(temperature, humidity) == true) {\n      timestamp = millis();\n      return true;\n    }\n  }\n  return false;\n}\n\nvoid loop() {\n  float temperature, humidity;\n  if (measure_environment(&temperature, &humidity) == true) {\n    Serial.print(\"T = \");\n    Serial.print(temperature, 1);\n    Serial.print(\" deg. C, H = \");\n    Serial.print(humidity, 1);\n    Serial.println(\"%\");\n  }\n}", test:["Serial Monitor at 9600 shows T and H.","Breathe near it; humidity rises."], trouble:["\"No such file\" → install DHT_nonblocking.zip (download button above).","No readings → data pin to 2; wait a few seconds."]},
-  {id:"ultrasonic", day:3, lesson:"Lesson 10", title:"Ultrasonic Distance", lib:"HC-SR04.zip", goal:"Measure distance with sound pulses, like a parking sensor.", materials:["Arduino UNO","Ultrasonic Sensor (HC-SR04 — the two round silver eyes)","jumper wires"], wiring:[["Sensor VCC","5V"],["Sensor Trig","pin 12"],["Sensor Echo","pin 11"],["Sensor GND","GND"]], manualImage:"ultrasonic", code:"#include \"SR04.h\"\n#define TRIG 12\n#define ECHO 11\nSR04 sr04 = SR04(ECHO, TRIG);\n\nvoid setup() {\n  Serial.begin(9600);\n  delay(1000);\n}\n\nvoid loop() {\n  Serial.print(sr04.Distance());\n  Serial.println(\"cm\");\n  delay(1000);\n}", test:["Serial Monitor at 9600 prints cm.","Move your hand; the number changes."], trouble:["\"No such file\" → install HC-SR04.zip (download button above).","Always 0 → re-check Trig 12 / Echo 11."], extension:"Light the on-board LED (pin 13) only when something is closer than 10 cm — a simple proximity alarm. Hint: pinMode(13, OUTPUT) and digitalWrite based on sr04.Distance() < 10."},
+  {id:"ultrasonic", day:3, lesson:"Lesson 10", title:"Ultrasonic Distance", lib:"HC-SR04.zip", goal:"Measure distance with sound pulses, like a parking sensor.", materials:["Arduino UNO","Ultrasonic Sensor (HC-SR04 - the two round silver eyes)","jumper wires"], wiring:[["Sensor VCC","5V"],["Sensor Trig","pin 12"],["Sensor Echo","pin 11"],["Sensor GND","GND"]], manualImage:"ultrasonic", code:"#include \"SR04.h\"\n#define TRIG 12\n#define ECHO 11\nSR04 sr04 = SR04(ECHO, TRIG);\n\nvoid setup() {\n  Serial.begin(9600);\n  delay(1000);\n}\n\nvoid loop() {\n  Serial.print(sr04.Distance());\n  Serial.println(\"cm\");\n  delay(1000);\n}", test:["Serial Monitor at 9600 prints cm.","Move your hand; the number changes."], trouble:["\"No such file\" → install HC-SR04.zip (download button above).","Always 0 → re-check Trig 12 / Echo 11."], extension:"Light the on-board LED (pin 13) only when something is closer than 10 cm - a simple proximity alarm. Hint: pinMode(13, OUTPUT) and digitalWrite based on sr04.Distance() < 10."},
 
   // ── Day 4 ────────────────────────────────────────────────
   {id:"final", day:4, lesson:"Final Project", title:"Light-Controlled Motor (LED + LDR)", goal:"Motor spins when light hits the LDR, stops when you block it.", materials:["Arduino UNO","breadboard","DC motor (the 'Fan Blade and 3-6V Motor')","L293D (16-pin chip stamped L293D)","photoresistor (LDR / photocell)","an LED (any color)","220Ω (red-red-brown) + 10kΩ (brown-black-orange) resistors","jumper wires"], wiring:[["L293D notch/dot","faces UP; chip straddles the center gap"],["L293D pin 1","D5"],["L293D pin 2","D6"],["L293D pin 3","motor wire 1"],["L293D pin 4","GND"],["L293D pin 5","GND"],["L293D pin 6","motor wire 2"],["L293D pin 7","D7"],["L293D pin 8","5V"],["L293D pin 12","GND"],["L293D pin 13","GND"],["L293D pin 16","5V"],["LDR one leg","5V"],["LDR other leg","A0 (also 10kΩ from A0 to GND)"],["LED: D3 → 220Ω → LED long leg","short leg → GND; aim the LED at the LDR"]], code:"const int lightLedPin = 3;\nconst int ldrPin = A0;\nconst int motorEnable = 5;\nconst int motorIn1 = 6;\nconst int motorIn2 = 7;\nint threshold = 765;   // <-- set this using the calibration sketch below\n\nvoid setup() {\n  pinMode(lightLedPin, OUTPUT);\n  pinMode(motorEnable, OUTPUT);\n  pinMode(motorIn1, OUTPUT);\n  pinMode(motorIn2, OUTPUT);\n  digitalWrite(lightLedPin, HIGH);\n  Serial.begin(9600);\n  digitalWrite(motorIn1, HIGH);\n  digitalWrite(motorIn2, LOW);\n}\n\nvoid loop() {\n  int lightValue = analogRead(ldrPin);\n  if (lightValue > threshold) {\n    analogWrite(motorEnable, 255);\n  } else {\n    analogWrite(motorEnable, 0);\n  }\n  delay(20);\n}", calibration:{note:"Do this FIRST. Upload this sketch, open the Serial Monitor at 9600, then note two numbers: with the LED shining on the LDR (num1), and with the beam blocked by your hand or a card (num2). Your threshold = (num1 + num2) / 2. Put that number in the main code's threshold line, then upload the main code.",code:"const int lightLedPin = 3;\n\nvoid setup() {\n  pinMode(lightLedPin, OUTPUT);\n  digitalWrite(lightLedPin, HIGH);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Serial.println(analogRead(A0));\n  delay(100);\n}"}, test:["Calibrate first (use the calibration sketch in the code): note the BRIGHT value (num1) and the BLOCKED value (num2), then set threshold = (num1 + num2) / 2.","LED shines on the LDR → the motor spins.","Block the beam with your hand → the motor stops.","Remove your hand → the motor spins again."], trouble:["LED does not light → reverse the LED (long leg toward the 220Ω / D3 side).","Motor does not spin → verify all L293D connections: pins 8 & 16 to 5V, and pins 4, 5, 12, 13 to GND.","Motor spins the wrong direction → swap the two motor wires.","Motor never changes → recalibrate: run the calibration sketch and set threshold = (num1 + num2) / 2."], extension:"Add a second, lower threshold so the motor runs at HALF speed in dim light and full speed in bright light. Hint: analogWrite(en, 128) between the two thresholds, 255 above the top one."},
@@ -444,10 +444,10 @@ void loop(){
     manualImage:"dot_matrix",
     code:
 `#include <LedControl.h>
-// LedControl(DIN, CLK, CS, numDevices) — DIN=12, CLK=10, CS=11 for this kit.
+// LedControl(DIN, CLK, CS, numDevices) - DIN=12, CLK=10, CS=11 for this kit.
 LedControl lc = LedControl(12, 10, 11, 1);
 
-// Draws 8 bytes at once — each byte is one row, bit 7 = left column.
+// Draws 8 bytes at once - each byte is one row, bit 7 = left column.
 void showPattern(byte rows[8]) {
   for (int i = 0; i < 8; i++) lc.setRow(0, i, rows[i]);
 }
@@ -479,7 +479,7 @@ void checkerboard() {
   delay(2000);
 }
 
-// ── Pattern 4: expanding square — grows from the center outward
+// ── Pattern 4: expanding square - grows from the center outward
 void expandingSquare() {
   byte ring1[8] = {0,0,0,0b00011000,0b00011000,0,0,0};
   byte ring2[8] = {0,0,0b00111100,0b00111100,0b00111100,0b00111100,0,0};
@@ -493,7 +493,7 @@ void expandingSquare() {
   delay(250);
 }
 
-// ── Pattern 5: random sparkle — random LEDs flicker on and off
+// ── Pattern 5: random sparkle - random LEDs flicker on and off
 void sparkle() {
   for (int i = 0; i < 40; i++) {
     lc.setLed(0, random(0, 8), random(0, 8), true);
@@ -513,14 +513,14 @@ void loop() {
   delay(400);           // then the whole show repeats
 }`,
     test:[
-      "All 5 patterns display in order: smiley, heart, checkerboard, a pulsing expanding square, and a random sparkle — then it repeats.",
+      "All 5 patterns display in order: smiley, heart, checkerboard, a pulsing expanding square, and a random sparkle - then it repeats.",
     ],
     trouble:[
       "\"No such file\" → install LedControl.zip (download button above).",
       "Nothing lit → VCC to 5V; DIN/CLK/CS to pins 12/10/11 exactly (CLK and CS are easy to mix up).",
       "Partial display → only one byte wrong; check each row pattern.",
     ],
-    extension:"Add a 6th pattern of your own — try scrolling a single lit column across the display left to right using a for loop and lc.setColumn().",
+    extension:"Add a 6th pattern of your own - try scrolling a single lit column across the display left to right using a for loop and lc.setColumn().",
   },
   {
     id:"lcd", day:5, lesson:"Lesson 22", title:"LCD Display",
@@ -558,14 +558,14 @@ void loop() {}`,
     test:[
       "FIRST set the contrast: slowly turn the blue pot through its WHOLE range. The text fades in somewhere (often near one end).",
       "When contrast is right, line 1 shows \"Hello, EPIC!\" and line 2 shows \"Cal Poly 2026\".",
-      "A blank screen — or a row of solid white/dark boxes — almost always just means the contrast isn't set yet, NOT that anything is broken.",
+      "A blank screen - or a row of solid white/dark boxes - almost always just means the contrast isn't set yet, NOT that anything is broken.",
     ],
     trouble:[
       "Blank screen, OR a row of solid boxes → this is contrast, not a broken display. Turn the blue pot slowly all the way from one side to the other; the text appears somewhere in the lower-to-middle range.",
       "Turning the pot does nothing → V0 must go to the pot's MIDDLE leg, and the pot's TWO OUTER legs must go to 5V and GND. A loose outer leg means the knob has no effect.",
       "Backlight is off → LCD pin A (backlight +) to 5V, pin K (−) to GND.",
       "Random characters or only half the screen → a D4–D7 wire (pins 5, 4, 3, 2) or EN (pin 11) is loose. Unplug USB and push them all the way in.",
-      "Still nothing → RW must go to GND, and re-seat every wire. The library is the built-in \"LiquidCrystal\" — installing LiquidCrystal.zip just adds the same one, so a missing library is not the cause.",
+      "Still nothing → RW must go to GND, and re-seat every wire. The library is the built-in \"LiquidCrystal\" - installing LiquidCrystal.zip just adds the same one, so a missing library is not the cause.",
     ],
   },
   // ── Lesson 19 ──────────────────────────────────────────────
@@ -581,7 +581,7 @@ void loop() {}`,
     ],
     manualImage:"rtc",
     code:
-`#include <Wire.h>   // built-in I2C library — no .ZIP needed
+`#include <Wire.h>   // built-in I2C library - no .ZIP needed
 
 // The DS1307 talks over I2C at address 0x68 (SDA→A4, SCL→A5).
 const int DS1307 = 0x68;
@@ -657,7 +657,7 @@ void setTime(byte s, byte m, byte h, byte dow, byte d, byte mo, byte yr) {
       "Loses time after unplugging → the coin battery is dead or missing; seat a fresh CR2032.",
     ],
     challenge:{
-      prompt:"Inside loop() you already have the numbers hour, minute, second. Add a greeting that changes with the time of day — fill in the blanks:",
+      prompt:"Inside loop() you already have the numbers hour, minute, second. Add a greeting that changes with the time of day - fill in the blanks:",
       code:
 `if (hour >= ___ && hour < 12) {
   Serial.println("Good morning!");
@@ -676,7 +676,7 @@ void setTime(byte s, byte m, byte h, byte dow, byte d, byte mo, byte yr) {
 
     // ── Lesson 20 ──────────────────────────────────────────────
   {
-    id:"sound_sensor", day:5, lesson:"Lesson 20", title:"Sound Sensor — Volume Bar",
+    id:"sound_sensor", day:5, lesson:"Lesson 20", title:"Sound Sensor - Volume Bar",
     goal:"Read sound level two ways (analog and digital) and visualize volume.",
     materials:["Arduino UNO","Sound Sensor Module (small red board with a round microphone)","jumper wires"],
     wiring:[
@@ -749,7 +749,7 @@ Serial.println("___");   // what character makes it look like a percent?
   {
     id:"thermometer", day:5, lesson:"Lesson 23", title:"Thermometer (Thermistor)",
     goal:"Turn a thermistor's changing resistance into a real temperature in C and F.",
-    materials:["Arduino UNO","breadboard","thermistor (tiny black bead with 2 legs — kit label: Thermistor)","10kΩ resistor (brown-black-orange)","jumper wires"],
+    materials:["Arduino UNO","breadboard","thermistor (tiny black bead with 2 legs - kit label: Thermistor)","10kΩ resistor (brown-black-orange)","jumper wires"],
     wiring:[
       ["Thermistor leg 1","5V"],
       ["Thermistor leg 2","A0 row"],
@@ -820,13 +820,13 @@ if (tempC > ___) {
 }
 
 // Bonus: why does this use log()?  Hint: equal steps in temperature do
-// NOT cause equal steps in resistance — a thermistor is not linear.`,
+// NOT cause equal steps in resistance - a thermistor is not linear.`,
     },
   },
 
   // ── Lesson 29 ──────────────────────────────────────────────
   {
-    id:"dc_motor", day:5, lesson:"Lesson 29", title:"DC Motor — Speed & Direction",
+    id:"dc_motor", day:5, lesson:"Lesson 29", title:"DC Motor - Speed & Direction",
     goal:"Control motor speed with a knob and understand how the L293D driver works.",
     materials:["Arduino UNO","L293D (16-pin chip stamped L293D)","DC motor (the 'Fan Blade and 3-6V Motor')","10K potentiometer (the blue knob marked 10K)","breadboard","jumper wires"],
     wiring:[
@@ -914,14 +914,14 @@ if (digitalRead(9) == ___) {    // INPUT_PULLUP: LOW when pressed, or HIGH?
   {
     id:"servo", day:5, lesson:"Lesson 9", title:"Servo Motor (SG90)",
     goal:"Sweep a servo arm back and forth, then steer it with a potentiometer.",
-    materials:["Arduino UNO","Servo Motor SG90 (small blue servo with a white arm)","jumper wires","(optional) 10K potentiometer — the blue knob marked 10K"],
+    materials:["Arduino UNO","Servo Motor SG90 (small blue servo with a white arm)","jumper wires","(optional) 10K potentiometer - the blue knob marked 10K"],
     wiring:[
       ["Servo signal (orange)","pin 9"],
       ["Servo VCC (red)","5V"],
       ["Servo GND (brown)","GND"],
     ],
     code:
-`#include <Servo.h>   // built into the Arduino IDE — no .ZIP needed
+`#include <Servo.h>   // built into the Arduino IDE - no .ZIP needed
 
 Servo myServo;
 
@@ -943,7 +943,7 @@ void loop() {
 }`,
     test:[
       "The servo arm sweeps smoothly from one side to the other and back, forever.",
-      "Change delay(15) to delay(5) — the sweep gets faster.",
+      "Change delay(15) to delay(5) - the sweep gets faster.",
     ],
     trouble:[
       "Servo jitters or the board resets → a servo pulls a lot of current; unplug other parts, or ask for a separate 5V supply.",
@@ -981,7 +981,7 @@ void loop() {
     ],
     manualImage:"stepper",
     code:
-`#include <Stepper.h>   // built into the Arduino IDE — no .ZIP needed
+`#include <Stepper.h>   // built into the Arduino IDE - no .ZIP needed
 
 // The 28BYJ-48 takes about 2048 steps for one full turn.
 const int stepsPerRev = 2048;
@@ -1031,8 +1031,8 @@ myStepper.step(___);
 
   // ── Lesson 16 ──────────────────────────────────────────────
   {
-    id:"shift_register", day:5, lesson:"Lesson 24", title:"Shift Register (74HC595) — 8 LEDs, 3 pins",
-    goal:"Control 8 LEDs with only 3 Arduino pins — 5 different light patterns.",
+    id:"shift_register", day:5, lesson:"Lesson 24", title:"Shift Register (74HC595) - 8 LEDs, 3 pins",
+    goal:"Control 8 LEDs with only 3 Arduino pins - 5 different light patterns.",
     materials:["Arduino UNO","breadboard","74HC595 IC (16-pin chip stamped 74HC595)","8 LEDs (any colors)","8× 220Ω resistors (red-red-brown)","jumper wires"],
     wiring:[
       ["74HC595 pin 14 (DS, data)","pin 12"],
@@ -1063,12 +1063,12 @@ void setup() {
   pinMode(latchPin, OUTPUT);
 }
 
-// ── Pattern 1: binary counter — the LEDs count 0 to 255 like an odometer
+// ── Pattern 1: binary counter - the LEDs count 0 to 255 like an odometer
 void binaryCount() {
   for (int number = 0; number < 256; number++) { show(number); delay(60); }
 }
 
-// ── Pattern 2: Knight Rider — one lit LED bounces back and forth
+// ── Pattern 2: Knight Rider - one lit LED bounces back and forth
 void knightRider() {
   for (int p = 0; p < 3; p++) {
     for (int i = 0; i < 8; i++)      { show(1 << i); delay(70); }
@@ -1101,7 +1101,7 @@ void loop() {
   delay(400);      // then the whole show repeats
 }`,
     test:[
-      "All 5 patterns play in order: binary counter, Knight Rider chase, all-blink, alternating, random sparkle — then it repeats.",
+      "All 5 patterns play in order: binary counter, Knight Rider chase, all-blink, alternating, random sparkle - then it repeats.",
       "The rightmost LED in the binary counter toggles every step; the next toggles half as often, and so on.",
     ],
     trouble:[
@@ -1110,7 +1110,7 @@ void loop() {
       "Wrong pins → data=12, clock=9, latch=11 exactly (easy to mix up which is which).",
     ],
     challenge:{
-      prompt:"Add a 6th pattern of your own. A byte is 8 bits — one per LED (1 = on). Fill in the blanks:",
+      prompt:"Add a 6th pattern of your own. A byte is 8 bits - one per LED (1 = on). Fill in the blanks:",
       code:
 `// Every OTHER LED on (binary 10101010):
 show(0b________);  // 8 digits
@@ -1128,7 +1128,7 @@ show(0b________);
   // ── Lesson 8: 1-digit 7-segment ───────────────────────────
   {
     id:"seven_seg", day:5, lesson:"Lesson 27", title:"7-Segment Display (1 digit)",
-    goal:"Light the seven bars of a digit — using the display's REAL physical pin numbers, not just letters.",
+    goal:"Light the seven bars of a digit - using the display's REAL physical pin numbers, not just letters.",
     materials:["Arduino UNO","breadboard","1 Digit 7-Segment Display (a single red digit block)","220Ω resistor (red-red-brown)","jumper wires"],
     wiring:[
       ["Display physical pin 7 (segment A)","Arduino pin 2"],
@@ -1148,7 +1148,7 @@ show(0b________);
 // display's common pin(s) sit at GND through the resistor.
 //
 // The display's own PHYSICAL pins (1-10, printed on its datasheet) are
-// NOT the same as these Arduino pin numbers — see the pin-diagram image
+// NOT the same as these Arduino pin numbers - see the pin-diagram image
 // above for exactly which physical pin is which segment. That mapping
 // is built into the wiring table above and the seg[] array below.
 
@@ -1195,9 +1195,9 @@ void countDown() {
   for (int n = 9; n >= 0; n--) { show(digits[n]); delay(450); }
 }
 
-// ── Pattern 3: spinning loader — one bar chases around the outer ring
+// ── Pattern 3: spinning loader - one bar chases around the outer ring
 void spinLoader() {
-  int order[6] = {0, 1, 2, 3, 4, 5};   // segments a,b,c,d,e,f — the outer ring
+  int order[6] = {0, 1, 2, 3, 4, 5};   // segments a,b,c,d,e,f - the outer ring
   for (int lap = 0; lap < 2; lap++) {
     for (int i = 0; i < 6; i++) {
       byte frame[7] = {0,0,0,0,0,0,0};
@@ -1229,22 +1229,22 @@ void loop() {
   delay(500);       // then the whole show repeats
 }`,
     test:[
-      "All 5 patterns play in order: count up, count down, a spinning loader, all-segment blink, then HELLO scrolls letter by letter — then it repeats.",
+      "All 5 patterns play in order: count up, count down, a spinning loader, all-segment blink, then HELLO scrolls letter by letter - then it repeats.",
       "Look closely: each digit or letter is just a different set of the seven bars lit.",
     ],
     trouble:[
-      "Some bars never light → check that display physical pin matches the Arduino pin in the wiring table — pins 6 and 9 (segments B and F) are the easiest to mix up.",
+      "Some bars never light → check that display physical pin matches the Arduino pin in the wiring table - pins 6 and 9 (segments B and F) are the easiest to mix up.",
       "Whole display dark → the common pin (physical pin 3 or 8) must go through the 220Ω resistor to GND (this is a common-cathode display).",
       "It shows a mirror/garbled number → your segment order is off; re-check the wiring table against the pin-diagram image above.",
     ],
-    extension:"Add your own letter or symbol to the scroll — you've already seen how H, E, L, and O are built bar-by-bar in the letters[] array above. Which bars make a 'C'? A '3' with the middle bar off looks like an 'E' too — can you find another letter hiding in the digit patterns?",
+    extension:"Add your own letter or symbol to the scroll - you've already seen how H, E, L, and O are built bar-by-bar in the letters[] array above. Which bars make a 'C'? A '3' with the middle bar off looks like an 'E' too - can you find another letter hiding in the digit patterns?",
   },
 
   // ── Lesson 9: 4-digit 7-segment (advanced) ────────────────
   {
     id:"seven_seg4", day:5, lesson:"Lesson 28", title:"4-Digit 7-Segment Display (advanced)",
     lib:"SevSeg.zip",
-    goal:"Show a whole 4-digit number, wired to the display's REAL physical pins. This one has the most wiring in the kit — go slow and check twice.",
+    goal:"Show a whole 4-digit number, wired to the display's REAL physical pins. This one has the most wiring in the kit - go slow and check twice.",
     materials:["Arduino UNO","breadboard","4 Digit 7-Segment Display (four red digits in one block)","4× 220Ω resistors (red-red-brown)","jumper wires"],
     wiring:[
       ["Display physical pin 11 (segment A)","Arduino pin 6"],
@@ -1266,7 +1266,7 @@ void loop() {
 SevSeg sevseg;
 
 // The display's own physical pins (1-12, printed on its datasheet) are NOT
-// the same as these Arduino pin numbers — see the pin-diagram image above.
+// the same as these Arduino pin numbers - see the pin-diagram image above.
 // Segments A-G/DP are SHARED across all 4 digits; only the 4 DIG pins
 // (physical 12, 9, 8, 6) pick which digit position is currently lit.
 
@@ -1285,7 +1285,7 @@ void loop() {
 }`,
     test:[
       "All four digits show 2026, steady and bright.",
-      "The trick: only ONE digit is truly lit at any instant — refreshDisplay() flashes them so fast your eye blends all four. That is called multiplexing.",
+      "The trick: only ONE digit is truly lit at any instant - refreshDisplay() flashes them so fast your eye blends all four. That is called multiplexing.",
     ],
     trouble:[
       "\"SevSeg.h: No such file\" → install SevSeg.zip (download button above).",
@@ -1373,8 +1373,8 @@ void loop() {
 
   // ── Lesson 30: relay ──────────────────────────────────────
   {
-    id:"relay", day:5, lesson:"Lesson 30", title:"5V Relay — Switch Big Things",
-    goal:"Use a tiny Arduino signal to flip a relay (a remote-controlled switch) on and off — you will hear it click.",
+    id:"relay", day:5, lesson:"Lesson 30", title:"5V Relay - Switch Big Things",
+    goal:"Use a tiny Arduino signal to flip a relay (a remote-controlled switch) on and off - you will hear it click.",
     materials:["Arduino UNO","5V Relay (the blue box with a clicking switch)","jumper wires"],
     wiring:[
       ["Relay IN (signal)","pin 7"],
@@ -1392,14 +1392,14 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(relayPin, HIGH);   // relay ON  — you hear a click
+  digitalWrite(relayPin, HIGH);   // relay ON  - you hear a click
   delay(1000);
-  digitalWrite(relayPin, LOW);    // relay OFF — click again
+  digitalWrite(relayPin, LOW);    // relay OFF - click again
   delay(1000);
 }`,
     test:[
       "The relay clicks once per second and its little LED blinks with it.",
-      "That click is a metal contact opening and closing — the same contact that would switch a real lamp.",
+      "That click is a metal contact opening and closing - the same contact that would switch a real lamp.",
     ],
     trouble:[
       "No click → VCC to 5V, GND to GND, IN to pin 7.",
@@ -1488,7 +1488,7 @@ void loop() {
   // ── Lesson 32: rotary encoder ─────────────────────────────
   {
     id:"encoder", day:5, lesson:"Lesson 33", title:"Rotary Encoder",
-    goal:"Read which way you turn a knob, and how far — the kind of endless knob used for volume dials.",
+    goal:"Read which way you turn a knob, and how far - the kind of endless knob used for volume dials.",
     materials:["Arduino UNO","Rotary Encoder Module (a knob you turn AND can press)","jumper wires"],
     wiring:[
       ["Encoder CLK","pin 2"],
@@ -1563,7 +1563,7 @@ if (counter < ___) counter = 0;    // don't go below the bottom
       ["GY-521 GND","GND"],
     ],
     code:
-`#include <Wire.h>   // built-in I2C library — no .ZIP needed
+`#include <Wire.h>   // built-in I2C library - no .ZIP needed
 
 const int MPU = 0x68;   // the chip's I2C address
 
@@ -1602,7 +1602,7 @@ void loop() {
 }`,
     test:[
       "Serial Monitor at 9600 → three numbers X, Y, Z.",
-      "Tilt the board different ways → the numbers change. Lying flat, Z is a big value — that is gravity pulling straight down.",
+      "Tilt the board different ways → the numbers change. Lying flat, Z is a big value - that is gravity pulling straight down.",
       "Tap or shake it → the numbers jump.",
     ],
     trouble:[
@@ -1666,7 +1666,7 @@ void loop() {
   rfid.PICC_HaltA();   // wait for the next tap
 }`,
     test:[
-      "Open Serial Monitor at 9600 — it prints \"Tap an RFID card...\".",
+      "Open Serial Monitor at 9600 - it prints \"Tap an RFID card...\".",
       "Tap the white card → its UID (a row of hex numbers) prints.",
       "Tap the blue keytag → a DIFFERENT UID prints. Every tag has its own permanent ID.",
     ],
@@ -1681,9 +1681,9 @@ void loop() {
       code:
 `// Add this right after the UID printout:
 if (rfid.uid.uidByte[0] == 0x____) {   // put YOUR card's first byte here
-  Serial.println("Access granted — welcome!");
+  Serial.println("Access granted - welcome!");
 } else {
-  Serial.println("Unknown card — access denied.");
+  Serial.println("Unknown card - access denied.");
 }
 
 // Real key-card systems keep a whole list of allowed IDs and check every
@@ -1693,10 +1693,10 @@ if (rfid.uid.uidByte[0] == 0x____) {   // put YOUR card's first byte here
 ];
 
 export const DAY_TITLES: Record<number, string> = {
-  1: "Day 1 — Getting Started & First Circuits",
-  2: "Day 2 — Inputs & Sound",
-  3: "Day 3 — Sensing the Environment",
-  4: "Day 4 — Final Project & Sound",
+  1: "Day 1 - Getting Started & First Circuits",
+  2: "Day 2 - Inputs & Sound",
+  3: "Day 3 - Sensing the Environment",
+  4: "Day 4 - Final Project & Sound",
   5: "Additional Exercises",
 };
 
@@ -1706,8 +1706,8 @@ export const WIRE: Record<HelpType, { color: string; label: string }> = {
   not_working: { color: "#E5484D", label: "It's not working" },
   wiring:      { color: "#2D7FF9", label: "Check our wiring" },
   question:    { color: "#F2B01E", label: "We have a question" },
-  done:        { color: "#30A46C", label: "Done — check us off" },
+  done:        { color: "#30A46C", label: "Done - check us off" },
 };
 
-// Cohort is now runtime — see cohort.ts (localStorage + ?cohort= URL param).
+// Cohort is now runtime - see cohort.ts (localStorage + ?cohort= URL param).
 export const GROUP_COUNT = 8;

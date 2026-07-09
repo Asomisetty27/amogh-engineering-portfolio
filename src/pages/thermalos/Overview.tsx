@@ -88,7 +88,7 @@ function Hero({ rowCount, demo, syncedAt }: { rowCount: number; demo: boolean; s
       </h1>
       <p className="text-[14px] md:text-[15px] leading-relaxed max-w-2xl" style={{ color: "var(--t-muted)" }}>
         Cloud operators run thousands of GPUs without knowing when one is silently throttling. ThermalOS
-        detects cooling-path anomalies from telemetry alone — using power, temperature, and effective
+        detects cooling-path anomalies from telemetry alone - using power, temperature, and effective
         thermal resistance (Rθ_eff) as forensic signals.
       </p>
     </div>
@@ -120,7 +120,7 @@ function HeadlineFinding() {
             experiment isolated starting ambient temperature as the dominant driver of recovery dynamics.{" "}
             <span className="font-semibold" style={{ color: "var(--t-healthy)" }}>A 2°C delta in starting temperature produces a 3.5× change in power-recovery time</span>
             {" "}(cold-start cohort 37°C, n=2: 4.2s; warm-start cohort 39°C, n=5: 14.7s ± 1.1s). Within-condition
-            reproducibility T&lt;55°C CV is 1.8%. This is direct, single-variable evidence of thermal memory —
+            reproducibility T&lt;55°C CV is 1.8%. This is direct, single-variable evidence of thermal memory -
             a signal utilization-based monitoring collapses into a single &ldquo;idle&rdquo; bucket.
           </p>
         </div>
@@ -515,9 +515,9 @@ function LiveData() {
       <SectionLabel hint="Auto-refreshes from Google Sheet every 30s">Live telemetry</SectionLabel>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
-        <KPI label="Latest Rθ_eff" value={latest ? `${latest.rthetaCwatt.toFixed(3)}` : "—"} unit="°C/W" tone={latest && latest.rthetaCwatt > 0.5 ? "amber" : "complete"} />
-        <KPI label="Best so far" value={bestRtheta !== null ? `${bestRtheta.toFixed(3)}` : "—"} unit="°C/W" tone="complete" />
-        <KPI label="Avg Rθ_eff" value={avgRtheta !== null ? `${avgRtheta.toFixed(3)}` : "—"} unit="°C/W" tone="gray" />
+        <KPI label="Latest Rθ_eff" value={latest ? `${latest.rthetaCwatt.toFixed(3)}` : "-"} unit="°C/W" tone={latest && latest.rthetaCwatt > 0.5 ? "amber" : "complete"} />
+        <KPI label="Best so far" value={bestRtheta !== null ? `${bestRtheta.toFixed(3)}` : "-"} unit="°C/W" tone="complete" />
+        <KPI label="Avg Rθ_eff" value={avgRtheta !== null ? `${avgRtheta.toFixed(3)}` : "-"} unit="°C/W" tone="gray" />
         <KPI label="Anomaly events" value={String(alertCount)} unit={`/ ${valid.length} runs`} tone={alertCount > 0 ? "amber" : "complete"} />
       </div>
 
@@ -574,7 +574,7 @@ function KPI({ label, value, unit, tone }: { label: string; value: string; unit:
 /* ------------------------------------------------------------------ */
 
 function Roadmap() {
-  // Stages are vault state, not live-derived — Sheets timeline phase grouping is unreliable
+  // Stages are vault state, not live-derived - Sheets timeline phase grouping is unreliable
   const stages = generateDemoRoadmapStages();
 
   return (
@@ -668,7 +668,7 @@ function Team() {
 const ASKS = [
   {
     title: "Cal Poly AI Factory access",
-    body: "Dedicated access to Cal Poly's new DGX B200 cluster ($3M Noyce School investment, 4 nodes, operational since Jan 2026) for Stage 2 experiments. This is the single critical unlock — publication-grade R_theta data requires measured ambient temperature, which the DGX cluster enables. Everything downstream sequences behind this.",
+    body: "Dedicated access to Cal Poly's new DGX B200 cluster ($3M Noyce School investment, 4 nodes, operational since Jan 2026) for Stage 2 experiments. This is the single critical unlock - publication-grade R_theta data requires measured ambient temperature, which the DGX cluster enables. Everything downstream sequences behind this.",
     tone: "queued" as Tone,
   },
   {
@@ -713,9 +713,9 @@ function CurrentAsks() {
 
 function DeepLinks() {
   const links = [
-    { to: "/thermalos/lab", label: "Lab — live telemetry & runs", icon: Cpu },
-    { to: "/thermalos/findings", label: "Research — Rθ methodology", icon: FlaskConical },
-    { to: "/thermalos/yc", label: "YC — evidence & milestones", icon: Check },
+    { to: "/thermalos/lab", label: "Lab - live telemetry & runs", icon: Cpu },
+    { to: "/thermalos/findings", label: "Research - Rθ methodology", icon: FlaskConical },
+    { to: "/thermalos/yc", label: "YC - evidence & milestones", icon: Check },
   ];
   return (
     <div className="mt-10 pt-6" style={{ borderTop: "1px solid var(--t-border)" }}>
@@ -747,7 +747,7 @@ function DeepLinks() {
 
 export default function Overview() {
   useEffect(() => {
-    document.title = "ThermalOS — Overview | amogh.site";
+    document.title = "ThermalOS - Overview | amogh.site";
   }, []);
 
   const { data, error, isError } = useQuery({

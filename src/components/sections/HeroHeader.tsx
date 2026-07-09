@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-// Words stay unbreakable — letters animate individually but can never orphan
+// Words stay unbreakable - letters animate individually but can never orphan
 // across a line break.
 const NAME_WORDS = "AMOGH SOMISETTY".split(" ").map((w) => w.split(""));
 const COORDS = "35.2828° N / 120.6596° W";
 
-// One easing for the whole hero — a long exponential settle. Nothing bounces.
+// One easing for the whole hero - a long exponential settle. Nothing bounces.
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 function LiveClock() {
@@ -29,7 +29,7 @@ function LiveClock() {
 export default function HeroHeader() {
   return (
     <div className="mb-12 relative select-none">
-      {/* Radial warmth behind the name — champagne, not mint */}
+      {/* Radial warmth behind the name - champagne, not mint */}
       <div
         className="absolute -inset-10 -z-10 pointer-events-none"
         style={{
@@ -50,13 +50,13 @@ export default function HeroHeader() {
         <LiveClock />
       </motion.div>
 
-      {/* Hairline — champagne fading to nothing */}
+      {/* Hairline - champagne fading to nothing */}
       <div
         className="mb-6 h-px"
         style={{ background: "linear-gradient(90deg, rgba(212,175,55,0.35), rgba(212,175,55,0.08) 55%, transparent)" }}
       />
 
-      {/* Name — editorial scale, machined metal fill.
+      {/* Name - editorial scale, machined metal fill.
           The gradient runs ivory → champagne → deep gold, like light across
           an engraved plate. This is the one place the site gets loud. */}
       <div className="overflow-hidden pb-1">
@@ -106,7 +106,7 @@ export default function HeroHeader() {
         </h1>
       </div>
 
-      {/* Subtitle — quiet, wide-set, ivory. Satoshi, not mono: this is a
+      {/* Subtitle - quiet, wide-set, ivory. Satoshi, not mono: this is a
           sentence, not a readout. */}
       <motion.p
         className="mt-4"
@@ -121,10 +121,10 @@ export default function HeroHeader() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.72, duration: 0.55, ease: EASE }}
       >
-        Electrical Engineer — Hardware, Embedded &amp; GPU Systems
+        Electrical Engineer - Hardware, Embedded &amp; GPU Systems
       </motion.p>
 
-      {/* Status strip — instrument readout. Mono belongs here. */}
+      {/* Status strip - instrument readout. Mono belongs here. */}
       <motion.div
         className="flex flex-wrap items-center gap-x-3 gap-y-2 mt-4"
         initial={{ opacity: 0 }}

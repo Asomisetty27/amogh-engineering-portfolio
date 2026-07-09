@@ -32,7 +32,7 @@ const detectStages: DetectStage[] = [
   { id: 4, name: "MOSFET Switches Off Electromagnet", shortName: "MOSFET\nOFF", x: 250, y: 45, color: "#ff6644",
     trigger: "Arduino pin 11 → LOW", description: "N-Channel MOSFET (30V/40A) gate goes LOW, cutting current to electromagnet. Requires shared ground between Arduino and 9V supply.",
     output: "Electromagnet field collapses", evidenceSource: "Lab_Final_Report, p4; EE_241_Lab_7",
-    failureMode: "No common ground between Arduino (USB 5V) and 9V supply — undefined gate-source voltage" },
+    failureMode: "No common ground between Arduino (USB 5V) and 9V supply - undefined gate-source voltage" },
   { id: 5, name: "Steel Ball Released", shortName: "BALL\nDROP", x: 320, y: 45, color: "#ffcc00",
     trigger: "Electromagnet field collapses", description: "2.5kg hold electromagnet releases steel ball. Ball falls under gravity onto tilt switch below.",
     output: "Ball impacts tilt switch → chain continues", evidenceSource: "Lab_Final_Report, p4-5" },
@@ -73,7 +73,7 @@ export default function MetalDetectorHologram() {
         <div className="absolute top-0 left-0 right-0 z-10 px-3 py-2 bg-gradient-to-b from-background/90 to-transparent space-y-2">
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono font-semibold text-primary tracking-wider uppercase">
-              DETECT-7 — Metal Detection & Electromagnet Release
+              DETECT-7 - Metal Detection & Electromagnet Release
             </span>
             <ConfidenceBadgeTag confidence="VERIFIED" />
           </div>

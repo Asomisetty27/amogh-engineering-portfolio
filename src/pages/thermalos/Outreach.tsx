@@ -41,7 +41,7 @@ function DiscoveryQuotes({ rows }: { rows: OutreachRow[] }) {
     .map((r) => ({ row: r, quote: extractQuote(r.notes) }))
     .filter((q): q is { row: OutreachRow; quote: string } => q.quote !== null);
 
-  // Sort by status priority — Positive Quote first
+  // Sort by status priority - Positive Quote first
   quotes.sort((a, b) => {
     const rank = (s: string) =>
       s === "Positive Quote" ? 0 : s === "Meeting Set" ? 1 : s === "Replied" ? 2 : 3;
@@ -122,7 +122,7 @@ function DiscoveryQuotes({ rows }: { rows: OutreachRow[] }) {
 }
 
 export default function Outreach() {
-  useEffect(() => { document.title = "ThermalOS — Outreach | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - Outreach | amogh.site"; }, []);
 
   const [filterStatus, setFilterStatus] = useState("All");
   const [filterType, setFilterType] = useState("All");
@@ -168,11 +168,11 @@ export default function Outreach() {
     <div className="space-y-4">
       {demo && (
         <div className="px-3 py-2 rounded-lg bg-[#EF9F27]/10 border border-[#EF9F27]/30 text-[12px] font-mono text-[#EF9F27]">
-          Demo Mode — connect the Google Sheet to load live outreach data.
+          Demo Mode - connect the Google Sheet to load live outreach data.
         </div>
       )}
 
-      {/* Discovery quotes — YC evidence */}
+      {/* Discovery quotes - YC evidence */}
       <DiscoveryQuotes rows={rows} />
 
       {/* Funnel */}
@@ -255,12 +255,12 @@ export default function Outreach() {
                         {r.status}
                       </span>
                     </td>
-                    <td className="px-3 py-2 font-mono text-[#5a5a55] text-[10px] whitespace-nowrap">{r.date || "—"}</td>
+                    <td className="px-3 py-2 font-mono text-[#5a5a55] text-[10px] whitespace-nowrap">{r.date || "-"}</td>
                     <td className="px-3 py-2">
                       {r.priority && (
                         <span className="text-[10px] font-mono"
                           style={{ color: r.priority.startsWith("P0") ? "#D85A30" : r.priority.startsWith("P1") ? "#EF9F27" : "#888780" }}>
-                          {r.priority.split(" — ")[0]}
+                          {r.priority.split(" - ")[0]}
                         </span>
                       )}
                     </td>
@@ -269,7 +269,7 @@ export default function Outreach() {
                         <span className="text-[10px] font-mono text-[#888780] italic truncate block max-w-[180px]" title={r.notes}>
                           {r.notes.length > 50 ? r.notes.slice(0, 50) + "…" : r.notes}
                         </span>
-                      ) : <span className="text-[#5a5a55]">—</span>}
+                      ) : <span className="text-[#5a5a55]">-</span>}
                     </td>
                   </tr>
                 );

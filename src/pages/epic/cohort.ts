@@ -1,4 +1,4 @@
-// EPIC 2026 — runtime cohort (weekly reset).
+// EPIC 2026 - runtime cohort (weekly reset).
 // Replaces the old hardcoded COHORT const. The active cohort scopes every
 // query, insert, and realtime filter in StudentHelper + InstructorDashboard.
 

@@ -5,9 +5,9 @@ import { motion, useReducedMotion } from "framer-motion";
  * Signature backdrop: a faint GPU-die thermal field (Higgsfield-generated)
  * with a slow Ken-Burns drift. Deliberately low-opacity and radially masked
  * so it reads as ambient texture, never competing with content. The whole
- * site quietly looks like it's under thermal monitoring — Theta's domain.
+ * site quietly looks like it's under thermal monitoring - Theta's domain.
  *
- * The image fades in only once decoded — it must never pop into place.
+ * The image fades in only once decoded - it must never pop into place.
  */
 const SRC = "/generated/thermal-hero.webp";
 

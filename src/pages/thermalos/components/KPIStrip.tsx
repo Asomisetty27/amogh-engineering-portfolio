@@ -11,12 +11,12 @@ interface KPI {
 function buildKpis(m: MeasurementRow | undefined): KPI[] {
   if (!m) {
     return [
-      { label: "GPU Temp", value: "—", accent: "#888780" },
-      { label: "Power Draw", value: "—", accent: "#EF9F27" },
-      { label: "Rθ eff", value: "—", accent: "#1D9E75" },
-      { label: "Headroom", value: "—", accent: "#1D9E75" },
-      { label: "SM Clock", value: "—", accent: "#D8D2C2" },
-      { label: "Alert", value: "—", accent: "#888780" },
+      { label: "GPU Temp", value: "-", accent: "#888780" },
+      { label: "Power Draw", value: "-", accent: "#EF9F27" },
+      { label: "Rθ eff", value: "-", accent: "#1D9E75" },
+      { label: "Headroom", value: "-", accent: "#1D9E75" },
+      { label: "SM Clock", value: "-", accent: "#D8D2C2" },
+      { label: "Alert", value: "-", accent: "#888780" },
     ];
   }
   const rAccent = m.rthetaCwatt > 1.8 ? "#D85A30" : m.rthetaCwatt > 1.5 ? "#EF9F27" : "#1D9E75";

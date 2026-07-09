@@ -55,7 +55,7 @@ const polymers: PolymerData[] = [
     elongation: "1–4",
     tg: "100",
     structure: "–(CH₂–CH(C₆H₅))– backbone. Bulky phenyl ring severely restricts chain motion.",
-    bondingNotes: "Van der Waals + steric hindrance from phenyl. High Tg. Brittle — fractures with minimal plastic deformation.",
+    bondingNotes: "Van der Waals + steric hindrance from phenyl. High Tg. Brittle - fractures with minimal plastic deformation.",
     curve: [[0, 0], [0.5, 20], [1, 40], [1.5, 50], [2, 45]],
   },
   {
@@ -177,7 +177,7 @@ export default function PolymerStressStrain() {
         </svg>
 
         <div className="absolute bottom-2 left-2 text-[10px] font-mono text-muted-foreground bg-background/80 rounded px-2 py-0.5 border border-panel-border">
-          Source: Lab_6_Polymer_Mechanical_Properties_SPR_2017 — conceptual curve shapes, property ranges from lab background
+          Source: Lab_6_Polymer_Mechanical_Properties_SPR_2017 - conceptual curve shapes, property ranges from lab background
         </div>
       </div>
 
@@ -202,7 +202,7 @@ export default function PolymerStressStrain() {
               }`}
             >
               <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: p.color, opacity: selected.find(s => s.id === p.id) ? 1 : 0.3 }} />
-              <span className="truncate">{p.abbrev} — {p.name.split("(")[0].trim()}</span>
+              <span className="truncate">{p.abbrev} - {p.name.split("(")[0].trim()}</span>
             </button>
           ))}
         </div>

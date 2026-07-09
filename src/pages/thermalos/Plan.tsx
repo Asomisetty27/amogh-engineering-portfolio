@@ -12,7 +12,7 @@ const TABS = [
 type TabValue = (typeof TABS)[number]["value"];
 
 export default function Plan() {
-  useEffect(() => { document.title = "ThermalOS — Plan | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - Plan | amogh.site"; }, []);
 
   const [params, setParams] = useSearchParams();
   const raw = params.get("tab");

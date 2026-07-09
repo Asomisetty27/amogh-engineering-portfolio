@@ -1,5 +1,5 @@
 /**
- * RGMHologram — 9-Stage Rube Goldberg Machine
+ * RGMHologram - 9-Stage Rube Goldberg Machine
  *
  * PCB-substrate schematic hologram. Each stage renders its actual electronic
  * schematic symbol (not a generic rectangle). Signal propagation follows real
@@ -36,11 +36,11 @@ interface Stage {
 
 const STAGES: Stage[] = [
   { id: 1, name: "Capacitive Touch Arduino Piano", shortName: "PIANO", cx: 26, cy: 80, color: "#00d4aa",
-    trigger: "Human touch — correct 5-note sequence (1,3,2,4,1)",
+    trigger: "Human touch - correct 5-note sequence (1,3,2,4,1)",
     activeComponents: ["Arduino Mega", "Copper foil pads", "2.2MΩ RC circuits", "Buzzer"],
     output: "Relay activation (pin 8 HIGH)", evidenceSource: "Lab_Final_Report p3",
     failureMode: "RC time constant 38.5% error", failureCause: "Oscilloscope cursor positioning + component tolerances + breadboard contact resistance" },
-  { id: 2, name: "Relay — Piano to Strobe", shortName: "RELAY", cx: 76, cy: 80, color: "#44aaff",
+  { id: 2, name: "Relay - Piano to Strobe", shortName: "RELAY", cx: 76, cy: 80, color: "#44aaff",
     trigger: "Relay activation signal from piano Arduino",
     activeComponents: ["BC548 NPN transistor", "Relay module", "Flyback diode"],
     output: "9V power connected to strobe circuit", evidenceSource: "Lab_Final_Report p3" },
@@ -53,7 +53,7 @@ const STAGES: Stage[] = [
     trigger: "Strobe flash detected by photoresistor",
     activeComponents: ["Photoresistor", "LM324 Op-Amp", "Schmitt trigger", "VR1 threshold pot"],
     output: "Clean digital trigger to solenoid", evidenceSource: "Lab_Final_Report p3-4",
-    failureMode: "False trigger from ambient light", failureCause: "VR1 reference too low — room lighting exceeded threshold" },
+    failureMode: "False trigger from ambient light", failureCause: "VR1 reference too low - room lighting exceeded threshold" },
   { id: 5, name: "Solenoid Launcher", shortName: "SOLENOID", cx: 226, cy: 80, color: "#00aaff",
     trigger: "Digital trigger from light detector",
     activeComponents: ["Solenoid actuator", "Custom track (6×2×1 in)", "Steel marble"],
@@ -75,7 +75,7 @@ const STAGES: Stage[] = [
   { id: 9, name: "LCD Display", shortName: "LCD\nDISPLAY", cx: 436, cy: 80, color: "#00ffcc",
     trigger: "Tilt switch pulls Arduino pin LOW",
     activeComponents: ["Inland 16×2 I2C LCD", "PCF8574 (0x27)", "Custom 0xFF block char"],
-    output: "2×16 white blocks — RGM COMPLETE", evidenceSource: "Lab_Final_Report p5-6" },
+    output: "2×16 white blocks - RGM COMPLETE", evidenceSource: "Lab_Final_Report p5-6" },
 ];
 
 // Copper trace paths connecting stage centers along the horizontal chain
@@ -92,7 +92,7 @@ function PianoSymbol({ cx, cy, active, color }: { cx: number; cy: number; active
     <g opacity={op}>
       {/* Microcontroller outline */}
       <rect x={cx - 12} y={cy - 10} width={24} height={20} rx="1" fill={color} fillOpacity="0.08" stroke={color} strokeWidth="0.5" />
-      {/* Key pads — 5 touch capacitive keys */}
+      {/* Key pads - 5 touch capacitive keys */}
       {[-8,-4,0,4,8].map((dx, i) => (
         <rect key={i} x={cx + dx - 1.5} y={cy - 7} width={3} height={5} rx="0.3"
           fill={color} fillOpacity={active ? 0.5 : 0.15} stroke={color} strokeWidth="0.3" />
@@ -138,7 +138,7 @@ function StrobeSymbol({ cx, cy, active, color }: { cx: number; cy: number; activ
   const op = active ? 1 : 0.45;
   return (
     <g opacity={op}>
-      {/* Xenon tube — curved envelope */}
+      {/* Xenon tube - curved envelope */}
       <ellipse cx={cx} cy={cy - 2} rx={9} ry={6} fill={color} fillOpacity="0.05" stroke={color} strokeWidth="0.4" />
       {/* Flash arc symbol inside */}
       <path d={`M ${cx-4} ${cy-4} L ${cx+1} ${cy-1} L ${cx-2} ${cy+1} L ${cx+4} ${cy+4}`}
@@ -363,7 +363,7 @@ export default function RGMHologram() {
           style={{ background: "linear-gradient(to bottom, rgba(8,15,8,.95), transparent)" }}>
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono font-semibold text-primary tracking-wider uppercase">
-              RGM — 9-Stage Chain Reaction
+              RGM - 9-Stage Chain Reaction
             </span>
             <ConfidenceBadgeTag confidence="VERIFIED" />
           </div>
@@ -565,7 +565,7 @@ export default function RGMHologram() {
               <rect x="-24" y="-10" width="68" height="20" rx="1"
                 fill="#001a00" fillOpacity="0.8" stroke="#00ff88" strokeWidth="0.4" />
               <text x="-22" y="-5" fill="#00ff88" fontSize="2" fontFamily="monospace" opacity="0.7">OSC</text>
-              {/* Frequency waveform — shows step down from 8760 to 8310 */}
+              {/* Frequency waveform - shows step down from 8760 to 8310 */}
               <polyline
                 points="−20,4 −10,4 −5,−4 10,−4 15,4 44,4"
                 fill="none" stroke="#00ff88" strokeWidth="0.6"
@@ -585,7 +585,7 @@ export default function RGMHologram() {
         <div className="absolute bottom-2 left-2 right-2 z-10 flex items-center justify-between">
           <span className="text-[9px] font-mono text-muted-foreground px-1.5 py-0.5 rounded"
             style={{ background: "rgba(8,15,8,.85)", border: "1px solid #1a3a1a" }}>
-            Source: Lab_Final_Report_Amogh_Somisetty.pdf — 9-stage verified chain
+            Source: Lab_Final_Report_Amogh_Somisetty.pdf - 9-stage verified chain
           </span>
           {(mode === "step" || mode === "play") && (
             <span className="text-[9px] font-mono px-1.5 py-0.5 rounded"
@@ -672,7 +672,7 @@ export default function RGMHologram() {
           ) : mode === "failure" ? (
             <div className="p-3 space-y-2 overflow-y-auto flex-1">
               <span className="text-[10px] font-mono uppercase font-semibold" style={{ color: "#ff3333" }}>
-                Failure Analysis — 4 Documented Modes
+                Failure Analysis - 4 Documented Modes
               </span>
               {STAGES.filter(s => s.failureMode).map(s => (
                 <div key={s.id}

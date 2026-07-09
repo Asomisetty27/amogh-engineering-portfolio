@@ -3,10 +3,10 @@
 // against advisor_allowlist for role-based write scope enforcement.
 //
 // REQUIRED ENV VARS (set in Supabase dashboard > Edge Functions > Secrets):
-//   GOOGLE_SERVICE_ACCOUNT_JSON  — entire service account JSON as a single string
-//   SPREADSHEET_ID               — same sheet ID used by sheets-read
-//   SUPABASE_URL                 — auto-provided by Supabase
-//   SUPABASE_ANON_KEY            — auto-provided by Supabase
+//   GOOGLE_SERVICE_ACCOUNT_JSON  - entire service account JSON as a single string
+//   SPREADSHEET_ID               - same sheet ID used by sheets-read
+//   SUPABASE_URL                 - auto-provided by Supabase
+//   SUPABASE_ANON_KEY            - auto-provided by Supabase
 //
 // Write scopes:
 //   admin    -> can write any allowed tab

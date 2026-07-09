@@ -29,15 +29,15 @@ const T = {
 const FM = "'JetBrains Mono', ui-monospace, monospace";
 
 // ──────────────────────────────────────────────────────────────────────────
-// Narrative state machine — one authored sequence, not a free orbit.
+// Narrative state machine - one authored sequence, not a free orbit.
 // Reuses the GPUHeroScene pattern: module-level mutable refs read inside
-// useFrame, set from a single setTimeout/rAF chain — zero React re-renders
+// useFrame, set from a single setTimeout/rAF chain - zero React re-renders
 // driving the animation.
 // ──────────────────────────────────────────────────────────────────────────
 
 type Stage = 'establishing' | 'flythrough' | 'focus' | 'incident' | 'pullback';
 
-// Shared physically-grounded thermal arc — see thermalModel.ts. Replaces the
+// Shared physically-grounded thermal arc - see thermalModel.ts. Replaces the
 // per-scene `level` script and the `0.071 + level * 0.024` readout, which
 // showed R_θ rising with load (the opposite of Theta's actual claim).
 import {
@@ -56,7 +56,7 @@ const _storyT = { current: 0 };          // 0..1 progress through the whole loop
 const _hudOpacity = { current: 0 };
 const _alertPulse = { current: 0 };
 
-// Live telemetry from the incident sim — written by NarrativeDirector,
+// Live telemetry from the incident sim - written by NarrativeDirector,
 // read by DataCenterHUD (same module-ref pattern as _hudOpacity).
 const _dcTelemetry: { current: Telemetry | null } = { current: null };
 
@@ -97,7 +97,7 @@ function makeFaceplateTexture(): THREE.CanvasTexture {
   for (let y = 18; y < 256; y += 14) {
     ctx.fillRect(12, y, 232, 6);
   }
-  // Status LEDs — sparse, mostly green/amber dots near the left edge
+  // Status LEDs - sparse, mostly green/amber dots near the left edge
   const ledColors = ['#D4AF37', '#D4AF37', '#D4AF37', '#C8942A', '#C9A84C'];
   for (let i = 0; i < 28; i++) {
     ctx.fillStyle = ledColors[Math.floor(Math.random() * ledColors.length)];
@@ -133,7 +133,7 @@ function makeRoughnessMap(): THREE.CanvasTexture {
 type Textures = { faceplate: THREE.CanvasTexture; rough: THREE.CanvasTexture };
 
 // ──────────────────────────────────────────────────────────────────────────
-// Layout — pure data: two facing rows of racks per aisle, several aisles
+// Layout - pure data: two facing rows of racks per aisle, several aisles
 // receding into haze. RackUnit positions are generated once and reused both
 // for the instanced frames/sleds and for picking the "hero" (focus) rack.
 // ──────────────────────────────────────────────────────────────────────────
@@ -163,17 +163,17 @@ function buildAisleLayout(): RackTransform[] {
 }
 
 const RACK_LAYOUT = buildAisleLayout();
-// The hero rack: front-row, mid-aisle of the second row pair — close enough
+// The hero rack: front-row, mid-aisle of the second row pair - close enough
 // to the establishing camera path to read clearly during the focus pull.
 const HERO_RACK_INDEX = RACK_LAYOUT.findIndex(
   (r) => r.row === 1 && Math.abs(r.pos[0]) < 0.1 && r.rotY === 0
 );
 const HERO_SLED_INDEX = 5; // which of the 8 sleds in the hero rack glows
 const HERO_ROW = RACK_LAYOUT[HERO_RACK_INDEX].row;
-// Z of the cold-aisle centerline for the hero's row pair — the corridor
+// Z of the cold-aisle centerline for the hero's row pair - the corridor
 // running between two facing rows, equidistant from both walls of racks.
 const HERO_AISLE_Z = HERO_ROW * (AISLE_GAP + RACK_D * 2 + 2.4);
-// Generous margin past the outermost rack column — gives the CatmullRom
+// Generous margin past the outermost rack column - gives the CatmullRom
 // spline (which can overshoot between closely-spaced waypoints) room to
 // breathe without its tangents swinging back through rack geometry.
 const AISLE_X_START = -((RACKS_PER_ROW - 1) / 2) * RACK_PITCH - 3.2;
@@ -183,7 +183,7 @@ const SLED_H = 0.22;
 const SLED_GAP = 0.06;
 
 // ──────────────────────────────────────────────────────────────────────────
-// Camera flight path — CatmullRom spline through the narrative beats.
+// Camera flight path - CatmullRom spline through the narrative beats.
 // CameraRig walks a spring-eased path parameter `u` along it; look-targets
 // are interpolated the same way rather than fixed, so transitions read as
 // one continuous camera move, not cuts.
@@ -191,14 +191,14 @@ const SLED_GAP = 0.06;
 // The path is a there-and-back-again palindrome: outbound (establishing →
 // hero rack, points 0-4) and return (hero rack → establishing, points 4-8)
 // retrace the EXACT same waypoints in reverse. This isn't just symmetry for
-// its own sake — it means the return leg inherits the outbound leg's safety
+// its own sake - it means the return leg inherits the outbound leg's safety
 // guarantees for free: (1) while at altitude, stay ABOVE everything (y > 11
-// — clears both RACK_H=3 and the ceiling trays at RACK_H+1.6) until already
+// - clears both RACK_H=3 and the ceiling trays at RACK_H+1.6) until already
 // positioned over the open aisle mouth in X/Z, only dropping/climbing once
 // clear; (2) at server height, travel the cold-aisle CENTERLINE (constant
-// Z = HERO_AISLE_Z, equidistant from both facing rows' faces — no rack
+// Z = HERO_AISLE_Z, equidistant from both facing rows' faces - no rack
 // origin sits on this line). Point 8 is identical to point 0 (and look-point
-// 8 to look-point 0), so u=1 and u=0 are the same camera pose — the loop
+// 8 to look-point 0), so u=1 and u=0 are the same camera pose - the loop
 // seam is a true match-cut, not a jump.
 // ──────────────────────────────────────────────────────────────────────────
 
@@ -209,15 +209,15 @@ const CORRIDOR_POS      = new THREE.Vector3(-1.4, 1.6, HERO_AISLE_Z);
 const HERO_ARRIVAL_POS  = new THREE.Vector3(0.6, 1.55, HERO_AISLE_Z);
 
 const FLIGHT_POINTS = [
-  ESTABLISHING_POS,   // 0 establishing — high overview
+  ESTABLISHING_POS,   // 0 establishing - high overview
   MOUTH_HIGH_POS,     // 1 slide laterally to the aisle mouth, staying high & clear
   MOUTH_LOW_POS,      // 2 drop straight down into the open aisle entrance
   CORRIDOR_POS,       // 3 glide down the corridor centerline toward the hero rack
-  HERO_ARRIVAL_POS,   // 4 arrived alongside the hero rack — hold through the incident
+  HERO_ARRIVAL_POS,   // 4 arrived alongside the hero rack - hold through the incident
   CORRIDOR_POS,       // 5 retreat back down the centerline (mirror of 3)
   MOUTH_LOW_POS,      // 6 retreat to the aisle mouth (mirror of 2)
-  MOUTH_HIGH_POS,     // 7 climb back to altitude — same safe vertical gate (mirror of 1)
-  ESTABLISHING_POS,   // 8 back to establishing — loop seam, identical pose to point 0
+  MOUTH_HIGH_POS,     // 7 climb back to altitude - same safe vertical gate (mirror of 1)
+  ESTABLISHING_POS,   // 8 back to establishing - loop seam, identical pose to point 0
 ];
 const FLIGHT_CURVE = new THREE.CatmullRomCurve3(FLIGHT_POINTS, false, 'catmullrom', 0.4);
 
@@ -230,18 +230,18 @@ const LOOK_POINTS = [
   OVERVIEW_LOOK,   // 0 wide overview
   CORRIDOR_LOOK,   // 1 looking down the corridor ahead
   TRACKING_LOOK,   // 2 still tracking forward down the centerline
-  HERO_LOOK,       // 3 focus pull — onto the hero rack
+  HERO_LOOK,       // 3 focus pull - onto the hero rack
   HERO_LOOK,       // 4 hold on the hero rack through arrival
   HERO_LOOK,       // 5 still holding as the pull-away begins
   TRACKING_LOOK,   // 6 glancing back down the centerline (mirror of 2)
   CORRIDOR_LOOK,   // 7 corridor recedes behind (mirror of 1)
-  OVERVIEW_LOOK,   // 8 wide overview — loop seam, identical to look-point 0
+  OVERVIEW_LOOK,   // 8 wide overview - loop seam, identical to look-point 0
 ];
 const LOOK_CURVE = new THREE.CatmullRomCurve3(LOOK_POINTS, false, 'catmullrom', 0.4);
 
 // Maps story-time (seconds, 0..LOOP_SECONDS) to a 0..1 spline parameter `u`.
 // Because the path is a palindrome through 9 points, u=0.5 lands exactly on
-// the hero rack (point 4) — that's the anchor "incident" pins to. The first
+// the hero rack (point 4) - that's the anchor "incident" pins to. The first
 // half (0 -> 0.5) is the approach; the second half (0.5 -> 1.0) retraces it
 // home. Stage boundaries pin specific u-values so "arrival" lands on the
 // hero rack regardless of spring easing.
@@ -249,12 +249,12 @@ const U_AT_STAGE: Record<Stage, number> = {
   establishing: 0.0,
   flythrough:   0.27,   // arriving at the aisle mouth, beginning the descent
   focus:        0.46,   // down the corridor, closing in on the hero rack
-  incident:     0.50,   // arrived — hold here through the anomaly
+  incident:     0.50,   // arrived - hold here through the anomaly
   pullback:     0.70,   // pulling away, partway back down the corridor
 };
 
 function storyU(t: number): number {
-  // Piecewise-linear interpolation between the named stage anchors —
+  // Piecewise-linear interpolation between the named stage anchors -
   // smooth enough once spring-eased in CameraRig, and keeps "arrival"
   // deterministic rather than drifting with frame-rate.
   for (let i = 0; i < STAGE_SEQUENCE.length - 1; i++) {
@@ -266,7 +266,7 @@ function storyU(t: number): number {
     }
   }
   // Pullback → loop seam: finish retracing the path home (u: pullback -> 1.0).
-  // u=1.0 is point 8, identical in pose to point 0/u=0.0 — so the wrap at
+  // u=1.0 is point 8, identical in pose to point 0/u=0.0 - so the wrap at
   // the loop restart is a match-cut, not a jump.
   const last = STAGE_SEQUENCE[STAGE_SEQUENCE.length - 1];
   const local = THREE.MathUtils.clamp((t - last.at) / (LOOP_SECONDS - last.at), 0, 1);
@@ -274,7 +274,7 @@ function storyU(t: number): number {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// RackUnit — instanced frame + sled grid. Two Instances pools (frame, sled)
+// RackUnit - instanced frame + sled grid. Two Instances pools (frame, sled)
 // keep the whole aisle to two draw calls regardless of rack count; the hero
 // sled is rendered as a single emissive-capable mesh layered on top so it
 // can run the thermal material independent of the instanced batch.
@@ -305,7 +305,7 @@ function RackFaceplates({ textures }: { textures: Textures }) {
       RACK_LAYOUT.map((r) => {
         // Front faces the cold-aisle centerline, not the outer wall: the
         // rotY===0 (north-wall) row's front is on its -Z side, and the
-        // rotY===π (south-wall) row's front is on its +Z side — opposite
+        // rotY===π (south-wall) row's front is on its +Z side - opposite
         // of a naive "rotation matches facing sign" assumption.
         const facing = r.rotY === 0 ? -1 : 1;
         return {
@@ -333,7 +333,7 @@ function RackFaceplates({ textures }: { textures: Textures }) {
   );
 }
 
-// The single sled that carries the incident — its own mesh + material so the
+// The single sled that carries the incident - its own mesh + material so the
 // thermal emissive can be driven every frame without touching the instanced
 // batch (same isolation GPUHeroScene uses for DieLayer vs. the static layers).
 function HeroSled({ thermalLevelRef }: { thermalLevelRef: React.MutableRefObject<number> }) {
@@ -384,7 +384,7 @@ function LayerLabel({ text, sub }: { text: string; sub?: string }) {
   );
 }
 
-// Pulsing alert ring around the hero rack — DOM-overlay technique ported
+// Pulsing alert ring around the hero rack - DOM-overlay technique ported
 // from ThermalGPUMap (scale-pulse driven by a sine, opacity gated by stage).
 function AlertRing() {
   const ref = useRef<HTMLDivElement>(null);
@@ -414,7 +414,7 @@ function AlertRing() {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Floor / ceiling / haze — cheap depth treatment so racks recede convincingly
+// Floor / ceiling / haze - cheap depth treatment so racks recede convincingly
 // without per-object LOD switching.
 // ──────────────────────────────────────────────────────────────────────────
 
@@ -426,7 +426,7 @@ function Environment3D({ textures }: { textures: Textures }) {
         <planeGeometry args={[40, farZ + 30]} />
         <meshStandardMaterial color="#101015" roughness={0.35} metalness={0.4} roughnessMap={textures.rough} envMapIntensity={0.6} />
       </mesh>
-      {/* Ceiling cable trays — coarse strips, just enough to read as infrastructure */}
+      {/* Ceiling cable trays - coarse strips, just enough to read as infrastructure */}
       {Array.from({ length: 6 }).map((_, i) => (
         <mesh key={i} position={[-9 + i * 3.6, RACK_H + 1.6, farZ / 2 - 6]}>
           <boxGeometry args={[0.18, 0.1, farZ + 24]} />
@@ -439,7 +439,7 @@ function Environment3D({ textures }: { textures: Textures }) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Lighting — sparse cool-aisle strips rather than one center glow; the
+// Lighting - sparse cool-aisle strips rather than one center glow; the
 // thermal point light tracks the hero rack so the incident reads as a
 // localized event in an otherwise calm room.
 // ──────────────────────────────────────────────────────────────────────────
@@ -469,7 +469,7 @@ function SceneLights({ thermalLevelRef }: { thermalLevelRef: React.MutableRefObj
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// CameraRig — walks the flight spline; `u` is spring-eased toward the
+// CameraRig - walks the flight spline; `u` is spring-eased toward the
 // story-time-derived target so stage transitions read as one continuous
 // move rather than a cut. Look-target follows the companion spline.
 // ──────────────────────────────────────────────────────────────────────────
@@ -496,7 +496,7 @@ function CameraRig() {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Post-processing — same chain as GPUHeroScene; lower bloom threshold so
+// Post-processing - same chain as GPUHeroScene; lower bloom threshold so
 // only the hero sled's emissive blooms, not the whole rack wall.
 // ──────────────────────────────────────────────────────────────────────────
 
@@ -517,7 +517,7 @@ function PostFX({ bloomRef }: { bloomRef: React.MutableRefObject<number> }) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// NarrativeDirector — the data-center analogue of GPUAssembly's useFrame
+// NarrativeDirector - the data-center analogue of GPUAssembly's useFrame
 // block: one orchestration point owning story time, stage, thermal level,
 // HUD visibility, and alert pulse. Everything else just reads these refs.
 // ──────────────────────────────────────────────────────────────────────────
@@ -552,7 +552,7 @@ function NarrativeDirector({
       1
     );
 
-    // Thermal arc — the incident sim only advances phases during the
+    // Thermal arc - the incident sim only advances phases during the
     // incident stage; everywhere else the node physically cools toward idle
     // (real RC decay, not a spring on an abstract level).
     if (stage === 'incident' || stage === 'focus') {
@@ -572,7 +572,7 @@ function NarrativeDirector({
         phaseStart.current = t;
       }
     } else {
-      // Calm stages: workload drained, cooling path healthy — the sim keeps
+      // Calm stages: workload drained, cooling path healthy - the sim keeps
       // integrating so the sled's glow decays on the real thermal curve.
       phaseIdx.current = 0;
       phaseStart.current = STAGE_SEQUENCE.find((s) => s.stage === 'incident')!.at;
@@ -591,7 +591,7 @@ function NarrativeDirector({
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// HUD — Theta readout, appears during focus/incident. Ported structure from
+// HUD - Theta readout, appears during focus/incident. Ported structure from
 // GPUHeroScene's PhaseHUD; copy rewritten for a fleet-monitoring framing.
 // ──────────────────────────────────────────────────────────────────────────
 
@@ -622,11 +622,11 @@ export function DataCenterHUD({
   const Tj     = telem ? `${telem.tjSensor}` : '37';
   const Rtheta = telem ? fmtRth(telem.rthSensor) : '0.072';
   const Pw     = telem ? `${telem.pSensor}` : '84';
-  const lead   = telem ? fmtLead(telem.leadMin) : '—';
+  const lead   = telem ? fmtLead(telem.leadMin) : '-';
 
   const labelMap: Record<Phase, string> = {
     idle: 'NOMINAL', load: 'UNDER LOAD', anomaly: 'R_θ DRIFT DETECTED',
-    critical: 'INCIDENT — ACTING', recovery: 'RESOLVING',
+    critical: 'INCIDENT - ACTING', recovery: 'RESOLVING',
   };
 
   return (
@@ -686,9 +686,9 @@ export function DataCenterCaption() {
   }, []);
   const copy: Record<Stage, string> = {
     establishing: 'A fleet of GPUs, running flat out.',
-    flythrough:   'Theta watches every node — not just util and power.',
+    flythrough:   'Theta watches every node - not just util and power.',
     focus:        'One node’s thermal path is starting to drift.',
-    incident:     'R_θ catches it before throttling does — with lead time to act.',
+    incident:     'R_θ catches it before throttling does - with lead time to act.',
     pullback:     'Theta is watching every node like this, all the time.',
   };
   return (
@@ -705,7 +705,7 @@ export function DataCenterCaption() {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Root scene — the shared 3D content. Wrappers (Showcase / Kiosk) decide
+// Root scene - the shared 3D content. Wrappers (Showcase / Kiosk) decide
 // canvas sizing, HUD scale, and chrome around this.
 // ──────────────────────────────────────────────────────────────────────────
 

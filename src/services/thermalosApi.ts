@@ -36,7 +36,7 @@ async function loadVaultSync(): Promise<VaultSyncData | null> {
   return null;
 }
 
-// GPU Telemetry columns (A–I, 9 cols) — written by Colab collector
+// GPU Telemetry columns (A–I, 9 cols) - written by Colab collector
 // A:timestamp  B:temp_c  C:power_w  D:power_cap_w  E:sm_clock_mhz
 // F:mem_clock_mhz  G:util_pct  H:headroom_c  I:rtheta_cwatt
 export interface MeasurementRow {
@@ -114,7 +114,7 @@ export async function fetchTimeline(): Promise<TimelineRow[]> {
     if (r[0]) lastPhase = r[0];
     return {
       phase: lastPhase, week: r[1] ?? "", dates: r[2] ?? "", milestone: r[3] ?? "",
-      owner: r[4] ?? "", status: r[5] ?? "Not Started", priority: r[6] ?? "P2 — Normal",
+      owner: r[4] ?? "", status: r[5] ?? "Not Started", priority: r[6] ?? "P2 - Normal",
       layer: r[7] ?? "", notes: r[8] ?? "",
     };
   });
@@ -163,35 +163,35 @@ export function generateDemoMeasurements(count = 60): MeasurementRow[] {
 
 export function generateDemoTimeline(): TimelineRow[] {
   return [
-    // Stage 1 — Colab baseline (complete)
-    { phase: "Stage 1 — Colab baseline", week: "W1–W4", dates: "May 2026", milestone: "E001–E004: idle, same-process, cross-process, controlled-variable cooldown trials", owner: "Amogh", status: "Done ✓", priority: "P0 — Critical", layer: "Research", notes: "8,734 rows · 14 trials · Tesla T4" },
-    { phase: "", week: "W3", dates: "May 2026", milestone: "F1 confirmed: 2°C ambient → 3.5× recovery time (n=7, CV 1.8%)", owner: "Amogh", status: "Done ✓", priority: "P0 — Critical", layer: "Research", notes: "Controlled-variable study E004 v2" },
-    { phase: "", week: "W4", dates: "May 2026", milestone: "Classifier: Naive Bayes 87% → Decision Tree 100% with steady-state filter", owner: "Amogh", status: "Done ✓", priority: "P1 — High", layer: "SW", notes: "Orange Data Mining + sklearn" },
-    { phase: "", week: "W4", dates: "May 2026", milestone: "Kundu advisor confirmed · 3 mandates filed (sensitivity, Bayesian, E003/E004 rerun)", owner: "Amogh", status: "Done ✓", priority: "P0 — Critical", layer: "Comms", notes: "2026-06-03 session" },
+    // Stage 1 - Colab baseline (complete)
+    { phase: "Stage 1 - Colab baseline", week: "W1–W4", dates: "May 2026", milestone: "E001–E004: idle, same-process, cross-process, controlled-variable cooldown trials", owner: "Amogh", status: "Done ✓", priority: "P0 - Critical", layer: "Research", notes: "8,734 rows · 14 trials · Tesla T4" },
+    { phase: "", week: "W3", dates: "May 2026", milestone: "F1 confirmed: 2°C ambient → 3.5× recovery time (n=7, CV 1.8%)", owner: "Amogh", status: "Done ✓", priority: "P0 - Critical", layer: "Research", notes: "Controlled-variable study E004 v2" },
+    { phase: "", week: "W4", dates: "May 2026", milestone: "Classifier: Naive Bayes 87% → Decision Tree 100% with steady-state filter", owner: "Amogh", status: "Done ✓", priority: "P1 - High", layer: "SW", notes: "Orange Data Mining + sklearn" },
+    { phase: "", week: "W4", dates: "May 2026", milestone: "Kundu advisor confirmed · 3 mandates filed (sensitivity, Bayesian, E003/E004 rerun)", owner: "Amogh", status: "Done ✓", priority: "P0 - Critical", layer: "Comms", notes: "2026-06-03 session" },
 
-    // Stage 2 — Agent v0.1.9 (complete)
-    { phase: "Stage 2 — Agent v0.1.9", week: "W5", dates: "Jun 2026", milestone: "pip install runtheta · pynvml + Redfish + DCGM telemetry collector", owner: "Amogh", status: "Done ✓", priority: "P0 — Critical", layer: "SW", notes: "v0.1.8" },
-    { phase: "", week: "W5", dates: "Jun 2026", milestone: "Fault curve classifier: 6 failure modes from R_θ(P) shape (dust, TIM, fan, blockage, mounting, HBM)", owner: "Amogh", status: "Done ✓", priority: "P0 — Critical", layer: "SW", notes: "v0.1.9 · fault_classifier.py" },
-    { phase: "", week: "W5", dates: "Jun 2026", milestone: "Discovery outreach: RunPod, Vast.ai, Lambda Labs — awaiting replies", owner: "Amogh", status: "In Progress", priority: "P0 — Critical", layer: "Comms", notes: "Sent 2026-06-02" },
-    { phase: "", week: "W5", dates: "Jun 2026", milestone: "Lupo proposal + Campus IT one-pager ready to send", owner: "Amogh", status: "In Progress", priority: "P0 — Critical", layer: "Comms", notes: "Gated on Lupo meeting" },
+    // Stage 2 - Agent v0.1.9 (complete)
+    { phase: "Stage 2 - Agent v0.1.9", week: "W5", dates: "Jun 2026", milestone: "pip install runtheta · pynvml + Redfish + DCGM telemetry collector", owner: "Amogh", status: "Done ✓", priority: "P0 - Critical", layer: "SW", notes: "v0.1.8" },
+    { phase: "", week: "W5", dates: "Jun 2026", milestone: "Fault curve classifier: 6 failure modes from R_θ(P) shape (dust, TIM, fan, blockage, mounting, HBM)", owner: "Amogh", status: "Done ✓", priority: "P0 - Critical", layer: "SW", notes: "v0.1.9 · fault_classifier.py" },
+    { phase: "", week: "W5", dates: "Jun 2026", milestone: "Discovery outreach: RunPod, Vast.ai, Lambda Labs - awaiting replies", owner: "Amogh", status: "In Progress", priority: "P0 - Critical", layer: "Comms", notes: "Sent 2026-06-02" },
+    { phase: "", week: "W5", dates: "Jun 2026", milestone: "Lupo proposal + Campus IT one-pager ready to send", owner: "Amogh", status: "In Progress", priority: "P0 - Critical", layer: "Comms", notes: "Gated on Lupo meeting" },
 
-    // Stage 3 — AI Factory deployment (in progress)
-    { phase: "Stage 3 — AI Factory deployment", week: "W6", dates: "Jun–Jul 2026", milestone: "Lupo meeting · deliver AI Factory proposal · get greenlight", owner: "Amogh", status: "Not Started", priority: "P0 — Critical", layer: "Comms", notes: "Gating milestone for Stage 3" },
-    { phase: "", week: "W7", dates: "Jul 2026", milestone: "Canary install on 1 of 4 DGX B200 nodes · BMC-measured ambient", owner: "Amogh", status: "Not Started", priority: "P0 — Critical", layer: "SW", notes: "Needs Lupo greenlight first" },
-    { phase: "", week: "W8", dates: "Jul 2026", milestone: "E005: power-cap sweep at 6 levels on DGX B200 · compare to T4 baseline", owner: "Amogh", status: "Not Started", priority: "P1 — High", layer: "Research", notes: "First dedicated-hardware experiment" },
-    { phase: "", week: "W8", dates: "Jul 2026", milestone: "TARUC integration angle confirmed with Lupo · ICPE 2027 co-authorship scoped", owner: "Both", status: "Not Started", priority: "P1 — High", layer: "Comms", notes: "" },
+    // Stage 3 - AI Factory deployment (in progress)
+    { phase: "Stage 3 - AI Factory deployment", week: "W6", dates: "Jun–Jul 2026", milestone: "Lupo meeting · deliver AI Factory proposal · get greenlight", owner: "Amogh", status: "Not Started", priority: "P0 - Critical", layer: "Comms", notes: "Gating milestone for Stage 3" },
+    { phase: "", week: "W7", dates: "Jul 2026", milestone: "Canary install on 1 of 4 DGX B200 nodes · BMC-measured ambient", owner: "Amogh", status: "Not Started", priority: "P0 - Critical", layer: "SW", notes: "Needs Lupo greenlight first" },
+    { phase: "", week: "W8", dates: "Jul 2026", milestone: "E005: power-cap sweep at 6 levels on DGX B200 · compare to T4 baseline", owner: "Amogh", status: "Not Started", priority: "P1 - High", layer: "Research", notes: "First dedicated-hardware experiment" },
+    { phase: "", week: "W8", dates: "Jul 2026", milestone: "TARUC integration angle confirmed with Lupo · ICPE 2027 co-authorship scoped", owner: "Both", status: "Not Started", priority: "P1 - High", layer: "Comms", notes: "" },
 
-    // Stage 4 — Anomaly detector v2 (locked)
-    { phase: "Stage 4 — Anomaly detector v2 + sensitivity", week: "W9", dates: "Aug 2026", milestone: "dR_θ/dT_amb sensitivity analysis at each power tier (Kundu mandate)", owner: "Amogh", status: "Not Started", priority: "P0 — Critical", layer: "Research", notes: "Q_sensitivity_analysis" },
-    { phase: "", week: "W9", dates: "Aug 2026", milestone: "E003 + E004 rerun on DGX B200 · n ≥ 10 trials · steady-state window + Bayesian", owner: "Amogh", status: "Not Started", priority: "P0 — Critical", layer: "Research", notes: "Kundu mandate 2026-06-03" },
-    { phase: "", week: "W10", dates: "Aug 2026", milestone: "Bayesian classifier refit on DGX data · model equation extracted · compare vs RF", owner: "Amogh", status: "Not Started", priority: "P1 — High", layer: "SW", notes: "" },
-    { phase: "", week: "W10", dates: "Aug–Sep 2026", milestone: "Lead-time prediction (E-LT testbed with Sam · fault induction · fall 2026)", owner: "Sam", status: "Not Started", priority: "P1 — High", layer: "EE", notes: "Sam returns fall 2026" },
+    // Stage 4 - Anomaly detector v2 (locked)
+    { phase: "Stage 4 - Anomaly detector v2 + sensitivity", week: "W9", dates: "Aug 2026", milestone: "dR_θ/dT_amb sensitivity analysis at each power tier (Kundu mandate)", owner: "Amogh", status: "Not Started", priority: "P0 - Critical", layer: "Research", notes: "Q_sensitivity_analysis" },
+    { phase: "", week: "W9", dates: "Aug 2026", milestone: "E003 + E004 rerun on DGX B200 · n ≥ 10 trials · steady-state window + Bayesian", owner: "Amogh", status: "Not Started", priority: "P0 - Critical", layer: "Research", notes: "Kundu mandate 2026-06-03" },
+    { phase: "", week: "W10", dates: "Aug 2026", milestone: "Bayesian classifier refit on DGX data · model equation extracted · compare vs RF", owner: "Amogh", status: "Not Started", priority: "P1 - High", layer: "SW", notes: "" },
+    { phase: "", week: "W10", dates: "Aug–Sep 2026", milestone: "Lead-time prediction (E-LT testbed with Sam · fault induction · fall 2026)", owner: "Sam", status: "Not Started", priority: "P1 - High", layer: "EE", notes: "Sam returns fall 2026" },
 
-    // Stage 5 — Publication (locked)
-    { phase: "Stage 5 — Multi-GPU validation + publication", week: "W11", dates: "Sep–Dec 2026", milestone: "A100 / H100 / RTX generalization experiments", owner: "Amogh", status: "Not Started", priority: "P1 — High", layer: "Research", notes: "" },
-    { phase: "", week: "W12", dates: "Oct 2026", milestone: "EE 4400 project: formal course credit for Stage 2–4 experiments", owner: "Amogh", status: "Not Started", priority: "P1 — High", layer: "Research", notes: "Fall 2026 semester" },
-    { phase: "", week: "W13", dates: "Nov 2026", milestone: "Conference paper draft · two-dim F1 finding · sensitivity confidence bands", owner: "Both", status: "Not Started", priority: "P0 — Critical", layer: "Research", notes: "ICPE 2027 target" },
-    { phase: "", week: "W14", dates: "Sep 2026", milestone: "YC W27 application · submit by September deadline", owner: "Amogh", status: "Not Started", priority: "P0 — Critical", layer: "Comms", notes: "Cal Poly student window" },
+    // Stage 5 - Publication (locked)
+    { phase: "Stage 5 - Multi-GPU validation + publication", week: "W11", dates: "Sep–Dec 2026", milestone: "A100 / H100 / RTX generalization experiments", owner: "Amogh", status: "Not Started", priority: "P1 - High", layer: "Research", notes: "" },
+    { phase: "", week: "W12", dates: "Oct 2026", milestone: "EE 4400 project: formal course credit for Stage 2–4 experiments", owner: "Amogh", status: "Not Started", priority: "P1 - High", layer: "Research", notes: "Fall 2026 semester" },
+    { phase: "", week: "W13", dates: "Nov 2026", milestone: "Conference paper draft · two-dim F1 finding · sensitivity confidence bands", owner: "Both", status: "Not Started", priority: "P0 - Critical", layer: "Research", notes: "ICPE 2027 target" },
+    { phase: "", week: "W14", dates: "Sep 2026", milestone: "YC W27 application · submit by September deadline", owner: "Amogh", status: "Not Started", priority: "P0 - Critical", layer: "Comms", notes: "Cal Poly student window" },
   ];
 }
 
@@ -217,20 +217,20 @@ export async function fetchOutreach(): Promise<OutreachRow[]> {
   return rows.filter((r) => r[0]).map((r) => ({
     name: r[0] ?? "", org: r[1] ?? "", role: r[2] ?? "", email: r[3] ?? "",
     type: r[4] ?? "", status: r[5] ?? "Not Contacted",
-    date: r[6] ?? "", priority: r[7] ?? "P2 — Normal", notes: r[8] ?? "",
+    date: r[6] ?? "", priority: r[7] ?? "P2 - Normal", notes: r[8] ?? "",
   }));
 }
 
 export function generateDemoOutreach(): OutreachRow[] {
   return [
-    { name: "Prof. Souvik Kundu", org: "Cal Poly EE", role: "Assistant Professor", email: "sokundu@calpoly.edu", type: "Advisor", status: "Active", date: "6/3/2026", priority: "P0 — Critical", notes: "Last session 2026-06-03: 3 mandates (sensitivity analysis, Bayesian, E003/E004 rerun). Conference publication confirmed as primary output." },
-    { name: "Prof. Christopher Lupo", org: "Cal Poly Noyce School", role: "Founding Director, CS&SE Chair", email: "clupo@calpoly.edu", type: "Deployment Sponsor", status: "Proposal Ready", date: "6/5/2026", priority: "P0 — Critical", notes: "20-min meeting request. Pitch: extend Sandia HPC Resilience Testbed (2015) to thermal-power layer on B200. ICPE 2027 + TARUC integration angle." },
-    { name: "Prof. Helen Yu", org: "Cal Poly EE", role: "Professor", email: "xhyu@calpoly.edu", type: "Advisor", status: "First meeting pending", date: "5/13/2026", priority: "P1 — High", notes: "Signal processing angle for adaptive control." },
-    { name: "Ryan Xu", org: "Redbrick (student VC)", role: "Partner", email: "—", type: "Pitch Comp + Mentorship", status: "First meeting done", date: "6/2/2026", priority: "P1 — High", notes: "Not a funder — pitch competition + connections to local VCs. Reconnect for follow-up." },
-    { name: "RunPod (infra team)", org: "RunPod", role: "Infrastructure", email: "X / Discord #infrastructure", type: "Neocloud (discovery)", status: "Awaiting reply", date: "6/2/2026", priority: "P0 — Critical", notes: "Sent X/Discord message 2026-06-02. Ask: how do you separate hot-because-busy from hot-because-failing?" },
-    { name: "Vast.ai (community)", org: "Vast.ai", role: "Ops / Community", email: "support@vast.ai", type: "Neocloud (discovery)", status: "Awaiting reply", date: "6/2/2026", priority: "P0 — Critical", notes: "Sent email 2026-06-02. Marketplace reliability angle — bad-node detection." },
-    { name: "Lambda Labs (eng)", org: "Lambda Labs", role: "Infra Engineer", email: "X DM / replies", type: "Neocloud (discovery)", status: "Awaiting reply", date: "6/2/2026", priority: "P0 — Critical", notes: "Sent X DM 2026-06-02. Already a Lambda customer; peer framing." },
-    { name: "Cal Poly Campus IT", org: "Cal Poly", role: "Cluster Ops", email: "TBD", type: "Deployment", status: "Blocked on Lupo", date: "", priority: "P1 — High", notes: "Campus IT one-pager ready. Routes through Lupo first — sequenced after AI Factory greenlight." },
+    { name: "Prof. Souvik Kundu", org: "Cal Poly EE", role: "Assistant Professor", email: "sokundu@calpoly.edu", type: "Advisor", status: "Active", date: "6/3/2026", priority: "P0 - Critical", notes: "Last session 2026-06-03: 3 mandates (sensitivity analysis, Bayesian, E003/E004 rerun). Conference publication confirmed as primary output." },
+    { name: "Prof. Christopher Lupo", org: "Cal Poly Noyce School", role: "Founding Director, CS&SE Chair", email: "clupo@calpoly.edu", type: "Deployment Sponsor", status: "Proposal Ready", date: "6/5/2026", priority: "P0 - Critical", notes: "20-min meeting request. Pitch: extend Sandia HPC Resilience Testbed (2015) to thermal-power layer on B200. ICPE 2027 + TARUC integration angle." },
+    { name: "Prof. Helen Yu", org: "Cal Poly EE", role: "Professor", email: "xhyu@calpoly.edu", type: "Advisor", status: "First meeting pending", date: "5/13/2026", priority: "P1 - High", notes: "Signal processing angle for adaptive control." },
+    { name: "Ryan Xu", org: "Redbrick (student VC)", role: "Partner", email: "-", type: "Pitch Comp + Mentorship", status: "First meeting done", date: "6/2/2026", priority: "P1 - High", notes: "Not a funder - pitch competition + connections to local VCs. Reconnect for follow-up." },
+    { name: "RunPod (infra team)", org: "RunPod", role: "Infrastructure", email: "X / Discord #infrastructure", type: "Neocloud (discovery)", status: "Awaiting reply", date: "6/2/2026", priority: "P0 - Critical", notes: "Sent X/Discord message 2026-06-02. Ask: how do you separate hot-because-busy from hot-because-failing?" },
+    { name: "Vast.ai (community)", org: "Vast.ai", role: "Ops / Community", email: "support@vast.ai", type: "Neocloud (discovery)", status: "Awaiting reply", date: "6/2/2026", priority: "P0 - Critical", notes: "Sent email 2026-06-02. Marketplace reliability angle - bad-node detection." },
+    { name: "Lambda Labs (eng)", org: "Lambda Labs", role: "Infra Engineer", email: "X DM / replies", type: "Neocloud (discovery)", status: "Awaiting reply", date: "6/2/2026", priority: "P0 - Critical", notes: "Sent X DM 2026-06-02. Already a Lambda customer; peer framing." },
+    { name: "Cal Poly Campus IT", org: "Cal Poly", role: "Cluster Ops", email: "TBD", type: "Deployment", status: "Blocked on Lupo", date: "", priority: "P1 - High", notes: "Campus IT one-pager ready. Routes through Lupo first - sequenced after AI Factory greenlight." },
   ];
 }
 
@@ -261,11 +261,11 @@ export function generateDemoEvidence(): EvidenceRow[] {
     { claim: "Child-exit recovery is consistent (P-state → P8 in 5-6s)", proof: "E004: all 7 trials recovered P-state in 5.1-6.1s regardless of starting temperature", location: "vault/wiki/experiments/E004.md", status: "Evidence collected" },
     { claim: "Rθ sensitivity quantified: dRθ/dT_amb = -1/P", proof: "F2: idle 7.1% / °C, load 2.0% / °C. Idle is 3.5× more sensitive than load. Kundu mandate 2026-06-03: present R_θ with confidence bands.", location: "vault/wiki/findings/F2.md", status: "Evidence collected" },
     { claim: "Classifier reaches 100% with steady-state filter", proof: "Naive Bayes raw 87.0%, with 15s steady-state filter 99.9%. Random Forest with filter 100%. Steady-state filter is the highest-leverage preprocessing step.", location: "vault/wiki/synthesis/classifier_comparison_orange.md", status: "Evidence collected" },
-    { claim: "Fault curve classifier shipped — 6 failure modes from R_θ(P) shape", proof: "v0.1.9 (2026-06-05): dust, TIM, fan, blockage, mounting, HBM. Causal diagnosis with remediation, not just anomaly flags.", location: "thermalos-agent/thermalos/agent/fault_classifier.py + vault/wiki/concepts/rtheta_fault_taxonomy.md", status: "Evidence collected" },
+    { claim: "Fault curve classifier shipped - 6 failure modes from R_θ(P) shape", proof: "v0.1.9 (2026-06-05): dust, TIM, fan, blockage, mounting, HBM. Causal diagnosis with remediation, not just anomaly flags.", location: "thermalos-agent/thermalos/agent/fault_classifier.py + vault/wiki/concepts/rtheta_fault_taxonomy.md", status: "Evidence collected" },
     { claim: "Cal Poly AI Factory deployment proposal ready", proof: "Lupo one-pager + Campus IT brief written, PDFs generated. TARUC integration angle → ICPE 2027 co-authorship.", location: "vault/raw/strategy/pdfs/thermalos_lupo_proposal.pdf", status: "Awaiting Lupo meeting" },
-    { claim: "Neocloud discovery outreach in flight", proof: "RunPod, Vast.ai, Lambda Labs — outreach sent 2026-06-02 via X/email/Discord. Discovery (not pitch).", location: "vault/wiki/sources/outreach_messages_2026_06_02.md", status: "Awaiting replies" },
+    { claim: "Neocloud discovery outreach in flight", proof: "RunPod, Vast.ai, Lambda Labs - outreach sent 2026-06-02 via X/email/Discord. Discovery (not pitch).", location: "vault/wiki/sources/outreach_messages_2026_06_02.md", status: "Awaiting replies" },
     { claim: "Kundu informal advising active; EE 4400 fall confirmed", proof: "2026-06-03 session: 3 mandates filed (sensitivity, Bayesian, E003/E004 rerun). AI Factory access via informal advising.", location: "vault/wiki/sources/kundu_session_2026_06_03.md", status: "Evidence collected" },
-    { claim: "Power-cap sweep on dedicated hardware", proof: "E005 planned — 6 power levels on DGX B200, BMC-measured ambient", location: "vault/wiki/experiments/E005.md (planned)", status: "No proof yet" },
+    { claim: "Power-cap sweep on dedicated hardware", proof: "E005 planned - 6 power levels on DGX B200, BMC-measured ambient", location: "vault/wiki/experiments/E005.md (planned)", status: "No proof yet" },
     { claim: "Lead-time validation (E-LT testbed)", proof: "Controlled induction of 5 failure modes on Sam's heater-block rig, fall 2026", location: "vault/wiki/experiments/E-LT.md (Fall 2026)", status: "No proof yet" },
     { claim: "Cal Poly AI Factory live deployment", proof: "Canary install on 1 of 4 DGX B200 nodes after Lupo greenlight", location: "vault/wiki/synthesis/cal_poly_deployment_strategy.md", status: "Pending Lupo response" },
   ];
@@ -488,8 +488,8 @@ export function generateDemoDecisionLog(): DecisionLogRow[] {
     },
     {
       date: "2026-06-05",
-      decision: "Ship fault curve classifier v0.1.9 — 6 failure modes from R_theta(P) shape",
-      rationale: "Dust, TIM, fan, blockage, mounting, HBM thermal — each has a distinct R_theta curve signature. Classifier ships causal diagnosis with remediation, not just anomaly flags. Validation path: E-LT controlled induction.",
+      decision: "Ship fault curve classifier v0.1.9 - 6 failure modes from R_theta(P) shape",
+      rationale: "Dust, TIM, fan, blockage, mounting, HBM thermal - each has a distinct R_theta curve signature. Classifier ships causal diagnosis with remediation, not just anomaly flags. Validation path: E-LT controlled induction.",
       source_question_id: "",
       status: "active",
     },
@@ -557,7 +557,7 @@ export async function fetchAdvisorAsks(): Promise<AdvisorAsk[]> {
 
 export function generateDemoAdvisorAsks(): AdvisorAsk[] {
   return [
-    { id: "a1", ask: "Confirm conference target venue and submission deadline (ICPE 2027 is the working target — please verify)", status: "open" },
+    { id: "a1", ask: "Confirm conference target venue and submission deadline (ICPE 2027 is the working target - please verify)", status: "open" },
     { id: "a2", ask: "Intro Amogh to Prof. Lupo (Noyce founding director) to deliver the AI Factory deployment proposal", status: "open" },
     { id: "a3", ask: "Cal Poly email confirmation for Supabase advisor-questions sign-in (currently sokundu@calpoly.edu)", status: "open" },
     { id: "a4", ask: "Confirm whether informal summer advising suffices to support an AI Factory cluster access request to the Noyce School", status: "resolved" },
@@ -566,13 +566,13 @@ export function generateDemoAdvisorAsks(): AdvisorAsk[] {
 
 export function generateDemoTodayPlan(): TodayRow[] {
   return [
-    { priority: "P0 — Critical", phase: "Stage 3 — AI Factory", milestone: "Draft and send Lupo email (warm via Kundu CC, or cold) — 20-min meeting request", owner: "Amogh", track: "Comms", notes: "Proposal PDF + Campus IT one-pager ready. Deadline: Fri Jun 12" },
-    { priority: "P0 — Critical", phase: "Stage 3 — AI Factory", milestone: "Follow up with Kundu: brief him on Lupo outreach strategy, get blessing or intro", owner: "Amogh", track: "Comms", notes: "Email Monday. Keep short — one paragraph, one ask" },
-    { priority: "P0 — Critical", phase: "Discovery", milestone: "Monitor RunPod / Vast.ai / Lambda replies — respond within 24h if they reply", owner: "Amogh", track: "Comms", notes: "Outreach sent 2026-06-02. First reply unlocks first discovery call." },
-    { priority: "P1 — High", phase: "Stage 4 — Research", milestone: "Run dR_θ/dT_amb sensitivity analysis (Kundu mandate) on Stage 1 CSV data", owner: "Amogh", track: "Research", notes: "Vary T_ref 20–30°C, compute R_theta at each power tier, plot sensitivity curve" },
-    { priority: "P1 — High", phase: "Stage 4 — Research", milestone: "Plan E003 rerun protocol — n ≥ 10 trials, steady-state window, Bayesian classifier", owner: "Amogh", track: "Research", notes: "E004 rerun script already ready; E003 needs same treatment" },
-    { priority: "P1 — High", phase: "Product", milestone: "Implement theta calibrate — per-GPU baseline fingerprint stored to ~/.theta/baselines/", owner: "Amogh", track: "Software", notes: "Prerequisite for any live operator install. Moat dimension 2." },
-    { priority: "P2 — Normal", phase: "Product", milestone: "Add Grafana annotation hook to agent — emit R_theta anomaly events as Grafana annotations", owner: "Amogh", track: "Software", notes: "Low effort, high operator value. Operators already have Grafana." },
+    { priority: "P0 - Critical", phase: "Stage 3 - AI Factory", milestone: "Draft and send Lupo email (warm via Kundu CC, or cold) - 20-min meeting request", owner: "Amogh", track: "Comms", notes: "Proposal PDF + Campus IT one-pager ready. Deadline: Fri Jun 12" },
+    { priority: "P0 - Critical", phase: "Stage 3 - AI Factory", milestone: "Follow up with Kundu: brief him on Lupo outreach strategy, get blessing or intro", owner: "Amogh", track: "Comms", notes: "Email Monday. Keep short - one paragraph, one ask" },
+    { priority: "P0 - Critical", phase: "Discovery", milestone: "Monitor RunPod / Vast.ai / Lambda replies - respond within 24h if they reply", owner: "Amogh", track: "Comms", notes: "Outreach sent 2026-06-02. First reply unlocks first discovery call." },
+    { priority: "P1 - High", phase: "Stage 4 - Research", milestone: "Run dR_θ/dT_amb sensitivity analysis (Kundu mandate) on Stage 1 CSV data", owner: "Amogh", track: "Research", notes: "Vary T_ref 20–30°C, compute R_theta at each power tier, plot sensitivity curve" },
+    { priority: "P1 - High", phase: "Stage 4 - Research", milestone: "Plan E003 rerun protocol - n ≥ 10 trials, steady-state window, Bayesian classifier", owner: "Amogh", track: "Research", notes: "E004 rerun script already ready; E003 needs same treatment" },
+    { priority: "P1 - High", phase: "Product", milestone: "Implement theta calibrate - per-GPU baseline fingerprint stored to ~/.theta/baselines/", owner: "Amogh", track: "Software", notes: "Prerequisite for any live operator install. Moat dimension 2." },
+    { priority: "P2 - Normal", phase: "Product", milestone: "Add Grafana annotation hook to agent - emit R_theta anomaly events as Grafana annotations", owner: "Amogh", track: "Software", notes: "Low effort, high operator value. Operators already have Grafana." },
   ];
 }
 
@@ -633,30 +633,30 @@ export function generateDemoCommandCenter(): CommandCenter {
   return {
     the_one_thing: {
       action: "Get one real operator to install ThermalOS and react to what it shows",
-      why: "Outreach is in flight (RunPod/Vast/Lambda sent 2026-06-02). The next unlock is a live install — not a strategy doc, not a deck. One install with a reaction beats ten conversations. This is the difference between a GitHub repo and a company.",
+      why: "Outreach is in flight (RunPod/Vast/Lambda sent 2026-06-02). The next unlock is a live install - not a strategy doc, not a deck. One install with a reaction beats ten conversations. This is the difference between a GitHub repo and a company.",
       how_steps: [
         "Monitor replies from RunPod, Vast.ai, Lambda Labs",
         "When a reply comes: offer to join their Slack/Discord and walk through install live",
         "During install: ask 'does this match what you see in your Grafana?' and 'what would make this actionable?'",
         "Collect: what did it detect, was it useful, what workflow should it integrate with",
         "File notes: ingest meeting:[date]-[org]-discovery",
-        "Parallel track: Lupo AI Factory install — canary on 1 DGX B200 node",
+        "Parallel track: Lupo AI Factory install - canary on 1 DGX B200 node",
       ],
       effort: "~3 hours per install including async follow-up",
       source: "wiki/synthesis/moat_analysis_2026_06_05.md",
     },
     on_deck: [
-      { title: "Send Lupo email by June 12", why: "AI Factory install is a live production install — counts as customer evidence even if Cal Poly. Lupo is the gating decision-maker." },
-      { title: "Implement theta calibrate", why: "Per-GPU baseline fingerprint is moat dimension 2. Prerequisite before any operator install — current T4 thresholds will misfire on A100/H100." },
-      { title: "Sensitivity analysis: dR_θ/dT_amb at each power tier", why: "Kundu mandate. Required for publication. Can compute from Stage 1 CSV now — no new hardware needed." },
+      { title: "Send Lupo email by June 12", why: "AI Factory install is a live production install - counts as customer evidence even if Cal Poly. Lupo is the gating decision-maker." },
+      { title: "Implement theta calibrate", why: "Per-GPU baseline fingerprint is moat dimension 2. Prerequisite before any operator install - current T4 thresholds will misfire on A100/H100." },
+      { title: "Sensitivity analysis: dR_θ/dT_amb at each power tier", why: "Kundu mandate. Required for publication. Can compute from Stage 1 CSV now - no new hardware needed." },
     ],
     blockers: [
-      { what: "No live operator install yet — discovery outreach awaiting replies", type: "external_dependency", how_to_unblock: "Replies from RunPod/Vast/Lambda. Follow up if no reply in 5 business days (Jun 9). Parallel track: Lupo AI Factory.", owner: "Amogh", days_open: 3 },
-      { what: "Calibration mode not implemented — T4 thresholds wrong on A100/H100/B200", type: "code_gap", how_to_unblock: "Implement theta calibrate command. Estimated: 1 day. Moat prerequisite.", owner: "Amogh", days_open: 0 },
-      { what: "Sam returns to campus — E-LT lead-time testbed blocked until fall 2026", type: "waiting_on_sam", how_to_unblock: "Continue software-only work. Sam picks up E-LT + TIM characterization in fall.", owner: "Sam", days_open: 0 },
+      { what: "No live operator install yet - discovery outreach awaiting replies", type: "external_dependency", how_to_unblock: "Replies from RunPod/Vast/Lambda. Follow up if no reply in 5 business days (Jun 9). Parallel track: Lupo AI Factory.", owner: "Amogh", days_open: 3 },
+      { what: "Calibration mode not implemented - T4 thresholds wrong on A100/H100/B200", type: "code_gap", how_to_unblock: "Implement theta calibrate command. Estimated: 1 day. Moat prerequisite.", owner: "Amogh", days_open: 0 },
+      { what: "Sam returns to campus - E-LT lead-time testbed blocked until fall 2026", type: "waiting_on_sam", how_to_unblock: "Continue software-only work. Sam picks up E-LT + TIM characterization in fall.", owner: "Sam", days_open: 0 },
     ],
     escalations: [
-      { question: "Does CalPoly AI Factory install create a university IP claim on ThermalOS?", route_to: "Kundu", why: "YC will do IP due diligence. Need written confirmation before the canary install.", draft_ask: "Hi Prof. Kundu,\n\nBefore I proceed with the AI Factory canary install, I want to do a quick IP check: does running ThermalOS on Cal Poly infrastructure under your informal advising create any university IP claim on the software? The code was written entirely on personal hardware (Colab T4), so my read is we're clean — but I want to confirm before we plug in.\n\nHappy to discuss at our next meeting or over email.\n\nThanks,\nAmogh" },
+      { question: "Does CalPoly AI Factory install create a university IP claim on ThermalOS?", route_to: "Kundu", why: "YC will do IP due diligence. Need written confirmation before the canary install.", draft_ask: "Hi Prof. Kundu,\n\nBefore I proceed with the AI Factory canary install, I want to do a quick IP check: does running ThermalOS on Cal Poly infrastructure under your informal advising create any university IP claim on the software? The code was written entirely on personal hardware (Colab T4), so my read is we're clean - but I want to confirm before we plug in.\n\nHappy to discuss at our next meeting or over email.\n\nThanks,\nAmogh" },
       { question: "What is the ICPE 2027 submission deadline and required paper format?", route_to: "Kundu", why: "Publication timeline determines when E-LT experiments must complete. Need the deadline to reverse-plan the fall semester.", draft_ask: "Hi Prof. Kundu,\n\nTo plan the fall experiment schedule: what is the ICPE 2027 submission deadline and paper format (page limit, IEEE style)? I want to make sure E003/E004 reruns and the lead-time validation are done with enough time to write and revise.\n\nThanks,\nAmogh" },
     ],
   };
@@ -700,7 +700,7 @@ export async function fetchWikiSummary(): Promise<WikiSummary> {
 export function generateDemoWikiSummary(): WikiSummary {
   return {
     sync_timestamp: new Date().toISOString(),
-    overview_stage: "Stage 1 complete (Colab T4, 8,734 rows, E001–E004 v2). Agent v0.1.12 live on PyPI. Stage 3 (AI Factory) in progress — gated on Lupo meeting.",
+    overview_stage: "Stage 1 complete (Colab T4, 8,734 rows, E001–E004 v2). Agent v0.1.12 live on PyPI. Stage 3 (AI Factory) in progress - gated on Lupo meeting.",
     open_questions_count: "13",
     open_questions_list: "Q_lead_time; Q_conference_venue; Q_cross_vendor_calibration; Q_workflow_integration; Q_per_gpu_baseline; Q_university_ip_risk; Q_sensitivity_analysis; Q_ambient_measurement; Q_AI_Factory_access; Q_discovery_progress; Q_slurm_integration; Q_Kundu_email; Q_memory_store",
     experiments_complete: "E001, E002, E003, E004 (v1 + v2 controlled-variable)",
@@ -764,7 +764,7 @@ export async function fetchRoadmapStages(): Promise<RoadmapStage[]> {
 
     stages.push({
       id: stages.length + 1,
-      title: phase.replace(/phase \d+ — /i, "").trim(),
+      title: phase.replace(/phase \d+ - /i, "").trim(),
       status,
       subtitle: doneCount === totalCount ? `${totalCount} milestones` : `${doneCount}/${totalCount} milestones`,
       progress,
@@ -779,6 +779,6 @@ export function generateDemoRoadmapStages(): RoadmapStage[] {
     { id: 1, title: "Colab baseline", status: "complete", subtitle: "Tesla T4 · 2,280+ rows · E001–E003 complete", progress: 100 },
     { id: 2, title: "Dedicated GPU hardware", status: "in_progress", subtitle: "Physical machine · power-cap sweep · E005–E008", progress: 10 },
     { id: 3, title: "Anomaly detector v1", status: "locked", subtitle: "Statistical detector on clean baseline", progress: 0 },
-    { id: 4, title: "Multi-GPU validation", status: "locked", subtitle: "A100 / H100 / RTX — generalization", progress: 0 },
+    { id: 4, title: "Multi-GPU validation", status: "locked", subtitle: "A100 / H100 / RTX - generalization", progress: 0 },
   ];
 }

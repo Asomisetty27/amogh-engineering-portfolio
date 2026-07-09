@@ -25,7 +25,7 @@ export default function Index() {
   }, []);
 
   // Every tab lands at its own top. Instant (not smooth-scrolled): the exit/
-  // enter animation is the transition — a competing scroll tween underneath
+  // enter animation is the transition - a competing scroll tween underneath
   // it reads as two things happening at once.
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
@@ -55,15 +55,15 @@ export default function Index() {
       <LensProvider>
       {booted && (
         <div className="min-h-screen bg-background relative">
-          {/* Ambient layers — exactly two: the thermal-field signature and the
+          {/* Ambient layers - exactly two: the thermal-field signature and the
               cursor heat trail. Everything else (orbs, grain, teal grid) is
               gone; restraint is the material. */}
           <ThermalField />
           <CursorHeat />
-          {/* The instrument — engages only over Inspectable surfaces */}
+          {/* The instrument - engages only over Inspectable surfaces */}
           <ThermalLens />
 
-          {/* Blueprint grid — champagne ink at drafting-table density */}
+          {/* Blueprint grid - champagne ink at drafting-table density */}
           <div
             className="fixed inset-0 pointer-events-none"
             style={{
@@ -77,7 +77,7 @@ export default function Index() {
             }}
           />
 
-          {/* Vignette — settles the edges like a lens */}
+          {/* Vignette - settles the edges like a lens */}
           <div
             className="fixed inset-0 pointer-events-none"
             style={{
@@ -103,7 +103,7 @@ export default function Index() {
                 exit={{
                   opacity: 0,
                   y: -6,
-                  // Exit fast — mode="wait" serializes exit→enter, so a long
+                  // Exit fast - mode="wait" serializes exit→enter, so a long
                   // exit is pure dead time between tabs.
                   transition: { duration: 0.16, ease: [0.4, 0, 1, 1] },
                 }}

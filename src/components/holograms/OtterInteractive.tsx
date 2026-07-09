@@ -1,5 +1,5 @@
 /**
- * OtterInteractive — OTTER RISC-V MCU Datapath
+ * OtterInteractive - OTTER RISC-V MCU Datapath
  *
  * PCB-substrate schematic hologram. Layout follows OTTER_Architecture.
  * FSM: FETCH (PC→IMEM, load IR) → EXEC (decode, RF→ALU→MEM→writeback)
@@ -281,7 +281,7 @@ export default function OtterInteractive() {
           style={{ background: "linear-gradient(to bottom,rgba(7,13,7,.95),transparent)" }}>
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono font-semibold text-primary tracking-wider uppercase">
-              OTTER MCU — RISC-V Datapath
+              OTTER MCU - RISC-V Datapath
             </span>
             <ConfidenceBadgeTag confidence="VERIFIED" />
           </div>
@@ -619,7 +619,7 @@ export default function OtterInteractive() {
               <text x={68} y={161} textAnchor="middle"
                 fill={isFetch ? "#00d4aa" : "#ffaa00"}
                 fontSize="3" fontFamily="monospace" fontWeight="bold">
-                STATE: {isFetch ? "FETCH" : "EXEC"} — {currentStep.desc}
+                STATE: {isFetch ? "FETCH" : "EXEC"} - {currentStep.desc}
               </text>
             </g>
           )}
@@ -640,7 +640,7 @@ export default function OtterInteractive() {
         <div className="absolute bottom-2 left-2 right-2 z-10 flex items-center justify-between">
           <span className="text-[9px] font-mono text-muted-foreground px-1.5 py-0.5 rounded"
             style={{ background: "rgba(7,13,7,.85)", border: "1px solid #1a3a1a" }}>
-            Source: OTTER_Architecture — RISC-V RV32I verified implementation
+            Source: OTTER_Architecture - RISC-V RV32I verified implementation
           </span>
           {mode !== "idle" && (
             <span className="text-[9px] font-mono px-1.5 py-0.5 rounded"

@@ -4,7 +4,7 @@ import Inspectable from "@/components/visual/Inspectable";
 import { useLens } from "@/components/visual/lens";
 
 /**
- * PLATE 01 — the establishing shot. A cinematic macro of a bare die
+ * PLATE 01 - the establishing shot. A cinematic macro of a bare die
  * (Higgsfield, Isotherm palette) presented like a lab specimen: slow optical
  * drift, scroll parallax, and a hidden instrument view under the lens with
  * drafted callouts. The annotations are illustrative (and say so).
@@ -20,7 +20,7 @@ const CALLOUTS = [
 function ThermalView({ engaged }: { engaged: boolean }) {
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", borderRadius: "inherit" }}>
-      {/* Same pixels, ironbow-mapped — perfectly registered with the showroom image */}
+      {/* Same pixels, ironbow-mapped - perfectly registered with the showroom image */}
       <img
         src={SRC}
         alt=""
@@ -35,7 +35,7 @@ function ThermalView({ engaged }: { engaged: boolean }) {
           transform: "scale(1.06)",
         }}
       />
-      {/* Drafted callouts — draw in when the instrument engages */}
+      {/* Drafted callouts - draw in when the instrument engages */}
       {CALLOUTS.map((c, i) => (
         <div key={c.label} style={{ position: "absolute", left: `${c.x}%`, top: `${c.y}%` }}>
           <motion.div
@@ -86,7 +86,7 @@ function ThermalView({ engaged }: { engaged: boolean }) {
           </motion.div>
         </div>
       ))}
-      {/* Scanline sweep — one slow pass while engaged */}
+      {/* Scanline sweep - one slow pass while engaged */}
       {engaged && (
         <motion.div
           initial={{ top: "-2%" }}
@@ -118,7 +118,7 @@ export default function SpecimenPlate() {
     else img.onload = () => setLoaded(true);
   }, []);
 
-  // Scroll parallax — the plate sits a layer deeper than the page
+  // Scroll parallax - the plate sits a layer deeper than the page
   const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start end", "end start"] });
   const parallaxY = useTransform(scrollYProgress, [0, 1], ["-4%", "4%"]);
 
@@ -151,7 +151,7 @@ export default function SpecimenPlate() {
           background: "#0a0810",
         }}
       >
-        {/* Showroom state — slow optical drift over a parallax layer */}
+        {/* Showroom state - slow optical drift over a parallax layer */}
         <motion.div style={{ position: "absolute", inset: 0, y: reduce ? 0 : parallaxY }}>
           <motion.img
             src={SRC}
@@ -172,7 +172,7 @@ export default function SpecimenPlate() {
           />
         </motion.div>
 
-        {/* Bottom caption bar — specimen labeling, not a UI chrome bar */}
+        {/* Bottom caption bar - specimen labeling, not a UI chrome bar */}
         <div
           style={{
             position: "absolute",

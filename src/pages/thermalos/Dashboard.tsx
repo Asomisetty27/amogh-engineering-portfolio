@@ -91,7 +91,7 @@ function computeActions(
   if (parseInt(summary.conflicts_found || "0") > 0) {
     actions.push({
       label: "Needs attention",
-      action: "Vault / site conflict detected — run sync to review",
+      action: "Vault / site conflict detected - run sync to review",
       reason: summary.conflicts_detail || "Contradiction between vault and site data.",
       type: "attention",
       link: "/thermalos/lab",
@@ -137,7 +137,7 @@ function computeActions(
     actions.push({
       label: "Vault directive",
       action: summary.next_action.replace(/\[\[.*?\]\]/g, "").trim().slice(0, 100),
-      reason: "From vault overview.md — last synced " + (summary.vault_last_updated || "unknown"),
+      reason: "From vault overview.md - last synced " + (summary.vault_last_updated || "unknown"),
       type: "ready",
       link: "/thermalos",
     });
@@ -191,10 +191,10 @@ function VaultState({ summary }: { summary: WikiSummary }) {
         <span className="text-[10px] font-mono text-[#5a5a55]">Last synced {syncedAt}</span>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCell label="Findings validated" value={summary.findings_current || "—"} tone="green" />
-        <StatCell label="Experiments complete" value={String(complete.length) || "—"} tone="green" />
-        <StatCell label="Experiments planned" value={String(planned.length) || "—"} tone="gray" />
-        <StatCell label="Open questions" value={summary.open_questions_count || "—"} tone={parseInt(summary.open_questions_count || "0") > 5 ? "amber" : "green"} />
+        <StatCell label="Findings validated" value={summary.findings_current || "-"} tone="green" />
+        <StatCell label="Experiments complete" value={String(complete.length) || "-"} tone="green" />
+        <StatCell label="Experiments planned" value={String(planned.length) || "-"} tone="gray" />
+        <StatCell label="Open questions" value={summary.open_questions_count || "-"} tone={parseInt(summary.open_questions_count || "0") > 5 ? "amber" : "green"} />
       </div>
       {openQs.length > 0 && (
         <div className="mt-3 pt-3 border-t border-white/[0.05]">
@@ -223,7 +223,7 @@ function StatCell({ label, value, tone }: { label: string; value: string; tone: 
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
-  useEffect(() => { document.title = "ThermalOS — Dashboard | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - Dashboard | amogh.site"; }, []);
 
   const { data: summaryData, error: summaryErr, isError: summaryIsErr } = useQuery({
     queryKey: ["wiki-summary"],

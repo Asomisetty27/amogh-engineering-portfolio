@@ -14,7 +14,7 @@ const T = {
 const FM = "'JetBrains Mono', ui-monospace, monospace";
 
 // ──────────────────────────────────────────────────────────────────────────
-// Website wrapper — visibility-gated exactly like DataCenterShowcase, so the
+// Website wrapper - visibility-gated exactly like DataCenterShowcase, so the
 // WebGL context only mounts near-viewport and the dashboard mockup (which
 // reads TowerUnit's shared refs) only renders once the scene has actually
 // started driving them.
@@ -61,7 +61,7 @@ export default function OperatorViewShowcase() {
             The hardware on the left. The screen your on-call is watching on the right.
           </h2>
           <p style={{ marginTop: 14, color: T.muted, fontSize: 15, lineHeight: 1.6, maxWidth: 640 }}>
-            Same incident, two views — Theta watching a node drift toward trouble, and the
+            Same incident, two views - Theta watching a node drift toward trouble, and the
             live readout, node grid, and alert feed an operator would actually see the
             instant R<sub>θ</sub> starts to climb. They're driven by the same clock: watch
             the glow on the left and the numbers on the right move together.

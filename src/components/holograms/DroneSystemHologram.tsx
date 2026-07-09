@@ -26,51 +26,51 @@ interface DroneSubsystem {
 const subsystems: DroneSubsystem[] = [
   { id: "frame", name: "Cockroach75 Frame", shortName: "FRAME", cx: 200, cy: 140, rx: 70, ry: 30, color: "#667788",
     description: "75 mm ducted whoop frame providing structural skeleton, motor mounting, and crash protection",
-    role: "Structural foundation — all subsystems mount to or within the frame",
+    role: "Structural foundation - all subsystems mount to or within the frame",
     constraints: "75 mm M2M limits component size; ducts add drag but enable indoor safety",
-    failureIfRemoved: "No structural support — entire system non-functional",
+    failureIfRemoved: "No structural support - entire system non-functional",
     confidence: "VERIFIED",
     specs: ["75 mm motor-to-motor", "Ducted prop guards", "Carbon fiber composite"] },
   { id: "motors", name: "0804 12000KV Motors (×4)", shortName: "MOTORS", cx: 200, cy: 50, rx: 55, ry: 18, color: "#00d4aa",
     description: "Four micro brushless motors: 8 mm stator diameter, 4 mm stator height, 12000 RPM/V",
     role: "Convert electrical energy to thrust via high-RPM propeller rotation",
     constraints: "High KV requires quality bearings; vibration couples directly to camera/gyro",
-    failureIfRemoved: "No thrust generation — craft cannot fly",
+    failureIfRemoved: "No thrust generation - craft cannot fly",
     confidence: "VERIFIED",
     specs: ["0804 (8×4 mm stator)", "12000 KV", "Bluejay 48 kHz ESC firmware", "Bidirectional DShot600"] },
   { id: "aio", name: "BeeBrain HD G4 AIO", shortName: "AIO / FC", cx: 200, cy: 140, rx: 40, ry: 16, color: "#4488ff",
     description: "All-in-one board: STM32G474 flight controller + 4×20A ESC + integrated ELRS 3.0 receiver",
-    role: "Central coordination core — PID control, ESC command, receiver input, OSD data",
+    role: "Central coordination core - PID control, ESC command, receiver input, OSD data",
     constraints: "Single PCB failure disables entire craft; thermal density from ESC FETs",
-    failureIfRemoved: "No flight control, no motor drive, no receiver — total system failure",
+    failureIfRemoved: "No flight control, no motor drive, no receiver - total system failure",
     confidence: "VERIFIED",
     specs: ["STM32G474 (Cortex-M4F, 170 MHz)", "4×20A ESC", "ELRS 3.0 diversity Rx", "DShot600 + bidir"] },
   { id: "o3", name: "DJI O3 Air Unit", shortName: "DJI O3", cx: 200, cy: 220, rx: 38, ry: 16, color: "#ff6644",
-    description: "HD digital video transmitter with camera — heaviest single component, premium payload",
+    description: "HD digital video transmitter with camera - heaviest single component, premium payload",
     role: "Low-latency HD video transmission for FPV piloting; OSD overlay via FC serial",
     constraints: "Dominant mass + power consumer; requires 10V dedicated rail; generates heat",
-    failureIfRemoved: "No video feed — pilot blind; craft still flyable in LOS but impractical for FPV",
+    failureIfRemoved: "No video feed - pilot blind; craft still flyable in LOS but impractical for FPV",
     confidence: "VERIFIED",
     specs: ["10V 2A power requirement", "HD digital video link", "OSD serial to FC", "Camera + VTX integrated"] },
   { id: "battery", name: "2S LiPo Battery", shortName: "BATTERY", cx: 200, cy: 280, rx: 35, ry: 14, color: "#ffcc00",
     description: "1–2S lithium polymer battery (typically 450–550 mAh) providing all system power",
-    role: "Sole energy source — powers motors, regulators, FC, receiver, and O3",
+    role: "Sole energy source - powers motors, regulators, FC, receiver, and O3",
     constraints: "Weight vs capacity tradeoff; internal resistance causes sag under load",
-    failureIfRemoved: "No power — entire system dead",
+    failureIfRemoved: "No power - entire system dead",
     confidence: "VERIFIED",
     specs: ["2S (7.4–8.4V)", "450–550 mAh typical", "XT30 connector", "~15–25C discharge"] },
   { id: "receiver", name: "ELRS 3.0 Diversity Rx", shortName: "ELRS Rx", cx: 65, cy: 140, rx: 32, ry: 14, color: "#00ffaa",
     description: "Integrated ExpressLRS 3.0 diversity receiver with dual antenna paths on UART2",
     role: "Receives pilot commands from transmitter and delivers to FC via serial protocol",
     constraints: "Antenna routing must clear carbon fiber; diversity logic needs both paths unobstructed",
-    failureIfRemoved: "No pilot input — craft enters failsafe (disarm or return-to-home)",
+    failureIfRemoved: "No pilot input - craft enters failsafe (disarm or return-to-home)",
     confidence: "VERIFIED",
     specs: ["ELRS 3.0 protocol", "UART2 to FC", "Diversity antenna (2 paths)", "Integrated on AIO"] },
   { id: "props", name: "40 mm Tri-blade Props", shortName: "PROPS", cx: 335, cy: 50, rx: 30, ry: 12, color: "#88ddaa",
-    description: "40 mm diameter tri-blade propellers — interface between motor output and aerodynamic thrust",
+    description: "40 mm diameter tri-blade propellers - interface between motor output and aerodynamic thrust",
     role: "Convert motor RPM to thrust; tri-blade increases control authority at efficiency cost",
     constraints: "Balance affects vibration; tri-blade less efficient than bi-blade but more responsive",
-    failureIfRemoved: "No thrust generation — motors spin but produce no useful force",
+    failureIfRemoved: "No thrust generation - motors spin but produce no useful force",
     confidence: "VERIFIED",
     specs: ["40 mm diameter", "Tri-blade", "Clockwise + counter-clockwise pairs"] },
   { id: "canopy", name: "AcroBee75 HD O3 Canopy", shortName: "CANOPY", cx: 335, cy: 220, rx: 32, ry: 14, color: "#9977cc",
@@ -112,7 +112,7 @@ const failureHotspots: FailureHotspot[] = [
   { id: "f-thermal", name: "BEC Thermal Stress", subsystemId: "aio", propagatesTo: ["o3"],
     description: "10V BEC heat in enclosed canopy → regulator instability → video artifacts or brownout", severity: "medium" },
   { id: "f-protocol", name: "Control-Link Mismatch", subsystemId: "receiver", propagatesTo: ["aio"],
-    description: "TBS Mambo (Tracer) ≠ onboard ELRS — incompatible RF protocols prevent flight without resolution", severity: "high" },
+    description: "TBS Mambo (Tracer) ≠ onboard ELRS - incompatible RF protocols prevent flight without resolution", severity: "high" },
 ];
 
 // ========== FUNCTION-MODE STAGES ==========
@@ -228,7 +228,7 @@ export default function DroneSystemHologram() {
         {/* Top Bar */}
         <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-3 py-2 bg-gradient-to-b from-background/90 to-transparent">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono font-semibold text-primary tracking-wider uppercase">FPV SYSTEM — {viewMode.toUpperCase()}</span>
+            <span className="text-[10px] font-mono font-semibold text-primary tracking-wider uppercase">FPV SYSTEM - {viewMode.toUpperCase()}</span>
             <ConfidenceBadgeTag confidence="VERIFIED" />
           </div>
         </div>
@@ -250,7 +250,7 @@ export default function DroneSystemHologram() {
 
         {/* Reconstructed note */}
         <div className="absolute bottom-2 left-2 right-2 z-10 text-[9px] font-mono text-neon-amber bg-background/80 rounded px-2 py-1 border border-neon-amber/20">
-          RECONSTRUCTED FROM KNOWN COMPONENTS — derived from platform specs and standard engineering integration logic
+          RECONSTRUCTED FROM KNOWN COMPONENTS - derived from platform specs and standard engineering integration logic
         </div>
 
         <svg viewBox="0 0 400 320" className="w-full h-full" style={{ background: "hsl(220, 20%, 3%)" }}>
@@ -354,7 +354,7 @@ export default function DroneSystemHologram() {
 
           {/* Title */}
           <text x="200" y="310" textAnchor="middle" fill="hsl(215, 12%, 40%)" fontSize="7" fontFamily="monospace">
-            AcroBee75 G4 HD O3 — Reconstructed System Architecture
+            AcroBee75 G4 HD O3 - Reconstructed System Architecture
           </text>
         </svg>
 

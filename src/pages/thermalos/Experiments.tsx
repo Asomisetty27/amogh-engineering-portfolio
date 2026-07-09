@@ -6,14 +6,14 @@ import {
   ScatterChart, Scatter, ZAxis,
 } from "recharts";
 
-// Hardcoded experiment log — real findings from E001-E004
+// Hardcoded experiment log - real findings from E001-E004
 const EXPERIMENTS = [
   {
     id: "E001",
-    title: "Idle Baseline — T4 GPU",
+    title: "Idle Baseline - T4 GPU",
     date: "2026-05-14",
     status: "Done",
-    finding: "Stable idle baseline established. T~39°C, P~11-14W, Rθ~1.28 °C/W, 0% utilization, P8 power state, ~450MB memory. Ambient assumption of 25°C introduces noise at low power — calibrate ambient in future runs.",
+    finding: "Stable idle baseline established. T~39°C, P~11-14W, Rθ~1.28 °C/W, 0% utilization, P8 power state, ~450MB memory. Ambient assumption of 25°C introduces noise at low power - calibrate ambient in future runs.",
     metrics: { avgTemp: 39, avgPower: 12, avgRtheta: 1.28, samples: 120 },
   },
   {
@@ -37,13 +37,13 @@ const EXPERIMENTS = [
     title: "Cooldown Replication (3 trials)",
     date: "2026-05-14",
     status: "Done",
-    finding: "Replicated E003 three times. Return times: 209s, 212s, 185s. Mean 202s, std dev 14.8s. Consistent and measurable — forms basis for anomaly detection threshold.",
+    finding: "Replicated E003 three times. Return times: 209s, 212s, 185s. Mean 202s, std dev 14.8s. Consistent and measurable - forms basis for anomaly detection threshold.",
     metrics: { avgTemp: 52, avgPower: 17, avgRtheta: 1.58, samples: 606 },
   },
   {
     id: "E005",
     title: "Power-Cap Sweep (6 levels)",
-    date: "—",
+    date: "-",
     status: "Planned",
     finding: "Run PyTorch matmul at 150W / 175W / 200W / 225W / 250W / full TDP. Measure compute/watt at each. Identify optimal power cap with <3% throughput loss.",
     metrics: null,
@@ -51,7 +51,7 @@ const EXPERIMENTS = [
   {
     id: "E006",
     title: "Rolling Rθ Baseline + Anomaly Threshold",
-    date: "—",
+    date: "-",
     status: "Planned",
     finding: "Establish rolling mean Rθ over 30-sample window. Calibrate deviation threshold (target: 15% above baseline triggers alert). Measure false positive rate.",
     metrics: null,
@@ -72,7 +72,7 @@ const statusColor: Record<string, string> = {
 };
 
 export default function Experiments() {
-  useEffect(() => { document.title = "ThermalOS — Experiments | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - Experiments | amogh.site"; }, []);
   const [selected, setSelected] = useState<string>("E002");
 
   const { data, error, isError } = useQuery({
@@ -164,7 +164,7 @@ export default function Experiments() {
         <div className="lg:col-span-2 space-y-4">
           <div className="bg-[#141412] border border-white/[0.07] rounded-xl p-4">
             <div className="text-[9px] font-mono uppercase tracking-wider text-[#5a5a55] mb-2">
-              E003/E004 — Cooldown curve shape
+              E003/E004 - Cooldown curve shape
             </div>
             <ResponsiveContainer width="100%" height={150}>
               <LineChart data={cooldownData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>

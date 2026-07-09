@@ -54,7 +54,7 @@ export default function FunckNetworkHologram() {
       <div className="flex-1 relative rounded-lg overflow-hidden border border-panel-border bg-[hsl(220,20%,3%)]">
         <div className="absolute top-0 left-0 right-0 z-10 flex items-center gap-2 px-3 py-2 bg-gradient-to-b from-background/90 to-transparent">
           <span className="text-xs font-mono font-semibold text-primary tracking-wider uppercase">
-            Funck — Systems Hologram
+            Funck - Systems Hologram
           </span>
           <ConfidenceBadgeTag confidence="CONCEPTUAL" />
         </div>
@@ -113,7 +113,7 @@ export default function FunckNetworkHologram() {
         </div>
 
         <div className="absolute bottom-2 left-2 right-2 z-10 text-[10px] font-mono text-neon-amber bg-background/80 rounded px-2 py-1 border border-neon-amber/20">
-          ⚠ CONCEPTUAL — Architecture based on stated tech stack. Reflects production system at funck.live.
+          ⚠ CONCEPTUAL - Architecture based on stated tech stack. Reflects production system at funck.live.
         </div>
       </div>
 

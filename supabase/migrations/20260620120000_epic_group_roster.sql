@@ -1,7 +1,7 @@
--- EPIC 2026 — group roster (first name + last initial ONLY; minors' data).
+-- EPIC 2026 - group roster (first name + last initial ONLY; minors' data).
 -- Stores who is in each group per cohort so the instructor dashboard can show
 -- names instead of bare group numbers. PRIVACY: never full names, emails, or
--- any other PII — the StudentHelper inputs enforce "Maya R." style entries.
+-- any other PII - the StudentHelper inputs enforce "Maya R." style entries.
 
 CREATE TABLE public.group_roster (
   cohort text NOT NULL DEFAULT 'week1',

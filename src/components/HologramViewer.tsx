@@ -193,7 +193,7 @@ export default function HologramViewer({ parts, title, confidence, sourceFiles =
 
         {conceptualNote && (
           <div className="absolute bottom-2 left-2 right-2 z-10 text-[10px] font-mono text-neon-amber bg-background/80 rounded px-2 py-1 border border-neon-amber/20">
-            ⚠ CONCEPTUAL 3D — {conceptualNote}
+            ⚠ CONCEPTUAL 3D - {conceptualNote}
           </div>
         )}
       </div>

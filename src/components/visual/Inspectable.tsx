@@ -92,7 +92,7 @@ export default function Inspectable({ meta, thermal, children, className, style 
     >
       {children}
 
-      {/* Instrument view — masked to the lens on desktop, full-bleed when pinned */}
+      {/* Instrument view - masked to the lens on desktop, full-bleed when pinned */}
       <div
         aria-hidden
         style={{
@@ -115,7 +115,7 @@ export default function Inspectable({ meta, thermal, children, className, style 
         {typeof thermal === "function" ? thermal(showThermal) : thermal}
       </div>
 
-      {/* Discovery affordance — quiet, mono, gone after first inspection */}
+      {/* Discovery affordance - quiet, mono, gone after first inspection */}
       {!inspectedOnce && (
         <div
           aria-hidden

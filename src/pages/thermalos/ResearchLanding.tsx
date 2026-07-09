@@ -1,11 +1,11 @@
 /**
- * ThermalOS Research Landing — amogh.site/thermalos
+ * ThermalOS Research Landing - amogh.site/thermalos
  *
  * Audience: academics, advisors, OSS users, engineers from GitHub/PyPI.
  * Tone: research project page, not a product pitch.
  *
  * Designed comprehension-first: a cold visitor should understand the metric,
- * the strongest evidence, and what is / is not yet validated — in that order,
+ * the strongest evidence, and what is / is not yet validated - in that order,
  * with a sticky section nav to jump anywhere.
  *
  * Production-cluster data (E009) is shown ANONYMIZED ("production H100
@@ -111,14 +111,14 @@ const FINDINGS = [
     id: 'F3',
     statement: 'Power smoothing has no detectable effect on R_θ variance (null result)',
     evidence: 'E002',
-    headline: 'Simplifies the pipeline — smoothing layer dropped in v0.1.2',
+    headline: 'Simplifies the pipeline - smoothing layer dropped in v0.1.2',
     confidence: 'high',
   },
   {
     id: 'F4',
     statement: 'Elevated post-load R_θ is CUDA context overhead, not thermal lag',
     evidence: 'E002, E003',
-    headline: 'Resolved apparent anomaly — memory artifact identified and isolated',
+    headline: 'Resolved apparent anomaly - memory artifact identified and isolated',
     confidence: 'high',
   },
   {
@@ -184,7 +184,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Plain-words callout — one per section so non-specialists never get lost. */
+/** Plain-words callout - one per section so non-specialists never get lost. */
 function PlainWords({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
@@ -333,7 +333,7 @@ function SectionNav() {
 }
 
 /** Paired bar chart: temperature row vs peer-relative R_θ row for one node.
- *  The single most important visual on the page — shows WHY temperature
+ *  The single most important visual on the page - shows WHY temperature
  *  thresholds miss what R_θ catches. Pure SVG, no deps. */
 function NodeBars({ data, anomaly, tempLooksFine }: {
   data: { g: number; T: number; dev: number }[];
@@ -348,7 +348,7 @@ function NodeBars({ data, anomaly, tempLooksFine }: {
     <svg viewBox={`0 0 ${W} ${rowH * 2 + gap + 34}`} style={{ width: '100%', height: 'auto', display: 'block' }}>
       {/* row 1: temperature */}
       <text x={0} y={12} fill={T.muted} fontFamily={FM} fontSize={10} letterSpacing="0.08em">
-        TEMPERATURE (°C) — {tempLooksFine ? 'looks unremarkable' : 'one unit clearly hot'}
+        TEMPERATURE (°C) - {tempLooksFine ? 'looks unremarkable' : 'one unit clearly hot'}
       </text>
       {data.map((d, i) => {
         const h = ((d.T - tMin) / (tMax - tMin)) * (rowH - 18);
@@ -365,13 +365,13 @@ function NodeBars({ data, anomaly, tempLooksFine }: {
           </g>
         );
       })}
-      {/* threshold line at 85C — nothing crosses it */}
+      {/* threshold line at 85C - nothing crosses it */}
       <line x1={pad - 8} x2={W} y1={20} y2={20} stroke={`${T.rising}55`} strokeDasharray="4 4" strokeWidth={1} />
       <text x={pad - 12} y={23} textAnchor="end" fill={`${T.rising}AA`} fontFamily={FM} fontSize={9}>85° alert</text>
 
       {/* row 2: peer-relative R_theta deviation */}
       <text x={0} y={rowH + gap + 10} fill={T.muted} fontFamily={FM} fontSize={10} letterSpacing="0.08em">
-        R_θ vs NODE PEERS (%) — the anomaly is unambiguous
+        R_θ vs NODE PEERS (%) - the anomaly is unambiguous
       </text>
       {data.map((d, i) => {
         const base = rowH + gap + 18 + (rowH - 18) * 0.72;
@@ -428,30 +428,30 @@ function HeroFormula() {
         lineHeight: 1.65, maxWidth: 500, margin: '0 auto',
       }}>
         Degrees of heating per watt of power. A healthy GPU's value is stable;
-        a rising value at steady power means the cooling path is degrading —
+        a rising value at steady power means the cooling path is degrading -
         independent of how busy the GPU is.
       </div>
     </div>
   );
 }
 
-/* ── "Start here" — 3-step comprehension ladder ──────────────────────────── */
+/* ── "Start here" - 3-step comprehension ladder ──────────────────────────── */
 function StartHere() {
   const steps = [
     {
       n: '01',
       title: 'Temperature alone is ambiguous',
-      body: 'A GPU at 75 °C could be a healthy unit working hard, or a failing unit barely working. Every temperature-threshold alert inherits this ambiguity — so thresholds are set high, and slow cooling failures pass underneath them for weeks.',
+      body: 'A GPU at 75 °C could be a healthy unit working hard, or a failing unit barely working. Every temperature-threshold alert inherits this ambiguity - so thresholds are set high, and slow cooling failures pass underneath them for weeks.',
     },
     {
       n: '02',
       title: 'Divide by power, and the ambiguity disappears',
-      body: 'Thermal resistance R_θ = ΔT / P asks "how hot per watt?" instead of "how hot?". Workload cancels out. What remains is a physical property of the cooling path itself — heatsink contact, thermal paste, airflow.',
+      body: 'Thermal resistance R_θ = ΔT / P asks "how hot per watt?" instead of "how hot?". Workload cancels out. What remains is a physical property of the cooling path itself - heatsink contact, thermal paste, airflow.',
     },
     {
       n: '03',
       title: 'Diagnosis intelligence: fingerprint the fault signature',
-      body: 'Each fault mode leaves a distinct signature: air-side blockage looks different from TIM dry-out, which looks different from silicon degradation. A 6-axis fault classifier (H100-calibrated on real production data) names the probable cause from the R_θ curve shape alone — before the technician opens the chassis.',
+      body: 'Each fault mode leaves a distinct signature: air-side blockage looks different from TIM dry-out, which looks different from silicon degradation. A 6-axis fault classifier (H100-calibrated on real production data) names the probable cause from the R_θ curve shape alone - before the technician opens the chassis.',
     },
   ];
   return (
@@ -477,7 +477,7 @@ function ProductionEvidence() {
     <>
       <PlainWords>
         We were given telemetry from a real production H100 cluster (72 GPUs, captured
-        during a cooling incident) and — without being told which units were bad — flagged
+        during a cooling incident) and - without being told which units were bad - flagged
         three. One of them ran at 72 °C, a temperature that dozens of healthy GPUs in the
         same fleet exceed. No temperature alert could ever catch it. R_θ flagged it in
         five minutes. Our fault classifier, calibrated on this production data, also named
@@ -494,14 +494,14 @@ function ProductionEvidence() {
         <div style={card}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
             <span style={{ fontFamily: FM, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted }}>
-              Case 1 — Node A, GPU 7 · severe
+              Case 1 - Node A, GPU 7 · severe
             </span>
             <Badge color={T.rising}>z = +15.6</Badge>
           </div>
           <NodeBars data={NODE_A} anomaly={7} tempLooksFine={false} />
           <div style={{ fontFamily: FD, fontSize: 12.5, color: T.muted, lineHeight: 1.65, marginTop: 12 }}>
             80 °C at 653 W while seven board-mates run 57–66 °C at identical power.
-            Visibly hot — but still <em>below every alert threshold</em>. Stable across
+            Visibly hot - but still <em>below every alert threshold</em>. Stable across
             the full window: this is established degradation, not a transient.
           </div>
         </div>
@@ -510,13 +510,13 @@ function ProductionEvidence() {
         <div style={card}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
             <span style={{ fontFamily: FM, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted }}>
-              Case 2 — Node B, GPU 6 · the invisible one
+              Case 2 - Node B, GPU 6 · the invisible one
             </span>
             <Badge color={T.healthy}>z = +4.4</Badge>
           </div>
           <NodeBars data={NODE_B} anomaly={6} tempLooksFine={true} />
           <div style={{ fontFamily: FD, fontSize: 12.5, color: T.muted, lineHeight: 1.65, marginTop: 12 }}>
-            72 °C — within 1 °C of healthy units elsewhere in this fleet. <em>No
+            72 °C - within 1 °C of healthy units elsewhere in this fleet. <em>No
             temperature-based system can flag this GPU.</em> Peer-relative R_θ puts it
             +16% above expectation after correcting for board position. This case is the
             thesis of the project in one chart.
@@ -528,12 +528,12 @@ function ProductionEvidence() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
         <div style={card}>
           <div style={{ fontFamily: FM, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted, marginBottom: 12 }}>
-            Method — why no new sensors are needed
+            Method - why no new sensors are needed
           </div>
           <div style={{ fontFamily: FD, fontSize: 13, color: T.muted, lineHeight: 1.7 }}>
             Two-way median polish decomposes each GPU's R_θ into <span style={{ color: T.text }}>node effect</span> (rack
             inlet, 14% of variance) + <span style={{ color: T.text }}>board-position effect</span> (HGX
-            airflow order, 55%) + <span style={{ color: T.text }}>per-unit residual</span> — the health signal.
+            airflow order, 55%) + <span style={{ color: T.text }}>per-unit residual</span> - the health signal.
             The reference temperature cancels in the comparison, so the method runs on
             the temp/power/util metrics that Prometheus exporters already collect.
             Cross-check: our simulation predicted H100 load R_θ within 3% of measurement.
@@ -541,26 +541,26 @@ function ProductionEvidence() {
         </div>
         <div style={{ ...card, borderColor: `${T.rising}44` }}>
           <div style={{ fontFamily: FM, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.rising, marginBottom: 12 }}>
-            Update, 2026-07-01 — independently re-confirmed
+            Update, 2026-07-01 - independently re-confirmed
           </div>
           <div style={{ fontFamily: FD, fontSize: 13, color: T.muted, lineHeight: 1.7 }}>
             The severe unit (z = +15.6) was independently re-observed: the operator's own staff ran a
             separate diagnostic on the same node months later, unaware of our flag, using different
             telemetry tooling on a different workload. Same GPU, still the sole thermal outlier, now with
-            real measured ambient (not assumed) and a small correlated clock/throughput deficit — not yet
+            real measured ambient (not assumed) and a small correlated clock/throughput deficit - not yet
             throttling. Two independent measurements, months apart, converging conclusion. Formal RMA-record
             match for the two subtler units is still pending.
           </div>
         </div>
         <div style={{ ...card, borderColor: `${T.caution}44` }}>
           <div style={{ fontFamily: FM, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.caution, marginBottom: 12 }}>
-            Status — what's confirmed, what's pending
+            Status - what's confirmed, what's pending
           </div>
           <div style={{ fontFamily: FD, fontSize: 13, color: T.muted, lineHeight: 1.7 }}>
             All three flags began as <span style={{ color: T.text }}>blind predictions</span> made before seeing
             the operator's maintenance records. The severe unit now has independent field re-confirmation
             (above); the two subtler units still await RMA-record confirmation.
-            This is still a snapshot-plus-re-observation result — it demonstrates detection persistence, not
+            This is still a snapshot-plus-re-observation result - it demonstrates detection persistence, not
             lead-time. Cluster identity withheld pending operator approval.
           </div>
         </div>
@@ -574,7 +574,7 @@ function DetectionPerformance() {
   const stats = [
     { v: '5 min',  l: 'to statistical separation', s: 'severe unit at z=+17 with 5 min of steady load' },
     { v: '0',      l: 'false positives',           s: '61 healthy GPUs · 36-config detector sweep' },
-    { v: '3 °C',   l: 'throttle margin left',      s: 'severe unit at full 700 W TDP — inside facility spec' },
+    { v: '3 °C',   l: 'throttle margin left',      s: 'severe unit at full 700 W TDP - inside facility spec' },
     { v: '3.0×',   l: 'thermal aging rate',        s: 'severe unit vs fleet median (Arrhenius 2×/10 °C)' },
   ];
   return (
@@ -602,7 +602,7 @@ function DetectionPerformance() {
       <div style={{ border: `1px solid ${T.border}`, borderRadius: 6, overflow: 'hidden' }}>
         <div style={{ padding: '10px 14px', borderBottom: `1px solid ${T.border}`, background: T.s1 }}>
           <span style={{ fontFamily: FM, fontSize: 10.5, letterSpacing: '0.1em', textTransform: 'uppercase', color: T.muted }}>
-            Fault-mode attribution — same metric, three different failure signatures
+            Fault-mode attribution - same metric, three different failure signatures
           </span>
         </div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -619,7 +619,7 @@ function DetectionPerformance() {
               {
                 u: 'Node A · GPU 7', z: '+15.6σ',
                 sig: 'Constant +22 °C offset; conduction slope NORMAL; fast transient response normal',
-                fault: 'Air-side: local hot inlet / blocked airflow — not the chip\'s thermal interface',
+                fault: 'Air-side: local hot inlet / blocked airflow - not the chip\'s thermal interface',
               },
               {
                 u: 'Node A · GPU 2', z: '+3.2σ',
@@ -629,7 +629,7 @@ function DetectionPerformance() {
               {
                 u: 'Node B · GPU 6', z: '+4.4σ',
                 sig: 'Mild offset + heaviest-tailed noise in the 64-GPU fleet',
-                fault: 'Intermittent cooling behaviour — early-stage degradation',
+                fault: 'Intermittent cooling behaviour - early-stage degradation',
               },
             ].map((r, i) => (
               <tr key={r.u} style={{ background: i % 2 === 0 ? 'transparent' : `${T.s1}66` }}>
@@ -689,7 +689,7 @@ function FindingsTable() {
 function Timeline() {
   const items = [
     {
-      when: 'May–Jun 2026', tag: 'done', title: 'Stage 1 — controlled experiments (Tesla T4)',
+      when: 'May–Jun 2026', tag: 'done', title: 'Stage 1 - controlled experiments (Tesla T4)',
       body: 'E001–E004 v2: 8,734 telemetry rows. Thermal memory (F1), reproducibility (F5), zombie-context detection (F6). 100% classifier accuracy with steady-state windowing.',
     },
     {
@@ -697,19 +697,19 @@ function Timeline() {
       body: '16/16-check validated thermal network model. Predicted H100/A100/B200/MI300X R_θ baselines and lead times ahead of hardware access.',
     },
     {
-      when: 'Jun 2026', tag: 'done', title: 'E009 — first production validation (72× H100)',
+      when: 'Jun 2026', tag: 'done', title: 'E009 - first production validation (72× H100)',
       body: 'Blind-flagged 3 degraded units on a production cluster during a real cooling incident. Sim prediction confirmed within 3% on real silicon. Fault-mode attribution + per-GPU digital twin.',
     },
     {
       when: 'pending', tag: 'open', title: 'Ground-truth confirmation',
-      body: 'Operator RMA records vs our blind flags — gates F7 from partial to validated.',
+      body: 'Operator RMA records vs our blind flags - gates F7 from partial to validated.',
     },
     {
-      when: 'Fall 2026', tag: 'open', title: 'E-LT — lead-time testbed (make-or-break)',
+      when: 'Fall 2026', tag: 'open', title: 'E-LT - lead-time testbed (make-or-break)',
       body: 'Does R_θ rise before throttling, with enough margin to act? Physical testbed with induced degradation. Sim predicts ~1.2 h lead for TIM dry-out. Determines diagnostic vs predictive positioning.',
     },
     {
-      when: 'Fall 2026', tag: 'open', title: 'Stage 2 — DGX B200 (Cal Poly AI Factory)',
+      when: 'Fall 2026', tag: 'open', title: 'Stage 2 - DGX B200 (Cal Poly AI Factory)',
       body: '4-node deployment: cross-generation validation, longitudinal baselines, SLURM integration. Publication target: ICPE 2027.',
     },
   ];
@@ -849,12 +849,12 @@ function ConfidenceMap() {
     { claim: 'Signature-matrix fault classifier works on E009 data', confidence: 'high', note: '282 tests green; 6-axis fingerprint (time, α/β, locality, channel, xcorr, τ)' },
     { claim: 'Peer-relative R_θ isolates degraded units in production', confidence: 'high', note: 'F7/E009: 3 blind flags; severe unit independently re-confirmed months later (F15, 2026-07-01), different workload' },
     { claim: 'R_θ rank stability persists over time, not a transient', confidence: 'high', note: 'F10: ρ=0.986 within-job rank stability; F15 extends this to months-apart persistence' },
-    { claim: 'R_θ magnitude does not transfer across GPU hardware', confidence: 'high', note: 'F8 (T4→H100 ~14x too permissive), F13 (V100 breaks naive TDP-scaling) — calibrate per deployment' },
+    { claim: 'R_θ magnitude does not transfer across GPU hardware', confidence: 'high', note: 'F8 (T4→H100 ~14x too permissive), F13 (V100 breaks naive TDP-scaling) - calibrate per deployment' },
     { claim: 'Real TIM-condition effect on actual GPU silicon', confidence: 'high', note: 'F16: real repaste study, up to 18°C hotspot / 16°C VRAM-junction swing at matched power' },
     { claim: 'Fault type is inferable from R_θ curve shape', confidence: 'medium', note: 'Slope vs offset vs tails separate 3 flagged units; classifier attribution validated' },
     { claim: 'Sim transfers to real H100 silicon', confidence: 'medium', note: 'Load R_θ predicted within 3%; calibrated on E009 production data' },
     { claim: 'Detector has a low-power false-positive mode', confidence: 'medium', note: 'F9: R_θ=(T−amb)/P diverges as P→0; min-power gate is a real, shippable fix' },
-    { claim: 'R_θ rises before throttling (lead-time)', confidence: 'low', note: 'Load-bearing open question. No public dataset anywhere contains a real degradation-to-throttle event (confirmed 2026-07-01, exhaustive search). A production fleet’s failure incidents tested negative for lead-time, but those are electrical faults, not gradual cooling degradation — doesn’t test the claim. A simulation attempt (DCTM + Monte Carlo) was built, then retracted after its own adversarial audit found it could not produce a trustworthy number. Resolvable only on real hardware: E-LT (Fall 2026) or a faster real-silicon path.' },
+    { claim: 'R_θ rises before throttling (lead-time)', confidence: 'low', note: 'Load-bearing open question. No public dataset anywhere contains a real degradation-to-throttle event (confirmed 2026-07-01, exhaustive search). A production fleet’s failure incidents tested negative for lead-time, but those are electrical faults, not gradual cooling degradation - doesn’t test the claim. A simulation attempt (DCTM + Monte Carlo) was built, then retracted after its own adversarial audit found it could not produce a trustworthy number. Resolvable only on real hardware: E-LT (Fall 2026) or a faster real-silicon path.' },
     { claim: 'Findings replicate on DGX B200', confidence: 'low', note: 'Stage 2 deploying Aug 17 2026 (Cal Poly AI Factory, 32 GPUs); B200 canary-install ask sent, scoped down to non-exclusive monitoring pending operator reply' },
     { claim: 'Method holds across vendors (AMD/Intel)', confidence: 'assumed', note: 'AMD MI300 implemented + unit-tested; cross-vendor validation pending' },
   ];
@@ -927,7 +927,7 @@ export default function ResearchLanding() {
             marginBottom: 36,
           }}>
             ThermalOS is GPU thermal-power forensics research. We compute effective thermal
-            resistance from software telemetry alone — no thermocouple, no new sensors — and
+            resistance from software telemetry alone - no thermocouple, no new sensors - and
             built a signature-matrix fault classifier (H100-calibrated, 282 tests green, cross-validated
             against E009) that blind-detected three degraded units on a 72-GPU H100 cluster,
             including one at 72 °C invisible to temperature thresholds.
@@ -937,19 +937,19 @@ export default function ResearchLanding() {
 
         {/* ── Start here ───────────────────────────────────────────────── */}
         <section id="start" style={{ marginBottom: 64, scrollMarginTop: 80 }}>
-          <SectionLabel>Start Here — the idea in three steps</SectionLabel>
+          <SectionLabel>Start Here - the idea in three steps</SectionLabel>
           <StartHere />
         </section>
 
         {/* ── Production evidence ──────────────────────────────────────── */}
         <section id="evidence" style={{ marginBottom: 64, scrollMarginTop: 80 }}>
-          <SectionLabel>Production Evidence — E009, 72× H100 SXM5, real cooling incident</SectionLabel>
+          <SectionLabel>Production Evidence - E009, 72× H100 SXM5, real cooling incident</SectionLabel>
           <ProductionEvidence />
         </section>
 
         {/* ── Detection performance ────────────────────────────────────── */}
         <section id="detection" style={{ marginBottom: 64, scrollMarginTop: 80 }}>
-          <SectionLabel>Detection Performance — speed, false-positive rate, fault attribution</SectionLabel>
+          <SectionLabel>Detection Performance - speed, false-positive rate, fault attribution</SectionLabel>
           <DetectionPerformance />
         </section>
 
@@ -957,7 +957,7 @@ export default function ResearchLanding() {
         <section id="findings" style={{ marginBottom: 64, scrollMarginTop: 80 }}>
           <SectionLabel>Findings F1–F7</SectionLabel>
           <PlainWords>
-            F1–F6 come from controlled experiments on a Tesla T4 — small hardware, but
+            F1–F6 come from controlled experiments on a Tesla T4 - small hardware, but
             single-variable designs with publication-grade reproducibility. F7 is the
             production result above.
           </PlainWords>

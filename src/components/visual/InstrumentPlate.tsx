@@ -25,7 +25,7 @@ interface InstrumentPlateProps {
 
 /**
  * The house display for imagery: a cinematic plate with a slow optical drift
- * and a hidden ironbow instrument view under the lens. Drop-in — every future
+ * and a hidden ironbow instrument view under the lens. Drop-in - every future
  * project plate uses this. See docs/plates.md for the matched Higgsfield
  * prompt set.
  */

@@ -1,13 +1,13 @@
-// Routing — single source of truth for all surfaces.
+// Routing - single source of truth for all surfaces.
 //
-//   THETA — startup / commercial surface
+//   THETA - startup / commercial surface
 //     /theta              -> Landing.tsx  (product pitch, GPU animation)
 //
-//   THERMALOS — research / OSS public surface
+//   THERMALOS - research / OSS public surface
 //     /thermalos          -> ResearchLanding.tsx  (academic, findings, formula)
 //     /thermalos/fleet    -> FleetDashboard.tsx   (live data demo)
 //
-//   THERMALOS APP — research/admin workspace
+//   THERMALOS APP - research/admin workspace
 //     /thermalos/app          -> research hub (Overview)
 //     /thermalos/app/<page>   -> findings, lab, advisor, publication, yc, roadmap…
 //

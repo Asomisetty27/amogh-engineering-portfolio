@@ -32,7 +32,7 @@ function ProgressBar({ value, max, color = "#1D9E75" }: { value: number; max: nu
 }
 
 export default function Predictions() {
-  useEffect(() => { document.title = "ThermalOS — Milestones | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - Milestones | amogh.site"; }, []);
 
   const { data: measurementsData, error, isError, isLoading } = useQuery({
     queryKey: ["measurements"],
@@ -90,7 +90,7 @@ export default function Predictions() {
     /^E\d{3}/.test(t.milestone || "") && t.status?.toLowerCase().includes("done")
   ).length;
 
-  // R_theta trajectory — running minimum (best-so-far trend per sample)
+  // R_theta trajectory - running minimum (best-so-far trend per sample)
   const trajectory = useMemo(() => {
     let best = Infinity;
     return validRows.slice(-30).map((r, i) => {
@@ -101,7 +101,7 @@ export default function Predictions() {
 
   // Weekly telemetry pace needed
   const rowsNeeded = Math.max(0, TARGET_TELEMETRY_ROWS - totalRows);
-  const rowsPerWeek = weeksLeft > 0 ? Math.round(rowsNeeded / weeksLeft).toLocaleString() : "—";
+  const rowsPerWeek = weeksLeft > 0 ? Math.round(rowsNeeded / weeksLeft).toLocaleString() : "-";
 
   const milestones = [
     {
@@ -152,7 +152,7 @@ export default function Predictions() {
     <div className="space-y-4">
       {demo && (
         <div className="px-3 py-2 rounded-lg bg-[#EF9F27]/10 border border-[#EF9F27]/30 text-[12px] font-mono text-[#EF9F27]">
-          Demo Mode — connect the Google Sheet for projections against real data.
+          Demo Mode - connect the Google Sheet for projections against real data.
         </div>
       )}
 
@@ -187,9 +187,9 @@ export default function Predictions() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Rθ trajectory */}
         <div className="bg-[#141412] border border-white/[0.07] rounded-xl p-4">
-          <div className="text-[9px] font-mono uppercase tracking-wider text-[#5a5a55] mb-1">Rθ_eff Trajectory — Best-So-Far</div>
+          <div className="text-[9px] font-mono uppercase tracking-wider text-[#5a5a55] mb-1">Rθ_eff Trajectory - Best-So-Far</div>
           <div className="text-[10px] font-mono text-[#888780] mb-3">
-            Current best: <span className="text-[#D4AF37]">{bestRtheta?.toFixed(3) ?? "—"} °C/W</span>
+            Current best: <span className="text-[#D4AF37]">{bestRtheta?.toFixed(3) ?? "-"} °C/W</span>
             {avgRtheta !== null && (
               <>
                 {" · "}Avg: <span className="text-[#EF9F27]">{avgRtheta.toFixed(3)} °C/W</span>

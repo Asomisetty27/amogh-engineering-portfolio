@@ -99,7 +99,7 @@ export default function ContactSection() {
             { Icon: Package, label: "PyPI", value: "pip install runtheta", href: "https://pypi.org/project/runtheta/" },
             { Icon: ExternalLink, label: "Live dashboard", value: "amogh.site/thermalos", href: "/thermalos" },
             { Icon: Linkedin, label: "LinkedIn", value: "linkedin.com/in/amoghsomisetty", href: "https://linkedin.com/in/amoghsomisetty" },
-            { Icon: FileText, label: "Resume (PDF)", value: "Fall 2026 — GPU / ML hardware", href: "/Amogh_Somisetty_Resume_Fall2026.pdf" },
+            { Icon: FileText, label: "Resume (PDF)", value: "Fall 2026 - GPU / ML hardware", href: "/Amogh_Somisetty_Resume_Fall2026.pdf" },
           ].map(({ Icon, label, value, href }) => (
             <a
               key={label}

@@ -14,7 +14,7 @@ const TABS = [
 type TabValue = (typeof TABS)[number]["value"];
 
 export default function YC() {
-  useEffect(() => { document.title = "ThermalOS — YC | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - YC | amogh.site"; }, []);
 
   const [params, setParams] = useSearchParams();
   const raw = params.get("tab");

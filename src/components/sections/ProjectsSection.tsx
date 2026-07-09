@@ -26,7 +26,7 @@ const CFRPComparison = lazy(() => import("@/components/materials/CFRPComparison"
 const DroneSystemHologram = lazy(() => import("@/components/holograms/DroneSystemHologram"));
 
 import RecruiterProjectView from "@/components/sections/RecruiterProjectView";
-// Lazy: pulls in recharts — must never sit in the initial bundle.
+// Lazy: pulls in recharts - must never sit in the initial bundle.
 const ThetaFlagshipVisuals = lazy(() => import("@/components/ThetaFlagshipVisuals"));
 
 type DetailTab = "brief" | "subsystems";

@@ -15,7 +15,7 @@ import {
 //   - When VITE_THETA_HEALTH_URL is set (build-time), use it as-is.
 //   - On localhost dev, default to the daemon's stdlib HTTP server.
 //   - In production (deployed site), default to a reverse-proxy path that
-//     the operator wires to their own daemon — `/agent-api/` is a conventional
+//     the operator wires to their own daemon - `/agent-api/` is a conventional
 //     prefix that avoids colliding with the Vite asset pipeline.
 //
 // The daemon serves /api/v1/agent/* directly under its port (no extra prefix),
@@ -31,7 +31,7 @@ const API_BASE = `${RAW_BASE}/api/v1/agent`;
 
 // Bearer token (optional). When the daemon is configured with auth, this
 // gets pulled from the same env var name the daemon recognizes. On the
-// public site the token is intentionally omitted — only the operator's
+// public site the token is intentionally omitted - only the operator's
 // own deployment will fetch real data.
 const AUTH_TOKEN = typeof window !== 'undefined'
   ? (import.meta as any).env?.VITE_THETA_HEALTH_TOKEN
@@ -150,24 +150,24 @@ export async function fetchAgentDetails(index: number): Promise<DaemonGpuDetails
 }
 
 async function fetchGpuHistory(index: number, lookbackSec = 3600): Promise<GPUHistory> {
-  // Daemon doesn't currently expose /history — synthesize from the fleet
+  // Daemon doesn't currently expose /history - synthesize from the fleet
   // status snapshot for now and let the caller's demo fallback handle the
   // rich case. Returning a minimal valid GPUHistory keeps the contract.
-  throw new Error('GPU history endpoint not yet wired on daemon — using demo data');
+  throw new Error('GPU history endpoint not yet wired on daemon - using demo data');
 }
 
 async function fetchGpuFingerprint(index: number): Promise<GPUFingerprint> {
-  // Daemon doesn't currently expose /fingerprint — same story.
-  throw new Error('GPU fingerprint endpoint not yet wired on daemon — using demo data');
+  // Daemon doesn't currently expose /fingerprint - same story.
+  throw new Error('GPU fingerprint endpoint not yet wired on daemon - using demo data');
 }
 
 async function fetchBenchmarks(gpuGen: string): Promise<TelemetryBenchmarks> {
-  // Daemon doesn't currently expose /telemetry/benchmarks — same story.
-  throw new Error('Benchmarks endpoint not yet wired on daemon — using demo data');
+  // Daemon doesn't currently expose /telemetry/benchmarks - same story.
+  throw new Error('Benchmarks endpoint not yet wired on daemon - using demo data');
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Adapter — daemon shape → UI shape (GPUStateSnapshot/FleetStatus from types)
+// Adapter - daemon shape → UI shape (GPUStateSnapshot/FleetStatus from types)
 // ──────────────────────────────────────────────────────────────────────────
 
 function adaptFleetStatus(daemon: DaemonFleetStatus): FleetStatus {
@@ -215,7 +215,7 @@ function adaptFleetStatus(daemon: DaemonFleetStatus): FleetStatus {
 function generateDemoFleetStatus(): FleetStatus {
   const now = Math.floor(Date.now() / 1000);
 
-  // Cal Poly AI Factory — DGX B200, 8× B200 GPUs, liquid cold-plate cooling,
+  // Cal Poly AI Factory - DGX B200, 8× B200 GPUs, liquid cold-plate cooling,
   // 20°C coolant inlet. R_θ healthy ≈ 0.060 C/W; drifting GPU shows +20% rise.
   const makeB200 = (
     index: number,
@@ -483,7 +483,7 @@ function generateDemoAgentDetails(index: number): DaemonGpuDetails {
   return {
     gpu_index: index,
     timestamp: fleet.timestamp,
-    cnn_prediction: null,  // intentional — no trained weights in demo mode
+    cnn_prediction: null,  // intentional - no trained weights in demo mode
     smoothed_state: {
       state: gpu.state,
       confidence: gpu.confidence,
@@ -511,18 +511,18 @@ function generateDemoAgentDetails(index: number): DaemonGpuDetails {
     },
     causal_explanation: gpu.state === 'drifting' || gpu.state === 'critical'
       ? {
-          headline: `GPU ${index}: liquid cooling path resistance elevated — R_θ drifted ${gpu.rtheta_k_sigma.toFixed(1)}σ above coolant-anchored baseline.`,
+          headline: `GPU ${index}: liquid cooling path resistance elevated - R_θ drifted ${gpu.rtheta_k_sigma.toFixed(1)}σ above coolant-anchored baseline.`,
           urgency: gpu.state === 'critical' ? 'act_now' : 'act_soon',
           hypothesis: {
             cause: 'cooling_degradation',
             confidence: 0.87,
-            one_line: 'Cold-plate flow restriction — R_θ uniform rise across load levels is the liquid-cooled signature of partial blockage or pump degradation.',
+            one_line: 'Cold-plate flow restriction - R_θ uniform rise across load levels is the liquid-cooled signature of partial blockage or pump degradation.',
           },
           alternatives: [
             {
               cause: 'thermal_interface_material',
               confidence: 0.11,
-              one_line: 'TIM degradation possible but less likely — TIM failure shows steeper rise at high power that is not present here.',
+              one_line: 'TIM degradation possible but less likely - TIM failure shows steeper rise at high power that is not present here.',
             },
           ],
           evidence: [
@@ -533,7 +533,7 @@ function generateDemoAgentDetails(index: number): DaemonGpuDetails {
             },
             {
               name: 'load_invariance',
-              value: 'R_θ rise is flat across power levels — consistent with hydraulic restriction, not TIM (which is power-dependent)',
+              value: 'R_θ rise is flat across power levels - consistent with hydraulic restriction, not TIM (which is power-dependent)',
               weight: 0.76,
             },
             {
@@ -546,7 +546,7 @@ function generateDemoAgentDetails(index: number): DaemonGpuDetails {
             {
               title: "Check coolant flow rate for this GPU's cold-plate loop",
               detail: "Verify facility manifold pressure and per-GPU flow meter. B200 cold-plate requires >= 2.5 L/min; below 2.0 L/min raises R_theta ~20%.",
-              effort: '10m — no workload disruption required',
+              effort: '10m - no workload disruption required',
               expected_impact: 'If flow is low, restoring pressure returns R_θ to baseline within 5 minutes.',
               blocks_workload: false,
               integration: null,
@@ -554,7 +554,7 @@ function generateDemoAgentDetails(index: number): DaemonGpuDetails {
             {
               title: `Drain GPU ${index} from active workloads (SLURM)`,
               detail: `scontrol update nodename=$(hostname) state=drain reason="theta:rtheta_drift_gpu${index}"`,
-              effort: '2m — SLURM drains after current job completes',
+              effort: '2m - SLURM drains after current job completes',
               expected_impact: 'Prevents thermal throttle cascade to neighboring GPUs on the same cold-plate loop.',
               blocks_workload: true,
               integration: 'SLURM',
@@ -562,7 +562,7 @@ function generateDemoAgentDetails(index: number): DaemonGpuDetails {
             {
               title: `Recalibrate coolant-inlet T_ref for GPU ${index}`,
               detail: `Run: theta calibrate --gpu ${index} --ambient <coolant_inlet_c>  after flow is restored.`,
-              effort: '5m — agent runs sweep automatically',
+              effort: '5m - agent runs sweep automatically',
               expected_impact: 'Per-unit thresholds replace extrapolated B200 defaults.',
               blocks_workload: false,
               integration: null,
@@ -588,8 +588,8 @@ function generateDemoAgentDetails(index: number): DaemonGpuDetails {
       headline: gpu.state === 'critical'
         ? `GPU ${index}: service recommended in ~3 days (primary driver: R_θ drift).`
         : gpu.state === 'drifting'
-        ? `GPU ${index}: check coolant flow — service recommended within ~14 days if not resolved.`
-        : `GPU ${index}: nominal — no maintenance projected in next 90 days.`,
+        ? `GPU ${index}: check coolant flow - service recommended within ~14 days if not resolved.`
+        : `GPU ${index}: nominal - no maintenance projected in next 90 days.`,
     },
     hw_profile: {
       canonical_name: gpu.model,

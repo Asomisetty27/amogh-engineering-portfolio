@@ -1,4 +1,4 @@
-# THETA — GPU Thermal Forensics Platform
+# THETA - GPU Thermal Forensics Platform
 ## Redbrick VC Investment Deck | June 2026
 
 ---
@@ -9,7 +9,7 @@
 
 - Temperature alone is ambiguous: a hot GPU could mean heavy workload OR cooling failure
 - Existing tools (NVIDIA Mission Control, Phaidra, ProphetStor) track temperature + power, but don't separate workload from failure
-- No operator knows when cooling is degrading until **throttling happens** — too late
+- No operator knows when cooling is degrading until **throttling happens** - too late
 - Degraded cooling + high-load work = **failure in production** = downtime, RMA costs, customer impact
 
 **The real cost:** A single throttle event on a GPU cluster = lost SLA, lost revenue, operational firefighting.

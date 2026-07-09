@@ -31,12 +31,12 @@ export default function IncidentPanel({ gpu, fleetAnomalyCount = 0 }: Props) {
   }
 
   const faultDescriptions: Record<string, string> = {
-    cooling_degradation: 'Cooling path degradation — check airflow and thermal paste',
-    dust_accumulation: 'Dust accumulation detected — scheduled cleaning recommended',
-    thermal_interface_material: 'TIM interface degradation — TIM replacement may be needed',
-    fan_blockage: 'Fan obstruction detected — clear vents and intake',
-    mounting_issue: 'Mounting pressure change — verify physical installation',
-    unknown: 'Unknown failure mode — escalate to support',
+    cooling_degradation: 'Cooling path degradation - check airflow and thermal paste',
+    dust_accumulation: 'Dust accumulation detected - scheduled cleaning recommended',
+    thermal_interface_material: 'TIM interface degradation - TIM replacement may be needed',
+    fan_blockage: 'Fan obstruction detected - clear vents and intake',
+    mounting_issue: 'Mounting pressure change - verify physical installation',
+    unknown: 'Unknown failure mode - escalate to support',
   };
 
   const getRiskColor = (risk: number): string => {
@@ -94,7 +94,7 @@ export default function IncidentPanel({ gpu, fleetAnomalyCount = 0 }: Props) {
                 color: COLORS.steel.bright,
               }}
             >
-              GPU {gpu.index} — {gpu.model}
+              GPU {gpu.index} - {gpu.model}
             </div>
             <div
               style={{

@@ -3,41 +3,41 @@
 // Credibility signal: "built by people who understand hardware"
 
 export const COLORS = {
-  // Champagne gold — primary brand accent (used sparingly, where it matters)
+  // Champagne gold - primary brand accent (used sparingly, where it matters)
   amber: {
-    bright: '#F5D98A',    // champagne highlight (rare — peak moments)
-    medium: '#D4AF37',    // 18k gold — primary CTA, brand mark
-    dim: '#8A6F2E',       // deep champagne — secondary borders/labels
+    bright: '#F5D98A',    // champagne highlight (rare - peak moments)
+    medium: '#D4AF37',    // 18k gold - primary CTA, brand mark
+    dim: '#8A6F2E',       // deep champagne - secondary borders/labels
   },
-  // Warm platinum + obsidian — typographic + bezel hierarchy
+  // Warm platinum + obsidian - typographic + bezel hierarchy
   steel: {
     bright: '#F0EADC',    // warm ivory text (highest contrast on obsidian)
     muted: '#A8A092',     // warm muted (body text, secondary)
     faint: '#48402F',     // warm faint border (more lift than before)
   },
-  // Canvas backgrounds — clear elevation stepping for depth
+  // Canvas backgrounds - clear elevation stepping for depth
   bg: {
     deep: '#050407',      // true obsidian (page bg, deepest)
     panel: '#0E0C12',     // instrument panel (sections)
     surface: '#181522',   // card surface (lifted 1)
-    raised: '#221E2E',    // raised surface (lifted 2 — hover/active)
+    raised: '#221E2E',    // raised surface (lifted 2 - hover/active)
   },
-  // Semantic thermal colors — distinguishable, not all gold
+  // Semantic thermal colors - distinguishable, not all gold
   thermal: {
-    healthy: '#D4AF37',   // champagne gold — brand / OK
+    healthy: '#D4AF37',   // champagne gold - brand / OK
     caution: '#E8B23A',   // amber
     rising: '#C85F2A',    // burnt orange / copper
     critical: '#B83030',  // crimson
   },
   // Accents for differentiation when needed
   accent: '#C9A84C',      // champagne accent (links, focus)
-  copper: '#B87333',      // burnished copper (secondary accent — counterpoint to gold)
+  copper: '#B87333',      // burnished copper (secondary accent - counterpoint to gold)
   platinum: '#D8D2C2',    // bright platinum (highlights, dividers)
   ink: '#6E91C8',         // deep blueprint blue (kept for data/diagram accents only)
 };
 
 export const TYPOGRAPHY = {
-  // All uppercase, tight tracking — like instrument labels
+  // All uppercase, tight tracking - like instrument labels
   labels: {
     fontFamily: "'JetBrains Mono', ui-monospace, monospace",
     fontSize: '8px',
@@ -46,7 +46,7 @@ export const TYPOGRAPHY = {
     textTransform: 'uppercase',
     color: COLORS.steel.muted,
   },
-  // Technical data readouts — monospace, high contrast
+  // Technical data readouts - monospace, high contrast
   readouts: {
     fontFamily: "'JetBrains Mono', ui-monospace, monospace",
     fontSize: '15px',
@@ -55,7 +55,7 @@ export const TYPOGRAPHY = {
     color: COLORS.steel.bright,
     fontVariantNumeric: 'tabular-nums',
   },
-  // Display/hero — technical but legible
+  // Display/hero - technical but legible
   display: {
     fontFamily: "'Space Grotesk', system-ui, -apple-system, sans-serif",
     fontSize: 'clamp(32px, 4.2vw, 56px)',
@@ -64,7 +64,7 @@ export const TYPOGRAPHY = {
     lineHeight: 1.1,
     color: COLORS.steel.bright,
   },
-  // Body copy — calibration-grade clarity
+  // Body copy - calibration-grade clarity
   body: {
     fontFamily: "'Space Grotesk', system-ui, -apple-system, sans-serif",
     fontSize: '15px',
@@ -75,7 +75,7 @@ export const TYPOGRAPHY = {
 };
 
 export const MOTIFS = {
-  // Corner brackets — like measurement reticles
+  // Corner brackets - like measurement reticles
   corner: (size = 8, color = COLORS.steel.faint) => ({
     width: size,
     height: size,
@@ -96,7 +96,7 @@ export const MOTIFS = {
 };
 
 export const COMPONENTS = {
-  // Bezel frame — like an instrument readout window
+  // Bezel frame - like an instrument readout window
   bezel: {
     border: `1px solid ${COLORS.steel.faint}`,
     borderRadius: '3px',
@@ -111,7 +111,7 @@ export const COMPONENTS = {
       0 2px 8px rgba(0,0,0,0.3)
     `,
   },
-  // Calibration label — small badge with a leader line
+  // Calibration label - small badge with a leader line
   calibLabel: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -123,7 +123,7 @@ export const COMPONENTS = {
   },
 };
 
-// EASING (oscilloscope trace smoothness — no springy bounces)
+// EASING (oscilloscope trace smoothness - no springy bounces)
 export const EASING = {
   instant: [1, 0, 1, 1],          // no ease
   snappy: [0.25, 0.46, 0.45, 0.94], // standard cubic
@@ -132,10 +132,10 @@ export const EASING = {
 
 // AGENT RISK & CONFIDENCE (5-pillar system visualization)
 export const RISK = {
-  safe: '#1D9E75',      // green — nominal
-  warning: '#EF9F27',   // amber — monitor
-  caution: '#D85A30',   // orange — escalating
-  critical: '#B83030',  // red — act now
+  safe: '#1D9E75',      // green - nominal
+  warning: '#EF9F27',   // amber - monitor
+  caution: '#D85A30',   // orange - escalating
+  critical: '#B83030',  // red - act now
 };
 
 export const CONFIDENCE = {

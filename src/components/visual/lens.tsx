@@ -31,12 +31,12 @@ export interface LensMeta {
 }
 
 interface LensContextValue {
-  /** Fine pointer present and reduced-motion off — continuous lens available */
+  /** Fine pointer present and reduced-motion off - continuous lens available */
   enabled: boolean;
   engaged: LensMeta | null;
   engage: (meta: LensMeta) => void;
   disengage: (id: string) => void;
-  /** Spring-smoothed viewport coords — the reticle AND masks follow these */
+  /** Spring-smoothed viewport coords - the reticle AND masks follow these */
   x: MotionValue<number>;
   y: MotionValue<number>;
   /** Lens radius in px (shared so reticle ring and mask agree) */
@@ -114,7 +114,7 @@ export function LensProvider({ children }: { children: ReactNode }) {
  * Ironbow gradient map as an SVG filter: luminance → the classic thermal
  * camera ramp (near-black → indigo → magenta → ember → amber → white-hot).
  * Applied to a duplicate of the showroom image, so the "thermal" state stays
- * pixel-registered with the visible one — no second asset, no misalignment.
+ * pixel-registered with the visible one - no second asset, no misalignment.
  */
 function IronbowDefs() {
   return (

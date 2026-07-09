@@ -40,7 +40,7 @@ function TaskRow({ row, isP0 }: { row: TodayRow; isP0: boolean }) {
           {row.owner && <Pill text={row.owner} colorMap={OWNER_COLOR} />}
           {row.track && <Pill text={row.track} colorMap={TRACK_COLOR} />}
           {row.phase && (
-            <span className="text-[10px] font-mono text-[#5a5a55]">{row.phase.replace(/^Phase /, "P").split(" — ")[0]}</span>
+            <span className="text-[10px] font-mono text-[#5a5a55]">{row.phase.replace(/^Phase /, "P").split(" - ")[0]}</span>
           )}
         </div>
         {row.notes && (
@@ -52,7 +52,7 @@ function TaskRow({ row, isP0 }: { row: TodayRow; isP0: boolean }) {
 }
 
 export default function TodayPlan() {
-  useEffect(() => { document.title = "ThermalOS — Today Plan | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - Today Plan | amogh.site"; }, []);
 
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["todayplan"],
@@ -81,7 +81,7 @@ export default function TodayPlan() {
     <div className="space-y-4">
       {demo && (
         <div className="px-3 py-2 rounded-lg bg-[#EF9F27]/10 border border-[#EF9F27]/30 text-[12px] font-mono text-[#EF9F27]">
-          Demo Mode — connect the Google Sheet to load today's actual tasks.
+          Demo Mode - connect the Google Sheet to load today's actual tasks.
         </div>
       )}
 
@@ -111,7 +111,7 @@ export default function TodayPlan() {
           <div className="px-4 py-2.5 flex items-center gap-2" style={{ background: "#D85A3010" }}>
             <div className="w-2 h-2 rounded-full bg-[#D85A30]" />
             <span className="text-[11px] font-mono uppercase tracking-wider font-bold text-[#D85A30]">
-              P0 — Critical ({p0.length} tasks)
+              P0 - Critical ({p0.length} tasks)
             </span>
           </div>
           <div className="px-4">
@@ -126,7 +126,7 @@ export default function TodayPlan() {
           <div className="px-4 py-2.5 flex items-center gap-2" style={{ background: "#EF9F2710" }}>
             <div className="w-2 h-2 rounded-full bg-[#EF9F27]" />
             <span className="text-[11px] font-mono uppercase tracking-wider font-bold text-[#EF9F27]">
-              P1 — High ({p1.length} tasks)
+              P1 - High ({p1.length} tasks)
             </span>
           </div>
           <div className="px-4">

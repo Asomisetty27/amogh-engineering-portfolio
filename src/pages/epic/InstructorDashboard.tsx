@@ -42,7 +42,7 @@ export default function InstructorDashboard() {
   const [history, setHistory] = useState<HelpRow[]>([]);
   const [progress, setProgress] = useState<Record<number, ProgRow>>({});
   const [roster, setRoster] = useState<Record<number, string[]>>({});
-  // Per-group set of completed activity ids — the server record behind
+  // Per-group set of completed activity ids - the server record behind
   // "restore progress" so a group can be brought back to where they were
   // after a lost device or a wiped browser.
   const [groupCompleted, setGroupCompleted] = useState<Record<number, Set<string>>>({});
@@ -75,7 +75,7 @@ export default function InstructorDashboard() {
 
   // Initial load + realtime (re-runs on cohort switch). Realtime is the fast
   // path; a short poll underneath is the fallback for when a channel silently
-  // drops — that's what "I have to manually refresh to see the queue" is.
+  // drops - that's what "I have to manually refresh to see the queue" is.
   useEffect(() => {
     let cancelled = false;
     const loadAll = async () => {
@@ -224,7 +224,7 @@ export default function InstructorDashboard() {
       .in("id", ids);
   };
 
-  // Hard reset: wipe ALL data for this cohort — requests, progress, rosters.
+  // Hard reset: wipe ALL data for this cohort - requests, progress, rosters.
   // Use it to start a fresh session / new groups (the cohort label can be reused).
   const resetCohort = async () => {
     if (!confirm(`Reset ${COHORT_LABEL[cohort]}? This permanently clears all help requests, progress, rosters, and completed-activity records for this cohort. Use it to start a fresh session with new groups.`)) return;
@@ -276,7 +276,7 @@ export default function InstructorDashboard() {
     }
   };
 
-  // Broadcast composer — reused on both Live and Today tabs.
+  // Broadcast composer - reused on both Live and Today tabs.
   const renderBroadcast = () => (
     <section className="rounded-md border border-panel-border bg-white/[0.02] p-3">
       <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Broadcast to all groups</div>
@@ -285,7 +285,7 @@ export default function InstructorDashboard() {
           value={broadcastMsg}
           onChange={(e) => setBroadcastMsg(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") sendBroadcast(); }}
-          placeholder="e.g. 5 min warning — wrap up your current step"
+          placeholder="e.g. 5 min warning - wrap up your current step"
           className="flex-1 bg-black/40 border border-panel-border rounded px-3 py-2 text-sm focus:outline-none focus:border-[#2D7FF9]/60"
         />
         <button onClick={sendBroadcast} disabled={!broadcastMsg.trim() || broadcastSending}
@@ -458,7 +458,7 @@ export default function InstructorDashboard() {
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <div>
                     <div className="text-base font-semibold">
-                      Group {pad2(topPick.group_no)} — silent struggler
+                      Group {pad2(topPick.group_no)} - silent struggler
                       {names(topPick.group_no) && <span className="text-secondary-foreground font-normal text-sm"> · {names(topPick.group_no)}</span>}
                     </div>
                     <div className="text-xs text-secondary-foreground mt-0.5">
@@ -483,7 +483,7 @@ export default function InstructorDashboard() {
                       <div className="text-sm">
                         <span className="font-mono">Group {pad2(s.group_no)}</span>
                         {names(s.group_no) && <span className="text-secondary-foreground"> · {names(s.group_no)}</span>}
-                        <span className="text-muted-foreground"> — </span>
+                        <span className="text-muted-foreground"> - </span>
                         <span className="text-secondary-foreground">{Math.round(s.sec / 60)} min on {s.activity}</span>
                       </div>
                       <div className="text-[11px] text-muted-foreground mt-0.5">
@@ -582,7 +582,7 @@ export default function InstructorDashboard() {
                     </div>
                     {names(g) && <div className="text-[10px] text-muted-foreground truncate mb-0.5">{names(g)}</div>}
                     <div className="text-[11px] text-secondary-foreground min-h-[2.4em] leading-tight">
-                      {p?.activity ?? "—"}
+                      {p?.activity ?? "-"}
                     </div>
                     <div className="mt-1 text-[10px] font-mono text-muted-foreground">
                       {p ? fmtMS(groupTimes[g] ?? 0) : ""}
@@ -651,11 +651,11 @@ export default function InstructorDashboard() {
             <div className="flex items-center justify-between mb-2">
               <div>
                 <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Friction report</div>
-                <div className="text-xs text-secondary-foreground">Activities ranked by total trouble — copy-ready for the post-mortem.</div>
+                <div className="text-xs text-secondary-foreground">Activities ranked by total trouble - copy-ready for the post-mortem.</div>
               </div>
               <button
                 onClick={() => navigator.clipboard?.writeText(friction.map(f =>
-                  `${f.activity} — ${f.count} requests, ${f.redPct}% stuck, avg wait ${fmtMS(f.avgWait)}`
+                  `${f.activity} - ${f.count} requests, ${f.redPct}% stuck, avg wait ${fmtMS(f.avgWait)}`
                 ).join("\n"))}
                 className="text-xs font-mono px-3 py-1.5 rounded border border-panel-border bg-white/[0.03] hover:bg-white/[0.07]">
                 Copy
@@ -685,14 +685,14 @@ export default function InstructorDashboard() {
         </div>
       )}
 
-      {/* Restore-progress checklist — tick/untick any activity to bring a
+      {/* Restore-progress checklist - tick/untick any activity to bring a
           group back to where they were after a lost device or wiped browser. */}
       {restoreGroup != null && (
         <div className="fixed inset-0 z-50 bg-[#09090D]/90 backdrop-blur flex items-center justify-center p-4">
           <div className="fx-glass fx-card w-full max-w-lg max-h-[85vh] flex flex-col rounded-lg border border-panel-border">
             <div className="flex items-center justify-between px-4 py-3 border-b border-panel-border">
               <div>
-                <h2 className="text-base font-semibold">Restore progress — Group {pad2(restoreGroup)}</h2>
+                <h2 className="text-base font-semibold">Restore progress - Group {pad2(restoreGroup)}</h2>
                 {names(restoreGroup) && <div className="text-xs text-muted-foreground">{names(restoreGroup)}</div>}
               </div>
               <button onClick={() => setRestoreGroup(null)}
@@ -703,7 +703,7 @@ export default function InstructorDashboard() {
             <div className="overflow-y-auto p-3 space-y-4">
               <p className="text-xs text-secondary-foreground px-1">
                 Check off whatever this group has already completed. This writes straight to the server, so their
-                helper page picks it up immediately — even on a brand new device.
+                helper page picks it up immediately - even on a brand new device.
               </p>
               {Object.keys(DAY_TITLES).map(k => {
                 const day = Number(k);
@@ -751,7 +751,7 @@ function TopPickRequest({ req, waitSec, names, onResolve }: { req: HelpRow; wait
       <div className="min-w-0">
         <div className="text-base font-semibold flex items-center gap-2">
           <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: w.color }} />
-          Group {pad2(req.group_no)} — {w.label}
+          Group {pad2(req.group_no)} - {w.label}
           {names && <span className="text-secondary-foreground font-normal text-sm">· {names}</span>}
         </div>
         <div className="text-xs text-secondary-foreground mt-0.5 truncate">

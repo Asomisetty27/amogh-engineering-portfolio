@@ -1,5 +1,5 @@
 /**
- * AIAgentsHologram — 5 Commonalities of Top AI Agents
+ * AIAgentsHologram - 5 Commonalities of Top AI Agents
  *
  * Pentagon topology: AGENT CORE at center, 5 satellite subsystem blocks,
  * one per architectural characteristic. Each satellite renders its own
@@ -48,7 +48,7 @@ const CHARS: Characteristic[] = [
     cx: 310, cy: 68,
     color: "#ffaa00",
     tagline: "Seamless connection to APIs, databases, and external software",
-    description: "Agents connect to external software, databases, and APIs (Salesforce, code repos, browsers) to execute real-world actions. Tool breadth determines the agent's effective action space — agents limited to chat cannot ship code or book travel.",
+    description: "Agents connect to external software, databases, and APIs (Salesforce, code repos, browsers) to execute real-world actions. Tool breadth determines the agent's effective action space - agents limited to chat cannot ship code or book travel.",
     details: ["REST/GraphQL API execution", "Browser automation", "Code interpreter + REPL", "File system + DB access", "Third-party SaaS integration"],
     ratings: { Claude: 4, Devin: 5, Operator: 5, Agentforce: 5 },
   },
@@ -59,7 +59,7 @@ const CHARS: Characteristic[] = [
     cx: 285, cy: 148,
     color: "#44aaff",
     tagline: "Store and recall past interactions, preferences, and history",
-    description: "Top platforms store past interactions, user preferences, and historical data to improve over time and maintain continuity across long-term projects. Without persistent memory, every session starts cold — the agent cannot learn from prior mistakes.",
+    description: "Top platforms store past interactions, user preferences, and historical data to improve over time and maintain continuity across long-term projects. Without persistent memory, every session starts cold - the agent cannot learn from prior mistakes.",
     details: ["Short-term (in-context) memory", "Long-term (vector) retrieval", "User preference recall", "Cross-session continuity", "Historical data access"],
     ratings: { Claude: 4, Devin: 4, Operator: 3, Agentforce: 5 },
   },
@@ -70,7 +70,7 @@ const CHARS: Characteristic[] = [
     cx: 195, cy: 148,
     color: "#ff4488",
     tagline: "Sense unexpected conditions and self-correct without re-prompting",
-    description: "Adaptable agents detect when their current approach is failing and pivot — without requiring a human to intervene and re-prompt. This closes the gap between demo performance (happy path) and production reliability (edge cases).",
+    description: "Adaptable agents detect when their current approach is failing and pivot - without requiring a human to intervene and re-prompt. This closes the gap between demo performance (happy path) and production reliability (edge cases).",
     details: ["Error detection + recovery", "Strategy switching", "Confidence estimation", "Graceful degradation", "Human-in-the-loop escalation"],
     ratings: { Claude: 5, Devin: 4, Operator: 4, Agentforce: 3 },
   },
@@ -145,7 +145,7 @@ function MemorySymbol({ active, color }: { active: boolean; color: string }) {
   const op = active ? 1 : 0.45;
   return (
     <g opacity={op}>
-      {/* Register bank — stacked rows */}
+      {/* Register bank - stacked rows */}
       {[0, 4, 8, 12].map((dy, i) => (
         <rect key={i} x={272} y={140 + dy} width={26} height={3.5} rx="0.3"
           fill={color} fillOpacity={active ? (i === 0 ? 0.2 : 0.08) : 0.05}
@@ -283,7 +283,7 @@ export default function AIAgentsHologram() {
           style={{ background: "linear-gradient(to bottom,rgba(8,8,8,.95),transparent)" }}>
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono font-semibold text-primary tracking-wider uppercase">
-              Top AI Agents — 5 Core Architecture Pillars
+              Top AI Agents - 5 Core Architecture Pillars
             </span>
             <ConfidenceBadgeTag confidence="VERIFIED" />
           </div>
@@ -443,12 +443,12 @@ export default function AIAgentsHologram() {
         <div className="absolute bottom-2 left-2 right-2 z-10 flex items-center justify-between">
           <span className="text-[9px] font-mono text-muted-foreground px-1.5 py-0.5 rounded"
             style={{ background: "rgba(8,8,8,.85)", border: "1px solid #1e1e1e" }}>
-            Agents: Claude · Devin · Operator · Agentforce — 5 architectural commonalities
+            Agents: Claude · Devin · Operator · Agentforce - 5 architectural commonalities
           </span>
           {mode !== "idle" && !selected && (
             <span className="text-[9px] font-mono px-1.5 py-0.5 rounded"
               style={{ color: activeChar.color, background: "rgba(8,8,8,.85)", border: `1px solid ${activeChar.color}44` }}>
-              {activeIdx + 1}/5 — {activeChar.short}
+              {activeIdx + 1}/5 - {activeChar.short}
             </span>
           )}
         </div>

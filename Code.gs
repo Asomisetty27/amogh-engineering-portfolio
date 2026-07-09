@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// THERMALOS APPS SCRIPT v3 — REORGANIZED FOR CLARITY
+// THERMALOS APPS SCRIPT v3 - REORGANIZED FOR CLARITY
 // Amogh (EE/Software) + Sam (ME/Hardware) · Cal Poly SLO / UCI · YC W27
 // GPU Thermal-Power Forensics for Clusters Without Hyperscaler Tooling
 // ═══════════════════════════════════════════════════════════════════
@@ -128,9 +128,9 @@ function applyStatus_(range, status) {
 
 function applyPriority_(range, prio) {
   const m = {
-    "P0 — Critical": [C.RED_L, C.RED],
-    "P1 — High":     [C.AMB_L, C.AMB],
-    "P2 — Normal":   [C.GRN_L, C.GRN],
+    "P0 - Critical": [C.RED_L, C.RED],
+    "P1 - High":     [C.AMB_L, C.AMB],
+    "P2 - Normal":   [C.GRN_L, C.GRN],
   };
   const [bg, fg] = m[prio] || [C.W, C.K8];
   range.setBackground(bg).setFontColor(fg).setFontWeight("bold")
@@ -196,11 +196,11 @@ function fullRefresh() {
   log_("Full refresh complete");
   SpreadsheetApp.getActiveSpreadsheet().toast(
     "All sheets refreshed. Open 🏠 Home to see today's focus.",
-    "🌡 Thermal OS — Done", 5);
+    "🌡 Thermal OS - Done", 5);
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// 🏠 HOME SHEET — landing page / command center
+// 🏠 HOME SHEET - landing page / command center
 // ═══════════════════════════════════════════════════════════════════
 
 function buildHomeSheet() {
@@ -216,7 +216,7 @@ function buildHomeSheet() {
 
   // ── Row 1: Main header ─────────────────────────────────────────
   sh.getRange(1,1,1,6).merge()
-    .setValue("🌡  THERMALOS — COMMAND CENTER")
+    .setValue("🌡  THERMALOS - COMMAND CENTER")
     .setBackground(C.TEAL).setFontColor(C.W)
     .setFontWeight("bold").setFontSize(17)
     .setHorizontalAlignment("center").setVerticalAlignment("middle");
@@ -255,7 +255,7 @@ function buildHomeSheet() {
 
   // ── Rows 7–15: HOW THIS SPREADSHEET WORKS ─────────────────────
   sh.getRange(7,1,1,6).merge()
-    .setValue("HOW THIS SPREADSHEET WORKS  —  which tabs to use and when")
+    .setValue("HOW THIS SPREADSHEET WORKS  -  which tabs to use and when")
     .setBackground(C.K8).setFontColor(C.W)
     .setFontWeight("bold").setFontSize(10).setHorizontalAlignment("center").setVerticalAlignment("middle");
   sh.setRowHeight(7, 22);
@@ -267,12 +267,12 @@ function buildHomeSheet() {
   sh.setRowHeight(8, 16);
 
   const rows = [
-    {tab:"📋 Today Plan",      color:TAB.GREEN, what:"Today's P0 + P1 tasks, auto-built each morning",                  who:"🤖 Auto only",         when:"Run 'Rebuild Today Plan' each morning. Read-only — do not edit."},
+    {tab:"📋 Today Plan",      color:TAB.GREEN, what:"Today's P0 + P1 tasks, auto-built each morning",                  who:"🤖 Auto only",         when:"Run 'Rebuild Today Plan' each morning. Read-only - do not edit."},
     {tab:"🗓 Master Timeline", color:TAB.BLUE,  what:"Every project task with phase, owner, priority, status",           who:"✏️ Both founders",     when:"Update Status column as you work. Add new tasks with Quick-add."},
     {tab:"📬 Outreach",        color:TAB.BLUE,  what:"Every person you contact for customer discovery",                  who:"✏️ Add row per contact",when:"After every call, email, or LinkedIn message."},
-    {tab:"🏆 Evidence Board",  color:TAB.AMBER, what:"YC application claims — each needs real proof",                    who:"✏️ Status column only", when:"Weekly — change to 'In progress' or 'Proof exists ✓' as evidence accumulates."},
+    {tab:"🏆 Evidence Board",  color:TAB.AMBER, what:"YC application claims - each needs real proof",                    who:"✏️ Status column only", when:"Weekly - change to 'In progress' or 'Proof exists ✓' as evidence accumulates."},
     {tab:"📡 Measurements",    color:TAB.GRAY,  what:"Physical rig + GPU telemetry data, auto-logged by script",         who:"🤖 Auto only",          when:"Use 'Log rig measurement' or 'Log GPU snapshot' from menu."},
-    {tab:"⚙️ Config",          color:TAB.LGRAY, what:"Emails, thresholds, URLs — settings for automation",              who:"✏️ Set once on install", when:"Only when changing an email address or threshold."},
+    {tab:"⚙️ Config",          color:TAB.LGRAY, what:"Emails, thresholds, URLs - settings for automation",              who:"✏️ Set once on install", when:"Only when changing an email address or threshold."},
   ];
 
   rows.forEach((r, i) => {
@@ -342,7 +342,7 @@ function buildHomeSheet() {
     let lastPhase = "", count = 0;
     data.forEach(r => {
       if (r[0]) lastPhase = r[0];
-      if (r[5] !== "Done ✓" && r[6] === "P0 — Critical" && count < 12) {
+      if (r[5] !== "Done ✓" && r[6] === "P0 - Critical" && count < 12) {
         const owner = r[4] || "";
         const obg = owner==="Amogh" ? C.TEAL_L : owner==="Sam" ? C.PUR_L : C.AMB_L;
         const ofg = owner==="Amogh" ? C.TEAL_T : owner==="Sam" ? C.PUR_T : C.AMB;
@@ -351,7 +351,7 @@ function buildHomeSheet() {
           .setBackground(obg).setFontColor(ofg)
           .setFontWeight("bold").setFontSize(9)
           .setHorizontalAlignment("center").setVerticalAlignment("middle");
-        sh.getRange(dataRow,2).setValue(lastPhase.replace(/^Phase /,"P").split(" — ")[0])
+        sh.getRange(dataRow,2).setValue(lastPhase.replace(/^Phase /,"P").split(" - ")[0])
           .setBackground(count%2===0?C.K00:C.W).setFontColor(C.K4)
           .setFontSize(9).setHorizontalAlignment("center").setVerticalAlignment("middle");
         sh.getRange(dataRow,3,1,4).merge().setValue(r[3])
@@ -363,7 +363,7 @@ function buildHomeSheet() {
     if (count === 0) {
       sh.setRowHeight(dataRow, 28);
       sh.getRange(dataRow,1,1,6).merge()
-        .setValue("✓  No open P0 tasks — great momentum! Check P1 tasks in Today Plan.")
+        .setValue("✓  No open P0 tasks - great momentum! Check P1 tasks in Today Plan.")
         .setBackground(C.GRN_L).setFontColor(C.GRN)
         .setFontWeight("bold").setFontSize(11).setHorizontalAlignment("center").setVerticalAlignment("middle");
       dataRow++;
@@ -371,7 +371,7 @@ function buildHomeSheet() {
   } else {
     sh.setRowHeight(dataRow, 28);
     sh.getRange(dataRow,1,1,6).merge()
-      .setValue("No timeline data yet — add tasks to 🗓 Master Timeline to see them here.")
+      .setValue("No timeline data yet - add tasks to 🗓 Master Timeline to see them here.")
       .setBackground(C.K00).setFontColor(C.K4)
       .setFontSize(10).setHorizontalAlignment("center").setVerticalAlignment("middle");
     dataRow++;
@@ -390,7 +390,7 @@ function buildHomeSheet() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// ORGANIZE SHEETS — tab colors, order, hide reference tabs
+// ORGANIZE SHEETS - tab colors, order, hide reference tabs
 // Run once after install: Thermal OS → Admin → Organize tabs
 // ═══════════════════════════════════════════════════════════════════
 
@@ -415,7 +415,7 @@ function organizeSheets() {
     if (sh) { sh.setTabColor(color); sh.showSheet(); }
   });
 
-  // 3. Hide reference/archive tabs (not deleted — Thermal OS → Admin → Show all to restore)
+  // 3. Hide reference/archive tabs (not deleted - Thermal OS → Admin → Show all to restore)
   const toHide = [
     SH.MISSION, SH.AMOGH, SH.SAM, SH.SECTOR,
     SH.YC_APP, SH.INTERVIEW, SH.COFOUNDER,
@@ -535,7 +535,7 @@ google.script.run.withSuccessHandler(()=>{document.getElementById('qt').value=''
 // ═══════════════════════════════════════════════════════════════════
 
 function refreshMissionControl() {
-  // Legacy stub — now delegates to buildHomeSheet so existing calls still work
+  // Legacy stub - now delegates to buildHomeSheet so existing calls still work
   buildHomeSheet();
 }
 
@@ -550,8 +550,8 @@ function getKPIs_() {
     data.forEach(r => {
       const stat=r[5]||"", prio=r[6]||"", track=r[7]||"";
       if (stat==="Done ✓") { done++; return; }
-      if (prio==="P0 — Critical") p0++;
-      else if (prio==="P1 — High") p1++;
+      if (prio==="P0 - Critical") p0++;
+      else if (prio==="P1 - High") p1++;
       if (stat==="Done ✓" && track==="Software") powerExps++;
     });
   }
@@ -592,13 +592,13 @@ function buildTodayPlan() {
 
   // Header banner
   sh.getRange(1,1,1,6).merge()
-    .setValue("📋 TODAY PLAN — " + new Date().toDateString())
+    .setValue("📋 TODAY PLAN - " + new Date().toDateString())
     .setBackground(C.TEAL).setFontColor(C.W).setFontWeight("bold").setFontSize(13).setVerticalAlignment("middle");
   sh.setRowHeight(1,36);
 
   // Auto-generated warning banner
   sh.getRange(2,1,1,6).merge()
-    .setValue("🤖  AUTO-GENERATED — do not edit manually. Run \"Rebuild Today Plan\" each morning to refresh.")
+    .setValue("🤖  AUTO-GENERATED - do not edit manually. Run \"Rebuild Today Plan\" each morning to refresh.")
     .setBackground(C.AMB_L).setFontColor(C.AMB).setFontStyle("italic").setFontSize(9)
     .setHorizontalAlignment("center").setVerticalAlignment("middle");
   sh.setRowHeight(2,18);
@@ -622,13 +622,13 @@ function buildTodayPlan() {
     if (r[0]) lastPhase=r[0];
     if (r[5]==="Done ✓") return;
     const entry=[r[6], lastPhase, r[3], r[4], r[7], r[8]];
-    if (r[6]==="P0 — Critical") p0Tasks.push(entry);
-    else if (r[6]==="P1 — High") p1Tasks.push(entry);
+    if (r[6]==="P0 - Critical") p0Tasks.push(entry);
+    else if (r[6]==="P1 - High") p1Tasks.push(entry);
   });
 
   let row=4;
   if (p0Tasks.length > 0) {
-    sh.getRange(row,1,1,6).merge().setValue("🔴 P0 — CRITICAL (" + p0Tasks.length + " open)")
+    sh.getRange(row,1,1,6).merge().setValue("🔴 P0 - CRITICAL (" + p0Tasks.length + " open)")
       .setBackground(C.RED_L).setFontColor(C.RED).setFontWeight("bold").setFontSize(10);
     sh.setRowHeight(row,20); row++;
     p0Tasks.slice(0,15).forEach(t => {
@@ -648,7 +648,7 @@ function buildTodayPlan() {
   sh.setRowHeight(row,8); row++;
 
   if (p1Tasks.length > 0) {
-    sh.getRange(row,1,1,6).merge().setValue("🟡 P1 — HIGH (" + p1Tasks.length + " open)")
+    sh.getRange(row,1,1,6).merge().setValue("🟡 P1 - HIGH (" + p1Tasks.length + " open)")
       .setBackground(C.AMB_L).setFontColor(C.AMB).setFontWeight("bold").setFontSize(10);
     sh.setRowHeight(row,20); row++;
     p1Tasks.slice(0,10).forEach(t => {
@@ -714,7 +714,7 @@ function pushToToday() {
   const lr = Math.max(todaySh.getLastRow(), 3);
   todaySh.getRange(lr+1,3).setValue("★ PUSHED: " + ms)
     .setBackground(C.PUR_L).setFontColor(C.PUR_T).setFontWeight("bold");
-  todaySh.getRange(lr+1,1).setValue("P0 — Critical")
+  todaySh.getRange(lr+1,1).setValue("P0 - Critical")
     .setBackground(C.RED_L).setFontColor(C.RED).setFontWeight("bold").setHorizontalAlignment("center");
   SpreadsheetApp.getActiveSpreadsheet().toast("Task pushed to Today Plan.", "Done", 3);
 }
@@ -733,7 +733,7 @@ function quickAddTaskFromSidebar(text) {
   const lr = Math.max(sh.getLastRow(), 3) + 1;
   sh.getRange(lr,1,1,9).setValues([[
     "", "", new Date().toLocaleDateString(), text.trim(), "Amogh",
-    "Not Started", "P0 — Critical", "Software", "Quick-added via Thermal OS"
+    "Not Started", "P0 - Critical", "Software", "Quick-added via Thermal OS"
   ]]);
   sh.getRange(lr,6).setBackground(C.K0).setFontColor(C.K6).setFontWeight("bold").setHorizontalAlignment("center");
   sh.getRange(lr,7).setBackground(C.RED_L).setFontColor(C.RED).setFontWeight("bold").setHorizontalAlignment("center");
@@ -761,12 +761,12 @@ function applyTimelineFormatting_() {
   // Ensure header rows exist (rows 1–3)
   if (sh.getLastRow() < 1 || sh.getRange(1,1).getValue() === "") {
     sh.getRange(1,1,1,9).merge()
-      .setValue("🗓 MASTER TIMELINE — All project tasks")
+      .setValue("🗓 MASTER TIMELINE - All project tasks")
       .setBackground(C.TEAL).setFontColor(C.W).setFontWeight("bold").setFontSize(13)
       .setVerticalAlignment("middle");
     sh.setRowHeight(1,36);
     sh.getRange(2,1,1,9).merge()
-      .setValue("✏️  EDIT THIS SHEET — Update Status as you work. Add new tasks with Thermal OS → Task Control → Quick-add task.")
+      .setValue("✏️  EDIT THIS SHEET - Update Status as you work. Add new tasks with Thermal OS → Task Control → Quick-add task.")
       .setBackground(C.BLU_L).setFontColor(C.BLU).setFontStyle("italic").setFontSize(9)
       .setHorizontalAlignment("center").setVerticalAlignment("middle");
     sh.setRowHeight(2,18);
@@ -778,7 +778,7 @@ function applyTimelineFormatting_() {
   } else {
     // Just refresh the edit banner
     sh.getRange(2,1,1,9).merge()
-      .setValue("✏️  EDIT THIS SHEET — Update Status as you work. Add new tasks with Thermal OS → Task Control → Quick-add task.")
+      .setValue("✏️  EDIT THIS SHEET - Update Status as you work. Add new tasks with Thermal OS → Task Control → Quick-add task.")
       .setBackground(C.BLU_L).setFontColor(C.BLU).setFontStyle("italic").setFontSize(9)
       .setHorizontalAlignment("center").setVerticalAlignment("middle");
   }
@@ -796,7 +796,7 @@ function applyTimelineFormatting_() {
   }
   if (prioCol > 0) {
     const pv = SpreadsheetApp.newDataValidation()
-      .requireValueInList(["P0 — Critical","P1 — High","P2 — Normal"],true).build();
+      .requireValueInList(["P0 - Critical","P1 - High","P2 - Normal"],true).build();
     sh.getRange(4, prioCol, lr-3, 1).setDataValidation(pv);
   }
   if (ownerCol > 0) {
@@ -840,11 +840,11 @@ function applyOutreachFormatting_() {
   // Ensure header rows exist
   if (sh.getLastRow() < 1 || sh.getRange(1,1).getValue() === "") {
     sh.getRange(1,1,1,9).merge()
-      .setValue("📬 OUTREACH — Customer discovery contacts")
+      .setValue("📬 OUTREACH - Customer discovery contacts")
       .setBackground(C.TEAL).setFontColor(C.W).setFontWeight("bold").setFontSize(13).setVerticalAlignment("middle");
     sh.setRowHeight(1,36);
     sh.getRange(2,1,1,9).merge()
-      .setValue("✏️  EDIT THIS SHEET — Add one row per person you contact. Update Status after each interaction.")
+      .setValue("✏️  EDIT THIS SHEET - Add one row per person you contact. Update Status after each interaction.")
       .setBackground(C.BLU_L).setFontColor(C.BLU).setFontStyle("italic").setFontSize(9)
       .setHorizontalAlignment("center").setVerticalAlignment("middle");
     sh.setRowHeight(2,18);
@@ -854,7 +854,7 @@ function applyOutreachFormatting_() {
     sh.setFrozenRows(3);
   } else {
     sh.getRange(2,1,1,9).merge()
-      .setValue("✏️  EDIT THIS SHEET — Add one row per person you contact. Update Status after each interaction.")
+      .setValue("✏️  EDIT THIS SHEET - Add one row per person you contact. Update Status after each interaction.")
       .setBackground(C.BLU_L).setFontColor(C.BLU).setFontStyle("italic").setFontSize(9)
       .setHorizontalAlignment("center").setVerticalAlignment("middle");
   }
@@ -883,11 +883,11 @@ function applyMeasurementsHeader_() {
   // Only set header rows if they're empty (don't overwrite data)
   if (sh.getRange(1,1).getValue() === "") {
     sh.getRange(1,1,1,20).merge()
-      .setValue("📡 MEASUREMENTS — Physical rig + GPU telemetry data")
+      .setValue("📡 MEASUREMENTS - Physical rig + GPU telemetry data")
       .setBackground(C.TEAL).setFontColor(C.W).setFontWeight("bold").setFontSize(13).setVerticalAlignment("middle");
     sh.setRowHeight(1,36);
     sh.getRange(2,1,1,20).merge()
-      .setValue("🤖  AUTO-GENERATED — do not edit manually. Use Thermal OS → Measurements → Log rig measurement / Log GPU snapshot.")
+      .setValue("🤖  AUTO-GENERATED - do not edit manually. Use Thermal OS → Measurements → Log rig measurement / Log GPU snapshot.")
       .setBackground(C.K8).setFontColor(C.K4).setFontStyle("italic").setFontSize(9)
       .setHorizontalAlignment("center").setVerticalAlignment("middle");
     sh.setRowHeight(2,18);
@@ -965,14 +965,14 @@ function draftOutreachEmail() {
 
   let subject, body;
   if (isProf) {
-    subject = "Summer research interest — GPU thermal-power efficiency characterization (ENGR 400)";
+    subject = "Summer research interest - GPU thermal-power efficiency characterization (ENGR 400)";
     body = `Hi ${fname},
 
 My name is Amogh Somisetty, and I'm an Electrical Engineering student at Cal Poly SLO. I'll be on campus this summer and I'm building a GPU thermal-power forensics tool for small and mid-size GPU clusters.
 
-The project involves two tracks: my EE side builds a GPU telemetry collector and power-cap profiler that computes effective thermal resistance in real time from NVIDIA DCGM data. My ME co-founder builds a physical thermal validation rig that generates controlled cooling fault signatures. Together, these form a system that can diagnose whether GPU throttling is workload-driven or cooling-path-driven — something existing tools like DCGM cannot do.
+The project involves two tracks: my EE side builds a GPU telemetry collector and power-cap profiler that computes effective thermal resistance in real time from NVIDIA DCGM data. My ME co-founder builds a physical thermal validation rig that generates controlled cooling fault signatures. Together, these form a system that can diagnose whether GPU throttling is workload-driven or cooling-path-driven - something existing tools like DCGM cannot do.
 
-I'd like to structure this as an ENGR 400 Independent Study. I handle the full build, data collection, and analysis independently — I'm looking for methodology guidance and ideally lab/sensor access.
+I'd like to structure this as an ENGR 400 Independent Study. I handle the full build, data collection, and analysis independently - I'm looking for methodology guidance and ideally lab/sensor access.
 
 Would you be open to a 15–20 minute meeting this week?
 
@@ -981,12 +981,12 @@ Amogh Somisetty
 EE, Cal Poly SLO | President, Poly Engineering Consulting
 GitHub: ${github} | Dashboard: ${dashboard}`;
   } else if (isHPC) {
-    subject = "GPU thermal efficiency tool — looking for feedback from operators";
+    subject = "GPU thermal efficiency tool - looking for feedback from operators";
     body = `Hi ${fname},
 
 My name is Amogh, and I'm building a read-only GPU thermal-power forensics tool for clusters like yours. It plugs into NVIDIA DCGM telemetry and turns raw data into specific recommendations: which GPUs are throttling, what power cap maximizes compute/watt, and whether thermal anomalies are workload-driven or cooling-path-driven.
 
-I'm not selling anything — I'm in the customer discovery phase and looking to talk to people who manage GPU clusters. The install is 30 minutes, completely read-only, no control permissions needed.
+I'm not selling anything - I'm in the customer discovery phase and looking to talk to people who manage GPU clusters. The install is 30 minutes, completely read-only, no control permissions needed.
 
 Would you have 15 minutes for a call?
 
@@ -995,10 +995,10 @@ Amogh Somisetty
 EE, Cal Poly SLO | ThermalOS
 Dashboard: ${dashboard} | GitHub: ${github}`;
   } else {
-    subject = "GPU thermal-power audit tool — feedback request";
+    subject = "GPU thermal-power audit tool - feedback request";
     body = `Hi ${fname},
 
-My name is Amogh, and I'm building ThermalOS Audit — a read-only GPU thermal-power forensics tool for small and mid-size GPU clusters. It takes NVIDIA DCGM telemetry and produces specific compute-per-watt recommendations and cooling anomaly diagnoses. 30-minute install, no CDU required, no control permissions needed.
+My name is Amogh, and I'm building ThermalOS Audit - a read-only GPU thermal-power forensics tool for small and mid-size GPU clusters. It takes NVIDIA DCGM telemetry and produces specific compute-per-watt recommendations and cooling anomaly diagnoses. 30-minute install, no CDU required, no control permissions needed.
 
 I'd value your technical feedback, especially on whether this matches real operator pain at companies like ${company}.
 
@@ -1057,7 +1057,7 @@ function generateFollowUps() {
         tl.getRange(lr,1,1,9).setValues([[
           "","",new Date().toLocaleDateString(),
           "FOLLOW UP: " + row[nameCol] + " (contacted " + days + " days ago)",
-          "Amogh","Not Started","P0 — Critical","Business","Auto follow-up"
+          "Amogh","Not Started","P0 - Critical","Business","Auto follow-up"
         ]]);
         tl.getRange(lr,7).setBackground(C.RED_L).setFontColor(C.RED).setFontWeight("bold").setHorizontalAlignment("center");
         count++;
@@ -1088,7 +1088,7 @@ function showOutreachSummary() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// MEASUREMENTS  (column layout A–T, 20 cols — matches amogh.site dashboard)
+// MEASUREMENTS  (column layout A–T, 20 cols - matches amogh.site dashboard)
 // A:Run ID  B:Timestamp  C:Type  D:Material  E:Pressure(N)  F:FaultCondition
 // G:V  H:I  I:P_W  J:T_hot  K:T_cold  L:T_amb  M:T_coolant  N:ThrottleReason
 // O:DeltaT  P:Rtheta  Q:vsBaseline  R:Headroom  S:Alert  T:Notes
@@ -1201,7 +1201,7 @@ function computeRthetaStats() {
     msg += `${m}:\n  n=${vals.length}  avg=${avg.toFixed(3)}  min=${min.toFixed(3)}  max=${max.toFixed(3)} °C/W\n`;
   });
   const hot = data.filter(r=>(r[18]||"").includes("HOT")||(r[18]||"").includes("THROTTLE")).length;
-  msg += `\nALERT COUNTS — HOT / THROTTLE RISK: ${hot}`;
+  msg += `\nALERT COUNTS - HOT / THROTTLE RISK: ${hot}`;
   SpreadsheetApp.getUi().alert(msg);
 }
 
@@ -1217,12 +1217,12 @@ function buildEvidenceBoard() {
   sh.setColumnWidth(3,38*5.5); sh.setColumnWidth(4,16*5.5);
 
   sh.getRange(1,1,1,4).merge()
-    .setValue("🏆 EVIDENCE BOARD — Every YC claim needs real proof before you write it")
+    .setValue("🏆 EVIDENCE BOARD - Every YC claim needs real proof before you write it")
     .setBackground(C.TEAL).setFontColor(C.W).setFontWeight("bold").setFontSize(13).setVerticalAlignment("middle");
   sh.setRowHeight(1,36);
 
   sh.getRange(2,1,1,4).merge()
-    .setValue("✏️  EDIT THE STATUS COLUMN ONLY — change to \"In progress\" or \"Proof exists ✓\" as evidence accumulates. No proof = cut the claim.")
+    .setValue("✏️  EDIT THE STATUS COLUMN ONLY - change to \"In progress\" or \"Proof exists ✓\" as evidence accumulates. No proof = cut the claim.")
     .setBackground(C.AMB_L).setFontColor(C.AMB).setFontStyle("italic").setFontSize(9)
     .setHorizontalAlignment("center").setVerticalAlignment("middle");
   sh.setRowHeight(2,18);
@@ -1237,18 +1237,18 @@ function buildEvidenceBoard() {
     .requireValueInList(["No proof yet","In progress","Proof exists ✓"],true).build();
 
   const claims = [
-    ["GPU telemetry collector logging [N] fields per second","collector_v2.py + sample CSV with all fields","GitHub — /src/collector.py + /data/sample_run.csv"],
-    ["Power-cap sweep: [X]% compute/watt improvement at [Y]% below TDP","power_cap_results.csv with throughput+watts+temp at 6+ power levels","GitHub — /experiments/power_cap/ + chart"],
-    ["Optimal power cap: [Y]% below TDP with <3% throughput loss","Specific data row with power, throughput, efficiency values","power_cap_results.csv — optimal row highlighted"],
-    ["Physical rig with [M] cooling fault signatures characterized","fault_library.json: each fault × Rθ deviation × threshold","GitHub — /hardware/fault_library.json"],
-    ["Rθ varies [B]% with mounting pressure alone at same heat load","pressure_sweep.csv: Rθ at 8N/16N/24N/32N/50N for Arctic MX-4","GitHub — /hardware/pressure_sweep.csv + chart"],
-    ["Anomaly detector flags cooling path degradation from GPU telemetry","validation_results.csv: each fault × detected(y/n) × accuracy × latency","GitHub — /model/validation_results.csv"],
-    ["Throttle prediction [T] seconds before thermal event","Timestamped log showing prediction then actual throttle","GitHub — /model/throttle_prediction_demo.csv"],
-    ["[N] GPU cluster operators interviewed, [X] confirmed the problem","Discovery call notes with org, role, exact quotes","Private notes doc — share with Sam"],
+    ["GPU telemetry collector logging [N] fields per second","collector_v2.py + sample CSV with all fields","GitHub - /src/collector.py + /data/sample_run.csv"],
+    ["Power-cap sweep: [X]% compute/watt improvement at [Y]% below TDP","power_cap_results.csv with throughput+watts+temp at 6+ power levels","GitHub - /experiments/power_cap/ + chart"],
+    ["Optimal power cap: [Y]% below TDP with <3% throughput loss","Specific data row with power, throughput, efficiency values","power_cap_results.csv - optimal row highlighted"],
+    ["Physical rig with [M] cooling fault signatures characterized","fault_library.json: each fault × Rθ deviation × threshold","GitHub - /hardware/fault_library.json"],
+    ["Rθ varies [B]% with mounting pressure alone at same heat load","pressure_sweep.csv: Rθ at 8N/16N/24N/32N/50N for Arctic MX-4","GitHub - /hardware/pressure_sweep.csv + chart"],
+    ["Anomaly detector flags cooling path degradation from GPU telemetry","validation_results.csv: each fault × detected(y/n) × accuracy × latency","GitHub - /model/validation_results.csv"],
+    ["Throttle prediction [T] seconds before thermal event","Timestamped log showing prediction then actual throttle","GitHub - /model/throttle_prediction_demo.csv"],
+    ["[N] GPU cluster operators interviewed, [X] confirmed the problem","Discovery call notes with org, role, exact quotes","Private notes doc - share with Sam"],
     ["'[exact operator quote confirming problem is real]'","Written/recorded quote from real person at real organization","Email/message screenshot"],
-    ["1 design partner running pilot audit","Email/Slack confirmation from partner","Email thread — keep it"],
-    ["Both founders have GitHub commits","Amogh: collector+model+experiments. Sam: CAD+fault CSVs+docs.","GitHub commit history — both usernames visible"],
-    ["Co-founder agreement signed 50/50","Signed document","Private doc — reference in application"],
+    ["1 design partner running pilot audit","Email/Slack confirmation from partner","Email thread - keep it"],
+    ["Both founders have GitHub commits","Amogh: collector+model+experiments. Sam: CAD+fault CSVs+docs.","GitHub commit history - both usernames visible"],
+    ["Co-founder agreement signed 50/50","Signed document","Private doc - reference in application"],
     ["ENGR 400 supervisor confirmed (Amogh)","Email reply from professor","Email thread"],
     ["UCI professor engagement (Sam)","Email reply from Prof. Won or Prof. Lee","Email thread"],
   ];
@@ -1289,7 +1289,7 @@ function generateYCBlockers() {
       const r = lr+i;
       tl.getRange(r,1,1,9).setValues([[
         "","","","YC BLOCKER: " + b[1].toString().replace("☐  ",""),
-        "Both","Not Started","P0 — Critical","YC",b[3]
+        "Both","Not Started","P0 - Critical","YC",b[3]
       ]]);
       tl.getRange(r,7).setBackground(C.RED_L).setFontColor(C.RED).setFontWeight("bold").setHorizontalAlignment("center");
       tl.getRange(r,4).setBackground(C.RED_L).setFontColor(C.RED).setWrap(true);
@@ -1317,11 +1317,11 @@ function competitorQuiz() {
     { q:"How do we answer 'NVIDIA will build this'?",
       a:"DCGM + Mission Control serve hyperscale AI factories. We integrate with DCGM as our data source. Our customer doesn't have NVIDIA reference architecture. We're the intelligence layer, not a competitor." },
     { q:"What are the 4 GPU throttle reasons?",
-      a:"1. HW_SLOWDOWN — hardware thermal protection (83-87°C). 2. SW_THERMAL_SLOWDOWN — SW limit, 5°C below HW. 3. POWER_BRAKE_SLOWDOWN — system power budget. 4. DISPLAY_CLOCKS_SLOWDOWN — display connected." },
+      a:"1. HW_SLOWDOWN - hardware thermal protection (83-87°C). 2. SW_THERMAL_SLOWDOWN - SW limit, 5°C below HW. 3. POWER_BRAKE_SLOWDOWN - system power budget. 4. DISPLAY_CLOCKS_SLOWDOWN - display connected." },
     { q:"ThermalOS one-liner (say it in 8 seconds)?",
       a:"ThermalOS Audit takes NVIDIA DCGM telemetry and turns it into specific compute-per-watt recommendations and cooling anomaly diagnoses. 30-minute install, no CDU required, no control permissions needed." },
     { q:"IEA data center power projection?",
-      a:"~945 TWh by 2030 — roughly doubles current. ~15% annual growth from AI. Data centers are ~4% of US electricity today." },
+      a:"~945 TWh by 2030 - roughly doubles current. ~15% annual growth from AI. Data centers are ~4% of US electricity today." },
   ];
   const q = questions[Math.floor(Math.random() * questions.length)];
   const result = ui.alert("🧠 Competitor Quiz", q.q + "\n\n(Think of your answer, then click OK)", ui.ButtonSet.OK_CANCEL);
@@ -1337,7 +1337,7 @@ function sendWeeklyDigest() {
   const samEmail = cfg_("SAM_EMAIL","");
   if (!email) { SpreadsheetApp.getUi().alert("Set FOUNDER_EMAIL in ⚙️ Config sheet first."); return; }
   const kpis = getKPIs_();
-  const subject = "🌡 Thermal OS Weekly Digest — " + new Date().toDateString();
+  const subject = "🌡 Thermal OS Weekly Digest - " + new Date().toDateString();
   const body = `THERMAL OS WEEKLY DIGEST
 ${"═".repeat(50)}
 Generated: ${new Date().toLocaleString()}
@@ -1353,7 +1353,7 @@ Days to YC W27 App:   ${kpis.days}
 
 FOCUS THIS WEEK
 ────────────────────────────
-${kpis.p0 > 15 ? "P0 overload — clear blockers before adding tasks." :
+${kpis.p0 > 15 ? "P0 overload - clear blockers before adding tasks." :
   kpis.operators < 5 ? "PRIORITY: Get to 5 operator conversations." :
   kpis.quotes < 1 ? "PRIORITY: Get 1 operator quote for the YC application." :
   "Good momentum. Keep pushing on power-cap experiments and outreach."}
@@ -1381,10 +1381,10 @@ function auditStaleTasks() {
   const stale = [];
   data.forEach((row,i) => {
     const stat=row[statCol]||"", prio=row[prioCol]||"", ms=row[msCol]||"";
-    if (stat==="In Progress" && prio==="P0 — Critical") stale.push({row:i+4,ms,stat:"IN PROGRESS P0"});
+    if (stat==="In Progress" && prio==="P0 - Critical") stale.push({row:i+4,ms,stat:"IN PROGRESS P0"});
     if (stat==="Blocked ✗") stale.push({row:i+4,ms,stat:"BLOCKED"});
   });
-  if (stale.length===0) { SpreadsheetApp.getActiveSpreadsheet().toast("No stale or blocked P0 tasks — clean ✓", "Done", 4); return; }
+  if (stale.length===0) { SpreadsheetApp.getActiveSpreadsheet().toast("No stale or blocked P0 tasks - clean ✓", "Done", 4); return; }
   let msg = `STALE / BLOCKED TASKS (${stale.length})\n${"─".repeat(40)}\n`;
   stale.forEach(t => { msg += `Row ${t.row}: [${t.stat}] ${t.ms}\n`; });
   SpreadsheetApp.getUi().alert(msg);
@@ -1399,7 +1399,7 @@ function installDailyTrigger() {
   const hour = parseInt(cfg_("DAILY_TRIGGER_HOUR","9"));
   ScriptApp.newTrigger("dailyAutoRefresh").timeBased().everyDays(1).atHour(hour).create();
   log_("Daily trigger installed at hour " + hour);
-  SpreadsheetApp.getActiveSpreadsheet().toast("Daily trigger set for " + hour + ":00 — Home + Today Plan rebuild automatically.", "Done", 4);
+  SpreadsheetApp.getActiveSpreadsheet().toast("Daily trigger set for " + hour + ":00 - Home + Today Plan rebuild automatically.", "Done", 4);
 }
 
 function removeAllTriggers() {

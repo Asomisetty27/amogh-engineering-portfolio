@@ -87,7 +87,7 @@ function getPhaseRegion(wtSn: number, tempC: number): PhaseRegion {
     };
   }
 
-  // Between eutectic and liquidus — mushy zone
+  // Between eutectic and liquidus - mushy zone
   if (wtSn < eutecticComp) {
     // α + L region
     return {
@@ -176,7 +176,7 @@ export default function PhaseDiagramInteractive() {
       <div className="flex-1 relative rounded-lg overflow-hidden border border-panel-border bg-[hsl(220,20%,3%)]">
         <div className="absolute top-0 left-0 right-0 z-10 flex items-center gap-2 px-3 py-2 bg-gradient-to-b from-background/90 to-transparent">
           <span className="text-xs font-mono font-semibold text-primary tracking-wider uppercase">
-            Pb-Sn Eutectic Phase Diagram — Interactive
+            Pb-Sn Eutectic Phase Diagram - Interactive
           </span>
           <ConfidenceBadgeTag confidence="VERIFIED" />
         </div>
@@ -271,11 +271,11 @@ export default function PhaseDiagramInteractive() {
         {/* Lock indicator */}
         {locked && (
           <div className="absolute bottom-2 right-2 text-[10px] font-mono text-neon-amber bg-background/80 rounded px-2 py-0.5 border border-neon-amber/20">
-            LOCKED — click to unlock
+            LOCKED - click to unlock
           </div>
         )}
         <div className="absolute bottom-2 left-2 text-[10px] font-mono text-muted-foreground bg-background/80 rounded px-2 py-0.5 border border-panel-border">
-          Source: Lab_4_Phase_Diagrams_Spring_2017_1.pdf — Pb-Sn eutectic data (61.9 wt% Sn, 183°C, α max 18.3 wt% Sn)
+          Source: Lab_4_Phase_Diagrams_Spring_2017_1.pdf - Pb-Sn eutectic data (61.9 wt% Sn, 183°C, α max 18.3 wt% Sn)
         </div>
       </div>
 
@@ -334,7 +334,7 @@ export default function PhaseDiagramInteractive() {
                       ? "Proeutectic β will solidify first. Remaining liquid reaches eutectic at 183°C and transforms to α + β lamellar."
                       : "Below eutectic. Two solid phases: α (Pb-rich) and β (Sn-rich). Amounts follow lever rule."
                     : cursor.tempC > 183
-                      ? "At eutectic composition — liquid transforms directly to lamellar α + β at 183°C. No proeutectic phase."
+                      ? "At eutectic composition - liquid transforms directly to lamellar α + β at 183°C. No proeutectic phase."
                       : "Fully eutectic microstructure: fine lamellar α + β."
                 }
               </p>

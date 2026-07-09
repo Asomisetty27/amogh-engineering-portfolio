@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-// TIM Analysis is Sam's physical rig work — planned for Fall 2026
+// TIM Analysis is Sam's physical rig work - planned for Fall 2026
 // This page documents the planned methodology and will populate with real data
 // once Sam's heater-block testbed is built.
 
@@ -8,37 +8,37 @@ const TIM_MATERIALS = [
   { name: "No TIM (bare)", rtheta: null, notes: "Dry reference baseline" },
   { name: "Generic paste", rtheta: null, notes: "Low-cost commodity" },
   { name: "Arctic MX-4", rtheta: null, notes: "Consumer benchmark standard" },
-  { name: "Fujipoly XR-m", rtheta: null, notes: "Premium pad — high conformability" },
+  { name: "Fujipoly XR-m", rtheta: null, notes: "Premium pad - high conformability" },
   { name: "Phase-change pad", rtheta: null, notes: "Melts at junction temp" },
-  { name: "Graphene TIM", rtheta: null, notes: "Research material — ultra-low Rθ target" },
+  { name: "Graphene TIM", rtheta: null, notes: "Research material - ultra-low Rθ target" },
 ];
 
 const PRESSURE_TARGETS = [8, 16, 24, 32, 40, 50]; // Newtons
 
 export default function TIMAnalysis() {
-  useEffect(() => { document.title = "ThermalOS — TIM Analysis | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - TIM Analysis | amogh.site"; }, []);
 
   return (
     <div className="space-y-4">
       <div className="px-3 py-2 rounded-lg bg-[#D8D2C2]/10 border border-[#D8D2C2]/30 text-[12px] font-mono text-[#D8D2C2]">
-        Physical rig work — planned Fall 2026. Sam's heater-block testbed will generate ground-truth fault signatures for the anomaly detector calibration (E006).
+        Physical rig work - planned Fall 2026. Sam's heater-block testbed will generate ground-truth fault signatures for the anomaly detector calibration (E006).
       </div>
 
       {/* External interim data point, 2026-07-01 */}
       <div className="bg-[#141412] border border-[#4a9d6e]/30 rounded-xl p-4">
         <div className="text-[9px] font-mono uppercase tracking-wider text-[#4a9d6e] mb-2">
-          Interim external data point — real GPU silicon, not our rig, found 2026-07-01
+          Interim external data point - real GPU silicon, not our rig, found 2026-07-01
         </div>
         <div className="font-mono text-[11px] text-[#c8c8be] leading-relaxed mb-2">
           A public, real-hardware TIM repaste study (RTX 3080 Ti, GA102, CC-BY-4.0) measured actual
           degraded-vs-fresh TIM effects at matched power: hotspot temperature fell up to <span className="text-[#E6F7F1]">18.1°C</span>,
           VRAM-junction temperature up to <span className="text-[#E6F7F1]">16.0°C</span>, after repaste. Converted to R_θ, the hotspot-based
-          metric moved <span className="text-[#E6F7F1]">29–39%</span> — larger than the standard on-die average sensor showed
+          metric moved <span className="text-[#E6F7F1]">29–39%</span> - larger than the standard on-die average sensor showed
           (<span className="text-[#E6F7F1]">11–18%</span>), because the hotspot-to-average-sensor gap itself collapses from
           ~20°C (degraded) to ~6°C (fresh).
         </div>
         <div className="font-mono text-[10px] text-[#5a5a55] leading-relaxed">
-          Single card, not our own rig, doesn't resolve lead-time — but it's the first REAL (not simulated)
+          Single card, not our own rig, doesn't resolve lead-time - but it's the first REAL (not simulated)
           TIM-degradation magnitude available to calibrate against, and it suggests the hotspot-vs-average-sensor
           gap is itself a real, previously unmeasured degradation signal worth building into the fault classifier.
         </div>
@@ -68,7 +68,7 @@ export default function TIMAnalysis() {
         </div>
       </div>
 
-      {/* TIM material table — placeholder */}
+      {/* TIM material table - placeholder */}
       <div className="bg-[#141412] border border-white/[0.07] rounded-xl p-4">
         <div className="font-bold text-[13px] mb-3">TIM material Rθ results</div>
         <div className="overflow-x-auto">
@@ -84,8 +84,8 @@ export default function TIMAnalysis() {
               {TIM_MATERIALS.map((m) => (
                 <tr key={m.name} className="border-b border-white/[0.04]">
                   <td className="py-2 pr-4 text-[#E6F7F1]">{m.name}</td>
-                  <td className="py-2 pr-4 text-[#5a5a55]">—</td>
-                  <td className="py-2 pr-4 text-[#5a5a55]">—</td>
+                  <td className="py-2 pr-4 text-[#5a5a55]">-</td>
+                  <td className="py-2 pr-4 text-[#5a5a55]">-</td>
                   <td className="py-2 pr-4 text-[#888780]">{m.notes}</td>
                   <td className="py-2 pr-4">
                     <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#5a5a5518] border border-[#5a5a5540] text-[#5a5a55]">
@@ -101,13 +101,13 @@ export default function TIMAnalysis() {
 
       {/* Pressure sweep placeholder */}
       <div className="bg-[#141412] border border-white/[0.07] rounded-xl p-4">
-        <div className="font-bold text-[13px] mb-1">Pressure sweep — Arctic MX-4</div>
+        <div className="font-bold text-[13px] mb-1">Pressure sweep - Arctic MX-4</div>
         <div className="text-[10px] font-mono text-[#5a5a55] mb-3">Rθ_eff at 6 mounting pressures. Expected: 30-35% reduction from 8N to 32N.</div>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
           {PRESSURE_TARGETS.map((p) => (
             <div key={p} className="bg-[#0A0A08] border border-white/[0.05] rounded-lg p-2.5 text-center">
               <div className="font-mono text-[11px] text-[#5a5a55]">{p}N</div>
-              <div className="font-mono text-[20px] font-bold text-[#5a5a55] mt-1">—</div>
+              <div className="font-mono text-[20px] font-bold text-[#5a5a55] mt-1">-</div>
               <div className="text-[8px] font-mono text-[#3a3a38] mt-0.5">°C/W</div>
             </div>
           ))}
@@ -118,7 +118,7 @@ export default function TIMAnalysis() {
       <div className="bg-[#0A0A08] border border-white/[0.07] rounded-xl p-4">
         <div className="text-[9px] font-mono uppercase tracking-wider text-[#5a5a55] mb-2">Why the rig matters for the software</div>
         <div className="font-mono text-[11px] text-[#888780] leading-relaxed">
-          The heater-block testbed generates known fault signatures under controlled conditions — wrong pressure, degraded TIM, reduced flow — at exact Rθ deviation values. These become the ground truth for calibrating the anomaly detector threshold in E006. Without the rig, the 15% threshold is an educated guess. With it, it becomes a validated, defensible number. That distinction is what makes ThermalOS's anomaly detection credible in a YC interview.
+          The heater-block testbed generates known fault signatures under controlled conditions - wrong pressure, degraded TIM, reduced flow - at exact Rθ deviation values. These become the ground truth for calibrating the anomaly detector threshold in E006. Without the rig, the 15% threshold is an educated guess. With it, it becomes a validated, defensible number. That distinction is what makes ThermalOS's anomaly detection credible in a YC interview.
         </div>
       </div>
     </div>

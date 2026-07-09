@@ -54,7 +54,7 @@ function UTCClock() {
   );
 }
 
-/* Isotherm mark — core dot + concentric rings. Ring spacing encodes R_theta: wider = healthy. */
+/* Isotherm mark - core dot + concentric rings. Ring spacing encodes R_theta: wider = healthy. */
 function IsothermMark({ size = 20 }: { size?: number }) {
   const c = size / 2;
   const r = size / 2;
@@ -68,7 +68,7 @@ function IsothermMark({ size = 20 }: { size?: number }) {
   );
 }
 
-/* Faint isotherm field bleeding from the top-right corner — the "structure" depth layer. */
+/* Faint isotherm field bleeding from the top-right corner - the "structure" depth layer. */
 function IsothermTexture() {
   return (
     <div
@@ -124,7 +124,7 @@ function InnerLayout() {
       className="min-h-screen font-sans relative"
       style={{ background: "var(--t-surface-0, var(--t-abyss))", color: "var(--t-text)" }}
     >
-      {/* Blueprint grid — shared visual language with the public landing. */}
+      {/* Blueprint grid - shared visual language with the public landing. */}
       <div
         className="pointer-events-none fixed inset-0"
         style={{

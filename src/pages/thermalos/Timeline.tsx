@@ -23,7 +23,7 @@ const OWNER_COLOR: Record<string, string> = {
 
 export default function Timeline() {
   useEffect(() => {
-    document.title = "ThermalOS — Master Timeline | amogh.site";
+    document.title = "ThermalOS - Master Timeline | amogh.site";
   }, []);
 
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
@@ -80,7 +80,7 @@ export default function Timeline() {
     <div>
       {demo && (
         <div className="mb-4 px-3 py-2 rounded-lg bg-[#EF9F27]/10 border border-[#EF9F27]/30 text-[12px] font-mono text-[#EF9F27]">
-          Demo Mode — connect the Google Sheet to load the live Master Timeline.
+          Demo Mode - connect the Google Sheet to load the live Master Timeline.
         </div>
       )}
 
@@ -171,7 +171,7 @@ export default function Timeline() {
                               : "#1D9E75"
                           }
                         >
-                          {r.priority.split(" — ")[0]}
+                          {r.priority.split(" - ")[0]}
                         </Pill>
                       </Td>
                       <Td className="font-mono text-[10px] text-[#888780]">{r.layer}</Td>
@@ -187,7 +187,7 @@ export default function Timeline() {
                             <TooltipContent className="max-w-sm">{r.notes}</TooltipContent>
                           </Tooltip>
                         ) : (
-                          <span className="text-[#5a5a55]">—</span>
+                          <span className="text-[#5a5a55]">-</span>
                         )}
                       </Td>
                     </tr>

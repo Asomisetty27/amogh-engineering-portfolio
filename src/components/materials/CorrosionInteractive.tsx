@@ -15,7 +15,7 @@ const elements: CorrosionElement[] = [
   {
     id: "anode",
     name: "Anode",
-    description: "Metal undergoing oxidation — loses electrons and dissolves into electrolyte as metal ions",
+    description: "Metal undergoing oxidation - loses electrons and dissolves into electrolyte as metal ions",
     role: "Oxidation: M → Mⁿ⁺ + ne⁻",
     color: "hsl(var(--neon-red))",
     prevention: "Coat with protective barrier, use sacrificial anode, select more noble metal",
@@ -23,7 +23,7 @@ const elements: CorrosionElement[] = [
   {
     id: "cathode",
     name: "Cathode",
-    description: "Site where reduction occurs — gains electrons transferred from anode through electrical path",
+    description: "Site where reduction occurs - gains electrons transferred from anode through electrical path",
     role: "Reduction: O₂ + 2H₂O + 4e⁻ → 4OH⁻",
     color: "hsl(var(--neon-cyan))",
     prevention: "Apply insulating coating to cathode surface, cathodic protection",
@@ -209,7 +209,7 @@ export default function CorrosionInteractive() {
         </svg>
 
         <div className="absolute bottom-2 left-2 text-[10px] font-mono text-muted-foreground bg-background/80 rounded px-2 py-0.5 border border-panel-border">
-          Source: Lab_5_Corrosion_SPR_2017 — 4-component model, galvanic series, Eqs.1–5
+          Source: Lab_5_Corrosion_SPR_2017 - 4-component model, galvanic series, Eqs.1–5
         </div>
       </div>
 

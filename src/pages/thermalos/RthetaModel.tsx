@@ -3,11 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchMeasurements, generateDemoMeasurements, isDemoModeError, type MeasurementRow } from "@/services/thermalosApi";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ZAxis, LineChart, Line, ReferenceLine } from "recharts";
 
-// Power-cap sweep targets (E005 — planned)
+// Power-cap sweep targets (E005 - planned)
 const POWER_CAP_TARGETS = [150, 175, 200, 225, 250, 270];
 
 export default function RthetaModel() {
-  useEffect(() => { document.title = "ThermalOS — Rθ Model | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - Rθ Model | amogh.site"; }, []);
 
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["measurements"],
@@ -59,7 +59,7 @@ export default function RthetaModel() {
     <div className="space-y-4">
       {demo && (
         <div className="px-3 py-2 rounded-lg bg-[#EF9F27]/10 border border-[#EF9F27]/30 text-[12px] font-mono text-[#EF9F27]">
-          Demo Mode — connect sheet for live Rθ model.
+          Demo Mode - connect sheet for live Rθ model.
         </div>
       )}
 
@@ -68,8 +68,8 @@ export default function RthetaModel() {
         {[
           { label: "Mean Rθ_eff", value: `${mean.toFixed(4)}`, sub: "°C/W", accent: "#1D9E75" },
           { label: "Std Dev", value: `${std.toFixed(4)}`, sub: "°C/W", accent: "#D8D2C2" },
-          { label: "Min", value: `${min?.toFixed(4) ?? "—"}`, sub: "°C/W", accent: "#1D9E75" },
-          { label: "Max", value: `${max?.toFixed(4) ?? "—"}`, sub: "°C/W", accent: "#D85A30" },
+          { label: "Min", value: `${min?.toFixed(4) ?? "-"}`, sub: "°C/W", accent: "#1D9E75" },
+          { label: "Max", value: `${max?.toFixed(4) ?? "-"}`, sub: "°C/W", accent: "#D85A30" },
         ].map((k) => (
           <div key={k.label} className="relative bg-[#141412] border border-white/[0.07] rounded-xl p-3 overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: k.accent }} />
@@ -131,13 +131,13 @@ export default function RthetaModel() {
       {/* E005 power-cap sweep placeholder */}
       <div className="bg-[#0A0A08] border border-[#5a5a55]/30 rounded-xl p-4">
         <div className="text-[9px] font-mono uppercase tracking-wider text-[#5a5a55] mb-2">
-          E005 — Power-Cap Sweep (planned)
+          E005 - Power-Cap Sweep (planned)
         </div>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
           {POWER_CAP_TARGETS.map((w) => (
             <div key={w} className="bg-[#141412] border border-white/[0.07] rounded-lg p-2.5 text-center">
               <div className="font-mono text-[11px] text-[#5a5a55]">{w}W</div>
-              <div className="font-mono text-[18px] font-bold text-[#5a5a55] mt-1">—</div>
+              <div className="font-mono text-[18px] font-bold text-[#5a5a55] mt-1">-</div>
               <div className="text-[8px] font-mono text-[#3a3a38] mt-0.5">compute/W</div>
             </div>
           ))}

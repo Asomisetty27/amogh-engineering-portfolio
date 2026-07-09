@@ -69,8 +69,8 @@ function StatusPill({ status }: { status: FormStatus }) {
 // ─── Task form ────────────────────────────────────────────────────────────────
 
 function TaskForm() {
-  const [priority, setPriority] = useState("P1 — High");
-  const [phase, setPhase] = useState("Phase 0 — Foundation");
+  const [priority, setPriority] = useState("P1 - High");
+  const [phase, setPhase] = useState("Phase 0 - Foundation");
   const [milestone, setMilestone] = useState("");
   const [owner, setOwner] = useState("Amogh");
   const [track, setTrack] = useState("Software");
@@ -96,13 +96,13 @@ function TaskForm() {
     <form onSubmit={submit} className="space-y-3">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <Field label="Priority">
-          <Select value={priority} onChange={setPriority} options={["P0 — Critical", "P1 — High", "P2 — Normal"]} />
+          <Select value={priority} onChange={setPriority} options={["P0 - Critical", "P1 - High", "P2 - Normal"]} />
         </Field>
         <Field label="Phase">
           <Select
             value={phase}
             onChange={setPhase}
-            options={["Phase 0 — Foundation", "Phase 1 — Experiments", "Phase 2 — Anomaly Detection", "Phase 3 — Validation", "Phase 4 — YC Application"]}
+            options={["Phase 0 - Foundation", "Phase 1 - Experiments", "Phase 2 - Anomaly Detection", "Phase 3 - Validation", "Phase 4 - YC Application"]}
           />
         </Field>
         <Field label="Owner">
@@ -154,7 +154,7 @@ function OutreachForm() {
   const [type, setType] = useState("GPU Cloud");
   const [contactStatus, setContactStatus] = useState("Contacted");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [priority, setPriority] = useState("P1 — High");
+  const [priority, setPriority] = useState("P1 - High");
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState<FormStatus>({ state: "idle" });
 
@@ -209,7 +209,7 @@ function OutreachForm() {
         </Field>
         <Field label="Priority">
           <Select value={priority} onChange={setPriority}
-            options={["P0 — Critical", "P1 — High", "P2 — Normal"]} />
+            options={["P0 - Critical", "P1 - High", "P2 - Normal"]} />
         </Field>
       </div>
       <Field label="Notes / pain quote">

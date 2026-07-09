@@ -33,7 +33,7 @@ export default function AgentDetailTabs({ selectedGpuIndex }: Props) {
       <Panel>
         {isLoading && <Empty text="Loading agent details..." />}
         {!isLoading && !details && (
-          <Empty text="No agent details available — daemon may be unreachable. Showing demo fallback in production mode." />
+          <Empty text="No agent details available - daemon may be unreachable. Showing demo fallback in production mode." />
         )}
         {!isLoading && details && (
           <>
@@ -145,7 +145,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Reasoning tab — causal explanation + raw classifier + fault diagnosis
+// Reasoning tab - causal explanation + raw classifier + fault diagnosis
 // ──────────────────────────────────────────────────────────────────────────
 
 function ReasoningTab({ details }: { details: DaemonGpuDetails }) {
@@ -214,7 +214,7 @@ function ReasoningTab({ details }: { details: DaemonGpuDetails }) {
                   <span style={{ color: COLORS.steel.bright }}>
                     {alt.cause.replace(/_/g, ' ')} · {(alt.confidence * 100).toFixed(0)}%
                   </span>{' '}
-                  — {alt.one_line}
+                  - {alt.one_line}
                 </div>
               ))}
             </>
@@ -301,7 +301,7 @@ function ReasoningTab({ details }: { details: DaemonGpuDetails }) {
       )}
       {!details.cnn_prediction && (
         <div style={{ fontSize: '10px', color: COLORS.steel.muted, marginTop: '12px', opacity: 0.6 }}>
-          CNN predictor scaffolding present but no trained weights deployed yet — daemon falls back to rule-based predictor. See <code>theta/agent/predictor_cnn.py</code> for the architecture (cascading 1D CNNs over multi-channel telemetry, inspired by Cai et al. 2026).
+          CNN predictor scaffolding present but no trained weights deployed yet - daemon falls back to rule-based predictor. See <code>theta/agent/predictor_cnn.py</code> for the architecture (cascading 1D CNNs over multi-channel telemetry, inspired by Cai et al. 2026).
         </div>
       )}
     </div>
@@ -316,7 +316,7 @@ function formatHorizon(s: number): string {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Memory tab — smoothed state posterior + hardware profile + maintenance
+// Memory tab - smoothed state posterior + hardware profile + maintenance
 // ──────────────────────────────────────────────────────────────────────────
 
 function MemoryTab({ details }: { details: DaemonGpuDetails }) {
@@ -455,7 +455,7 @@ function MemoryTab({ details }: { details: DaemonGpuDetails }) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Telemetry tab — Intelligence Network status + community benchmarks
+// Telemetry tab - Intelligence Network status + community benchmarks
 // ──────────────────────────────────────────────────────────────────────────
 
 function TelemetryTab({ details }: { details: DaemonGpuDetails }) {
@@ -463,7 +463,7 @@ function TelemetryTab({ details }: { details: DaemonGpuDetails }) {
     <div>
       <SectionLabel>Intelligence Network</SectionLabel>
       <div style={{ fontSize: '12px', color: COLORS.steel.bright, lineHeight: 1.6, marginBottom: '12px' }}>
-        Theta's opt-in telemetry layer uploads <strong>anonymized aggregates only</strong> — R_θ percentiles, ECC rates, recovery-time signatures — bucketed hourly by GPU class. No hostnames, no IPs, no workload content, no model weights leave the host.
+        Theta's opt-in telemetry layer uploads <strong>anonymized aggregates only</strong> - R_θ percentiles, ECC rates, recovery-time signatures - bucketed hourly by GPU class. No hostnames, no IPs, no workload content, no model weights leave the host.
       </div>
 
       <SectionLabel>What this install would share (if opted in)</SectionLabel>
@@ -484,16 +484,16 @@ function TelemetryTab({ details }: { details: DaemonGpuDetails }) {
         <div>n_samples_per_hour: ~720 (at 5s interval)</div>
         <div>rtheta_mean, rtheta_std, ecc_sbit_total, recovery_time_p50</div>
         <div style={{ color: COLORS.steel.muted, marginTop: '4px' }}>
-          (off by default — set data_sharing: true in ~/.theta/config.json to enable)
+          (off by default - set data_sharing: true in ~/.theta/config.json to enable)
         </div>
       </div>
 
       <SectionLabel>Community benchmarks (when opted in)</SectionLabel>
       <div style={{ fontSize: '11px', color: COLORS.steel.muted, lineHeight: 1.6 }}>
-        Cross-fleet percentiles by GPU class — does this unit run hotter or
+        Cross-fleet percentiles by GPU class - does this unit run hotter or
         cooler than the median {details.hw_profile?.canonical_name ?? 'GPU'} across all opted-in installs? This is the data layer
         that turns Theta into a knowledge network rather than a per-cluster
-        diagnostic. Cold-start data not yet aggregated — endpoint will populate
+        diagnostic. Cold-start data not yet aggregated - endpoint will populate
         once Intelligence Network has &gt;100 installations of this hardware class.
       </div>
     </div>
@@ -501,7 +501,7 @@ function TelemetryTab({ details }: { details: DaemonGpuDetails }) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Integrations tab — copy-paste script generators for SLURM/K8s/Grafana
+// Integrations tab - copy-paste script generators for SLURM/K8s/Grafana
 // ──────────────────────────────────────────────────────────────────────────
 
 function IntegrationsTab({ details }: { details: DaemonGpuDetails }) {
@@ -513,14 +513,14 @@ function IntegrationsTab({ details }: { details: DaemonGpuDetails }) {
     });
   };
 
-  const slurmProlog = `# SLURM prolog — drain node when Theta risk > 0.5
+  const slurmProlog = `# SLURM prolog - drain node when Theta risk > 0.5
 RISK=$(curl -sH "Authorization: Bearer $THETA_TOKEN" \\
   http://localhost:9102/api/v1/health/gpu/${details.gpu_index} | jq .risk)
 if (( $(echo "$RISK > 0.5" | bc -l) )); then
   scontrol update nodename=$(hostname) state=drain reason="theta:r_theta_drift"
 fi`;
 
-  const k8sCordon = `# Kubernetes admission webhook — cordon node when Theta risk > 0.5
+  const k8sCordon = `# Kubernetes admission webhook - cordon node when Theta risk > 0.5
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
@@ -537,7 +537,7 @@ webhooks:
     sideEffects: None
     admissionReviewVersions: ["v1"]`;
 
-  const grafanaQuery = `# Grafana panel queries — Theta-exposed Prometheus metrics
+  const grafanaQuery = `# Grafana panel queries - Theta-exposed Prometheus metrics
 # R_θ per GPU
 theta_gpu_rtheta_cwatt{gpu_index="${details.gpu_index}"}
 
@@ -552,7 +552,7 @@ theta_gpu_maintenance_days{gpu_index="${details.gpu_index}"}`;
 
   return (
     <div>
-      <SectionLabel>SLURM prolog — auto-drain on drift</SectionLabel>
+      <SectionLabel>SLURM prolog - auto-drain on drift</SectionLabel>
       <Snippet
         label="SLURM"
         text={slurmProlog}

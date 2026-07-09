@@ -12,7 +12,7 @@ const T = {
 const FM = "'JetBrains Mono', ui-monospace, monospace";
 
 // ──────────────────────────────────────────────────────────────────────────
-// Website wrapper — visibility-gated so the scene (and its WebGL context)
+// Website wrapper - visibility-gated so the scene (and its WebGL context)
 // only mounts once scrolled near, and unmounts again once scrolled well past.
 // Mirrors the Hero's lazy-load-after-first-paint approach in Landing.tsx,
 // extended with an IntersectionObserver since this section sits mid-page
@@ -61,7 +61,7 @@ export default function DataCenterShowcase() {
           </h2>
           <p style={{ marginTop: 14, color: T.muted, fontSize: 15, lineHeight: 1.6 }}>
             The same R<sub>θ</sub> signal from the Tesla T4 demo above, scaled to a real
-            data-center floor — Theta tracking every node, catching a thermal drift with
+            data-center floor - Theta tracking every node, catching a thermal drift with
             enough lead time to act before throttling ever shows up in util or power.
           </p>
         </div>
@@ -78,7 +78,7 @@ export default function DataCenterShowcase() {
           <div style={{ position: 'absolute', inset: 0, background: T.bg }} aria-hidden />
         )}
 
-        {/* Top/bottom fades — same blend treatment as the Hero's GPU scene */}
+        {/* Top/bottom fades - same blend treatment as the Hero's GPU scene */}
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 64, background: `linear-gradient(to bottom, ${T.bg}, transparent)`, pointerEvents: 'none', zIndex: 5 }} />
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 100, background: `linear-gradient(to bottom, transparent, ${T.bg})`, pointerEvents: 'none', zIndex: 5 }} />
       </div>
