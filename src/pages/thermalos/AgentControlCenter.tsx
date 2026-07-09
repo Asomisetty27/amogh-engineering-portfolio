@@ -143,7 +143,7 @@ export default function AgentControlCenter() {
               />
             )}
 
-            {/* Real tab system — Reasoning / Memory / Telemetry / Integrations.
+            {/* Real tab system - Reasoning / Memory / Telemetry / Integrations.
                 Driven by useAgentDetails() which polls /api/v1/agent/gpu/{i}/details
                 every 5s. Falls back to demo data when daemon isn't running. */}
             <AgentDetailTabs selectedGpuIndex={selectedGpuIndex} />

@@ -14,7 +14,7 @@ const TABS = [
 type TabValue = (typeof TABS)[number]["value"];
 
 export default function Lab() {
-  useEffect(() => { document.title = "ThermalOS — Lab | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - Lab | amogh.site"; }, []);
 
   const [params, setParams] = useSearchParams();
   const raw = params.get("tab");

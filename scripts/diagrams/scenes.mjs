@@ -221,11 +221,11 @@ export const SCENES = {
     // speed knob (pot) cols 6/8/10 (top group)
     g += potBody(colX(8), ROWY.H - 30, [colX(6), colX(8), colX(10)], ROWY.G);
     g += tapP('J6'); g += wire('AN0', 'J8', C.green); g += tapM('J10');
-    // control signals — direct from digital pins
+    // control signals - direct from digital pins
     g += wire('~5', chip.hole(1), C.blue);   // EN1 (speed)
     g += wire('~6', chip.hole(2), C.yellow); // IN1
     g += wire('7',  chip.hole(7), C.orange); // IN2
-    // chip power — tapped from the rails
+    // chip power - tapped from the rails
     g += tapP(chip.hole(8));   // VCC2
     g += tapP(chip.hole(16));  // VCC1
     g += tapM(chip.hole(4));   // GND
@@ -356,7 +356,7 @@ export const SCENES = {
     const m = module({ ...b, fill: '#0d3b66', label: 'RC522 RFID', side: 'left',
       pins: [{ name: 'V33', label: '3.3V' }, { name: 'GND', label: 'GND' }, { name: 'RST', label: 'RST' }, { name: 'SDA', label: 'SDA' }, { name: 'MOSI', label: 'MOSI' }, { name: 'MISO', label: 'MISO' }, { name: 'SCK', label: 'SCK' }] });
     const coil = `<rect x="${b.x + b.w - 78}" y="${b.y + 22}" width="60" height="${b.h - 44}" rx="8" fill="none" stroke="#c9a227" stroke-width="3"/>`;
-    const note = text(b.x + b.w/2 + 14, b.y + b.h + 22, '3.3V — NOT 5V', { size: 11, fill: '#d21f24', weight: 700 });
+    const note = text(b.x + b.w/2 + 14, b.y + b.h + 22, '3.3V - NOT 5V', { size: 11, fill: '#d21f24', weight: 700 });
     return mod(m, [['3.3V', m.at('V33'), C.red], ['GND', m.at('GND'), C.black], ['~9', m.at('RST'), C.yellow], ['~10', m.at('SDA'), C.green], ['~11', m.at('MOSI'), C.blue], ['12', m.at('MISO'), C.orange], ['13', m.at('SCK'), C.green]], coil + note);
   },
   seven_seg() {

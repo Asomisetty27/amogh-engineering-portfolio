@@ -19,7 +19,7 @@ function timeSince(ts: string): string {
 }
 
 export default function Alerts() {
-  useEffect(() => { document.title = "ThermalOS — Alerts | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - Alerts | amogh.site"; }, []);
 
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["measurements"],
@@ -50,7 +50,7 @@ export default function Alerts() {
     <div className="space-y-4">
       {demo && (
         <div className="px-3 py-2 rounded-lg bg-[#EF9F27]/10 border border-[#EF9F27]/30 text-[12px] font-mono text-[#EF9F27]">
-          Demo Mode — connect sheet to see live alerts.
+          Demo Mode - connect sheet to see live alerts.
         </div>
       )}
 
@@ -107,7 +107,7 @@ export default function Alerts() {
       {/* Alert event log */}
       <div className="bg-[#141412] border border-white/[0.07] rounded-xl p-4">
         <div className="text-[9px] font-mono uppercase tracking-wider text-[#5a5a55] mb-3">
-          Alert Event Log — non-OK only ({events.length} events)
+          Alert Event Log - non-OK only ({events.length} events)
         </div>
         {events.length === 0 ? (
           <div className="text-[12px] font-mono text-[#5a5a55] py-6 text-center">No alert events in current window. System nominal.</div>

@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
         return jsonResponse({ error: "unauthorized" }, 401);
       }
       // Use getUser() (server-side validation w/ revocation), not getClaims()
-      // — revoked / disabled sessions must be rejected immediately.
+      // - revoked / disabled sessions must be rejected immediately.
       const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         global: { headers: { Authorization: authHeader } },
       });

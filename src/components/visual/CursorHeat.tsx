@@ -3,9 +3,9 @@ import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-moti
 
 /**
  * Signature interaction: a faint heat-glow that trails the cursor (ivory-hot
- * center cooling to champagne — the Isotherm thermal palette). Implemented as
+ * center cooling to champagne - the Isotherm thermal palette). Implemented as
  * a fixed-size element moved by GPU
- * transform (x/y) over a STATIC gradient — not a per-frame fullscreen repaint —
+ * transform (x/y) over a STATIC gradient - not a per-frame fullscreen repaint -
  * so it stays smooth and doesn't starve scroll/reveal animations.
  * Pointer-only (hidden on touch), disabled under prefers-reduced-motion.
  */

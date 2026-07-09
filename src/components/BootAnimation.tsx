@@ -213,7 +213,7 @@ export default function BootAnimation({ onComplete }: { onComplete: () => void }
             >
               {phase === "complete" ? (
                 <span style={{ textShadow: "0 0 8px #D4AF37" }}>
-                  ✓ ALL SYSTEMS NOMINAL — MOUNTING INTERFACE
+                  ✓ ALL SYSTEMS NOMINAL - MOUNTING INTERFACE
                 </span>
               ) : (
                 <span>INITIALIZING SUBSYSTEMS...</span>

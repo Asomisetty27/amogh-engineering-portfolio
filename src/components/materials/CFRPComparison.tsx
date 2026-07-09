@@ -14,12 +14,12 @@ const comparisonData: MaterialRow[] = [
   { property: "Tensile Strength", cfrp: "600–3000", al6061: "~310", unit: "MPa", winner: "cfrp" },
   { property: "Specific Strength (σ/ρ)", cfrp: "375–1875", al6061: "~115", unit: "kN·m/kg", winner: "cfrp" },
   { property: "Elastic Modulus", cfrp: "70–230", al6061: "~69", unit: "GPa", winner: "cfrp" },
-  { property: "Fatigue Resistance", cfrp: "Excellent", al6061: "Good", unit: "—", winner: "cfrp" },
+  { property: "Fatigue Resistance", cfrp: "Excellent", al6061: "Good", unit: "-", winner: "cfrp" },
   { property: "Cost", cfrp: "High ($20–50/kg)", al6061: "Low ($3–5/kg)", unit: "$/kg", winner: "al" },
-  { property: "Repairability", cfrp: "Complex, specialist", al6061: "Weldable, standard", unit: "—", winner: "al" },
-  { property: "Recyclability", cfrp: "Difficult", al6061: "Highly recyclable", unit: "—", winner: "al" },
-  { property: "Impact Damage Visibility", cfrp: "Often hidden (BVID)", al6061: "Visible denting", unit: "—", winner: "al" },
-  { property: "Corrosion Resistance", cfrp: "Excellent", al6061: "Good (with anodize)", unit: "—", winner: "cfrp" },
+  { property: "Repairability", cfrp: "Complex, specialist", al6061: "Weldable, standard", unit: "-", winner: "al" },
+  { property: "Recyclability", cfrp: "Difficult", al6061: "Highly recyclable", unit: "-", winner: "al" },
+  { property: "Impact Damage Visibility", cfrp: "Often hidden (BVID)", al6061: "Visible denting", unit: "-", winner: "al" },
+  { property: "Corrosion Resistance", cfrp: "Excellent", al6061: "Good (with anodize)", unit: "-", winner: "cfrp" },
 ];
 
 export default function CFRPComparison() {
@@ -31,7 +31,7 @@ export default function CFRPComparison() {
       {/* Header */}
       <div className="flex items-center gap-2">
         <span className="text-xs font-mono font-semibold text-primary tracking-wider uppercase">
-          CFRP vs 6061-T6 Aluminum — Material Selection
+          CFRP vs 6061-T6 Aluminum - Material Selection
         </span>
         <ConfidenceBadgeTag confidence="CONCEPTUAL" />
       </div>
@@ -90,12 +90,12 @@ export default function CFRPComparison() {
       <div className="border border-primary/20 rounded-lg p-3 bg-primary/5">
         <h4 className="text-xs font-mono font-semibold text-primary tracking-wider mb-1 uppercase">Framework</h4>
         <p className="text-xs text-secondary-foreground leading-relaxed">
-          Structure → Properties → Processing → Performance. Material selection is never absolute — it is always relative to the application requirements, lifecycle costs, and manufacturing constraints.
+          Structure → Properties → Processing → Performance. Material selection is never absolute - it is always relative to the application requirements, lifecycle costs, and manufacturing constraints.
         </p>
       </div>
 
       <div className="text-[10px] font-mono text-muted-foreground">
-        ⚠ CONCEPTUAL — values from white paper and standard material databases. Upload white paper for VERIFIED status.
+        ⚠ CONCEPTUAL - values from white paper and standard material databases. Upload white paper for VERIFIED status.
       </div>
     </div>
   );

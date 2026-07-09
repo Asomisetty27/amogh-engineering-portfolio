@@ -1,4 +1,4 @@
-# Instrument plates — the house imagery system
+# Instrument plates - the house imagery system
 
 Every hero image on the site is a "plate": a cinematic macro in the Isotherm
 palette (obsidian, copper, champagne key light) displayed via
@@ -6,12 +6,12 @@ palette (obsidian, copper, champagne key light) displayed via
 cursor / tap on touch) each plate reveals an ironbow instrument view with
 drafted callouts. The ironbow state is derived from the same image by the
 `#fx-ironbow` SVG filter (see `src/components/visual/lens.tsx`), so the two
-states are always pixel-registered — never generate a separate thermal image.
+states are always pixel-registered - never generate a separate thermal image.
 
 ## Generated so far (Higgsfield · cinematic_studio_2_5 · 1k · 2 credits each)
 
-- `public/generated/die-plate.webp` — PLATE 01, hero, 21:9
-- `public/generated/theta-plate.webp` — PLATE 02, Theta banner, 4:5
+- `public/generated/die-plate.webp` - PLATE 01, hero, 21:9
+- `public/generated/theta-plate.webp` - PLATE 02, Theta banner, 4:5
 
 ## House prompt template
 
@@ -23,7 +23,7 @@ states are always pixel-registered — never generate a separate thermal image.
 Model: `cinematic_studio_2_5`. Cards: 4:5. Wide plates: 21:9.
 Convert with `cwebp -q 84`.
 
-## Remaining plate set (blocked on Higgsfield credits — 2 credits per plate)
+## Remaining plate set (blocked on Higgsfield credits - 2 credits per plate)
 
 | Plate | Project | SUBJECT for the template |
 |---|---|---|

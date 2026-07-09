@@ -74,7 +74,7 @@ export default function AirMotorHologram() {
   return (
     <HologramViewer
       parts={airMotorParts}
-      title="Air Motor Assembly — 3D Hologram"
+      title="Air Motor Assembly - 3D Hologram"
       confidence="CONCEPTUAL"
       sourceFiles={[
         "IME_144_MANUAL.pdf",

@@ -7,7 +7,7 @@ const T = { bg: '#06060A', text: '#ECE6D8', muted: '#9A9285' };
 const FM = "'JetBrains Mono', ui-monospace, monospace";
 
 // ──────────────────────────────────────────────────────────────────────────
-// Kiosk wrapper — fullscreen, no page chrome, larger HUD for viewing-distance
+// Kiosk wrapper - fullscreen, no page chrome, larger HUD for viewing-distance
 // legibility on a lab display. Same <DataCenterScene> as the website showcase
 // so the two never drift apart; only sizing/scale/chrome differ here.
 // Route: /theta/kiosk/datacenter (registered in App.tsx)
@@ -17,7 +17,7 @@ export default function DataCenterKiosk() {
   useEffect(() => {
     const prevOverflow = document.documentElement.style.overflow;
     document.documentElement.style.overflow = 'hidden';
-    document.title = 'Theta — Live Fleet View';
+    document.title = 'Theta - Live Fleet View';
     return () => {
       document.documentElement.style.overflow = prevOverflow;
     };
@@ -29,7 +29,7 @@ export default function DataCenterKiosk() {
         <DataCenterScene hudScale={1.7} />
       </React.Suspense>
 
-      {/* Lab-context corner mark — tells visitors what they're looking at
+      {/* Lab-context corner mark - tells visitors what they're looking at
           without competing with the in-scene HUD/caption. */}
       <div style={{
         position: 'absolute', top: 28, left: 28,

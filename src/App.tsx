@@ -7,7 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { FLEET_BASE, LEGACY_REDIRECTS, RESEARCH_BASE, SITE_BASE, THETA_BASE } from "./pages/thermalos/config.ts";
 
 // Route-level code splitting: each page is its own chunk, loaded on demand.
-// Keeps the initial bundle small — visiting "/" no longer pulls in the admin
+// Keeps the initial bundle small - visiting "/" no longer pulls in the admin
 // workspace or the three.js GPU scene (those live in their own route chunks).
 const Index            = lazy(() => import("./pages/Index.tsx"));
 const NotFound         = lazy(() => import("./pages/NotFound.tsx"));
@@ -28,7 +28,7 @@ const QuickEntry       = lazy(() => import("./pages/thermalos/QuickEntry.tsx"));
 const DataCenterKiosk  = lazy(() => import("./pages/thermalos/components/DataCenterKiosk.tsx"));
 const AgentControlCenter = lazy(() => import("./pages/thermalos/AgentControlCenter.tsx"));
 
-// EPIC 2026 — Arduino lab helper (hostname-routed to la.amogh.site)
+// EPIC 2026 - Arduino lab helper (hostname-routed to la.amogh.site)
 const StudentHelper       = lazy(() => import("./pages/epic/StudentHelper.tsx"));
 const InstructorDashboard = lazy(() => import("./pages/epic/InstructorDashboard.tsx"));
 const IS_LAB_HOST = typeof window !== "undefined" && window.location.hostname.startsWith("epic.");
@@ -40,7 +40,7 @@ const RouteFallback = () => (
   <div style={{ minHeight: "100vh", background: "#09090D" }} aria-busy="true" />
 );
 
-// The commercial/client surface lives exclusively on runtheta.com now —
+// The commercial/client surface lives exclusively on runtheta.com now -
 // the portfolio keeps only the ThermalOS research surfaces. /theta links
 // in the wild hard-redirect to the product site.
 const RuntheaRedirect = () => {
@@ -56,7 +56,7 @@ const App = () => (
       <BrowserRouter>
         <Suspense fallback={<RouteFallback />}>
           <Routes>
-            {/* ══ EPIC 2026 — Arduino lab helper (la.amogh.site front door) ══ */}
+            {/* ══ EPIC 2026 - Arduino lab helper (la.amogh.site front door) ══ */}
             {IS_LAB_HOST && <Route path="/" element={<StudentHelper />} />}
             {IS_LAB_HOST && <Route path="/dashboard" element={<InstructorDashboard />} />}
             <Route path="/epic" element={<StudentHelper />} />
@@ -64,25 +64,25 @@ const App = () => (
 
             <Route path="/" element={<Index />} />
 
-            {/* ══ THETA — commercial surface moved to runtheta.com ══════════ */}
+            {/* ══ THETA - commercial surface moved to runtheta.com ══════════ */}
             <Route path={THETA_BASE} element={<RuntheaRedirect />} />
-            {/* Lab kiosk — fullscreen "living data center" loop, no chrome.
+            {/* Lab kiosk - fullscreen "living data center" loop, no chrome.
                 Same <DataCenterScene> as the website showcase section. */}
             <Route path={`${THETA_BASE}/kiosk/datacenter`} element={<DataCenterKiosk />} />
 
-            {/* ══ THERMALOS — research / OSS public surface ═════════════════
+            {/* ══ THERMALOS - research / OSS public surface ═════════════════
                 /thermalos          -> ResearchLanding (academic)
                 /thermalos/fleet    -> FleetDashboard (live data demo) */}
             <Route path={SITE_BASE} element={<ResearchLanding />} />
             <Route path={FLEET_BASE} element={<FleetDashboard />} />
 
-            {/* ══ THERMALOS APP — research/admin/advisor workspace ══════════ */}
+            {/* ══ THERMALOS APP - research/admin/advisor workspace ══════════ */}
             <Route path={RESEARCH_BASE} element={<ThermalOSLayout />}>
               <Route index element={<Overview />} />
 
-              {/* Agent Control Center — 5-pillar command post */}
+              {/* Agent Control Center - 5-pillar command post */}
               <Route path="agent"       element={<AgentControlCenter />} />
-              {/* methodology page — segment is "findings" */}
+              {/* methodology page - segment is "findings" */}
               <Route path="findings"    element={<Research />} />
               <Route path="lab"         element={<Lab />} />
               <Route path="roadmap"     element={<Roadmap />} />
@@ -93,9 +93,9 @@ const App = () => (
               <Route path="entry"       element={<QuickEntry />} />
               <Route path="yc"          element={<YC />} />
 
-              {/* Admin command center — default admin landing */}
+              {/* Admin command center - default admin landing */}
               <Route path="command"      element={<CommandCenter />} />
-              {/* Admin dashboard — kept for deep links */}
+              {/* Admin dashboard - kept for deep links */}
               <Route path="dashboard"    element={<Dashboard />} />
               {/* In-hub legacy tab redirects */}
               <Route path="live"         element={<Navigate to={`${RESEARCH_BASE}/lab`} replace />} />

@@ -13,7 +13,7 @@ type Broadcast = { id: string; message: string; created_at: string };
 // ── Day-1 station setup (Part 2) ─ self-serve checklist for shared PCs ──────
 const SETUP_STEPS: string[] = [
   "Open the Arduino IDE (or install it from arduino.cc/en/software).",
-  "Plug in the Arduino with the USB cable — a small light turns on.",
+  "Plug in the Arduino with the USB cable - a small light turns on.",
   "Tools → Board → Arduino AVR Boards → Arduino UNO.",
   "Tools → Port → pick the port that appears (often shows \"UNO\").",
   "Paste the Blink code below, click Verify (✓), then Upload (→). Wait for \"Done uploading.\"",
@@ -51,7 +51,7 @@ export default function StudentHelper() {
   const [broadcast, setBroadcast] = useState<Broadcast | null>(null);
   const [dismissedId, setDismissedId] = useState<string | null>(null);
 
-  // Group roster — first name + last initial ONLY (minors' data).
+  // Group roster - first name + last initial ONLY (minors' data).
   const [rosterOpen, setRosterOpen] = useState(false);
   const [members, setMembers] = useState<string[]>(["", "", "", ""]);
 
@@ -74,7 +74,7 @@ export default function StudentHelper() {
     if (n >= 1 && n <= GROUP_COUNT) setGroup(n);
   }, []);
 
-  // Broadcast — newest non-dismissed banner (scoped to cohort). Realtime is
+  // Broadcast - newest non-dismissed banner (scoped to cohort). Realtime is
   // the fast path; a short poll is the fallback in case a channel silently
   // drops (which is what "announcements don't show up" looks like from here).
   useEffect(() => {
@@ -103,7 +103,7 @@ export default function StudentHelper() {
   );
   const onSetup = activeId === "setup";
   const onThankYou = activeId === "thankyou";
-  // What this group is "on" right now — used for progress + help labels.
+  // What this group is "on" right now - used for progress + help labels.
   const currentLabel = onSetup ? "Setup" : onThankYou ? "Wrap-up" : activity.title;
 
   // Reset transient state when activity changes
@@ -137,7 +137,7 @@ export default function StudentHelper() {
     setMembers([0, 1, 2, 3].map(i => existing[i] ?? ""));
   };
 
-  // Save first name + last initial ONLY — never full names, emails, or other PII.
+  // Save first name + last initial ONLY - never full names, emails, or other PII.
   const saveRoster = async () => {
     if (group == null) return;
     const cleaned = members.map(m => m.trim()).filter(Boolean).slice(0, 4);
@@ -168,7 +168,7 @@ export default function StudentHelper() {
 
   const sendHelp = async (type: HelpType, label: string = currentLabel) => {
     if (group == null) return;
-    // We're about to auto-resolve our own prior request of this type — mark it
+    // We're about to auto-resolve our own prior request of this type - mark it
     // so it doesn't fire a false "an instructor helped" toast.
     openReqs.filter(r => r.group_no === group && r.type === type).forEach(r => selfResolvedIds.current.add(r.id));
     // Resolve any existing open request of same type+group to avoid duplicates
@@ -229,7 +229,7 @@ export default function StudentHelper() {
   }, [awaitingCheck, approved]);
 
   // Load this group's completed activities: localStorage first (instant),
-  // then merge in the server record (group_completed) — this is what lets an
+  // then merge in the server record (group_completed) - this is what lets an
   // instructor-restored or another-device group pick up where they left off
   // even if THIS browser's localStorage was wiped.
   useEffect(() => {
@@ -274,13 +274,13 @@ export default function StudentHelper() {
     return () => { cancelled = true; supabase.removeChannel(ch); };
   }, [group, cohort]);
 
-  // Clock tick — drives the 22-hour additional-projects window + go-live flip.
+  // Clock tick - drives the 22-hour additional-projects window + go-live flip.
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 30000);
     return () => clearInterval(t);
   }, []);
 
-  // When a check-off is approved, record that activity as completed —
+  // When a check-off is approved, record that activity as completed -
   // locally right away, and on the server so it survives a lost device and
   // shows up on the instructor's restore-progress checklist.
   useEffect(() => {
@@ -353,7 +353,7 @@ export default function StudentHelper() {
       <div className="min-h-screen bg-[#09090D] text-foreground flex items-center justify-center p-6">
         <div className="fx-glass fx-card max-w-md w-full rounded-lg p-6 border border-panel-border">
           <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-xl font-semibold">EPIC 2026 — Arduino Lab</h1>
+            <h1 className="text-xl font-semibold">EPIC 2026 - Arduino Lab</h1>
             <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border border-primary/40 bg-primary/10 text-primary">{COHORT_LABEL[cohort]}</span>
           </div>
           <p className="text-sm text-muted-foreground mb-5">Pick your group to begin.</p>
@@ -377,7 +377,7 @@ export default function StudentHelper() {
         <div className="fx-glass fx-card max-w-md w-full rounded-lg p-6 border border-panel-border">
           <h1 className="text-xl font-semibold mb-1">Who's in Group {pad2(group)}?</h1>
           <p className="text-sm text-muted-foreground mb-4">
-            First name and last initial only — like <span className="font-mono">Maya R.</span> Helps your
+            First name and last initial only - like <span className="font-mono">Maya R.</span> Helps your
             instructor know who's who. You can skip this.
           </p>
           <div className="space-y-2 mb-5">
@@ -457,7 +457,7 @@ export default function StudentHelper() {
       <div className="flex flex-col md:flex-row max-w-6xl mx-auto pb-32">
         {/* Left nav */}
         <aside className="md:w-64 md:border-r border-panel-border p-3 md:p-4 md:sticky md:top-[60px] md:self-start md:h-[calc(100vh-60px)] md:overflow-y-auto">
-          {/* Setup — pinned above Day 1 */}
+          {/* Setup - pinned above Day 1 */}
           <div className="mb-4">
             <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Get started</div>
             <ul className="space-y-1">
@@ -480,7 +480,7 @@ export default function StudentHelper() {
             const acts = byDay[day] ?? [];
             const gated = gatingActive(now);
 
-            // Additional Exercises — gated behind the 22-hour window once live.
+            // Additional Exercises - gated behind the 22-hour window once live.
             if (day === 5) {
               const until = additionalsUntil(completed);
               const open = !gated || (until != null && now < until);
@@ -496,7 +496,7 @@ export default function StudentHelper() {
                     <ul className="space-y-1">{acts.map(navItem)}</ul>
                   ) : (
                     <div className="text-[11px] leading-relaxed text-muted-foreground rounded border border-panel-border bg-white/[0.02] px-2.5 py-2">
-                      🔒 Finish today's required activities to unlock the bonus projects — they open for 22 hours.
+                      🔒 Finish today's required activities to unlock the bonus projects - they open for 22 hours.
                     </div>
                   )}
                 </div>
@@ -517,7 +517,7 @@ export default function StudentHelper() {
             );
           })}
 
-          {/* Wrap up — last step */}
+          {/* Wrap up - last step */}
           <div className="mb-2">
             <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Wrap up</div>
             <ul className="space-y-1">
@@ -541,11 +541,11 @@ export default function StudentHelper() {
           {onThankYou ? (
             (() => {
               const ready = hope.trim().length > 3;
-              const subject = `Thank you from EPIC 2026 — Group ${pad2(group)}`;
+              const subject = `Thank you from EPIC 2026 - Group ${pad2(group)}`;
               const body =
                 `Dear Professor Kundu and Maria,\n\nThank you for the EPIC 2026 Arduino lab! ` +
                 `One thing I'm looking forward to building or doing with what I learned: ${hope.trim() || "..."}.\n\n` +
-                `— Group ${group}${thanksName.trim() ? `, ${thanksName.trim()}` : ""}, EPIC 2026`;
+                `- Group ${group}${thanksName.trim() ? `, ${thanksName.trim()}` : ""}, EPIC 2026`;
               const mailto = `mailto:${THANKYOU_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
               const gmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(THANKYOU_EMAIL)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
               const noRecipient = THANKYOU_EMAIL.startsWith("REPLACE_WITH");
@@ -561,7 +561,7 @@ export default function StudentHelper() {
                   </section>
                   <section className="space-y-3 max-w-xl">
                     <label className="block">
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Your name(s) — optional</span>
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Your name(s) - optional</span>
                       <input value={thanksName} onChange={(e) => setThanksName(e.target.value)} placeholder="Maya R. & Devin K."
                         className="mt-1 w-full bg-black/40 border border-panel-border rounded px-3 py-2 text-sm focus:outline-none focus:border-primary/60" />
                     </label>
@@ -593,13 +593,13 @@ export default function StudentHelper() {
               <section>
                 <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1">Get your station ready</div>
                 <p className="text-sm text-secondary-foreground">
-                  Work through these once per computer. Check each step as you go — it's saved on this machine.
+                  Work through these once per computer. Check each step as you go - it's saved on this machine.
                 </p>
               </section>
 
               {allSetupDone && (
                 <div className="rounded-md border border-[#30A46C]/40 bg-[#30A46C]/10 text-[#30A46C] px-3 py-2 text-sm font-medium">
-                  ✅ Station ready — you can start Day 1.
+                  ✅ Station ready - you can start Day 1.
                 </div>
               )}
 
@@ -653,7 +653,7 @@ export default function StudentHelper() {
               {activity.lib && (
                 <div className="rounded-md border border-[#F2B01E]/40 bg-[#F2B01E]/10 text-[#F2B01E] px-3 py-2 text-sm space-y-2">
                   <div>
-                    Install <code className="font-mono">{activity.lib}</code> first — in the Arduino IDE, do this:
+                    Install <code className="font-mono">{activity.lib}</code> first - in the Arduino IDE, do this:
                   </div>
                   <img
                     src="/diagrams/add_zip_library.jpg"
@@ -708,7 +708,7 @@ export default function StudentHelper() {
                     onError={() => setImgOk(false)}
                     className="rounded-md border border-panel-border max-w-full bg-white"
                   />
-                  <figcaption className="text-[11px] text-muted-foreground">Wiring diagram — put each wire and part in the exact hole shown here.</figcaption>
+                  <figcaption className="text-[11px] text-muted-foreground">Wiring diagram - put each wire and part in the exact hole shown here.</figcaption>
                 </figure>
               )}
 
@@ -720,7 +720,7 @@ export default function StudentHelper() {
                     loading="lazy"
                     className="rounded-md border border-panel-border max-w-full bg-white"
                   />
-                  <figcaption className="text-[11px] text-muted-foreground">Straight from the Elegoo UNO Starter Kit manual — a second reference if the diagram above isn't enough.</figcaption>
+                  <figcaption className="text-[11px] text-muted-foreground">Straight from the Elegoo UNO Starter Kit manual - a second reference if the diagram above isn't enough.</figcaption>
                 </figure>
               )}
 
@@ -772,10 +772,10 @@ export default function StudentHelper() {
                 </button>
                 {troubleOpen && (
                   <div className="mt-3 space-y-4">
-                    {/* Universal first-aid checklist — tick each as you check it */}
+                    {/* Universal first-aid checklist - tick each as you check it */}
                     <div>
                       <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">
-                        Step 1 — check these on ANY project ({firstAid.filter(Boolean).length}/{FIRST_AID.length})
+                        Step 1 - check these on ANY project ({firstAid.filter(Boolean).length}/{FIRST_AID.length})
                       </div>
                       <ol className="space-y-1.5">
                         {FIRST_AID.map((step, i) => (
@@ -797,7 +797,7 @@ export default function StudentHelper() {
                     {/* Exercise-specific fixes */}
                     {activity.trouble.length > 0 && (
                       <div>
-                        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Step 2 — for THIS project specifically</div>
+                        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Step 2 - for THIS project specifically</div>
                         <ul className="space-y-1 px-1">
                           {activity.trouble.map((t, i) => (
                             <li key={i} className="flex items-start gap-2 text-sm"><span className="text-[#E5484D] mt-0.5">▸</span><span className="text-secondary-foreground">{t}</span></li>
@@ -879,7 +879,7 @@ export default function StudentHelper() {
         </div>
       )}
 
-      {/* Check-off gate — blocks moving on until an instructor resolves it */}
+      {/* Check-off gate - blocks moving on until an instructor resolves it */}
       {awaitingCheck && (
         <div className="fixed inset-0 z-50 bg-[#09090D]/95 backdrop-blur flex items-center justify-center p-6">
           <div className="fx-glass fx-card max-w-md w-full text-center rounded-lg border border-panel-border p-8">
@@ -904,13 +904,13 @@ export default function StudentHelper() {
                 </div>
                 <button onClick={cancelCheckoff}
                   className="text-sm font-mono px-4 py-2.5 rounded border border-panel-border bg-white/[0.03] hover:bg-white/[0.07] text-muted-foreground">
-                  ← We're not done yet — go back
+                  ← We're not done yet - go back
                 </button>
               </>
             ) : (
               <>
                 <div className="text-5xl mb-4">✅</div>
-                <h2 className="text-xl font-semibold mb-2 text-[#30A46C]">Checked off — nice work!</h2>
+                <h2 className="text-xl font-semibold mb-2 text-[#30A46C]">Checked off - nice work!</h2>
                 <p className="text-sm text-secondary-foreground mb-6">
                   An instructor approved <span className="font-medium">{awaitingCheck.activity}</span>. Ready for the next one?
                 </p>

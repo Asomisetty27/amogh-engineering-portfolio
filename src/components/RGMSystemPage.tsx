@@ -33,11 +33,11 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
           Rube Goldberg Machine
         </h1>
         <p className="text-sm text-muted-foreground font-mono mt-1">
-          9-Stage Electromechanical Chain Reaction — EE 241-01 | Winter 2026
+          9-Stage Electromechanical Chain Reaction - EE 241-01 | Winter 2026
         </p>
       </div>
 
-      {/* HOLOGRAM — always visible */}
+      {/* HOLOGRAM - always visible */}
       <Suspense fallback={<div className="h-80 flex items-center justify-center text-muted-foreground font-mono text-sm animate-pulse">Loading holographic display...</div>}>
         <RGMHologram />
       </Suspense>
@@ -54,7 +54,7 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {rgmProject.heroImage && (
           <div className="panel-glass rounded-lg overflow-hidden">
-            <PanelHeader>Setup Photo — VERIFIED</PanelHeader>
+            <PanelHeader>Setup Photo - VERIFIED</PanelHeader>
             <div className="p-2">
               <img src={rgmProject.heroImage} alt="Complete RGM Setup" className="w-full rounded" loading="lazy" />
               <div className="text-[10px] font-mono text-muted-foreground mt-1 px-1">
@@ -66,14 +66,14 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
         {rgmProject.videoPath && (
           <div className="panel-glass rounded-lg overflow-hidden">
             <PanelHeader>
-              <span className="flex items-center gap-1.5"><Play size={12} /> Video Demonstration — VERIFIED</span>
+              <span className="flex items-center gap-1.5"><Play size={12} /> Video Demonstration - VERIFIED</span>
             </PanelHeader>
             <div className="p-2">
               <video controls className="w-full rounded" preload="metadata">
                 <source src={rgmProject.videoPath} type="video/mp4" />
               </video>
               <div className="text-[10px] font-mono text-muted-foreground mt-1 px-1">
-                EE_241_Final_Demonstration.mp4 — March 10, 2026
+                EE_241_Final_Demonstration.mp4 - March 10, 2026
               </div>
             </div>
           </div>
@@ -196,7 +196,7 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
       {/* Verification Summary */}
       {rgmProject.module.verificationSummary && rgmProject.module.verificationSummary.length > 0 && (
         <div className="panel-glass rounded-lg overflow-hidden">
-          <PanelHeader>Verification Summary — Cited Values</PanelHeader>
+          <PanelHeader>Verification Summary - Cited Values</PanelHeader>
           <div className="p-4">
             <div className="border border-panel-border rounded overflow-hidden">
               <table className="w-full text-xs">
@@ -227,7 +227,7 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
       {/* Schematics */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="panel-glass rounded-lg overflow-hidden">
-          <PanelHeader>Last Step — Tilt Switch + I2C LCD</PanelHeader>
+          <PanelHeader>Last Step - Tilt Switch + I2C LCD</PanelHeader>
           <div className="p-2">
             <img src="/evidence/rgm-last-step-schematic.png" alt="Last Step Schematic" className="w-full rounded" loading="lazy" />
             <div className="text-[10px] font-mono text-muted-foreground mt-1 px-1 flex items-center gap-2">
@@ -237,7 +237,7 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
           </div>
           {mode === "engineer" && (
             <div className="px-4 pb-4 text-xs text-secondary-foreground space-y-1">
-              <p>• TILT_PIN uses INPUT_PULLUP — default HIGH, closure pulls LOW</p>
+              <p>• TILT_PIN uses INPUT_PULLUP - default HIGH, closure pulls LOW</p>
               <p>• I2C LCD: 0x27 via PCF8574 backpack</p>
               <p>• fillLCD() writes custom 0xFF block to all 32 positions</p>
             </div>
@@ -285,7 +285,7 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
       {/* Validation */}
       {validationResults.length > 0 && (
         <div className="panel-glass rounded-lg overflow-hidden">
-          <PanelHeader>Demo Day — All 9 Stages Verified</PanelHeader>
+          <PanelHeader>Demo Day - All 9 Stages Verified</PanelHeader>
           <div className="p-4 space-y-1.5">
             {validationResults.map((a, i) => (
               <div key={i} className="flex items-start gap-2 text-xs text-secondary-foreground">

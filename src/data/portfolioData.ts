@@ -429,14 +429,14 @@ export const projects: Project[] = [
         "Packaged and published to PyPI as `runtheta` (v0.1.12); one-line install, plus Dockerfile, docker-compose (agent + Prometheus + Grafana), and multi-arch images on GHCR",
         "Kubernetes-native deployment: Helm chart with a hardened DaemonSet (numeric non-root UIDs, GPU Operator alignment) plus a Go controller (client-go observe→reconcile) that writes theta.dev/gpu-health node labels a scheduler can act on; end-to-end k3d test in CI",
         "Cross-vendor collectors behind one HAL seam: NVIDIA (NVML), AMD Instinct (amdsmi, with hardware profiles MI250X through MI355X), DCGM, and Redfish BMC",
-        "theta characterize: one-command, self-contained HTML fleet characterization report (peer-relative findings with cause attribution + the fleet R_θ(P) power-tier curve) — the shareable artifact a validation engineer hands over",
+        "theta characterize: one-command, self-contained HTML fleet characterization report (peer-relative findings with cause attribution + the fleet R_θ(P) power-tier curve) - the shareable artifact a validation engineer hands over",
         "Diagnosis intelligence (signature classifier + H100 calibration) built and validated June 2026; SLURM/jobstats integration shipped (theta report <jobid>)",
         "Alert governor holds inferential alerts while a GPU is warming and circuit-breaks noisy GPUs to earn trust on a stranger's fleet",
         "Characterization tests pin real incidents (e.g. the 72-H100 blind-flag) so regressions are caught; CI runs pytest on Python 3.10/3.11/3.12 + ruff + mypy",
       ],
       failureModes: [],
       improvements: [
-        "H100 calibration complete (June 2026); B200 calibration planned (Cal Poly AI Factory); A100 + AMD MI100 characterization runs planned on NCSA Delta (ACCESS allocation, ~3,000 GPU-hours) — the first cross-vendor validation",
+        "H100 calibration complete (June 2026); B200 calibration planned (Cal Poly AI Factory); A100 + AMD MI100 characterization runs planned on NCSA Delta (ACCESS allocation, ~3,000 GPU-hours) - the first cross-vendor validation",
         "ICPE 2027 publication in preparation (cross-fleet, cross-vendor GPU thermal forensics), advised by ex-Intel silicon-validation faculty",
         "Lead-time validation: hardware E-LT testbed planned fall 2026; simulation shows ~2.5-7.7 days at 0 false alarms",
         "Monitoring pipeline observability (Gap 1): track poll_latency, consecutive_poll_failures for GPU-hang detection; low effort, high research value",
@@ -447,7 +447,7 @@ export const projects: Project[] = [
         "Diagnosis intelligence: signature classifier cross-validated against E009-B hand analysis (3 Princeton degraded units), 282 tests green, reproduces all attributions",
         "H100 calibration: healthy R_θ median 0.0598 C/W (robust-σ 0.0072), nonlinear P-dependent curve (0.120→0.0585), position-conditioned HGX structure (±11% of mean)",
         "Peer-relative method blind-flagged 3 degraded units on 72 production Princeton H100s; cross-node scan recovered all 3 at 0 false positives",
-        "Blind flag independently re-confirmed: 3 months later Princeton's own DCGM diagnostics found the same unit at +47.8% thermal resistance and -2.6% GFLOPS at matched power — caught pre-throttle by Theta first",
+        "Blind flag independently re-confirmed: 3 months later Princeton's own DCGM diagnostics found the same unit at +47.8% thermal resistance and -2.6% GFLOPS at matched power - caught pre-throttle by Theta first",
         "Decision-Tree classifier: 100% 5-fold CV accuracy on Tesla T4 steady-state data (steady-state gating takes Naive Bayes 84% → 99.8%)",
         "Controlled Stage-1 study (Tesla T4, n=7, within-condition CV 1.8%): a 2 °C ambient delta drives a 3.5× change in power-recovery time, direct evidence of GPU thermal memory",
         "Reproduce the blind-flag result: `python tools/validate_e009_princeton.py <export.json>` (theta/tools/discovery_tracker.py)",
@@ -1985,7 +1985,7 @@ export const projects: Project[] = [
   },
   {
     id: "poly-uas-jetson",
-    name: "Poly UAS — Jetson AGX Orin Carrier Board & Sensor Modules",
+    name: "Poly UAS - Jetson AGX Orin Carrier Board & Sensor Modules",
     codename: "EDGE-ORIN",
     domain: "ai-systems",
     status: "IN_PROGRESS",
@@ -2092,8 +2092,8 @@ export interface ExperienceItem {
 
 export const experiences: ExperienceItem[] = [
   {
-    company: "Poly UAS — Cal Poly Unmanned Aerial Systems",
-    role: "Edge-AI Hardware Designer — Carrier Boards & Sensor Modules",
+    company: "Poly UAS - Cal Poly Unmanned Aerial Systems",
+    role: "Edge-AI Hardware Designer - Carrier Boards & Sensor Modules",
     location: "San Luis Obispo, CA",
     period: "Apr 2026 – Present",
     bullets: [
@@ -2182,7 +2182,7 @@ export const skills = {
   technical: [
     {
       name: "GPU Telemetry (NVML / DCGM)",
-      evidence: "Theta — blind-validated on 72 Princeton H100s",
+      evidence: "Theta - blind-validated on 72 Princeton H100s",
       confidence: "VERIFIED" as ConfidenceBadge,
     },
     {
@@ -2197,7 +2197,7 @@ export const skills = {
     },
     {
       name: "NVIDIA Jetson (AGX Orin)",
-      evidence: "Poly UAS carrier board — schematics & layout in progress",
+      evidence: "Poly UAS carrier board - schematics & layout in progress",
       confidence: "VERIFIED" as ConfidenceBadge,
     },
     {

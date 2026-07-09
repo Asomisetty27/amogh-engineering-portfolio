@@ -4,7 +4,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import RthetaModel from "./RthetaModel";
 
 /* ------------------------------------------------------------------ */
-/* Methodology tab — framing for the GPU forensics thesis              */
+/* Methodology tab - framing for the GPU forensics thesis              */
 /* ------------------------------------------------------------------ */
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -40,23 +40,23 @@ const STAGE_1_FINDINGS = [
   },
   {
     title: "F1 dim-2 · wait duration → recovery-time variance (v2, 2026-06-04)",
-    body: "E004 v2 trials 1–2 used a 1800s pre-trial wait. Power recovery times collapsed: 3.2s and 5.2s, vs v1's 10–37s across all 7 trials. The 35°C thermal gate was unreachable on Colab T4 (idle floor ~37°C), but the 30-min wait normalized starts better than a gate would have — and revealed a 10x recovery-time improvement. The wait, not the gate, is the active variable. F1 has two memory dimensions: starting temp and wait duration. Trials 3–7 running now.",
+    body: "E004 v2 trials 1–2 used a 1800s pre-trial wait. Power recovery times collapsed: 3.2s and 5.2s, vs v1's 10–37s across all 7 trials. The 35°C thermal gate was unreachable on Colab T4 (idle floor ~37°C), but the 30-min wait normalized starts better than a gate would have - and revealed a 10x recovery-time improvement. The wait, not the gate, is the active variable. F1 has two memory dimensions: starting temp and wait duration. Trials 3–7 running now.",
   },
   {
     title: "Same-process termination leaves GPU in P0",
-    body: "After killing a load process in-place (E002), the GPU stayed at P-state P0 (~30–31W, ~74°C) for the full 10-minute observation window, never returning to clean idle. The CUDA context held by the still-alive notebook process prevented recovery. R_theta during this zombie state ~1.54 C/W vs ~1.28 C/W clean idle — invisible to utilization monitoring (both show 0%).",
+    body: "After killing a load process in-place (E002), the GPU stayed at P-state P0 (~30–31W, ~74°C) for the full 10-minute observation window, never returning to clean idle. The CUDA context held by the still-alive notebook process prevented recovery. R_theta during this zombie state ~1.54 C/W vs ~1.28 C/W clean idle - invisible to utilization monitoring (both show 0%).",
   },
   {
     title: "Child-process exit recovers cleanly · P-state to P8 in 5–6s",
-    body: "Across all 7 E004 trials, P-state recovered to P8 in 5.1–6.1 seconds regardless of starting temperature — the cleanest recovery metric available. Temperature recovery scales with starting temp: cool start reaches T<55°C in 45s, warm start needs 116–160s. The asymmetry between same-process zombie and clean child-exit recovery is sharp and reproducible.",
+    body: "Across all 7 E004 trials, P-state recovered to P8 in 5.1–6.1 seconds regardless of starting temperature - the cleanest recovery metric available. Temperature recovery scales with starting temp: cool start reaches T<55°C in 45s, warm start needs 116–160s. The asymmetry between same-process zombie and clean child-exit recovery is sharp and reproducible.",
   },
   {
     title: "Reproducibility holds within thermal regime (F5 conditional)",
-    body: "Within thermally-consistent trials (E004 trials 3–7, all starting at 48–49°C), cross-trial CV is 2.0% — matching the original ~1.68% claim. Across mixed thermal regimes, CV is 14%. The 14% is not measurement noise — it is the F1 thermal-memory signature. Methodology lesson: reproducibility claims must condition on starting thermal state.",
+    body: "Within thermally-consistent trials (E004 trials 3–7, all starting at 48–49°C), cross-trial CV is 2.0% - matching the original ~1.68% claim. Across mixed thermal regimes, CV is 14%. The 14% is not measurement noise - it is the F1 thermal-memory signature. Methodology lesson: reproducibility claims must condition on starting thermal state.",
   },
   {
     title: "Classifier achieves 100% with steady-state filter",
-    body: "Naive Bayes (Gaussian) on raw 3,880-sample dataset: 87.0% accuracy. With a 15-second steady-state window (σ(R_theta) < 0.05 C/W): 99.9%. Random Forest: 100%. Steady-state filtering is the single highest-leverage preprocessing step — Kundu's hypothesis validated. Four classes: clean_idle, under_load, zombie_recovery, child_exit_recovery. Naive Bayes is preferred for publication (interpretable, model equation extractable).",
+    body: "Naive Bayes (Gaussian) on raw 3,880-sample dataset: 87.0% accuracy. With a 15-second steady-state window (σ(R_theta) < 0.05 C/W): 99.9%. Random Forest: 100%. Steady-state filtering is the single highest-leverage preprocessing step - Kundu's hypothesis validated. Four classes: clean_idle, under_load, zombie_recovery, child_exit_recovery. Naive Bayes is preferred for publication (interpretable, model equation extractable).",
   },
   {
     title: "Rθ_eff fragility at low power: quantified sensitivity",
@@ -71,7 +71,7 @@ function SensitivityTab() {
         <SectionLabel>T_reference uncertainty at low power loads</SectionLabel>
         <Card className="p-5">
           <p className="text-[13px] text-[#a8a89f] leading-relaxed mb-3">
-            The largest source of measurement error in Rθ_eff comes from T_reference (ambient temperature assumption). At idle (~9.5W), a ±5°C error in T_ref assumption causes a 35% swing in calculated Rθ_eff — exactly when anomaly detection needs precision most.
+            The largest source of measurement error in Rθ_eff comes from T_reference (ambient temperature assumption). At idle (~9.5W), a ±5°C error in T_ref assumption causes a 35% swing in calculated Rθ_eff - exactly when anomaly detection needs precision most.
           </p>
           <div className="bg-[#0D0D0B] border border-white/[0.1] rounded p-4 mb-3">
             <div className="font-mono text-[11px] text-[#D8D2C2] mb-2">Stage 1 sensitivity analysis (F002)</div>
@@ -79,7 +79,7 @@ function SensitivityTab() {
               <li>• Idle (9.5W): 35.3% Rθ_eff swing with ±5°C ambient error</li>
               <li>• Load (68W): 10.2% Rθ_eff swing with same ambient error</li>
               <li>• Error sensitivity is 3.5× worse at idle vs load</li>
-              <li>• Cloud baseline (Colab) has no ambient sensor — T_ref = 25°C assumed</li>
+              <li>• Cloud baseline (Colab) has no ambient sensor - T_ref = 25°C assumed</li>
             </ul>
           </div>
           <p className="text-[12px] text-[#888780] leading-relaxed">
@@ -89,7 +89,7 @@ function SensitivityTab() {
       </div>
 
       <div>
-        <SectionLabel>Power smoothing — rolling average vs median vs steady-state</SectionLabel>
+        <SectionLabel>Power smoothing - rolling average vs median vs steady-state</SectionLabel>
         <Card className="p-5">
           <p className="text-[13px] text-[#a8a89f] leading-relaxed mb-3">
             Telemetry power readings include measurement noise from the GPU's own power supply. Three smoothing methods were tested:
@@ -103,7 +103,7 @@ function SensitivityTab() {
             </ul>
           </div>
           <p className="text-[12px] text-[#888780] leading-relaxed">
-            Decision: Use steady-state window. The null result from filtering confirms that power noise is not the dominant error source — T_reference uncertainty is. Filtering adds complexity without addressing root cause.
+            Decision: Use steady-state window. The null result from filtering confirms that power noise is not the dominant error source - T_reference uncertainty is. Filtering adds complexity without addressing root cause.
           </p>
         </Card>
       </div>
@@ -115,7 +115,7 @@ function ClassificationTab() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <SectionLabel>Probabilistic state classifier — fitted on Stage 1 data</SectionLabel>
+        <SectionLabel>Probabilistic state classifier - fitted on Stage 1 data</SectionLabel>
         <Card className="p-5">
           <p className="text-[13px] text-[#a8a89f] leading-relaxed mb-3">
             GPU thermal state must be inferred from telemetry to anchor Rθ_eff baselines. Following Kundu&apos;s direction, we replaced rule-based thresholds with a probabilistic classifier and compared Naive Bayes against Random Forest on the 3,880-sample expanded dataset.
@@ -130,7 +130,7 @@ function ClassificationTab() {
             </ul>
           </div>
           <p className="text-[12px] text-[#888780] leading-relaxed">
-            Classes: clean_idle · under_load · zombie_recovery · child_exit_recovery. Features: R_theta, power, util, P-state. Steady-state window (Kundu hypothesis) is the single highest-leverage preprocessing step — Naive Bayes gains 13 points of accuracy from it alone.
+            Classes: clean_idle · under_load · zombie_recovery · child_exit_recovery. Features: R_theta, power, util, P-state. Steady-state window (Kundu hypothesis) is the single highest-leverage preprocessing step - Naive Bayes gains 13 points of accuracy from it alone.
           </p>
         </Card>
       </div>
@@ -162,20 +162,20 @@ function ClassificationTab() {
             </table>
           </div>
           <p className="text-[12px] text-[#888780] leading-relaxed">
-            zombie_recovery is the tightest distribution (σ = 0.05 C/W) — the CUDA-context-retained state is remarkably consistent. child_exit_recovery is the noisiest (σ = 0.46) as expected for a thermal transient.
+            zombie_recovery is the tightest distribution (σ = 0.05 C/W) - the CUDA-context-retained state is remarkably consistent. child_exit_recovery is the noisiest (σ = 0.46) as expected for a thermal transient.
           </p>
         </Card>
       </div>
 
       <div>
-        <SectionLabel>Next — Stage 2 validation on DGX B200</SectionLabel>
+        <SectionLabel>Next - Stage 2 validation on DGX B200</SectionLabel>
         <Card className="p-5">
           <ol className="space-y-1.5 text-[12px] text-[#a8a89f]">
-            <li><span className="text-[#D8D2C2]">1. v2 trials 3–7</span> — <span className="text-[#D89A5C]">running in Colab now</span>, ~3.5hr ETA. Replicate v2 T1/T2 protocol with 1800s wait.</li>
-            <li><span className="text-[#D8D2C2]">2. Retrain classifier on full v2 dataset</span> — confirm DT/NB stability with 7-trial v2 control</li>
-            <li><span className="text-[#D8D2C2]">3. Power-cap sweep (E005–E008)</span> — 6 power levels on DGX B200, measured ambient</li>
-            <li><span className="text-[#D8D2C2]">4. Lead-time testbed (E-LT)</span> — Sam returns Fall 2026, simulate cooling degradation</li>
-            <li><span className="text-[#D8D2C2]">5. Conference submission</span> — Two-dimensional F1 finding + Naive Bayes equation + sensitivity bands</li>
+            <li><span className="text-[#D8D2C2]">1. v2 trials 3–7</span> - <span className="text-[#D89A5C]">running in Colab now</span>, ~3.5hr ETA. Replicate v2 T1/T2 protocol with 1800s wait.</li>
+            <li><span className="text-[#D8D2C2]">2. Retrain classifier on full v2 dataset</span> - confirm DT/NB stability with 7-trial v2 control</li>
+            <li><span className="text-[#D8D2C2]">3. Power-cap sweep (E005–E008)</span> - 6 power levels on DGX B200, measured ambient</li>
+            <li><span className="text-[#D8D2C2]">4. Lead-time testbed (E-LT)</span> - Sam returns Fall 2026, simulate cooling degradation</li>
+            <li><span className="text-[#D8D2C2]">5. Conference submission</span> - Two-dimensional F1 finding + Naive Bayes equation + sensitivity bands</li>
           </ol>
         </Card>
       </div>
@@ -194,7 +194,7 @@ const FAULT_TAXONOMY = [
   },
   {
     cause: "TIM pump-out / dry-out",
-    signature: "Gap narrows over months — slope rotates around low-power anchor",
+    signature: "Gap narrows over months - slope rotates around low-power anchor",
     timescale: "Months, accelerated by heavy thermal cycling",
     detection: "gap_trend < −0.025 C/W per day, fan RPM stable",
     remediation: "Schedule TIM replacement (repaste)",
@@ -244,11 +244,11 @@ function FaultTaxonomyTab() {
             R_θ at a single power level tells you that something is wrong. The <em>shape</em> of the R_θ-vs-power curve, and how that shape changes over time, tells you <em>what</em> is wrong. The curve has two independently variable degrees of freedom:
           </p>
           <ul className="space-y-1.5 text-[12px] text-[#a8a89f] mb-3 pl-4">
-            <li>• <span className="text-[#D8D2C2] font-mono">Intercept</span> — R_θ at low power (5–25W), dominated by conduction</li>
-            <li>• <span className="text-[#D8D2C2] font-mono">Gap</span> — intercept minus R_θ at high power (55W+), reflects active cooling efficiency</li>
+            <li>• <span className="text-[#D8D2C2] font-mono">Intercept</span> - R_θ at low power (5–25W), dominated by conduction</li>
+            <li>• <span className="text-[#D8D2C2] font-mono">Gap</span> - intercept minus R_θ at high power (55W+), reflects active cooling efficiency</li>
           </ul>
           <p className="text-[12px] text-[#888780] leading-relaxed">
-            Each failure mode deforms one or both in a characteristic way. The fault_classifier module (<span className="font-mono text-[#D8D2C2]">thermalos/agent/fault_classifier.py</span>) tracks both per GPU, computes drift rates over a 30-day rolling window, and emits causal diagnosis with remediation guidance — not just &quot;something is wrong&quot;.
+            Each failure mode deforms one or both in a characteristic way. The fault_classifier module (<span className="font-mono text-[#D8D2C2]">thermalos/agent/fault_classifier.py</span>) tracks both per GPU, computes drift rates over a 30-day rolling window, and emits causal diagnosis with remediation guidance - not just &quot;something is wrong&quot;.
           </p>
         </Card>
       </div>
@@ -318,11 +318,11 @@ function FaultTaxonomyTab() {
             The classifier ships in v0.1.9 but ground-truth labels come from controlled induction on the E-LT testbed (Sam, Fall 2026). Each failure mode gets its own induction protocol:
           </p>
           <ol className="space-y-1.5 text-[12px] text-[#a8a89f] pl-4">
-            <li>1. <span className="text-[#D8D2C2]">Dust</span> — tape over heatsink fins, measure R_θ(P) before/after</li>
-            <li>2. <span className="text-[#D8D2C2]">TIM</span> — bake cycles to accelerate pump-out, measure slope change</li>
-            <li>3. <span className="text-[#D8D2C2]">Fan</span> — reduce fan RPM via PWM, confirm power-threshold signature</li>
-            <li>4. <span className="text-[#D8D2C2]">Airflow</span> — restrict inlet with cardboard, confirm step-change + T_ref correlation</li>
-            <li>5. <span className="text-[#D8D2C2]">Mounting</span> — reduce heatsink contact pressure, confirm intercept step</li>
+            <li>1. <span className="text-[#D8D2C2]">Dust</span> - tape over heatsink fins, measure R_θ(P) before/after</li>
+            <li>2. <span className="text-[#D8D2C2]">TIM</span> - bake cycles to accelerate pump-out, measure slope change</li>
+            <li>3. <span className="text-[#D8D2C2]">Fan</span> - reduce fan RPM via PWM, confirm power-threshold signature</li>
+            <li>4. <span className="text-[#D8D2C2]">Airflow</span> - restrict inlet with cardboard, confirm step-change + T_ref correlation</li>
+            <li>5. <span className="text-[#D8D2C2]">Mounting</span> - reduce heatsink contact pressure, confirm intercept step</li>
           </ol>
           <p className="text-[12px] text-[#888780] leading-relaxed mt-3">
             No published paper has demonstrated this taxonomy from software telemetry alone. These five experiments are the E-LT paper&apos;s most novel contribution beyond the lead-time finding.
@@ -345,13 +345,13 @@ function MethodologyTab() {
           </div>
           <p className="text-[13px] text-[#a8a89f] leading-relaxed">
             Effective thermal resistance is the steady-state temperature rise per watt of power dissipated. A
-            healthy cooling path holds Rθ_eff stable across workloads. A degrading one drifts upward — silently,
+            healthy cooling path holds Rθ_eff stable across workloads. A degrading one drifts upward - silently,
             before any throttle event surfaces in performance metrics.
           </p>
           <p className="text-[13px] text-[#a8a89f] leading-relaxed mt-2">
             ThermalOS treats Rθ_eff as a forensic signal: not just <em>how hot is this GPU</em>, but{" "}
             <em>is the cooling path doing what it&rsquo;s supposed to do?</em> The thesis is that anomalies in
-            Rθ_eff, power regime, and recovery behavior — measurable from telemetry alone — predict failures
+            Rθ_eff, power regime, and recovery behavior - measurable from telemetry alone - predict failures
             that current monitoring stacks miss.
           </p>
         </Card>
@@ -359,7 +359,7 @@ function MethodologyTab() {
 
       {/* Stage 1 findings */}
       <div>
-        <SectionLabel>Stage 1 findings — Tesla T4 / Colab / 8,734 rows / 14 child-exit trials (v2 complete · controlled-variable F1)</SectionLabel>
+        <SectionLabel>Stage 1 findings - Tesla T4 / Colab / 8,734 rows / 14 child-exit trials (v2 complete · controlled-variable F1)</SectionLabel>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {STAGE_1_FINDINGS.map((f) => (
             <Card key={f.title} className="p-4">
@@ -372,7 +372,7 @@ function MethodologyTab() {
 
       {/* Stage 2 open questions */}
       <div>
-        <SectionLabel>Stage 2 — open methodological questions</SectionLabel>
+        <SectionLabel>Stage 2 - open methodological questions</SectionLabel>
         <Card className="p-5">
           <p className="text-[12px] text-[#888780] mb-4 leading-relaxed">
             Questions for Prof. Kundu (Cal Poly EE) and other advisors as we move from cloud baseline to
@@ -391,12 +391,12 @@ function MethodologyTab() {
 
       {/* Supporting rig evidence */}
       <div>
-        <SectionLabel>Supporting evidence — physical rig</SectionLabel>
+        <SectionLabel>Supporting evidence - physical rig</SectionLabel>
         <Card className="p-5">
           <p className="text-[13px] text-[#a8a89f] leading-relaxed mb-3">
             Alongside the GPU telemetry work, we maintain a controlled physical rig measuring Rθ across
             thermal interface materials, mounting pressures, and fault conditions. The rig data is{" "}
-            <span className="text-[#D8D2C2]">not the headline result</span> — it&rsquo;s the methodological
+            <span className="text-[#D8D2C2]">not the headline result</span> - it&rsquo;s the methodological
             ground truth that lets us calibrate what &ldquo;normal&rdquo; cooling-path behavior looks like
             against a sensor-instrumented baseline.
           </p>
@@ -431,7 +431,7 @@ const MOAT_DIMENSIONS = [
     status: "not_built" as const,
     current: "Agent computes R_θ live but does not persist anything. Every restart starts cold. No concept of 'this GPU's normal.'",
     target: "theta calibrate writes ~/.theta/baselines/<gpu_uuid>.json. Anomaly detection drifts against per-GPU history, not fleet average.",
-    timeline: "P1 — implement before first operator install",
+    timeline: "P1 - implement before first operator install",
     why: "Accumulated fingerprints can't be copied. Each install makes the model smarter for that GPU.",
   },
   {
@@ -488,7 +488,7 @@ function MoatTab() {
         <SectionLabel>The defensibility problem</SectionLabel>
         <Card className="p-5">
           <p className="text-[13px] text-[#a8a89f] leading-relaxed mb-3">
-            The R_θ = ΔT/P equation is physics. A bigger company can copy it in one sprint. The moat cannot be the equation — it has to be built on top of it, in data, workflow integration, and calibration that takes time and operator access to accumulate.
+            The R_θ = ΔT/P equation is physics. A bigger company can copy it in one sprint. The moat cannot be the equation - it has to be built on top of it, in data, workflow integration, and calibration that takes time and operator access to accumulate.
           </p>
           <div className="font-mono text-[11px] text-[#5a5a55] border-t border-white/[0.05] pt-3 mt-3">
             Current stage: technical wedge is credible. Market timing is real. Missing proof: customer/operator validation.
@@ -497,7 +497,7 @@ function MoatTab() {
       </div>
 
       <div>
-        <SectionLabel>Six moat dimensions — build status</SectionLabel>
+        <SectionLabel>Six moat dimensions - build status</SectionLabel>
         <div className="space-y-3">
           {MOAT_DIMENSIONS.map((m) => {
             const s = MOAT_STATUS[m.status];
@@ -547,7 +547,7 @@ function MoatTab() {
             Not "take a meeting." Not "validate interest." Install it. Then collect: what did it detect, was it useful, did it match their intuition, would they keep it running, what would they pay for, what workflow should it integrate with.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            {["RunPod (awaiting reply)", "Vast.ai (awaiting reply)", "Lambda Labs (awaiting reply)", "Cal Poly AI Factory (Lupo proposal ready)", "theta calibrate (P1 — build this week)", "Grafana annotation hook (low effort)"].map((item) => (
+            {["RunPod (awaiting reply)", "Vast.ai (awaiting reply)", "Lambda Labs (awaiting reply)", "Cal Poly AI Factory (Lupo proposal ready)", "theta calibrate (P1 - build this week)", "Grafana annotation hook (low effort)"].map((item) => (
               <div key={item} className="bg-[#0D0D0B] rounded p-2 text-[11px] font-mono text-[#888780]">
                 {item}
               </div>
@@ -571,7 +571,7 @@ const TABS = [
 type TabValue = (typeof TABS)[number]["value"];
 
 export default function Research() {
-  useEffect(() => { document.title = "ThermalOS — Research | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - Research | amogh.site"; }, []);
 
   const [params, setParams] = useSearchParams();
   const raw = params.get("tab");

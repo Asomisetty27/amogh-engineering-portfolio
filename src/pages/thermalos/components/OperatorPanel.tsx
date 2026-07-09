@@ -13,7 +13,7 @@ import {
 } from './TowerUnit';
 import { fmtRth, fmtLead, type Telemetry } from './thermalModel';
 
-// Same T/FM tokens as Landing/DataCenterScene/GPUHeroScene — duplicated by
+// Same T/FM tokens as Landing/DataCenterScene/GPUHeroScene - duplicated by
 // convention (each scene file is a self-contained unit; see GPUHeroScene).
 const T = {
   bg: '#06060A',
@@ -34,12 +34,12 @@ const FM = "'JetBrains Mono', ui-monospace, monospace";
 
 const PHASE_LABEL: Record<Phase, string> = {
   idle: 'NOMINAL', load: 'UNDER LOAD', anomaly: 'R_θ DRIFT DETECTED',
-  critical: 'INCIDENT — ACTING', recovery: 'RESOLVING',
+  critical: 'INCIDENT - ACTING', recovery: 'RESOLVING',
 };
 
 // ──────────────────────────────────────────────────────────────────────────
 // Reads the same module-level refs TowerUnit's ThermalDriver writes, on a
-// plain rAF-driven interval — this is how DataCenterHUD/Caption stay in
+// plain rAF-driven interval - this is how DataCenterHUD/Caption stay in
 // sync with a Canvas scene from outside it. No React state in the hot path;
 // just a periodic force-render so the DOM catches up to the shared clock.
 // ──────────────────────────────────────────────────────────────────────────
@@ -52,7 +52,7 @@ function useDriverTick(hz = 12) {
   }, [hz]);
 }
 
-// Companion nodes hold steady near baseline — realistic per-unit silicon
+// Companion nodes hold steady near baseline - realistic per-unit silicon
 // spread: every GPU in a rack lands at a slightly different R_θ (TIM
 // application variance, coolant loop position), and idle temps differ by a
 // degree or two. Numbers obey R_θ = (T_j − 31°C coolant) / P exactly.
@@ -167,7 +167,7 @@ function AlertFeed({ entries }: { entries: AlertLogEntry[] }) {
       </div>
       {entries.length === 0 ? (
         <div style={{ fontFamily: FM, fontSize: 10.5, color: T.faint, padding: '14px 0' }}>
-          Watching every node — nothing to report yet…
+          Watching every node - nothing to report yet…
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -192,7 +192,7 @@ function AlertFeed({ entries }: { entries: AlertLogEntry[] }) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Root — the operator-dashboard mockup. Driven entirely by TowerUnit's
+// Root - the operator-dashboard mockup. Driven entirely by TowerUnit's
 // shared thermal-arc refs so it transitions in lockstep with the 3D pane.
 // ──────────────────────────────────────────────────────────────────────────
 

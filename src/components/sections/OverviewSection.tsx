@@ -9,7 +9,7 @@ import HeroHeader from "@/components/sections/HeroHeader";
 import SpecimenPlate from "@/components/sections/SpecimenPlate";
 import TiltCard from "@/components/ui/TiltCard";
 
-// The flagship charts pull in recharts (~380 KB pre-gzip) — lazy-loaded so
+// The flagship charts pull in recharts (~380 KB pre-gzip) - lazy-loaded so
 // first paint never waits on it. The fallback reserves space to avoid layout
 // shift when the chunk lands.
 const ThetaFlagshipVisuals = lazy(() => import("@/components/ThetaFlagshipVisuals"));
@@ -22,7 +22,7 @@ const REVEAL = {
   transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const },
 };
 
-// One accent. The cards differ by index numeral, not by hue — the luxury
+// One accent. The cards differ by index numeral, not by hue - the luxury
 // move is repetition with discipline, not a rainbow.
 const strengths = [
   {
@@ -64,10 +64,10 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
         {/* Hero */}
         <HeroHeader />
 
-        {/* PLATE 01 — cinematic establishing shot with the lens instrument view */}
+        {/* PLATE 01 - cinematic establishing shot with the lens instrument view */}
         <SpecimenPlate />
 
-        {/* Value proposition — an editorial lede, not a boxed paragraph.
+        {/* Value proposition - an editorial lede, not a boxed paragraph.
             Display type at reading scale with a champagne rule: the sentence
             IS the design element. */}
         <div className="relative pl-5 mb-12" style={{ maxWidth: "56rem" }}>
@@ -85,11 +85,11 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
               color: "var(--t-text)",
             }}
           >
-            I'm an electrical engineer who works the full GPU stack: I built Theta (<span className="font-mono text-primary" style={{ fontSize: "0.85em" }}>pip install runtheta</span>), an open-source GPU-reliability tool that blind-flagged degraded units across 72 production H100s at Princeton — a flag Princeton's own diagnostics independently re-confirmed months later at +47.8% thermal resistance. On the hardware side I design Jetson AGX Orin carrier boards and sensor modules for Cal Poly's autonomous drone team, and I've built a RISC-V CPU from the RTL up. What ties it together is measurement discipline: <em style={{ color: "hsl(46 65% 62%)", fontStyle: "normal" }}>knowing when a number is real</em>. Seeking a Fall 2026 GPU / ML-hardware co-op or internship.
+            I'm an electrical engineer who works the full GPU stack: I built Theta (<span className="font-mono text-primary" style={{ fontSize: "0.85em" }}>pip install runtheta</span>), an open-source GPU-reliability tool that blind-flagged degraded units across 72 production H100s at Princeton - a flag Princeton's own diagnostics independently re-confirmed months later at +47.8% thermal resistance. On the hardware side I design Jetson AGX Orin carrier boards and sensor modules for Cal Poly's autonomous drone team, and I've built a RISC-V CPU from the RTL up. What ties it together is measurement discipline: <em style={{ color: "hsl(46 65% 62%)", fontStyle: "normal" }}>knowing when a number is real</em>. Seeking a Fall 2026 GPU / ML-hardware co-op or internship.
           </p>
         </div>
 
-        {/* 3 Core Strengths — one material, indexed like chapters */}
+        {/* 3 Core Strengths - one material, indexed like chapters */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-12">
           {strengths.map((s, i) => {
             const Icon = s.icon;
@@ -136,7 +136,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
           })}
         </div>
 
-        {/* Flagship Project — Theta (self-built standout) */}
+        {/* Flagship Project - Theta (self-built standout) */}
         <motion.div {...REVEAL} className="flex items-center gap-2 mb-3">
           <span className="inline-block w-1.5 h-1.5 rounded-full animate-glow-pulse"
             style={{ background: "var(--t-healthy)", boxShadow: "0 0 8px rgba(212,175,55,0.55)" }} />
@@ -150,7 +150,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
           <ThetaFlagshipVisuals />
         </Suspense>
 
-        {/* Coursework & Hardware Systems — fx-card hover with shimmer */}
+        {/* Coursework & Hardware Systems - fx-card hover with shimmer */}
         <motion.h3 {...REVEAL} className="text-xs font-mono font-semibold tracking-wider uppercase mb-3 fx-grad-text-cyan">
           Hardware & Systems Foundation
         </motion.h3>

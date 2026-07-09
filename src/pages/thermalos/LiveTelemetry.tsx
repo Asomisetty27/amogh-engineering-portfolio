@@ -17,7 +17,7 @@ const ALERT_CONFIG: Record<string, { text: (m: MeasurementRow) => string; action
     color: "#1D9E75",
   },
   HIGH_RTHETA: {
-    text: (m) => `Thermal resistance elevated at ${m.rthetaCwatt.toFixed(3)} °C/W above expected baseline. Possible cooling path degradation — verify TIM and mounting.`,
+    text: (m) => `Thermal resistance elevated at ${m.rthetaCwatt.toFixed(3)} °C/W above expected baseline. Possible cooling path degradation - verify TIM and mounting.`,
     action: "inspect_cooling_path",
     color: "#D85A30",
   },
@@ -35,7 +35,7 @@ const ALERT_CONFIG: Record<string, { text: (m: MeasurementRow) => string; action
 
 export default function LiveTelemetry() {
   useEffect(() => {
-    document.title = "ThermalOS — Live Telemetry | amogh.site";
+    document.title = "ThermalOS - Live Telemetry | amogh.site";
   }, []);
 
   const { data, isLoading, error, isError } = useQuery({
@@ -80,12 +80,12 @@ export default function LiveTelemetry() {
     <div>
       {demo && (
         <div className="mb-4 px-3 py-2 rounded-lg bg-[#EF9F27]/10 border border-[#EF9F27]/30 text-[12px] font-mono text-[#EF9F27]">
-          Demo Mode — sheet not connected. Connect Supabase edge function to stream live Colab data.
+          Demo Mode - sheet not connected. Connect Supabase edge function to stream live Colab data.
         </div>
       )}
       {!demo && data && data.length === 0 && (
         <div className="mb-4 px-3 py-2 rounded-lg bg-[#1D9E75]/10 border border-[#1D9E75]/30 text-[12px] font-mono text-[#1D9E75]">
-          Sheet connected — no rows yet in <span className="opacity-70">📡 Measurements</span> A4:I. Run the Colab collector to populate.
+          Sheet connected - no rows yet in <span className="opacity-70">📡 Measurements</span> A4:I. Run the Colab collector to populate.
         </div>
       )}
 
@@ -150,14 +150,14 @@ export default function LiveTelemetry() {
               Live GPU Readout
             </div>
             <div className="space-y-0">
-              <Row dot="#D85A30" label="GPU Temp" value={latest ? `${latest.tempC.toFixed(1)} °C` : "—"} />
-              <Row dot="#EF9F27" label="Power Draw" value={latest ? `${latest.powerW.toFixed(1)} W` : "—"} />
-              <Row dot="#888780" label="Power Cap" value={latest ? `${latest.powerCapW.toFixed(0)} W` : "—"} />
-              <Row dot="#D8D2C2" label="SM Clock" value={latest ? `${latest.smClockMhz.toLocaleString()} MHz` : "—"} />
-              <Row dot="#D8D2C2" label="Mem Clock" value={latest ? `${latest.memClockMhz.toLocaleString()} MHz` : "—"} />
-              <Row dot="#1D9E75" label="Utilization" value={latest ? `${latest.utilPct}%` : "—"} />
-              <Row dot="#1D9E75" label="Headroom" value={latest ? `${latest.headroomC.toFixed(1)} °C` : "—"} />
-              <Row dot="#5a5a55" label="Last sample" value={latest ? latest.timestamp.slice(0, 19).replace("T", " ") : "—"} last />
+              <Row dot="#D85A30" label="GPU Temp" value={latest ? `${latest.tempC.toFixed(1)} °C` : "-"} />
+              <Row dot="#EF9F27" label="Power Draw" value={latest ? `${latest.powerW.toFixed(1)} W` : "-"} />
+              <Row dot="#888780" label="Power Cap" value={latest ? `${latest.powerCapW.toFixed(0)} W` : "-"} />
+              <Row dot="#D8D2C2" label="SM Clock" value={latest ? `${latest.smClockMhz.toLocaleString()} MHz` : "-"} />
+              <Row dot="#D8D2C2" label="Mem Clock" value={latest ? `${latest.memClockMhz.toLocaleString()} MHz` : "-"} />
+              <Row dot="#1D9E75" label="Utilization" value={latest ? `${latest.utilPct}%` : "-"} />
+              <Row dot="#1D9E75" label="Headroom" value={latest ? `${latest.headroomC.toFixed(1)} °C` : "-"} />
+              <Row dot="#5a5a55" label="Last sample" value={latest ? latest.timestamp.slice(0, 19).replace("T", " ") : "-"} last />
             </div>
           </div>
 
@@ -177,11 +177,11 @@ export default function LiveTelemetry() {
               </span>
             </div>
             <div className="mt-3 bg-[#0A0A08] border border-white/[0.07] rounded p-2.5 font-mono text-[11px] text-[#D8D2C2] leading-relaxed">
-              <div>Rθ_eff(t) = {latest?.rthetaCwatt.toFixed(4) ?? "—"} °C/W</div>
+              <div>Rθ_eff(t) = {latest?.rthetaCwatt.toFixed(4) ?? "-"} °C/W</div>
               <div>Formula: (T_gpu - T_amb) / P_draw</div>
-              <div>Headroom = {latest?.headroomC.toFixed(1) ?? "—"} °C to throttle</div>
+              <div>Headroom = {latest?.headroomC.toFixed(1) ?? "-"} °C to throttle</div>
               <div>
-                Alert: <span style={{ color: rec.color }}>{latest?.alert ?? "—"}</span>
+                Alert: <span style={{ color: rec.color }}>{latest?.alert ?? "-"}</span>
                 <span className="inline-block w-1.5 h-3 bg-[#D4AF37] ml-1 align-middle animate-pulse" />
               </div>
             </div>
@@ -190,7 +190,7 @@ export default function LiveTelemetry() {
           {/* Key finding callout */}
           <div className="bg-[#0A0A08] border border-[#EF9F27]/30 rounded-xl p-4">
             <div className="text-[9px] font-mono uppercase tracking-wider text-[#EF9F27] mb-2">
-              Research Finding — E002/E003/E004
+              Research Finding - E002/E003/E004
             </div>
             <p className="font-mono text-[11px] text-[#a8a89f] leading-relaxed">
               GPU utilization is a broken thermal state signal. After workload exit, GPU holds elevated temp+power for ~202s (mean, 3 trials) while reporting 0% utilization. Multi-field classifier required.

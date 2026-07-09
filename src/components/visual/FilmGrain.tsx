@@ -1,5 +1,5 @@
 /**
- * FilmGrain — adds micro-texture noise over a section.
+ * FilmGrain - adds micro-texture noise over a section.
  *
  * Uses an SVG turbulence filter as a data-URI background. Pure CSS, no JS.
  * Apply at the section level above content: <FilmGrain /> as the first child.

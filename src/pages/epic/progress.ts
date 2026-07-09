@@ -14,7 +14,7 @@ import { CURRICULUM, type Activity } from "./curriculum";
 
 export const ADDITIONAL_WINDOW_MS = 22 * 60 * 60 * 1000; // 22 hours
 
-// Progressive unlocking stays DORMANT until this moment — every activity is
+// Progressive unlocking stays DORMANT until this moment - every activity is
 // open before it, so it can't lock students out mid-session. It flips on
 // automatically at the timestamp (no deploy needed).
 // 2026-07-02 15:35 PDT.

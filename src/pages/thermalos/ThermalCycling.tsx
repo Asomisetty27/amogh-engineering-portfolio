@@ -7,7 +7,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 // idle -> load -> idle transitions, capturing ramp-up and cooldown curves.
 
 export default function ThermalCycling() {
-  useEffect(() => { document.title = "ThermalOS — Thermal Cycling | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - Thermal Cycling | amogh.site"; }, []);
 
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["measurements"],
@@ -58,7 +58,7 @@ export default function ThermalCycling() {
     <div className="space-y-4">
       {demo && (
         <div className="px-3 py-2 rounded-lg bg-[#EF9F27]/10 border border-[#EF9F27]/30 text-[12px] font-mono text-[#EF9F27]">
-          Demo Mode — connect sheet for real cycling data.
+          Demo Mode - connect sheet for real cycling data.
         </div>
       )}
 
@@ -97,7 +97,7 @@ export default function ThermalCycling() {
 
       {/* Full timeline chart */}
       <div className="bg-[#141412] border border-white/[0.07] rounded-xl p-4">
-        <div className="font-bold text-[13px] mb-1">Temp + Power — full session</div>
+        <div className="font-bold text-[13px] mb-1">Temp + Power - full session</div>
         <div className="text-[10px] font-mono text-[#5a5a55] mb-1">
           {transitions.length} state transitions detected. E002 finding: GPU holds load state thermally even after workload exits.
         </div>
@@ -118,9 +118,9 @@ export default function ThermalCycling() {
 
       {/* E002 finding callout */}
       <div className="bg-[#0A0A08] border border-[#EF9F27]/30 rounded-xl p-4">
-        <div className="text-[9px] font-mono uppercase tracking-wider text-[#EF9F27] mb-2">E002/E003/E004 — Thermal cycling insight</div>
+        <div className="text-[9px] font-mono uppercase tracking-wider text-[#EF9F27] mb-2">E002/E003/E004 - Thermal cycling insight</div>
         <div className="font-mono text-[11px] text-[#a8a89f] leading-relaxed">
-          When a workload exits from the same process (E002), the GPU CUDA context stays alive, holding temp at ~74°C and power at ~31W for up to 10 minutes — while reporting 0% utilization. When isolated in a child process (E003/E004), the context is released on exit and the GPU returns to thermal idle in ~202s. This means operator dashboards that show "0% util = idle" are wrong. Thermal state requires multi-field classification.
+          When a workload exits from the same process (E002), the GPU CUDA context stays alive, holding temp at ~74°C and power at ~31W for up to 10 minutes - while reporting 0% utilization. When isolated in a child process (E003/E004), the context is released on exit and the GPU returns to thermal idle in ~202s. This means operator dashboards that show "0% util = idle" are wrong. Thermal state requires multi-field classification.
         </div>
       </div>
     </div>

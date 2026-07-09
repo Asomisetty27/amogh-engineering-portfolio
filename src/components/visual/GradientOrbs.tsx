@@ -1,5 +1,5 @@
 /**
- * GradientOrbs — Framer-style depth layer.
+ * GradientOrbs - Framer-style depth layer.
  *
  * Three drifting radial-gradient orbs with mix-blend-mode:screen.
  * Adds depth and luminance to dark sections without changing palette.
@@ -10,11 +10,11 @@
  *   </div>
  *
  * variant controls hue:
- *   cyan    — primary brand (170° 80%)
- *   magenta — accent (310° 80%)
- *   amber   — warm accent (38° 90%)
- *   mixed   — cyan + magenta + green (hero / index page)
- *   subtle  — low-opacity version for content sections
+ *   cyan    - primary brand (170° 80%)
+ *   magenta - accent (310° 80%)
+ *   amber   - warm accent (38° 90%)
+ *   mixed   - cyan + magenta + green (hero / index page)
+ *   subtle  - low-opacity version for content sections
  */
 
 import * as React from 'react';

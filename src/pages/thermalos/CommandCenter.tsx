@@ -263,7 +263,7 @@ function Escalations({ items }: { items: CommandCenterEscalation[] }) {
           className="px-4 py-3 rounded-md text-[12px] font-mono text-[#5a5a55]"
           style={{ background: "#141412", border: "0.5px solid rgba(255,255,255,0.07)" }}
         >
-          No escalations — no questions marked needs-expert and none open 7+ days.
+          No escalations - no questions marked needs-expert and none open 7+ days.
         </div>
       </div>
     );
@@ -282,7 +282,7 @@ function Escalations({ items }: { items: CommandCenterEscalation[] }) {
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function CommandCenter() {
-  useEffect(() => { document.title = "ThermalOS — Command Center | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - Command Center | amogh.site"; }, []);
 
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["command-center"],
@@ -317,7 +317,7 @@ export default function CommandCenter() {
               className="text-[9px] font-mono px-2 py-0.5 rounded-full"
               style={{ color: "#EF9F27", background: "#EF9F2715", border: "0.5px solid #EF9F2740" }}
             >
-              Demo data — connect Google Sheet for live vault state
+              Demo data - connect Google Sheet for live vault state
             </span>
           )}
         </div>

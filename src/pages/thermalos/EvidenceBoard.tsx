@@ -14,7 +14,7 @@ function getStatusMeta(status: string) {
 }
 
 export default function EvidenceBoard() {
-  useEffect(() => { document.title = "ThermalOS — Evidence Board | amogh.site"; }, []);
+  useEffect(() => { document.title = "ThermalOS - Evidence Board | amogh.site"; }, []);
 
   const [filter, setFilter] = useState<"All" | "No proof yet" | "In progress" | "Proof exists ✓">("All");
 
@@ -45,7 +45,7 @@ export default function EvidenceBoard() {
     <div className="space-y-4">
       {demo && (
         <div className="px-3 py-2 rounded-lg bg-[#EF9F27]/10 border border-[#EF9F27]/30 text-[12px] font-mono text-[#EF9F27]">
-          Demo Mode — connect the Google Sheet to load live evidence status.
+          Demo Mode - connect the Google Sheet to load live evidence status.
         </div>
       )}
 

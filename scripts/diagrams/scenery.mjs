@@ -25,7 +25,7 @@ export function drawBreadboard() {
   g += sym(BB_LEFT+8, RAILY.BM+5, '−', '#2f6fd0') + sym(BB_RIGHT-8, RAILY.BM+5, '−', '#2f6fd0');
   g += sym(BB_LEFT+8, RAILY.BP+5, '+', '#d23a3a') + sym(BB_RIGHT-8, RAILY.BP+5, '+', '#d23a3a');
 
-  // rail holes — groups of 5 with a gap, aligned under columns 2..59
+  // rail holes - groups of 5 with a gap, aligned under columns 2..59
   for (const railY of [RAILY.TM, RAILY.TP, RAILY.BM, RAILY.BP]) {
     for (let c = 2; c <= COLS - 1; c++) {
       if (c % 6 === 1) continue; // create visual grouping gaps

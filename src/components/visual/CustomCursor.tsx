@@ -5,11 +5,11 @@ export default function CustomCursor() {
   const [state, setState] = useState<"default" | "hover" | "click">("default");
   const [visible, setVisible] = useState(false);
 
-  // Inner dot — no lag
+  // Inner dot - no lag
   const dotX = useMotionValue(-120);
   const dotY = useMotionValue(-120);
 
-  // Outer ring — spring lag
+  // Outer ring - spring lag
   const rawX = useMotionValue(-120);
   const rawY = useMotionValue(-120);
   const ringX = useSpring(rawX, { stiffness: 180, damping: 20, mass: 0.6 });
@@ -93,7 +93,7 @@ export default function CustomCursor() {
         }}
       />
 
-      {/* Crosshair lines — only in default state */}
+      {/* Crosshair lines - only in default state */}
       {state === "default" && (
         <motion.div
           style={{

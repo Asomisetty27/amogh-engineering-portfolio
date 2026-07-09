@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1180" height="660" viewBox="0 0 1180 660">
 <rect width="1180" height="660" fill="#ffffff"/>
 <rect x="4" y="4" width="1172" height="652" rx="14" fill="#fbfbfc" stroke="#e5e5e8" stroke-width="2"/>
-<text x="590" y="38" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="800" fill="#111" text-anchor="middle">1-Digit 7-Segment Display — real physical pins</text>
-<text x="590" y="59" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#666" text-anchor="middle">Package pin numbers below match the display's own datasheet — not just segment letters</text>
+<text x="590" y="38" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="800" fill="#111" text-anchor="middle">1-Digit 7-Segment Display - real physical pins</text>
+<text x="590" y="59" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#666" text-anchor="middle">Package pin numbers below match the display's own datasheet - not just segment letters</text>
 <polygon points="428.5,183.5 511.5,183.5 520.0,192.0 511.5,200.5 428.5,200.5 420.0,192.0" fill="#f3b6ab" stroke="#b23a24" stroke-width="1.5"/>
 <polygon points="536.5,204.5 536.5,257.5 545.0,266.0 553.5,257.5 553.5,204.5 545.0,196.0" fill="#f3b6ab" stroke="#b23a24" stroke-width="1.5"/>
 <polygon points="536.5,282.5 536.5,335.5 545.0,344.0 553.5,335.5 553.5,282.5 545.0,274.0" fill="#f3b6ab" stroke="#b23a24" stroke-width="1.5"/>

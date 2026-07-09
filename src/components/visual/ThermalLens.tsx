@@ -3,7 +3,7 @@ import { useLens } from "@/components/visual/lens";
 
 /**
  * The reticle: a measurement instrument that engages over Inspectable
- * surfaces. Ring diameter matches the mask radius exactly — the ring IS the
+ * surfaces. Ring diameter matches the mask radius exactly - the ring IS the
  * edge of the revealed thermal window. Ticks, a slow-rotating dashed scale,
  * and a readout chip complete the instrument.
  */
@@ -25,7 +25,7 @@ export default function ThermalLens() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* Outer ring — the physical edge of the lens */}
+            {/* Outer ring - the physical edge of the lens */}
             <motion.div
               initial={{ scale: 0.86 }}
               animate={{ scale: 1 }}
@@ -59,7 +59,7 @@ export default function ThermalLens() {
                   }}
                 />
               ))}
-              {/* Rotating dashed scale — the instrument is alive */}
+              {/* Rotating dashed scale - the instrument is alive */}
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
@@ -76,7 +76,7 @@ export default function ThermalLens() {
             <div style={{ position: "absolute", left: -5, top: 0, width: 10, height: 1, background: "rgba(240,234,220,0.7)" }} />
             <div style={{ position: "absolute", left: 0, top: -5, width: 1, height: 10, background: "rgba(240,234,220,0.7)" }} />
 
-            {/* Readout chip — rides the lower-right of the ring */}
+            {/* Readout chip - rides the lower-right of the ring */}
             <motion.div
               className="font-mono"
               initial={{ opacity: 0, y: 6 }}

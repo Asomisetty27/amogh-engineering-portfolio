@@ -1,5 +1,5 @@
 /**
- * ThermalGPUMap — Live animated GPU core thermal visualization
+ * ThermalGPUMap - Live animated GPU core thermal visualization
  *
  * Renders a 12×4 SM-core grid with a time-driven thermal state machine:
  *   Phase 0 (idle):   cool blue-teal baseline
@@ -9,7 +9,7 @@
  *   Phase 4 (alert):  ring + readout, other SMs cooling
  *   Phase 5 (reset):  fade back to idle, loop
  *
- * Updates DOM directly via refs — zero React re-renders at 60fps.
+ * Updates DOM directly via refs - zero React re-renders at 60fps.
  */
 
 import { useEffect, useRef, useCallback } from 'react';
@@ -24,7 +24,7 @@ const PHASES = [2.5, 3.0, 3.5, 2.0, 3.5, 1.5]; // sum = 16s loop
 const LOOP = PHASES.reduce((a, b) => a + b, 0);
 
 function thermalColor(t: number): string {
-  // t in [0,1] — 0=cold, 1=critical
+  // t in [0,1] - 0=cold, 1=critical
   const stops: [number, [number, number, number]][] = [
     [0.00, [15, 28, 52]],
     [0.18, [21, 68, 94]],
@@ -80,7 +80,7 @@ export default function ThermalGPUMap() {
 
   const animate = useCallback((now: number) => {
     if (!startRef.current) startRef.current = now;
-    // dt for frame-rate-independent integration — the old fixed 0.04/frame
+    // dt for frame-rate-independent integration - the old fixed 0.04/frame
     // smoothing ran 2× faster on 120 Hz displays.
     const dt = Math.min(0.05, (now - (lastRef.current || now)) / 1000);
     lastRef.current = now;
@@ -104,7 +104,7 @@ export default function ThermalGPUMap() {
           case 0: // idle
             target = 0.12 + noise * 0.4;
             break;
-          case 1: { // ramp — wave left→right
+          case 1: { // ramp - wave left→right
             const wavePos = col / (COLS - 1);
             const waveAmt = Math.max(0, pt - wavePos * 0.6);
             target = lerp(0.12 + noise * 0.4, 0.52 + noise * 0.4, Math.min(1, waveAmt * 2.5));
@@ -118,11 +118,11 @@ export default function ThermalGPUMap() {
             target = 0.52 + noise * 0.4;
             if (isAnomaly) target = lerp(0.56, 1.0, pt);
             break;
-          case 4: // alert — anomaly stays hot, others persist
+          case 4: // alert - anomaly stays hot, others persist
             target = 0.48 + noise * 0.35;
             if (isAnomaly) target = lerp(1.0, 0.88, pt * 0.3); // anomaly barely cools
             break;
-          case 5: // reset — all cool
+          case 5: // reset - all cool
             target = lerp(0.48 + noise * 0.35, 0.12 + noise * 0.4, pt);
             if (isAnomaly) target = lerp(0.88, 0.22, pt);
             break;
@@ -130,13 +130,13 @@ export default function ThermalGPUMap() {
             target = 0.12;
         }
         // Frame-rate-independent first-order smoothing (RC-style). The
-        // anomaly cell responds faster — a hotspot is a small thermal mass.
+        // anomaly cell responds faster - a hotspot is a small thermal mass.
         const k = isAnomaly ? 2.6 : 1.6; // per-second rates
         t[idx] = lerp(t[idx], target, 1 - Math.exp(-k * dt));
       }
     }
 
-    // Lateral heat conduction — silicon is a heat spreader, so the hotspot
+    // Lateral heat conduction - silicon is a heat spreader, so the hotspot
     // bleeds into adjacent SMs instead of being one isolated hot rectangle.
     // 4-neighbor Laplacian diffusion; this is what gives real thermal
     // imagery its gradient halo.
@@ -155,7 +155,7 @@ export default function ThermalGPUMap() {
     const kDiff = 1 - Math.exp(-1.1 * dt);
     for (let i = 0; i < N; i++) t[i] += diff[i] * kDiff;
 
-    // Update cell fills — with a whisper of per-cell sensor flicker so the
+    // Update cell fills - with a whisper of per-cell sensor flicker so the
     // grid reads as live telemetry, not a finished render. Display-only;
     // never fed back into the simulation state.
     for (let i = 0; i < N; i++) {
@@ -166,7 +166,7 @@ export default function ThermalGPUMap() {
       }
     }
 
-    // Alert ring — show in phases 3+4
+    // Alert ring - show in phases 3+4
     const showAlert = (phase === 3 && pt > 0.5) || phase === 4;
     if (alertRingRef.current) {
       alertRingRef.current.style.opacity = showAlert ? '1' : '0';
@@ -179,9 +179,9 @@ export default function ThermalGPUMap() {
       alertLabelRef.current.style.opacity = showAlert ? '1' : '0';
     }
 
-    // ── Readouts — physically consistent with the T4 Stage 1 data ─────────
+    // ── Readouts - physically consistent with the T4 Stage 1 data ─────────
     // T_amb = 21 °C virtual ambient; board power scripted per phase
-    // (T4: ~12 W idle, ~68 W under load — power stays FLAT through the
+    // (T4: ~12 W idle, ~68 W under load - power stays FLAT through the
     // anomaly, which is the whole point: temp rising at constant power is
     // exactly what R_θ = ΔT/P isolates). The displayed R_θ is computed from
     // the displayed T and P, so it reproduces the real measurements:
@@ -219,7 +219,7 @@ export default function ThermalGPUMap() {
           : '#525a55';
     }
     if (timestampRef.current) {
-      // Wall clock — the old `new Date(now)` fed a performance.now()
+      // Wall clock - the old `new Date(now)` fed a performance.now()
       // timestamp into Date, rendering a time near the 1970 epoch.
       const d = new Date();
       const pad2 = (n: number) => String(n).padStart(2, '0');
@@ -273,7 +273,7 @@ export default function ThermalGPUMap() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 9.5, color: '#3A332A' }}>
           <span>Tesla T4 · 2560 CUDA</span>
-          <span ref={timestampRef} style={{ color: '#525a55' }}>—</span>
+          <span ref={timestampRef} style={{ color: '#525a55' }}>-</span>
         </div>
       </div>
 
@@ -376,23 +376,23 @@ export default function ThermalGPUMap() {
           <span style={{ fontSize: 8.5, color: '#2E2E3E', marginLeft: 4 }}>cold → critical</span>
         </div>
 
-        {/* Live readouts — T, P and R_θ shown together so R_θ = ΔT/P is
+        {/* Live readouts - T, P and R_θ shown together so R_θ = ΔT/P is
             verifiable from the panel itself */}
         <div style={{ display: 'flex', gap: 16, fontSize: 9.5 }}>
           <div>
             <span style={{ color: '#3A332A', marginRight: 5 }}>T_max</span>
-            <span ref={readTmaxRef} style={{ color: '#ECE6D8', fontVariantNumeric: 'tabular-nums' }}>—</span>
+            <span ref={readTmaxRef} style={{ color: '#ECE6D8', fontVariantNumeric: 'tabular-nums' }}>-</span>
           </div>
           <div>
             <span style={{ color: '#3A332A', marginRight: 5 }}>P</span>
-            <span ref={readPowerRef} style={{ color: '#ECE6D8', fontVariantNumeric: 'tabular-nums' }}>—</span>
+            <span ref={readPowerRef} style={{ color: '#ECE6D8', fontVariantNumeric: 'tabular-nums' }}>-</span>
           </div>
           <div>
             <span style={{ color: '#3A332A', marginRight: 5 }}>R_θ</span>
-            <span ref={readRthetaRef} style={{ color: '#ECE6D8', fontVariantNumeric: 'tabular-nums' }}>—</span>
+            <span ref={readRthetaRef} style={{ color: '#ECE6D8', fontVariantNumeric: 'tabular-nums' }}>-</span>
           </div>
           <div>
-            <span ref={readStatusRef} style={{ fontVariantNumeric: 'tabular-nums' }}>—</span>
+            <span ref={readStatusRef} style={{ fontVariantNumeric: 'tabular-nums' }}>-</span>
           </div>
         </div>
       </div>

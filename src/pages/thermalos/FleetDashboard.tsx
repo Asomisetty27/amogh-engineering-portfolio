@@ -1,8 +1,8 @@
-// ThermalOS — Fleet Dashboard (customer-facing product demo).
+// ThermalOS - Fleet Dashboard (customer-facing product demo).
 //
 // Implements the "fleet dashboard" UI kit from the Isotherm design system:
 // rack grid of GPU cards, live R_theta / temperature telemetry, and an alert
-// event log. Distinct from the founder research dashboard (ThermalOSLayout) —
+// event log. Distinct from the founder research dashboard (ThermalOSLayout) -
 // this is the paid product surface a neocloud operator would see.
 //
 // Standalone full-screen shell (own topbar + sidebar), so it is domain-portable:
@@ -336,7 +336,7 @@ function TelemetryView() {
         </Card>
         <div style={{ background: C.s1, border: `1px solid rgba(255,255,255,.07)`, borderLeft: `3px solid ${C.stable}`, borderRadius: 8, padding: 14 }}>
           <div className="mono" style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.15em', color: C.healthy, marginBottom: 8 }}>ThermalOS Recommendation</div>
-          <p className="mono" style={{ fontSize: 11, color: '#E6F7F1', lineHeight: 1.65 }}>Thermal resistance elevated at 2.1000 °C/W. Cooling path degrading — verify TIM and mounting pressure on G-03-B.</p>
+          <p className="mono" style={{ fontSize: 11, color: '#E6F7F1', lineHeight: 1.65 }}>Thermal resistance elevated at 2.1000 °C/W. Cooling path degrading - verify TIM and mounting pressure on G-03-B.</p>
           <div className="mono" style={{ marginTop: 10, padding: '8px 10px', background: 'rgba(10,10,8,.8)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 4, fontSize: 10, color: '#D8D2C2', lineHeight: 1.8 }}>
             <div>Rθ_eff(t) = 2.1000 °C/W</div>
             <div>Formula: (T_gpu − T_amb) / P_draw</div>
@@ -372,7 +372,7 @@ function AlertsView() {
         })}
       </div>
       <Card style={{ padding: 14 }}>
-        <div className="mono" style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.15em', color: C.faint, marginBottom: 12 }}>Alert Event Log — {ALERTS.length} events</div>
+        <div className="mono" style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.15em', color: C.faint, marginBottom: 12 }}>Alert Event Log - {ALERTS.length} events</div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {ALERTS.map((ev, i) => {
             const m = ALERT_META[ev.a] || ALERT_META.OK;

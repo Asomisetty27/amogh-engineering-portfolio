@@ -14,7 +14,7 @@ import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLigh
 import { createNoise3D } from 'simplex-noise';
 import { useGpuTextures, type GpuTextures } from './gpuTextures';
 
-// PBR maps from gpuTextures.ts — loaded once inside Suspense and threaded via
+// PBR maps from gpuTextures.ts - loaded once inside Suspense and threaded via
 // context so individual layer components can opt in without prop churn.
 const GpuMapsCtx = createContext<GpuTextures | null>(null);
 function GpuMapsProvider({ children }: { children: React.ReactNode }) {
@@ -41,10 +41,10 @@ const T = {
 };
 const FM = "'JetBrains Mono', ui-monospace, monospace";
 
-// Physically-grounded thermal sim — shared with DataCenterScene/TowerUnit.
+// Physically-grounded thermal sim - shared with DataCenterScene/TowerUnit.
 // Replaces this scene's old level-lerp driver and its `0.22 + level * 0.41`
 // R_θ readout, which was (a) ~6× too large for a liquid-cooled H100 and
-// (b) rising with load — the exact opposite of what Theta detects.
+// (b) rising with load - the exact opposite of what Theta detects.
 import {
   ThermalSim,
   H100_SXM,
@@ -76,9 +76,9 @@ interface GPUSpec {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// The lineup — five silicon archetypes that define the current AI-data-center
+// The lineup - five silicon archetypes that define the current AI-data-center
 // hardware landscape. Two PCIe-card silhouettes (blower / triple-fan) and
-// three flat OAM/SXM module silhouettes (cold-plate, no fans) — chosen so
+// three flat OAM/SXM module silhouettes (cold-plate, no fans) - chosen so
 // every card on the runway reads as a genuinely different machine, not five
 // re-skins of the same box.
 // ──────────────────────────────────────────────────────────────────────────
@@ -100,7 +100,7 @@ const GPU_SPECS: GPUSpec[] = [
   { id: 'mi300x', name: 'MI300X',    arch: 'CDNA 3 · CHIPLET',  mem: '192GB HBM3',  vendor: 'AMD',    accent: '#ed1c24', cooler: 'cold-plate', dieLayout: 'chiplet-grid', memCount: 8, width: 7.50, depth: 4.00 }, // OAM module, 1.875:1
 ];
 
-const HERO_INDEX = 2; // H100 SXM5 — the thermal-arc protagonist; Theta's primary subject
+const HERO_INDEX = 2; // H100 SXM5 - the thermal-arc protagonist; Theta's primary subject
 const CARD_SPACING = 9.6;
 const LINEUP_X0 = -((GPU_SPECS.length - 1) * CARD_SPACING) / 2;
 const cardX = (i: number) => LINEUP_X0 + i * CARD_SPACING;
@@ -111,18 +111,18 @@ function stackProfileFor(spec: GPUSpec): StackProfile {
 
 // Per-archetype layer separation. Cards (with fan shrouds) explode into a tall
 // stack; flat modules (liquid-cooled, no shroud) separate into a much shorter,
-// denser sandwich — the difference IS the story (one needs to move air, one doesn't).
+// denser sandwich - the difference IS the story (one needs to move air, one doesn't).
 const LAYER_OFFSETS: Record<StackProfile, { exploded: number[]; assembled: number[] }> = {
   card:   { exploded: [-4.3, -2.05, 0.35, 4.1],   assembled: [-1.27, -0.97, -0.61, 0.56] },
   module: { exploded: [-2.75, -1.25, 0.25, 1.65], assembled: [-0.46, -0.30, -0.15, 0.07] },
 };
 
-// Cinematic reveal cycle — each card runs the same explode → hold → assemble →
+// Cinematic reveal cycle - each card runs the same explode → hold → assemble →
 // hold loop, phase-offset by index so the runway is always mid-motion somewhere
 // (a living showroom, not five synchronized robots).
 const CYCLE = { explodedHold: 2.6, assembling: 2.4, assembledHold: 5.8, disassembling: 1.8 };
 const CYCLE_LEN = CYCLE.explodedHold + CYCLE.assembling + CYCLE.assembledHold + CYCLE.disassembling;
-// Phase cards so only one is mid-transition at a time — the eye lands on a
+// Phase cards so only one is mid-transition at a time - the eye lands on a
 // single moving card while the rest are held in their pose.
 const STAGGER = (CYCLE.assembling + CYCLE.disassembling + 0.6);
 
@@ -139,7 +139,7 @@ function cardStageAt(elapsed: number, index: number): { stage: AnimStage; cycleP
 
 const thermalHex = modelThermalHex;
 
-// Hero-card live telemetry — written by the root driver's sim tick, read by
+// Hero-card live telemetry - written by the root driver's sim tick, read by
 // GPUCard (fan duty) and PhaseHUD (sensor readouts). Module-ref pattern, no
 // React state in the hot path.
 const _heroFanDuty = { current: 0.12 };
@@ -150,17 +150,17 @@ function spring(cur: number, target: number, delta: number, k: number): number {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Procedural textures — generic PCB + roughness + brushed-metal (cold plates)
+// Procedural textures - generic PCB + roughness + brushed-metal (cold plates)
 // ──────────────────────────────────────────────────────────────────────────
 
 function makePCBTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas');
   c.width = 512; c.height = 512;
   const ctx = c.getContext('2d')!;
-  // Dark forest green solder mask — server-grade boards run darker than consumer
+  // Dark forest green solder mask - server-grade boards run darker than consumer
   ctx.fillStyle = '#0F4A2E';
   ctx.fillRect(0, 0, 512, 512);
-  // FR4 fiberglass weave — the visible warp/weft is the "expensive hardware" tell
+  // FR4 fiberglass weave - the visible warp/weft is the "expensive hardware" tell
   ctx.strokeStyle = '#0a3622';
   ctx.lineWidth = 0.8;
   for (let y = 0; y < 512; y += 14) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke(); }
@@ -175,7 +175,7 @@ function makePCBTexture(): THREE.CanvasTexture {
     ctx.lineTo(sx + (Math.random() - 0.5) * 120, sy + (Math.random() - 0.5) * 90);
     ctx.stroke();
   }
-  // Via pads — nickel-gold ENIG finish
+  // Via pads - nickel-gold ENIG finish
   ctx.fillStyle = '#b8860b';
   for (let i = 0; i < 320; i++) {
     ctx.beginPath();
@@ -227,8 +227,8 @@ function makeBrushedMetalTexture(): THREE.CanvasTexture {
   return t;
 }
 
-// Organic ABF substrate — dark brown-black, fine grain. Used under SXM/OAM
-// mezzanine pads and HBM stacks (NOT green FR4 — this is the "server module,
+// Organic ABF substrate - dark brown-black, fine grain. Used under SXM/OAM
+// mezzanine pads and HBM stacks (NOT green FR4 - this is the "server module,
 // not gaming card" tell).
 function makeOrganicSubstrateTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas');
@@ -236,7 +236,7 @@ function makeOrganicSubstrateTexture(): THREE.CanvasTexture {
   const ctx = c.getContext('2d')!;
   ctx.fillStyle = '#1C1C20';
   ctx.fillRect(0, 0, 512, 512);
-  // Fine-grain speckle — ABF resin texture, not weave
+  // Fine-grain speckle - ABF resin texture, not weave
   const img = ctx.getImageData(0, 0, 512, 512);
   for (let i = 0; i < img.data.length; i += 4) {
     const n = (Math.random() - 0.5) * 18;
@@ -258,9 +258,9 @@ function makeOrganicSubstrateTexture(): THREE.CanvasTexture {
   return t;
 }
 
-// Product-text decal — transparent canvas with crisp wordmark used as an
+// Product-text decal - transparent canvas with crisp wordmark used as an
 // emissive/printed label on shroud tops and cold-plate lids. This is the
-// single biggest "real GPU vs generic 3D box" tell — every shipped accelerator
+// single biggest "real GPU vs generic 3D box" tell - every shipped accelerator
 // has its model name screen-printed or laser-etched on the exterior.
 function makeProductTextDecal(
   primary: string,
@@ -278,7 +278,7 @@ function makeProductTextDecal(
   ctx.textBaseline = 'middle';
   ctx.textAlign = opts.align ?? 'center';
   const x = opts.align === 'left' ? 48 : W / 2;
-  // Primary wordmark — bold, wide-tracked
+  // Primary wordmark - bold, wide-tracked
   ctx.font = `700 96px "Helvetica Neue", "Arial Black", sans-serif`;
   const tracked = primary.split('').join(String.fromCharCode(8201)); // thin-space tracking
   ctx.shadowColor = 'rgba(0,0,0,0.35)';
@@ -308,7 +308,7 @@ type Textures = {
 };
 
 // ──────────────────────────────────────────────────────────────────────────
-// Instanced helpers — keep draw calls flat across five simultaneous assemblies
+// Instanced helpers - keep draw calls flat across five simultaneous assemblies
 // ──────────────────────────────────────────────────────────────────────────
 
 function InstancedBoxes({
@@ -348,7 +348,7 @@ function InstancedBoxes({
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Layer label — reads a per-card opacity ref via useFrame
+// Layer label - reads a per-card opacity ref via useFrame
 // ──────────────────────────────────────────────────────────────────────────
 
 function LayerLabel({ text, sub, opacityRef, accent }: { text: string; sub?: string; opacityRef: React.MutableRefObject<number>; accent: string }) {
@@ -378,7 +378,7 @@ function Fan({ fanRef, radius = 1.0 }: { fanRef: React.MutableRefObject<THREE.Gr
     <group ref={fanRef}>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[radius, 0.055, 12, 44]} />
-        {/* Fan frame — molded plastic, matte */}
+        {/* Fan frame - molded plastic, matte */}
         <meshStandardMaterial color="#1A1A1F" roughness={0.65} metalness={0.0} />
       </mesh>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
@@ -391,7 +391,7 @@ function Fan({ fanRef, radius = 1.0 }: { fanRef: React.MutableRefObject<THREE.Gr
           <group key={i} rotation={[0, angle, 0]}>
             <mesh position={[radius * 0.5, 0, 0]} rotation={[0.35, 0, 0]}>
               <boxGeometry args={[radius * 0.72, 0.035, 0.2]} />
-              {/* Fan blades — light translucent-ish gray plastic */}
+              {/* Fan blades - light translucent-ish gray plastic */}
               <meshStandardMaterial color="#C8C8CE" roughness={0.5} metalness={0.0} />
             </mesh>
           </group>
@@ -402,13 +402,13 @@ function Fan({ fanRef, radius = 1.0 }: { fanRef: React.MutableRefObject<THREE.Gr
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Layer renderers — parametrized by archetype (card vs module)
+// Layer renderers - parametrized by archetype (card vs module)
 // ──────────────────────────────────────────────────────────────────────────
 
 function SubstrateLayer({ spec, textures, labelOpacityRef }: { spec: GPUSpec; textures: Textures; labelOpacityRef: React.MutableRefObject<number> }) {
   const profile = stackProfileFor(spec);
 
-  // Module baseplates carry a gold contact-pad array along the short edge —
+  // Module baseplates carry a gold contact-pad array along the short edge -
   // instanced (4 rows × 14 cols = 56 pads, one draw call). Computed
   // unconditionally so this hook always runs in the same order regardless
   // of which archetype this instance renders (rules-of-hooks).
@@ -441,12 +441,12 @@ function SubstrateLayer({ spec, textures, labelOpacityRef }: { spec: GPUSpec; te
   }
   return (
     <group>
-      {/* Module baseplate — organic ABF substrate (dark brown-black), NOT green FR4.
+      {/* Module baseplate - organic ABF substrate (dark brown-black), NOT green FR4.
           This is the visual cue that says "server module, not consumer card". */}
       <RoundedBox args={[spec.width, 0.12, spec.depth]} radius={0.04} smoothness={4}>
         <meshStandardMaterial color="#1C1C20" roughness={0.5} metalness={0.1} map={textures.organic} envMapIntensity={1.0} />
       </RoundedBox>
-      {/* SXM5/OAM mezzanine pads — gold-on-nickel; same plated-gold spec as PCIe fingers */}
+      {/* SXM5/OAM mezzanine pads - gold-on-nickel; same plated-gold spec as PCIe fingers */}
       <InstancedBoxes positions={pads} size={[0.1, 0.02, 0.07]} color="#D4AF37" roughness={0.28} metalness={1.0} />
       <LayerLabel text="MODULE BASEPLATE" sub="SXM5 / OAM contact array · 56 pads" opacityRef={labelOpacityRef} accent={spec.accent} />
     </group>
@@ -478,7 +478,7 @@ function SubstrateAndComponentsLayer({ spec, textures, labelOpacityRef }: { spec
 
   return (
     <group>
-      {/* PCB body — dark forest green solder mask over FR4; server-grade dark mask, not consumer bright green.
+      {/* PCB body - dark forest green solder mask over FR4; server-grade dark mask, not consumer bright green.
           PCB normal map (gpuTextures.pcbNormal) drives micro-relief solder-mask topography for grazing light. */}
       <RoundedBox args={[spec.width - 0.2, 0.22, spec.depth - 0.2]} radius={0.05} smoothness={4}>
         <meshStandardMaterial
@@ -494,7 +494,7 @@ function SubstrateAndComponentsLayer({ spec, textures, labelOpacityRef }: { spec
       {profile === 'card' && Array.from({ length: 16 }).map((_, i) => (
         <mesh key={`pcie-${i}`} position={[-spec.width / 2 + 1.1 + i * 0.3, -0.02, spec.depth / 2 - 0.18]}>
           <boxGeometry args={[0.2, 0.2, 0.4]} />
-          {/* PCIe gold fingers — nickel underplate + hard gold overplate; roughness slightly above
+          {/* PCIe gold fingers - nickel underplate + hard gold overplate; roughness slightly above
               pure gold so it reads as plated, not solid. */}
           <meshStandardMaterial color="#D4AF37" roughness={0.28} metalness={1.0} />
         </mesh>
@@ -510,7 +510,7 @@ function SubstrateAndComponentsLayer({ spec, textures, labelOpacityRef }: { spec
           <meshStandardMaterial color={s.gold ? '#D4AF37' : '#16161a'} roughness={s.gold ? 0.3 : 0.6} metalness={s.gold ? 1.0 : 0.3} roughnessMap={s.gold ? undefined : textures.rough} />
         </mesh>
       ))}
-      {/* AMD INSTINCT silkscreen decal — printed on the PCB short edge of the
+      {/* AMD INSTINCT silkscreen decal - printed on the PCB short edge of the
           MI300X OAM module. Faces up; aligned along the long axis of the short edge. */}
       {spec.id === 'mi300x' && maps?.amdDecal && (
         <mesh
@@ -551,7 +551,7 @@ function CoolerLayer({
   });
 
   // Both archetypes' instanced-position arrays are computed unconditionally
-  // (rules-of-hooks) — only one set is actually mounted per instance, decided
+  // (rules-of-hooks) - only one set is actually mounted per instance, decided
   // by spec.cooler, which is invariant for the lifetime of this component.
   const grooves = useMemo<[number, number, number][]>(() => {
     const out: [number, number, number][] = [];
@@ -569,7 +569,7 @@ function CoolerLayer({
   );
 
   if (spec.cooler === 'cold-plate') {
-    // Liquid-cooled module — the photoreal product skin fills the entire top
+    // Liquid-cooled module - the photoreal product skin fills the entire top
     // face edge-to-edge, sized exactly to spec.width × spec.depth so no stock
     // lid color shows through.
     const skin = maps?.skins?.[spec.id];
@@ -593,7 +593,7 @@ function CoolerLayer({
     // L40S single-slot passive card. The photoreal skin already contains the
     // ribbed anodized-aluminum extrusion, the NVIDIA + L40S wordmark, the
     // mounting-screw pockets, the green diagonal accent stripe AND the 4× DP
-    // bracket — so the 3D geometry is just a flat shroud sized exactly to the
+    // bracket - so the 3D geometry is just a flat shroud sized exactly to the
     // skin, with the skin draped over the full top face. No ribs poking
     // through, no stock GPU showing.
     const shellH = 0.62;
@@ -623,14 +623,14 @@ function CoolerLayer({
 
   // A100 PCIe blower archetype. The photoreal skin contains the radial blower
   // fan, the smooth shroud, the NVIDIA A100 silkscreen and the green accent
-  // stripe — so we render only a flat shroud sized to the skin and drape the
+  // stripe - so we render only a flat shroud sized to the skin and drape the
   // skin over the entire top face. No 3D fan torus, no rib stack poking
   // through. Internal fin block stays underneath for the exploded-view layer
   // separation, but it sits well below the shroud top.
   const shroudH = 0.34;
   return (
     <group>
-      {/* internal fin stack — only visible in exploded view, hidden under the shroud when assembled */}
+      {/* internal fin stack - only visible in exploded view, hidden under the shroud when assembled */}
       <group position={[0, -1.9, 0]}>
         <InstancedBoxes positions={fins} size={[spec.width - 1.2, 0.045, spec.depth - 1.2]} color="#B8B8BC" roughness={0.4} metalness={0.85} emissive="#c85f2a" emissiveIntensity={0} />
         <mesh position={[0, FIN_COUNT * spacing * 0.5 + 0.1, 0]}>
@@ -638,18 +638,18 @@ function CoolerLayer({
           <meshStandardMaterial ref={finMatRef} color="#CFCAC0" roughness={0.18} metalness={0.95} emissive="#c85f2a" emissiveIntensity={0} map={maps?.nickelBrushed ?? undefined} />
         </mesh>
       </group>
-      {/* Shroud body — flat lid, exactly the card footprint, hidden by the skin on top */}
+      {/* Shroud body - flat lid, exactly the card footprint, hidden by the skin on top */}
       <RoundedBox args={[spec.width, shroudH, spec.depth]} radius={0.045} smoothness={4} position={[0, 0.5, 0]}>
         <meshStandardMaterial color="#0E0E11" roughness={0.55} metalness={0.05} />
       </RoundedBox>
-      {/* Photoreal top-face skin — full footprint, edge-to-edge */}
+      {/* Photoreal top-face skin - full footprint, edge-to-edge */}
       {maps?.skins?.a100 && (
         <mesh position={[0, 0.5 + shroudH / 2 + 0.004, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[spec.width, spec.depth]} />
           <meshStandardMaterial map={maps.skins.a100} roughness={0.92} metalness={0.05} envMapIntensity={0.35} />
         </mesh>
       )}
-      {/* PCIe bracket — full-height steel I/O end-plate at +z edge. Real
+      {/* PCIe bracket - full-height steel I/O end-plate at +z edge. Real
           server cards have a vented bracket with screw notch + slot openings
           for exhaust (blower) or display outputs (passive). */}
       <group position={[0, 0.32, spec.depth / 2 + 0.04]}>
@@ -671,7 +671,7 @@ function CoolerLayer({
           </mesh>
         ))}
       </group>
-      {/* A100 PCIe 8-pin EPS power connector — black housing with 8 gold pins,
+      {/* A100 PCIe 8-pin EPS power connector - black housing with 8 gold pins,
           mounted top-rear of the shroud (real card: single 8-pin near the
           bracket end, recessed into the shroud). */}
       {spec.cooler === 'blower' && (
@@ -703,7 +703,7 @@ function CoolerLayer({
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// GPU card — full assembly with its own staggered explode/assemble loop
+// GPU card - full assembly with its own staggered explode/assemble loop
 // ──────────────────────────────────────────────────────────────────────────
 
 function GPUCard({
@@ -767,7 +767,7 @@ function GPUCard({
 
     // Fan controller realism: fans track TEMPERATURE through the sim's
     // lagged fan-duty channel (≈1.6 s controller filter), so RPM audibly
-    // trails the thermal event instead of snapping with it — and keeps
+    // trails the thermal event instead of snapping with it - and keeps
     // spinning fast during recovery while the card is still shedding heat.
     const fanBase = stage === 'assembled' ? 4 : stage === 'assembling' ? 2.2 : 0.9;
     const fanDuty = isHero ? _heroFanDuty.current : localLevelRef.current;
@@ -814,7 +814,7 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
   } else if (spec.dieLayout === 'dual-die') {
     dies = [{ pos: [-0.66, 0.07, 0], w: 1.25, d: 1.7 }, { pos: [0.66, 0.07, 0], w: 1.25, d: 1.7 }];
   } else {
-    // MI300X: 8 XCD/IOD chiplets — transposed to 2 cols × 4 rows so the
+    // MI300X: 8 XCD/IOD chiplets - transposed to 2 cols × 4 rows so the
     // chiplet field runs along the long (z) axis of the OAM package,
     // matching AMD's MI300X die-shot orientation.
     dies = [];
@@ -824,7 +824,7 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
   }
 
   // HBM placement is layout-specific. Real B200/H100 modules stack HBM in
-  // rings/rows around the die — not decorative. Chiplet modules (MI300X)
+  // rings/rows around the die - not decorative. Chiplet modules (MI300X)
   // flank the chiplet grid along its long edges.
   type MemPlace = { pos: [number, number, number]; w: number; d: number; h: number };
   const memPositions = useMemo<MemPlace[]>(() => {
@@ -851,7 +851,7 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
         const w = 0.46;
         const d = 0.6;
         // Hex angles starting at +x, every 60°. Real SXM5 reference: 3 stacks
-        // top, 3 stacks bottom — flatter on the long edges than a perfect hex
+        // top, 3 stacks bottom - flatter on the long edges than a perfect hex
         // so use a slight z-bias to read as two parallel rows of 3.
         for (let i = 0; i < 6; i++) {
           const ang = (i / 6) * Math.PI * 2 + Math.PI / 6;
@@ -894,13 +894,13 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
 
   return (
     <group>
-      {/* Package substrate / interposer — rectangular, matching real silicon footprint */}
+      {/* Package substrate / interposer - rectangular, matching real silicon footprint */}
       <RoundedBox args={[spec.width * 0.92, 0.04, spec.depth * 0.92]} radius={0.03} smoothness={3} position={[0, -0.02, 0]}>
         <meshStandardMaterial color="#1C1C20" roughness={0.5} metalness={0.1} />
       </RoundedBox>
       {dies.map((d, i) => (
         <group key={i}>
-          {/* Lapped silicon die — near-black with faint blue tint */}
+          {/* Lapped silicon die - near-black with faint blue tint */}
           <RoundedBox args={[d.w, 0.12, d.d]} radius={0.02} smoothness={3} position={d.pos}>
             <meshStandardMaterial ref={(m) => { matRefs.current[i] = m; }} color="#16161C" roughness={0.15} metalness={0.3} />
           </RoundedBox>
@@ -911,21 +911,21 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
           )}
         </group>
       ))}
-      {/* H100 SXM5 — NVIDIA wordmark etched into the IHS top face */}
+      {/* H100 SXM5 - NVIDIA wordmark etched into the IHS top face */}
       {spec.id === 'h100' && maps?.nvidiaDecal && (
         <mesh position={[0, 0.07 + 0.085 + 0.026, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[1.1, 0.28]} />
           <meshBasicMaterial map={maps.nvidiaDecal} transparent toneMapped={false} opacity={0.9} />
         </mesh>
       )}
-      {/* B200 unified IHS — one large nickel-plated lid spanning both dies
+      {/* B200 unified IHS - one large nickel-plated lid spanning both dies
           AND the 8 HBM3e stacks (reference: Blackwell B200 package shot). */}
       {spec.dieLayout === 'dual-die' && (
         <group>
           <RoundedBox args={[3.6, 0.05, 2.2]} radius={0.04} smoothness={4} position={[0, 0.345, 0]}>
             <meshStandardMaterial color="#CFCAC0" roughness={0.18} metalness={0.95} envMapIntensity={1.25} map={maps?.nickelBrushed ?? undefined} />
           </RoundedBox>
-          {/* NV-HBI signature — faint recessed hairline across the lid where the
+          {/* NV-HBI signature - faint recessed hairline across the lid where the
               two GB100 dies meet through the high-bandwidth interconnect bridge.
               Slightly darker, slightly rougher than the lid for grazing-light read. */}
           <mesh position={[0, 0.371, 0]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -935,7 +935,7 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
         </group>
       )}
 
-      {/* MI300X unified IHS — single nickel lid spanning the transposed 2×4
+      {/* MI300X unified IHS - single nickel lid spanning the transposed 2×4
           chiplet field. Dimensions transposed to match the new grid. */}
       {spec.dieLayout === 'chiplet-grid' && (
         <RoundedBox args={[1.15, 0.05, 2.05]} radius={0.025} smoothness={4} position={[0, 0.155, 0]}>
@@ -944,16 +944,16 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
       )}
       {memPositions.map((m, i) => (
         <group key={`mem-${i}`} position={m.pos}>
-          {/* HBM stack base — dark ABF organic substrate */}
+          {/* HBM stack base - dark ABF organic substrate */}
           <mesh position={[0, -m.h / 2 + 0.02, 0]}>
             <boxGeometry args={[m.w + 0.04, 0.04, m.d + 0.04]} />
             <meshStandardMaterial color="#1A1614" roughness={0.6} metalness={0.05} />
           </mesh>
-          {/* The stack itself — taller than wide, matte brown-black */}
+          {/* The stack itself - taller than wide, matte brown-black */}
           <RoundedBox args={[m.w, m.h, m.d]} radius={0.015} smoothness={3}>
             <meshStandardMaterial color="#26201C" roughness={0.55} metalness={0.1} />
           </RoundedBox>
-          {/* HBM3 top cap — gold metallic TIM/logic-die lid. Hidden under
+          {/* HBM3 top cap - gold metallic TIM/logic-die lid. Hidden under
               the unified B200 IHS where it'd visually intersect the lid. */}
           {showHbmCaps && (
             <mesh position={[0, m.h / 2 + 0.006, 0]}>
@@ -972,7 +972,7 @@ function DieBlockWrapper({ spec, thermalRef, opacityRef }: { spec: GPUSpec; ther
   );
 }
 
-// Floating model name plate — visible while exploded, the "ad copy" beat
+// Floating model name plate - visible while exploded, the "ad copy" beat
 function CardNamePlate({ spec, index }: { spec: GPUSpec; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
   useFrame((state, delta) => {
@@ -980,7 +980,7 @@ function CardNamePlate({ spec, index }: { spec: GPUSpec; index: number }) {
     const { stage } = cardStageAt(state.clock.elapsedTime, index);
     const target = (stage === 'exploded' || stage === 'disassembling') ? 1 : 0;
     const cur = parseFloat(ref.current.dataset.op || '0');
-    // dt-based smoothing — the old 0.06/frame constant ran 2× faster on
+    // dt-based smoothing - the old 0.06/frame constant ran 2× faster on
     // 120 Hz displays; exp form is frame-rate independent (k≈3.6/s ≙ 0.06@60fps)
     const next = cur + (target - cur) * (1 - Math.exp(-3.6 * delta));
     ref.current.dataset.op = String(next);
@@ -1005,7 +1005,7 @@ function CardNamePlate({ spec, index }: { spec: GPUSpec; index: number }) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Cinematic palette — "Liquid Gold": Champagne Gold + Obsidian Silver.
+// Cinematic palette - "Liquid Gold": Champagne Gold + Obsidian Silver.
 // Luxury watch / premium automotive reveal aesthetic. Warm, not neon.
 // ──────────────────────────────────────────────────────────────────────────
 const CINE = {
@@ -1018,9 +1018,9 @@ const CINE = {
 };
 
 // ──────────────────────────────────────────────────────────────────────────
-// The set — black-nickel mirror floor (0.01 roughness) + warm slate-to-
+// The set - black-nickel mirror floor (0.01 roughness) + warm slate-to-
 // soft-champagne gradient cyc. Single champagne emissive ribbon for the
-// luxury "inner glow" — wide bloom, low intensity, no neon line.
+// luxury "inner glow" - wide bloom, low intensity, no neon line.
 // ──────────────────────────────────────────────────────────────────────────
 
 function Backdrop() {
@@ -1045,17 +1045,17 @@ function Backdrop() {
 
   return (
     <group>
-      {/* Cyc backdrop — warm silk gradient, behind everything */}
+      {/* Cyc backdrop - warm silk gradient, behind everything */}
       <mesh position={[0, 6, -18]}>
         <planeGeometry args={[120, 38]} />
         <meshBasicMaterial map={gradTex} toneMapped={false} />
       </mesh>
-      {/* Champagne emissive ribbon — wide, soft, luxury "inner heat" glow */}
+      {/* Champagne emissive ribbon - wide, soft, luxury "inner heat" glow */}
       <mesh position={[0, 4.6, -15]}>
         <boxGeometry args={[26, 0.06, 0.04]} />
         <meshBasicMaterial color={CINE.hot} toneMapped={false} />
       </mesh>
-      {/* Faint horizon under-strip — desaturated gold whisper */}
+      {/* Faint horizon under-strip - desaturated gold whisper */}
       <mesh position={[0, -1.2, -15]}>
         <planeGeometry args={[60, 0.05]} />
         <meshBasicMaterial color={CINE.hotSoft} toneMapped={false} opacity={0.3} transparent />
@@ -1067,7 +1067,7 @@ function Backdrop() {
 function Runway({ textures }: { textures: Textures }) {
   return (
     <group position={[0, -3.4, 0]}>
-      {/* Black nickel mirror floor — roughness pushed to glass minimum so
+      {/* Black nickel mirror floor - roughness pushed to glass minimum so
           metallic surfaces cast long, unbroken vertical reflections. */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[GPU_SPECS.length * CARD_SPACING + 24, 26]} />
@@ -1086,20 +1086,20 @@ function Runway({ textures }: { textures: Textures }) {
           mirror={0.7}
         />
       </mesh>
-      {/* Removed gold ring halos under each GPU — read as an upside-down U arch. */}
-      {/* Warm slate atmosphere — soft falloff, low density */}
+      {/* Removed gold ring halos under each GPU - read as an upside-down U arch. */}
+      {/* Warm slate atmosphere - soft falloff, low density */}
       <fogExp2 attach="fog" args={[CINE.void, 0.02]} />
     </group>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Lighting — Liquid Gold rig:
+// Lighting - Liquid Gold rig:
 //   • Overhead silver softbox (clean white, broad) → pure white linear bands
-//   • Traveling key spot — platinum white, follows hero
-//   • Champagne backdrop wash — warm cyc bleed onto rear of cards
+//   • Traveling key spot - platinum white, follows hero
+//   • Champagne backdrop wash - warm cyc bleed onto rear of cards
 //   • Subtle platinum side fill from camera-left
-//   • Warm blackpoint ambient — never crushes to true black
+//   • Warm blackpoint ambient - never crushes to true black
 // ──────────────────────────────────────────────────────────────────────────
 
 function SceneLights({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
@@ -1124,22 +1124,22 @@ function SceneLights({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
 
   return (
     <>
-      {/* Overhead silver softbox — narrow, tight top band kiss only */}
+      {/* Overhead silver softbox - narrow, tight top band kiss only */}
       <rectAreaLight ref={stripRef} position={[0, 13, 3]} width={16} height={3.5} intensity={4.5} color={CINE.rim} />
-      {/* Whisper platinum side fill from camera-left — just lifts shadow side */}
+      {/* Whisper platinum side fill from camera-left - just lifts shadow side */}
       <rectAreaLight ref={fillRef} position={[-12, 5, 8]} width={7} height={5} intensity={0.85} color="#e8edf3" />
-      {/* Champagne cyc wash — warm bleed across rear of cards, very low */}
+      {/* Champagne cyc wash - warm bleed across rear of cards, very low */}
       <rectAreaLight ref={cycRef} position={[0, 3.5, -10]} width={20} height={5} intensity={1.1} color={CINE.hot} />
-      {/* Per-card traveling key — tight liquid-platinum spot, deep falloff */}
+      {/* Per-card traveling key - tight liquid-platinum spot, deep falloff */}
       <spotLight ref={spotRef} position={[0, 11, 6]} angle={0.32} penumbra={0.88} intensity={42} color={CINE.rim} distance={22} decay={2.2} castShadow />
-      {/* Warm blackpoint ambient — barely there */}
+      {/* Warm blackpoint ambient - barely there */}
       <ambientLight intensity={0.018} color={CINE.void} />
     </>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Camera — slow lateral dolly sweeping the full runway, noise-driven drift
+// Camera - slow lateral dolly sweeping the full runway, noise-driven drift
 // ──────────────────────────────────────────────────────────────────────────
 
 const SWEEP_HALF = (GPU_SPECS.length - 1) * CARD_SPACING * 0.5 + 3;
@@ -1198,7 +1198,7 @@ function PostFX({ camXRef }: { camXRef: React.MutableRefObject<number> }) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// HUD — Theta's readout on the hero card (H100), bottom-right
+// HUD - Theta's readout on the hero card (H100), bottom-right
 // ──────────────────────────────────────────────────────────────────────────
 
 function PhaseHUD({ phaseRef, valuesRef }: { phaseRef: React.MutableRefObject<Phase>; valuesRef: React.MutableRefObject<{ level: number; progress: number }> }) {
@@ -1214,7 +1214,7 @@ function PhaseHUD({ phaseRef, valuesRef }: { phaseRef: React.MutableRefObject<Ph
   const isCritical = phase === 'critical';
   const tColor = thermalHex(level).getStyle();
   // NVML-style sensor readouts from the shared sim: integer °C / integer W,
-  // R_θ = (T_j − T_ref)/P so the three numbers are mutually consistent —
+  // R_θ = (T_j − T_ref)/P so the three numbers are mutually consistent -
   // and R_θ stays flat through the load ramp (healthy), only drifting up
   // when the anomaly begins. That flat-then-drift signature IS the product.
   const Tj = telem ? `${telem.tjSensor}` : '37';
@@ -1222,14 +1222,14 @@ function PhaseHUD({ phaseRef, valuesRef }: { phaseRef: React.MutableRefObject<Ph
   const Rtheta = telem ? fmtRth(telem.rthSensor) : '0.072';
   const throttled = telem?.throttled ?? false;
   // Stable-window gate (the agent's window.py analogue): during power
-  // transients R_θ holds its last steady-state value and renders dimmed —
+  // transients R_θ holds its last steady-state value and renders dimmed -
   // a live ΔT/P mid-transient would read thermal memory, not the cooling path.
   const rthStale = telem?.rthStale ?? false;
   const labelMap: Record<Phase, string> = {
     idle: 'IDLE', load: 'UNDER LOAD', anomaly: 'ANOMALY DETECTED', critical: 'THERMAL CRITICAL', recovery: 'RECOVERING',
   };
 
-  // Luxury palette overrides — platinum text, champagne accents, amber-gold
+  // Luxury palette overrides - platinum text, champagne accents, amber-gold
   // for critical (instead of harsh red) to keep the warm color harmony.
   const PLATINUM = '#E2E8F0';
   const CHAMPAGNE = '#D4AF37';

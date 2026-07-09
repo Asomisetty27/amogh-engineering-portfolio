@@ -71,7 +71,7 @@ export default function ThermalOSBanner() {
         </p>
 
         <p className="text-[11px] font-mono text-muted-foreground mb-3">
-          Theta is the shipped agent (<a href="https://runtheta.com" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-foreground" style={{ textDecorationColor: "rgba(212,175,55,.4)" }}>runtheta.com</a>); ThermalOS is the research program behind it — same project, product face and research face.
+          Theta is the shipped agent (<a href="https://runtheta.com" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-foreground" style={{ textDecorationColor: "rgba(212,175,55,.4)" }}>runtheta.com</a>); ThermalOS is the research program behind it - same project, product face and research face.
         </p>
 
         <p className="text-sm text-secondary-foreground leading-relaxed mb-4">
@@ -210,7 +210,7 @@ export default function ThermalOSBanner() {
         </div>
       </div>
 
-      {/* PLATE 02 — the cooling stack, same instrument language as the hero plate */}
+      {/* PLATE 02 - the cooling stack, same instrument language as the hero plate */}
       <div className="hidden md:block">
         <InstrumentPlate
           src="/generated/theta-plate.webp"
