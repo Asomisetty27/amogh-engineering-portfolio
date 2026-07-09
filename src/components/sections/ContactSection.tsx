@@ -15,7 +15,7 @@ export default function ContactSection() {
 
   return (
     <section className="max-w-lg mx-auto">
-      <SectionTitle>Contact</SectionTitle>
+      <SectionTitle index="section 05 · uplink">Contact</SectionTitle>
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}

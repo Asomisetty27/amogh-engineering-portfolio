@@ -12,6 +12,7 @@ import QuickviewSection from "@/components/sections/QuickviewSection";
 import ThermalField from "@/components/visual/ThermalField";
 import CursorHeat from "@/components/visual/CursorHeat";
 import CommandPalette from "@/components/CommandPalette";
+import ScrollProgress from "@/components/visual/ScrollProgress";
 
 const SECTIONS = ["overview", "projects", "experience", "skills", "contact", "quickview"] as const;
 
@@ -105,6 +106,7 @@ export default function Index() {
           />
 
           <MissionNav activeSection={activeSection} onNavigate={handleNavigate} />
+          <ScrollProgress />
           <CommandPalette onNavigate={handleNavigate} />
 
           <main className="pt-20 pb-16 px-4 relative" style={{ zIndex: 10 }}>

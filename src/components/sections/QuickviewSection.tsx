@@ -13,9 +13,25 @@ export default function QuickviewSection() {
   return (
     <section className="max-w-3xl mx-auto">
       <div className="no-print flex items-center justify-between mb-6">
-        <h2 className="font-display text-xl tracking-wider text-primary neon-text-cyan">
-          Quickview
-        </h2>
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span aria-hidden style={{ width: 14, height: 1, background: "rgba(212,175,55,0.8)" }} />
+            <span className="font-mono" style={{ fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(212,175,55,0.65)" }}>
+              section 06 · recruiter brief
+            </span>
+          </div>
+          <h2
+            className="font-display text-2xl md:text-[26px] tracking-wide font-semibold"
+            style={{
+              background: "linear-gradient(168deg, hsl(42 45% 96%) 0%, hsl(44 55% 84%) 45%, hsl(46 65% 58%) 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            Quickview
+          </h2>
+        </div>
         <div className="flex items-center gap-2">
           <a
             href="/Amogh_Somisetty_Resume_Fall2026.pdf"

@@ -82,7 +82,7 @@ export default function SkillsSection() {
 
   return (
     <section className="max-w-3xl mx-auto fx-blur-reveal">
-      <SectionTitle>Skills</SectionTitle>
+      <SectionTitle index="section 04 · capability matrix">Skills</SectionTitle>
 
       <div className="space-y-3">
         {skillCategories.map((cat) => {

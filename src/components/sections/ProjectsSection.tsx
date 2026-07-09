@@ -7,8 +7,7 @@ import {
 import { useViewMode } from "@/contexts/ViewModeContext";
 import InspectableImage from "@/components/visual/InspectableImage";
 import {
-  ConfidenceBadgeTag, StatusLight, PanelHeader, EvidencePending,
-} from "@/components/ui/mission-ui";
+  ConfidenceBadgeTag, StatusLight, PanelHeader, EvidencePending, SectionTitle } from "@/components/ui/mission-ui";
 import {
   ChevronRight, ChevronDown, FileText, Image as ImageIcon,
   ExternalLink, Box, Zap, Cpu, Wrench, Radio, Plane,
@@ -124,6 +123,7 @@ export default function ProjectsSection({ initialProjectId, onSelectProject }: P
 
   return (
     <section className="max-w-7xl mx-auto fx-blur-reveal">
+      <SectionTitle index="section 02 · systems index">Systems</SectionTitle>
       {/* Domain Selector, fx-card hover + active gradient glow */}
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-2 mb-6">
         {systemDomains.map((domain) => {

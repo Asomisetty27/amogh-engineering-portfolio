@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import type { ConfidenceBadge } from "@/data/portfolioData";
 import { Shield, AlertTriangle, Clock } from "lucide-react";
 
@@ -47,11 +48,47 @@ export function PanelHeader({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function SectionTitle({ children }: { children: React.ReactNode }) {
+export function SectionTitle({ children, index }: { children: React.ReactNode; index?: string }) {
   return (
-    <h2 className="font-display text-xl tracking-wider text-primary neon-text-cyan mb-6">
-      {children}
-    </h2>
+    <div className="mb-7">
+      {index && (
+        <div className="flex items-center gap-2 mb-1.5">
+          <span aria-hidden style={{ width: 14, height: 1, background: "rgba(212,175,55,0.8)" }} />
+          <span
+            className="font-mono"
+            style={{ fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(212,175,55,0.65)" }}
+          >
+            {index}
+          </span>
+        </div>
+      )}
+      <h2
+        className="font-display text-2xl md:text-[26px] tracking-wide font-semibold"
+        style={{
+          background:
+            "linear-gradient(168deg, hsl(42 45% 96%) 0%, hsl(44 55% 84%) 45%, hsl(46 65% 58%) 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+        }}
+      >
+        {children}
+      </h2>
+      {/* Drafted rule - draws in like a measurement line */}
+      <motion.div
+        aria-hidden
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+        style={{
+          height: 1,
+          marginTop: 10,
+          transformOrigin: "left center",
+          background:
+            "linear-gradient(90deg, rgba(212,175,55,0.55), rgba(212,175,55,0.12) 60%, transparent)",
+        }}
+      />
+    </div>
   );
 }
 
