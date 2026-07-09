@@ -16,8 +16,8 @@ export default function ExperienceSection() {
         {experiences.map((exp, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.12, duration: 0.5, ease: [0.22, 0.68, 0, 1.0] }}
             className="fx-glass fx-card rounded-lg p-5 relative overflow-hidden"
           >

@@ -6,55 +6,63 @@
 @tailwind utilities;
 
 @layer base {
+  /* ══════════════════════════════════════════════════════════════════════
+   * ISOTHERM — the single design system. Obsidian + warm ivory, one
+   * precious-metal accent (champagne), copper as the only counterpoint.
+   * Every shadcn token points into this palette so the entire component
+   * tree speaks one language. No teal, no magenta, no neon green.
+   * ══════════════════════════════════════════════════════════════════════ */
   :root {
-    --background: 220 20% 4%;
-    --foreground: 210 20% 92%;
+    --background: 260 27% 2%;          /* obsidian #050407 */
+    --foreground: 42 40% 90%;          /* warm ivory #F0EADC */
 
-    --card: 220 18% 7%;
-    --card-foreground: 210 20% 92%;
+    --card: 258 20% 6%;                /* surface-1 */
+    --card-foreground: 42 40% 90%;
 
-    --popover: 220 18% 7%;
-    --popover-foreground: 210 20% 92%;
+    --popover: 258 20% 6%;
+    --popover-foreground: 42 40% 90%;
 
-    --primary: 170 80% 50%;
-    --primary-foreground: 220 20% 4%;
+    --primary: 46 65% 52%;             /* champagne #D4AF37 */
+    --primary-foreground: 260 27% 4%;
 
-    --secondary: 220 16% 14%;
-    --secondary-foreground: 210 20% 85%;
+    --secondary: 254 18% 11%;          /* surface-2, violet-warm slate */
+    --secondary-foreground: 40 24% 82%;
 
-    --muted: 220 14% 12%;
-    --muted-foreground: 215 12% 50%;
+    --muted: 256 16% 9%;
+    --muted-foreground: 38 11% 62%;    /* warm stone #A8A092 */
 
-    --accent: 280 70% 60%;
-    --accent-foreground: 210 20% 95%;
+    --accent: 29 57% 46%;              /* copper #B87333 — counterpoint only */
+    --accent-foreground: 42 40% 94%;
 
-    --destructive: 0 72% 55%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 65% 52%;
+    --destructive-foreground: 42 40% 96%;
 
-    --border: 220 16% 16%;
-    --input: 220 16% 16%;
-    --ring: 170 80% 50%;
+    --border: 36 12% 15%;              /* warm hairline #2E2A24 */
+    --input: 36 12% 15%;
+    --ring: 46 65% 52%;
 
     --radius: 0.5rem;
 
-    --neon-cyan: 170 80% 50%;
-    --neon-magenta: 310 80% 60%;
-    --neon-amber: 38 90% 55%;
-    --neon-green: 142 70% 50%;
-    --neon-red: 0 72% 55%;
+    /* Legacy neon slots — remapped into the metal family so every component
+     * that still references "neon-*" automatically speaks Isotherm. */
+    --neon-cyan: 46 65% 52%;           /* → champagne */
+    --neon-magenta: 29 57% 46%;        /* → copper */
+    --neon-amber: 42 78% 57%;          /* → caution gold */
+    --neon-green: 158 32% 52%;         /* → muted jade (status only) */
+    --neon-red: 0 65% 52%;
 
-    --panel: 220 18% 6%;
-    --panel-border: 220 16% 14%;
-    --panel-highlight: 220 16% 10%;
+    --panel: 260 24% 3%;
+    --panel-border: 36 12% 14%;
+    --panel-highlight: 254 18% 8%;
 
-    --sidebar-background: 220 20% 4%;
-    --sidebar-foreground: 210 20% 85%;
-    --sidebar-primary: 170 80% 50%;
-    --sidebar-primary-foreground: 220 20% 4%;
-    --sidebar-accent: 220 16% 10%;
-    --sidebar-accent-foreground: 210 20% 85%;
-    --sidebar-border: 220 16% 14%;
-    --sidebar-ring: 170 80% 50%;
+    --sidebar-background: 260 27% 2%;
+    --sidebar-foreground: 40 24% 82%;
+    --sidebar-primary: 46 65% 52%;
+    --sidebar-primary-foreground: 260 27% 4%;
+    --sidebar-accent: 254 18% 8%;
+    --sidebar-accent-foreground: 40 24% 82%;
+    --sidebar-border: 36 12% 14%;
+    --sidebar-ring: 46 65% 52%;
   }
 }
 
@@ -368,23 +376,26 @@
   animation: thermal-pulse 2s ease-out infinite;
 }
 
-/* Neon glow effects */
+/* Legacy "neon" classes — now restrained metal. Glow is nearly gone: luxury
+ * type carries itself without halos. */
 .neon-text-cyan {
-  text-shadow: 0 0 6px hsl(var(--neon-cyan) / 0.35), 0 0 18px hsl(var(--neon-cyan) / 0.12);
+  text-shadow: 0 0 14px hsl(var(--neon-cyan) / 0.14);
 }
 
 .neon-text-magenta {
-  text-shadow: 0 0 6px hsl(var(--neon-magenta) / 0.35), 0 0 18px hsl(var(--neon-magenta) / 0.12);
+  text-shadow: 0 0 14px hsl(var(--neon-magenta) / 0.14);
 }
 
 .neon-border {
-  box-shadow: inset 0 0 12px hsl(var(--neon-cyan) / 0.03), 0 0 8px hsl(var(--neon-cyan) / 0.06);
+  box-shadow: inset 0 1px 0 rgba(240, 234, 220, 0.05), 0 0 0 0.5px hsl(var(--neon-cyan) / 0.08);
 }
 
 .panel-glass {
-  background: linear-gradient(135deg, hsl(var(--panel) / 0.9), hsl(var(--panel) / 0.7));
-  backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, hsl(258 20% 5% / 0.92), hsl(260 24% 3% / 0.96));
   border: 1px solid hsl(var(--panel-border));
+  box-shadow:
+    inset 0 1px 0 rgba(240, 234, 220, 0.045),
+    0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -418,15 +429,17 @@
 .fx-orb-b { animation: fx-orb-b 26s ease-in-out infinite; }
 .fx-orb-c { animation: fx-orb-c 32s ease-in-out infinite; }
 
-/* Heavier glass — for content cards that should float above the orb layer */
+/* Machined surface — was glassmorphism; now a solid, warm, watch-dial card.
+ * No backdrop-filter (it was both the plastic look AND a jank source).
+ * The material: near-black warm surface, hairline warm border, a 1px ivory
+ * inset highlight along the top edge (light catching a machined bevel). */
 .fx-glass {
-  background: rgba(12, 16, 24, 0.62);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, hsl(256 18% 6% / 0.92), hsl(258 22% 4% / 0.96));
+  border: 1px solid hsl(36 12% 15%);
   box-shadow:
-    inset 0 0 0 0.5px rgba(255, 255, 255, 0.04),
-    0 8px 32px rgba(0, 0, 0, 0.35);
+    inset 0 1px 0 rgba(240, 234, 220, 0.055),
+    inset 0 0 0 0.5px rgba(212, 175, 55, 0.03),
+    0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
 /* Gradient text fills (cyan, magenta, amber, green) */
@@ -440,36 +453,39 @@
   background-clip: text;
 }
 .fx-grad-text-magenta {
+  /* copper */
   background: linear-gradient(120deg,
-    hsl(310 90% 70%) 0%,
-    hsl(310 80% 60%) 50%,
-    hsl(290 70% 60%) 100%);
+    hsl(29 62% 58%) 0%,
+    hsl(29 57% 46%) 50%,
+    hsl(22 52% 42%) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 .fx-grad-text-green {
+  /* champagne — same metal as cyan; "green" kept only as a legacy alias */
   background: linear-gradient(120deg,
-    hsl(142 80% 60%) 0%,
-    hsl(142 70% 50%) 50%,
-    hsl(155 65% 55%) 100%);
+    hsl(46 72% 62%) 0%,
+    hsl(46 65% 52%) 50%,
+    hsl(36 58% 46%) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 .fx-grad-text-amber {
   background: linear-gradient(120deg,
-    hsl(38 100% 65%) 0%,
-    hsl(38 90% 55%) 50%,
-    hsl(28 85% 60%) 100%);
+    hsl(42 82% 62%) 0%,
+    hsl(42 78% 55%) 50%,
+    hsl(32 70% 50%) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 .fx-grad-text-platinum {
+  /* warm platinum — ivory catching light */
   background: linear-gradient(135deg,
-    hsl(210 20% 95%) 0%,
-    hsl(210 14% 70%) 100%);
+    hsl(42 40% 96%) 0%,
+    hsl(40 18% 72%) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -490,12 +506,12 @@
   inset: 0;
   background: linear-gradient(
     105deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.06) 50%,
-    transparent 70%
+    transparent 35%,
+    rgba(240, 234, 220, 0.035) 50%,
+    transparent 65%
   );
   background-size: 200%;
-  animation: fx-shimmer 2.8s linear infinite;
+  animation: fx-shimmer 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   pointer-events: none;
   z-index: 1;
 }
@@ -539,21 +555,20 @@
   z-index: 2;
 }
 
-/* Blur-in reveal (use on first paint or scroll trigger) */
+/* Reveal (transform/opacity only — no filter blur: it forces expensive
+ * repaints and reads as smeary rather than precise) */
 @keyframes fx-blur-in {
   from {
-    filter: blur(6px);
     opacity: 0;
-    transform: translateY(18px) scale(.99);
+    transform: translateY(14px);
   }
   to {
-    filter: blur(0);
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 .fx-blur-reveal {
-  animation: fx-blur-in .65s cubic-bezier(.22, .68, 0, 1.2) both;
+  animation: fx-blur-in .6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Reduced motion — kill all FX animations */

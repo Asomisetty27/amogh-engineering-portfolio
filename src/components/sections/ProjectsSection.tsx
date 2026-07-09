@@ -299,7 +299,7 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
                 />
               </motion.div>
             ) : (
-              <motion.div key={selectedProject.id + "-brief"} initial={{ opacity: 0, filter: "blur(4px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(4px)" }} transition={{ duration: 0.32, ease: [0.22, 0.68, 0, 1.0] }}>
+              <motion.div key={selectedProject.id + "-brief"} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}>
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
                   <div className="lg:col-span-3 fx-glass rounded-lg overflow-hidden relative">
                     {/* Top accent line */}

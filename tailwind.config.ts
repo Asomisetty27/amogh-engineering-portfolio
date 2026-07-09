@@ -14,9 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Satoshi", "Inter", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
-        display: ["Space Grotesk", "sans-serif"],
+        display: ["Clash Display", "Satoshi", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

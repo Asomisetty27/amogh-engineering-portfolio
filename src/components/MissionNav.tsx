@@ -61,12 +61,12 @@ function MagneticNavButton({
       {isActive && (
         <motion.div
           layoutId="nav-indicator"
-          className="absolute bottom-0 left-1 right-1 h-0.5 rounded-full"
+          className="absolute bottom-0 left-1 right-1 rounded-full"
           style={{
-            background: "linear-gradient(90deg, transparent, hsl(var(--primary)), transparent)",
-            boxShadow: "0 0 8px hsl(var(--primary) / 0.5)",
+            height: 1.5,
+            background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.9), transparent)",
           }}
-          transition={{ duration: 0.25, ease: [0.22, 0.68, 0, 1.0] }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         />
       )}
     </motion.button>
@@ -94,11 +94,11 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
       <nav
         className="no-print fixed top-0 left-0 right-0 z-40"
         style={{
-          background: "rgba(8, 10, 14, 0.78)",
-          backdropFilter: "blur(20px) saturate(160%)",
-          WebkitBackdropFilter: "blur(20px) saturate(160%)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
-          boxShadow: "0 1px 0 rgba(255, 255, 255, 0.04), 0 8px 24px rgba(0, 0, 0, 0.2)",
+          background: "rgba(5, 4, 7, 0.82)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+          borderBottom: "1px solid rgba(212, 175, 55, 0.09)",
+          boxShadow: "0 1px 0 rgba(240, 234, 220, 0.03), 0 8px 24px rgba(0, 0, 0, 0.3)",
         }}
       >
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">

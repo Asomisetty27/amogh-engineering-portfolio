@@ -8,8 +8,6 @@ import ExperienceSection from "@/components/sections/ExperienceSection";
 import SkillsSection from "@/components/sections/SkillsSection";
 import ContactSection from "@/components/sections/ContactSection";
 import QuickviewSection from "@/components/sections/QuickviewSection";
-import GradientOrbs from "@/components/visual/GradientOrbs";
-import FilmGrain from "@/components/visual/FilmGrain";
 import ThermalField from "@/components/visual/ThermalField";
 import CursorHeat from "@/components/visual/CursorHeat";
 import CommandPalette from "@/components/CommandPalette";
@@ -47,29 +45,33 @@ export default function Index() {
     <ViewModeProvider>
       {booted && (
         <div className="min-h-screen bg-background relative">
-          {/* Ambient layers */}
+          {/* Ambient layers — exactly two: the thermal-field signature and the
+              cursor heat trail. Everything else (orbs, grain, teal grid) is
+              gone; restraint is the material. */}
           <ThermalField />
           <CursorHeat />
-          <GradientOrbs variant="mixed" fixed />
-          <FilmGrain fixed opacity={0.02} />
 
-          {/* Subtle background grid (kept — adds technical credibility above orbs) */}
+          {/* Blueprint grid — champagne ink at drafting-table density */}
           <div
-            className="fixed inset-0 pointer-events-none opacity-[0.04]"
+            className="fixed inset-0 pointer-events-none"
             style={{
               zIndex: 1,
-              backgroundImage: `linear-gradient(hsl(var(--primary) / 0.25) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary) / 0.25) 1px, transparent 1px)`,
-              backgroundSize: "60px 60px",
+              backgroundImage:
+                `linear-gradient(rgba(212,175,55,0.045) 1px, transparent 1px),` +
+                `linear-gradient(90deg, rgba(212,175,55,0.045) 1px, transparent 1px)`,
+              backgroundSize: "96px 96px",
+              maskImage: "radial-gradient(ellipse 90% 80% at 50% 20%, black 0%, rgba(0,0,0,0.35) 60%, transparent 95%)",
+              WebkitMaskImage: "radial-gradient(ellipse 90% 80% at 50% 20%, black 0%, rgba(0,0,0,0.35) 60%, transparent 95%)",
             }}
           />
 
-          {/* Vignette — top + bottom fade so orbs blend smoothly */}
+          {/* Vignette — settles the edges like a lens */}
           <div
             className="fixed inset-0 pointer-events-none"
             style={{
               zIndex: 1,
               background:
-                "radial-gradient(ellipse 100% 60% at center, transparent 0%, transparent 60%, rgba(0,0,0,0.4) 100%)",
+                "radial-gradient(ellipse 100% 70% at center, transparent 0%, transparent 55%, rgba(0,0,0,0.5) 100%)",
             }}
           />
 
@@ -80,10 +82,10 @@ export default function Index() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeSection}
-                initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -12, filter: "blur(4px)" }}
-                transition={{ duration: 0.32, ease: [0.22, 0.68, 0, 1.0] }}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               >
                 {renderSection()}
               </motion.div>

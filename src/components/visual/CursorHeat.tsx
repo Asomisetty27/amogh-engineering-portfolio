@@ -2,8 +2,9 @@ import { useEffect } from "react";
 import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
 
 /**
- * Signature interaction: a faint heat-glow that trails the cursor (teal->amber,
- * the Theta thermal palette). Implemented as a fixed-size element moved by GPU
+ * Signature interaction: a faint heat-glow that trails the cursor (ivory-hot
+ * center cooling to champagne — the Isotherm thermal palette). Implemented as
+ * a fixed-size element moved by GPU
  * transform (x/y) over a STATIC gradient — not a per-frame fullscreen repaint —
  * so it stays smooth and doesn't starve scroll/reveal animations.
  * Pointer-only (hidden on touch), disabled under prefers-reduced-motion.
@@ -41,7 +42,7 @@ export default function CursorHeat() {
         y: sy,
         borderRadius: "9999px",
         background:
-          "radial-gradient(circle, rgba(53,199,146,0.07), rgba(212,175,55,0.035) 42%, transparent 70%)",
+          "radial-gradient(circle, rgba(240,220,160,0.055), rgba(212,175,55,0.03) 45%, transparent 70%)",
         willChange: "transform",
       }}
     />

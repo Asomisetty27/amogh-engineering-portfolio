@@ -32,8 +32,8 @@ const PIPE = [
 ];
 
 const STATES = [
-  { state: "Under load", rtheta: 0.72, fill: "#35C792" },
-  { state: "Clean idle", rtheta: 1.28, fill: "#7FA8C9" },
+  { state: "Under load", rtheta: 0.72, fill: "#D4AF37" },
+  { state: "Clean idle", rtheta: 1.28, fill: "#D8D2C2" },
   { state: "CUDA zombie", rtheta: 2.1, fill: "#E0A33E" },
 ];
 
@@ -46,7 +46,7 @@ const FLAGGED = [
 function ChartCard({ title, sub, children, foot }: { title: string; sub: string; children: ReactNode; foot?: string }) {
   return (
     <motion.div whileHover={{ y: -3 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className="fx-glass rounded-lg p-4 relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(53,199,146,.35), transparent)" }} />
+      <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(212,175,55,.35), transparent)" }} />
       <div className="flex items-baseline justify-between mb-2">
         <h4 className="text-sm font-semibold text-foreground leading-tight">{title}</h4>
         <span className="text-[10px] font-mono text-muted-foreground">{sub}</span>
@@ -79,9 +79,9 @@ export default function ThetaFlagshipVisuals() {
                 whileHover={{ scale: 1.04 }}
                 transition={{ type: "spring", stiffness: 400, damping: 18 }}
                 className="flex-1 rounded-md px-3 py-2 border cursor-default"
-                style={{ borderColor: "rgba(53,199,146,0.22)", background: "linear-gradient(135deg, rgba(15,110,86,0.12) 0%, transparent 100%)" }}
+                style={{ borderColor: "rgba(201,168,76,0.24)", background: "linear-gradient(135deg, rgba(138,111,46,0.12) 0%, transparent 100%)" }}
               >
-                <div className="text-[11px] font-mono text-[#9FE1CB] leading-tight">{n.k}</div>
+                <div className="text-[11px] font-mono text-[#EAD9A0] leading-tight">{n.k}</div>
                 <div className="text-[10px] text-muted-foreground leading-tight mt-0.5">{n.d}</div>
               </motion.div>
               {i < PIPE.length - 1 && (
@@ -122,7 +122,7 @@ export default function ThetaFlagshipVisuals() {
             <ScatterChart margin={{ top: 18, right: 16, left: -14, bottom: 0 }}>
               <XAxis type="number" dataKey="x" hide domain={[0, 4]} />
               <YAxis type="number" dataKey="z" tick={{ fontSize: 10, fill: "#8a8f98" }} axisLine={false} tickLine={false} domain={[-2, 18]} ticks={[0, 5, 10, 15]} />
-              <ReferenceArea y1={-3} y2={3} fill="#35C792" fillOpacity={0.1} />
+              <ReferenceArea y1={-3} y2={3} fill="#D4AF37" fillOpacity={0.08} />
               <ReferenceLine y={3} stroke="#E0A33E" strokeDasharray="3 3" />
               <Scatter data={FLAGGED} fill="#E0A33E" isAnimationActive={false}>
                 <LabelList dataKey="gpu" position="right" style={{ fontSize: 9, fill: "#E0A33E" }} />

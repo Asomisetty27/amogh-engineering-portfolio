@@ -115,7 +115,7 @@ export default function CommandPalette({ onNavigate }: { onNavigate: (id: string
             onMouseDown={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5">
-              <Search size={14} className="text-[#35C792]" />
+              <Search size={14} className="text-primary" />
               <input
                 ref={inputRef}
                 value={q}
@@ -149,7 +149,7 @@ export default function CommandPalette({ onNavigate }: { onNavigate: (id: string
                     <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
                       {it.kind === "link" ? "open" : "go"}
                     </span>
-                    {idx === active && <CornerDownLeft size={12} className="text-[#35C792]" />}
+                    {idx === active && <CornerDownLeft size={12} className="text-primary" />}
                   </span>
                 </button>
               ))}

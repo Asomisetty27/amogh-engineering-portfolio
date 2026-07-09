@@ -9,24 +9,26 @@ import HeroHeader from "@/components/sections/HeroHeader";
 import TiltCard from "@/components/ui/TiltCard";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
+// One accent. The cards differ by index numeral, not by hue — the luxury
+// move is repetition with discipline, not a rainbow.
 const strengths = [
   {
+    index: "01",
     title: "Hardware & Embedded",
     description: "Carrier-board and sensor-module design for NVIDIA Jetson AGX Orin (Poly UAS), analog signal chains, PCB design and reflow, and embedded C++ for real-time sensing and control",
     icon: Radio,
-    color: "neon-cyan",
   },
   {
+    index: "02",
     title: "Digital & Computer Architecture",
     description: "A RISC-V CPU built from logic gates up, FPGA synthesis (Vivado), FSM and HDL design, and computer-architecture fundamentals",
     icon: Cpu,
-    color: "neon-magenta",
   },
   {
+    index: "03",
     title: "Software, Data & ML",
     description: "Python, statistical modeling, and Theta, a self-built open-source GPU-reliability tool (NVML/DCGM, peer-relative anomaly detection) shipped on PyPI",
     icon: Zap,
-    color: "neon-green",
   },
 ];
 
@@ -49,46 +51,67 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
         {/* Hero */}
         <HeroHeader />
 
-        {/* Value Proposition — glass + accent line */}
-        <div className="fx-glass rounded-lg p-5 mb-8 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-1 h-full"
+        {/* Value proposition — an editorial lede, not a boxed paragraph.
+            Display type at reading scale with a champagne rule: the sentence
+            IS the design element. */}
+        <div className="relative pl-5 mb-12" style={{ maxWidth: "56rem" }}>
+          <div className="absolute top-1 bottom-1 left-0 w-px"
             style={{
-              background: "linear-gradient(180deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.2) 100%)",
+              background: "linear-gradient(180deg, rgba(212,175,55,0.7) 0%, rgba(212,175,55,0.15) 100%)",
             }}
           />
-          <p className="text-sm leading-relaxed text-secondary-foreground pl-1">
-            I'm an electrical engineer who works the full GPU stack: I built Theta (<span className="font-mono text-primary">pip install runtheta</span>), an open-source GPU-reliability tool that blind-flagged degraded units across 72 production H100s at Princeton — a flag Princeton's own diagnostics independently re-confirmed months later at +47.8% thermal resistance. On the hardware side I design Jetson AGX Orin carrier boards and sensor modules for Cal Poly's autonomous drone team, and I've built a RISC-V CPU from the RTL up. What ties it together is measurement discipline: knowing when a number is real. Seeking a Fall 2026 GPU / ML-hardware co-op or internship.
+          <p
+            style={{
+              fontFamily: "var(--t-font-ui)",
+              fontSize: "clamp(15px, 1.7vw, 18px)",
+              lineHeight: 1.65,
+              fontWeight: 400,
+              color: "var(--t-text)",
+            }}
+          >
+            I'm an electrical engineer who works the full GPU stack: I built Theta (<span className="font-mono text-primary" style={{ fontSize: "0.85em" }}>pip install runtheta</span>), an open-source GPU-reliability tool that blind-flagged degraded units across 72 production H100s at Princeton — a flag Princeton's own diagnostics independently re-confirmed months later at +47.8% thermal resistance. On the hardware side I design Jetson AGX Orin carrier boards and sensor modules for Cal Poly's autonomous drone team, and I've built a RISC-V CPU from the RTL up. What ties it together is measurement discipline: <em style={{ color: "hsl(46 65% 62%)", fontStyle: "normal" }}>knowing when a number is real</em>. Seeking a Fall 2026 GPU / ML-hardware co-op or internship.
           </p>
         </div>
 
-        {/* 3 Core Strengths — fx-card hover + top radial glow */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
+        {/* 3 Core Strengths — one material, indexed like chapters */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-12">
           {strengths.map((s, i) => {
             const Icon = s.icon;
             return (
               <motion.div
                 key={s.title}
-                initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ delay: 0.1 + i * 0.08, duration: 0.5, ease: [0.22, 0.68, 0, 1.0] }}
-                className="fx-card fx-glass rounded-lg p-4 relative overflow-hidden cursor-default"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.12 + i * 0.09, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                className="fx-card fx-glass rounded-lg p-5 relative overflow-hidden cursor-default"
               >
-                {/* Top accent line */}
+                {/* Champagne hairline along the top */}
                 <div className="absolute top-0 left-0 right-0 h-px"
                   style={{
-                    background: `linear-gradient(90deg, transparent, hsl(var(--${s.color})) 50%, transparent)`,
-                  }}
-                />
-                {/* Radial glow from top */}
-                <div className="absolute top-0 left-0 right-0 h-20 pointer-events-none"
-                  style={{
-                    background: `radial-gradient(ellipse 60% 100% at 50% 0%, hsl(var(--${s.color}) / 0.08), transparent)`,
+                    background: "linear-gradient(90deg, transparent, rgba(212,175,55,0.4) 50%, transparent)",
                   }}
                 />
                 <div className="relative">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Icon size={16} style={{ color: `hsl(var(--${s.color}))` }} />
-                    <span className="text-sm font-semibold text-foreground">{s.title}</span>
+                  <div className="flex items-start justify-between mb-3">
+                    <Icon size={16} style={{ color: "var(--t-healthy)" }} strokeWidth={1.75} />
+                    <span
+                      className="t-mono-xs t-tabular"
+                      style={{ color: "var(--t-faint)", letterSpacing: "0.12em" }}
+                    >
+                      {s.index}
+                    </span>
+                  </div>
+                  <div
+                    className="mb-2"
+                    style={{
+                      fontFamily: "var(--t-font-display)",
+                      fontSize: 16,
+                      fontWeight: 500,
+                      letterSpacing: "-0.01em",
+                      color: "var(--t-text)",
+                    }}
+                  >
+                    {s.title}
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">{s.description}</p>
                 </div>
@@ -100,7 +123,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
         {/* Flagship Project — Theta (self-built standout) */}
         <div className="flex items-center gap-2 mb-3">
           <span className="inline-block w-1.5 h-1.5 rounded-full animate-glow-pulse"
-            style={{ background: "#35C792", boxShadow: "0 0 8px #35C792" }} />
+            style={{ background: "var(--t-healthy)", boxShadow: "0 0 8px rgba(212,175,55,0.55)" }} />
           <h3 className="text-xs font-mono font-semibold tracking-wider uppercase fx-grad-text-green">
             Flagship Project
           </h3>
@@ -119,14 +142,14 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
             return (
               <motion.div
                 key={p.id}
-                initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ delay: 0.2 + i * 0.08, duration: 0.5, ease: [0.22, 0.68, 0, 1.0] }}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + i * 0.09, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               >
                 <TiltCard
                   className="fx-glass rounded-lg p-4 cursor-pointer group relative overflow-hidden h-full"
                   onClick={() => onNavigateToProject?.(p.id)}
-                  maxDeg={8}
+                  maxDeg={3.5}
                 >
                   {/* Top accent line */}
                   <div className="absolute top-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"

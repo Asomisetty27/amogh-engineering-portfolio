@@ -10,7 +10,9 @@ interface Props {
   style?: React.CSSProperties;
 }
 
-export default function TiltCard({ children, className, onClick, maxDeg = 9, style }: Props) {
+// Default tilt is deliberately shallow — luxury objects are heavy; they lean,
+// they don't flap.
+export default function TiltCard({ children, className, onClick, maxDeg = 3.5, style }: Props) {
   const { ref, tiltStyle, onMouseMove, onMouseLeave } = useTilt(maxDeg);
 
   return (
