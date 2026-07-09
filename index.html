@@ -20,6 +20,19 @@
 
     <link rel="canonical" href="https://www.amogh.site/" />
 
+    <!-- Fonts — linked in the head (not CSS @import) so discovery starts
+         immediately instead of after the stylesheet chain. display=swap keeps
+         text visible; preconnect shaves the TLS round-trips. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://api.fontshare.com" />
+    <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=clash-display@500,600,700&display=swap" rel="stylesheet" />
+
+    <!-- The ambient thermal-field backdrop — start fetching before JS runs -->
+    <link rel="preload" as="image" href="/generated/thermal-hero.webp" fetchpriority="low" />
+
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",

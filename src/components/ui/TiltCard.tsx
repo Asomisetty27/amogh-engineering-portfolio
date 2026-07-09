@@ -23,6 +23,9 @@ export default function TiltCard({ children, className, onClick, maxDeg = 3.5, s
       onMouseLeave={onMouseLeave}
       onClick={onClick}
       className={className}
+      // Tactile press for clickable cards — a firm, quick settle
+      whileTap={onClick ? { scale: 0.985 } : undefined}
+      transition={{ type: "spring", stiffness: 480, damping: 32 }}
     >
       {children}
     </motion.div>

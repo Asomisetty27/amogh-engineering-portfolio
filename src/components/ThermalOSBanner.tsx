@@ -14,9 +14,10 @@ export default function ThermalOSBanner() {
   };
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, ease: [0.22, 0.68, 0, 1.0] }}
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       className="fx-glass relative rounded-lg p-5 mb-8 overflow-hidden hover:-translate-y-0.5 transition-transform duration-300"
       style={{
         borderLeft: "2px solid #8A6F2E",

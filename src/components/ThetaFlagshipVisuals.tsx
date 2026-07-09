@@ -63,7 +63,7 @@ export default function ThetaFlagshipVisuals() {
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.5, ease: [0.22, 0.68, 0, 1.0] }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className="mb-10"
     >
       <h3 className="text-xs font-mono font-semibold tracking-wider uppercase mb-3 fx-grad-text-green">

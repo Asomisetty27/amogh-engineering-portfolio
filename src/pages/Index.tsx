@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import MissionNav from "@/components/MissionNav";
 import { ViewModeProvider } from "@/contexts/ViewModeContext";
@@ -21,6 +21,13 @@ export default function Index() {
     setTargetProjectId(projectId);
     setActiveSection("projects");
   }, []);
+
+  // Every tab lands at its own top. Instant (not smooth-scrolled): the exit/
+  // enter animation is the transition — a competing scroll tween underneath
+  // it reads as two things happening at once.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  }, [activeSection]);
 
   const renderSection = () => {
     switch (activeSection) {
@@ -83,9 +90,18 @@ export default function Index() {
               <motion.div
                 key={activeSection}
                 initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] },
+                }}
+                exit={{
+                  opacity: 0,
+                  y: -6,
+                  // Exit fast — mode="wait" serializes exit→enter, so a long
+                  // exit is pure dead time between tabs.
+                  transition: { duration: 0.16, ease: [0.4, 0, 1, 1] },
+                }}
               >
                 {renderSection()}
               </motion.div>

@@ -1,5 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=clash-display@500,600,700&display=swap');
+/* Fonts are linked from index.html <head> (preconnect + <link>) so the
+ * browser discovers them immediately — @import here would serialize them
+ * behind the compiled stylesheet and cause a late swap on the display type. */
 
 @tailwind base;
 @tailwind components;
@@ -72,6 +73,17 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
+  }
+  /* Keyboard focus — a precise champagne ring, only for keyboard users.
+   * Mouse clicks never flash it. */
+  :focus-visible {
+    outline: 1.5px solid hsl(46 65% 52% / 0.75);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: hsl(46 65% 52% / 0.25);
+    color: hsl(42 40% 96%);
   }
 }
 

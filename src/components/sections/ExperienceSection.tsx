@@ -17,8 +17,9 @@ export default function ExperienceSection() {
           <motion.div
             key={i}
             initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.12, duration: 0.5, ease: [0.22, 0.68, 0, 1.0] }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ delay: Math.min(i * 0.08, 0.24), duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
             className="fx-glass fx-card rounded-lg p-5 relative overflow-hidden"
           >
             {/* Top accent line */}

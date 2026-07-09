@@ -26,7 +26,8 @@ const CFRPComparison = lazy(() => import("@/components/materials/CFRPComparison"
 const DroneSystemHologram = lazy(() => import("@/components/holograms/DroneSystemHologram"));
 
 import RecruiterProjectView from "@/components/sections/RecruiterProjectView";
-import ThetaFlagshipVisuals from "@/components/ThetaFlagshipVisuals";
+// Lazy: pulls in recharts — must never sit in the initial bundle.
+const ThetaFlagshipVisuals = lazy(() => import("@/components/ThetaFlagshipVisuals"));
 
 type DetailTab = "brief" | "subsystems";
 
@@ -230,7 +231,11 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
           )}
 
           {/* Flagship visuals for Theta (architecture + results, in place of a 3D hologram) */}
-          {selectedProject.id === "theta-thermalos" && <ThetaFlagshipVisuals />}
+          {selectedProject.id === "theta-thermalos" && (
+            <Suspense fallback={<div style={{ minHeight: 560 }} aria-hidden />}>
+              <ThetaFlagshipVisuals />
+            </Suspense>
+          )}
 
           {/* RGM full view button, shimmer + gradient */}
           {selectedProject.id === "rgm-machine" && (

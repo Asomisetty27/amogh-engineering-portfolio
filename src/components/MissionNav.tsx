@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useViewMode } from "@/contexts/ViewModeContext";
 import {
   Compass, Rocket, Briefcase, Cpu, Mail, FileText,
@@ -162,35 +162,41 @@ export default function MissionNav({ activeSection, onNavigate }: MissionNavProp
           </div>
         </div>
 
-        {/* Mobile menu */}
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="md:hidden border-t border-panel-border bg-panel px-4 py-3 space-y-1"
-          >
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    onNavigate(item.id);
-                    setMobileOpen(false);
-                  }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-sm font-mono rounded ${
-                    activeSection === item.id
-                      ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <Icon size={14} />
-                  {item.label}
-                </button>
-              );
-            })}
-          </motion.div>
-        )}
+        {/* Mobile menu — enters AND exits smoothly (height-collapsed) */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              className="md:hidden border-t border-panel-border bg-panel overflow-hidden"
+            >
+              <div className="px-4 py-3 space-y-1">
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        onNavigate(item.id);
+                        setMobileOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm font-mono rounded ${
+                        activeSection === item.id
+                          ? "text-primary bg-primary/10"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <Icon size={14} />
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
     </>
   );

@@ -20,7 +20,7 @@ export default function ContactSection() {
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 0.68, 0, 1.0] }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className="fx-glass rounded-lg p-6 space-y-4 relative overflow-hidden"
       >
         {/* Subtle accent glow at top */}

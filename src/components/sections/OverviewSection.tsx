@@ -1,13 +1,25 @@
+import { lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { personalInfo, projects } from "@/data/portfolioData";
 import { recruiterSummaries } from "@/data/interviewData";
 import { useViewMode } from "@/contexts/ViewModeContext";
 import { Cpu, Radio, Zap, ArrowRight, Shield } from "lucide-react";
 import ThermalOSBanner from "@/components/ThermalOSBanner";
-import ThetaFlagshipVisuals from "@/components/ThetaFlagshipVisuals";
 import HeroHeader from "@/components/sections/HeroHeader";
 import TiltCard from "@/components/ui/TiltCard";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+
+// The flagship charts pull in recharts (~380 KB pre-gzip) — lazy-loaded so
+// first paint never waits on it. The fallback reserves space to avoid layout
+// shift when the chunk lands.
+const ThetaFlagshipVisuals = lazy(() => import("@/components/ThetaFlagshipVisuals"));
+
+// House reveal: triggers when scrolled into view, once, with the settle ease.
+const REVEAL = {
+  initial: { opacity: 0, y: 18 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-60px" },
+  transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const },
+};
 
 // One accent. The cards differ by index numeral, not by hue — the luxury
 // move is repetition with discipline, not a rainbow.
@@ -121,21 +133,23 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
         </div>
 
         {/* Flagship Project — Theta (self-built standout) */}
-        <div className="flex items-center gap-2 mb-3">
+        <motion.div {...REVEAL} className="flex items-center gap-2 mb-3">
           <span className="inline-block w-1.5 h-1.5 rounded-full animate-glow-pulse"
             style={{ background: "var(--t-healthy)", boxShadow: "0 0 8px rgba(212,175,55,0.55)" }} />
           <h3 className="text-xs font-mono font-semibold tracking-wider uppercase fx-grad-text-green">
             Flagship Project
           </h3>
-        </div>
+        </motion.div>
         <ThermalOSBanner />
 
-        <ThetaFlagshipVisuals />
+        <Suspense fallback={<div style={{ minHeight: 560 }} aria-hidden />}>
+          <ThetaFlagshipVisuals />
+        </Suspense>
 
         {/* Coursework & Hardware Systems — fx-card hover with shimmer */}
-        <h3 className="text-xs font-mono font-semibold tracking-wider uppercase mb-3 fx-grad-text-cyan">
+        <motion.h3 {...REVEAL} className="text-xs font-mono font-semibold tracking-wider uppercase mb-3 fx-grad-text-cyan">
           Hardware & Systems Foundation
-        </h3>
+        </motion.h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
           {topProjects.map((p, i) => {
             const summary = recruiterSummaries[p.id];
@@ -143,8 +157,9 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
               <motion.div
                 key={p.id}
                 initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + i * 0.09, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ delay: i * 0.07, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               >
                 <TiltCard
                   className="fx-glass rounded-lg p-4 cursor-pointer group relative overflow-hidden h-full"
@@ -182,7 +197,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
 
         {/* Engineer mode: evidence-backed competencies */}
         {mode === "engineer" && (
-          <div className="panel-glass rounded-lg p-6 mb-8">
+          <motion.div {...REVEAL} className="panel-glass rounded-lg p-6 mb-8">
             <h3 className="font-mono text-xs font-semibold tracking-wider text-muted-foreground uppercase mb-3 flex items-center gap-1.5">
               <Shield size={12} className="text-primary" /> Evidence-Backed Competencies
             </h3>
@@ -203,11 +218,11 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Additional */}
-        <div className="panel-glass rounded-lg p-5">
+        <motion.div {...REVEAL} className="panel-glass rounded-lg p-5">
           <h3 className="font-mono text-xs font-semibold tracking-wider text-muted-foreground uppercase mb-3">
             Additional
           </h3>
@@ -219,7 +234,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
               </li>
             ))}
           </ul>
-        </div>
+        </motion.div>
       </motion.div>
     </section>
   );
