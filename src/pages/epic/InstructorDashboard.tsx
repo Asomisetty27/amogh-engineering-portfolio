@@ -48,6 +48,7 @@ export default function InstructorDashboard() {
   const [groupCompleted, setGroupCompleted] = useState<Record<number, Set<string>>>({});
   const [restoreGroup, setRestoreGroup] = useState<number | null>(null);
   const [restoreBusy, setRestoreBusy] = useState<string | null>(null);
+  const [restoreError, setRestoreError] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [soundOn, setSoundOn] = useState(false);
   const [flashId, setFlashId] = useState<string | null>(null);
@@ -253,12 +254,24 @@ export default function InstructorDashboard() {
       next[g] = set;
       return next;
     });
-    if (already) {
-      await (supabase as any).from("group_completed")
-        .delete().eq("cohort", cohort).eq("group_no", g).eq("activity_id", activityId);
+    // Never swallow the write result: a silent RLS/schema failure here looks
+    // exactly like "the checkbox won't stick" and hides the real cause.
+    const { error } = already
+      ? await (supabase as any).from("group_completed")
+          .delete().eq("cohort", cohort).eq("group_no", g).eq("activity_id", activityId)
+      : await (supabase as any).from("group_completed")
+          .insert({ cohort, group_no: g, activity_id: activityId });
+    if (error) {
+      setGroupCompleted(curr => {
+        const next = { ...curr };
+        const set = new Set(next[g] ?? []);
+        already ? set.add(activityId) : set.delete(activityId);
+        next[g] = set;
+        return next;
+      });
+      setRestoreError(`Save failed - ${error.message}`);
     } else {
-      await (supabase as any).from("group_completed")
-        .insert({ cohort, group_no: g, activity_id: activityId });
+      setRestoreError(null);
     }
     setRestoreBusy(curr => curr === key ? null : curr);
   };
@@ -705,6 +718,12 @@ export default function InstructorDashboard() {
                 Check off whatever this group has already completed. This writes straight to the server, so their
                 helper page picks it up immediately - even on a brand new device.
               </p>
+              {restoreError && (
+                <p className="text-xs font-mono px-2.5 py-2 rounded border border-red-500/40 bg-red-500/10 text-red-300">
+                  {restoreError} - the change was rolled back. If this keeps happening the database policies are
+                  blocking writes; check the group_completed table.
+                </p>
+              )}
               {Object.keys(DAY_TITLES).map(k => {
                 const day = Number(k);
                 const acts = byDay[day] ?? [];
