@@ -42,6 +42,12 @@ export default function InstructorDashboard() {
   const [history, setHistory] = useState<HelpRow[]>([]);
   const [progress, setProgress] = useState<Record<number, ProgRow>>({});
   const [roster, setRoster] = useState<Record<number, string[]>>({});
+  // Per-group set of completed activity ids — the server record behind
+  // "restore progress" so a group can be brought back to where they were
+  // after a lost device or a wiped browser.
+  const [groupCompleted, setGroupCompleted] = useState<Record<number, Set<string>>>({});
+  const [restoreGroup, setRestoreGroup] = useState<number | null>(null);
+  const [restoreBusy, setRestoreBusy] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [soundOn, setSoundOn] = useState(false);
   const [flashId, setFlashId] = useState<string | null>(null);
@@ -67,16 +73,19 @@ export default function InstructorDashboard() {
     setCohort(c);
   };
 
-  // Initial load + realtime (re-runs on cohort switch)
+  // Initial load + realtime (re-runs on cohort switch). Realtime is the fast
+  // path; a short poll underneath is the fallback for when a channel silently
+  // drops — that's what "I have to manually refresh to see the queue" is.
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      const [{ data: reqs }, { data: progs }, { data: hist }, { data: rost }] = await Promise.all([
+    const loadAll = async () => {
+      const [{ data: reqs }, { data: progs }, { data: hist }, { data: rost }, { data: comp }] = await Promise.all([
         supabase.from("help_requests").select("*")
           .eq("cohort", cohort).eq("status", "open").order("created_at", { ascending: true }),
         supabase.from("group_progress").select("*").eq("cohort", cohort),
         supabase.from("help_requests").select("*").eq("cohort", cohort),
         (supabase as any).from("group_roster").select("*").eq("cohort", cohort),
+        (supabase as any).from("group_completed").select("group_no, activity_id").eq("cohort", cohort),
       ]);
       if (cancelled) return;
       setRequests((reqs ?? []) as HelpRow[]);
@@ -87,7 +96,12 @@ export default function InstructorDashboard() {
       const rmap: Record<number, string[]> = {};
       (rost ?? []).forEach((r: any) => { rmap[r.group_no] = (r.members as string[]) ?? []; });
       setRoster(rmap);
-    })();
+      const cmap: Record<number, Set<string>> = {};
+      (comp ?? []).forEach((c: any) => { (cmap[c.group_no] ||= new Set()).add(c.activity_id); });
+      setGroupCompleted(cmap);
+    };
+    loadAll();
+    const poll = setInterval(loadAll, 5000);
 
     const channel = supabase
       .channel(`epic-classroom-${cohort}`)
@@ -152,9 +166,23 @@ export default function InstructorDashboard() {
             setRoster(curr => ({ ...curr, [row.group_no]: row.members ?? [] }));
           }
         })
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "group_completed", filter: `cohort=eq.${cohort}` },
+        (payload) => {
+          const row = (payload.new ?? payload.old) as { group_no: number; activity_id: string };
+          if (!row) return;
+          setGroupCompleted(curr => {
+            const next = { ...curr };
+            const set = new Set(next[row.group_no] ?? []);
+            if (payload.eventType === "DELETE") set.delete(row.activity_id);
+            else set.add(row.activity_id);
+            next[row.group_no] = set;
+            return next;
+          });
+        })
       .subscribe();
 
-    return () => { cancelled = true; supabase.removeChannel(channel); };
+    return () => { cancelled = true; clearInterval(poll); supabase.removeChannel(channel); };
   }, [soundOn, cohort]);
 
   // Copyable per-cohort student link, e.g. https://amogh.site/epic?cohort=week2.
@@ -199,15 +227,40 @@ export default function InstructorDashboard() {
   // Hard reset: wipe ALL data for this cohort — requests, progress, rosters.
   // Use it to start a fresh session / new groups (the cohort label can be reused).
   const resetCohort = async () => {
-    if (!confirm(`Reset ${COHORT_LABEL[cohort]}? This permanently clears all help requests, progress, and rosters for this cohort. Use it to start a fresh session with new groups.`)) return;
+    if (!confirm(`Reset ${COHORT_LABEL[cohort]}? This permanently clears all help requests, progress, rosters, and completed-activity records for this cohort. Use it to start a fresh session with new groups.`)) return;
     setResetting(true);
     await Promise.all([
       supabase.from("help_requests").delete().eq("cohort", cohort),
       supabase.from("group_progress").delete().eq("cohort", cohort),
       (supabase as any).from("group_roster").delete().eq("cohort", cohort),
+      (supabase as any).from("group_completed").delete().eq("cohort", cohort),
     ]);
-    setRequests([]); setHistory([]); setProgress({}); setRoster({});
+    setRequests([]); setHistory([]); setProgress({}); setRoster({}); setGroupCompleted({});
     setResetting(false);
+  };
+
+  // Restore-progress checklist: instructor ticks/unticks any activity for a
+  // group, directly writing the server record a lost/wiped device would
+  // otherwise need to replay live to rebuild.
+  const toggleGroupActivity = async (g: number, activityId: string) => {
+    const already = groupCompleted[g]?.has(activityId);
+    const key = `${g}:${activityId}`;
+    setRestoreBusy(key);
+    setGroupCompleted(curr => {
+      const next = { ...curr };
+      const set = new Set(next[g] ?? []);
+      already ? set.delete(activityId) : set.add(activityId);
+      next[g] = set;
+      return next;
+    });
+    if (already) {
+      await (supabase as any).from("group_completed")
+        .delete().eq("cohort", cohort).eq("group_no", g).eq("activity_id", activityId);
+    } else {
+      await (supabase as any).from("group_completed")
+        .insert({ cohort, group_no: g, activity_id: activityId });
+    }
+    setRestoreBusy(curr => curr === key ? null : curr);
   };
 
   const sendBroadcast = async () => {
@@ -537,6 +590,10 @@ export default function InstructorDashboard() {
                     <div className="mt-1.5 h-1 rounded-full bg-white/5 overflow-hidden">
                       <div className="h-full transition-all" style={{ width: `${pct}%`, background: "hsl(var(--primary))" }} />
                     </div>
+                    <button onClick={() => setRestoreGroup(g)}
+                      className="mt-2 w-full text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded border border-panel-border text-muted-foreground hover:text-foreground hover:bg-white/[0.05]">
+                      Restore progress
+                    </button>
                   </div>
                 );
               })}
@@ -625,6 +682,62 @@ export default function InstructorDashboard() {
               </ul>
             )}
           </section>
+        </div>
+      )}
+
+      {/* Restore-progress checklist — tick/untick any activity to bring a
+          group back to where they were after a lost device or wiped browser. */}
+      {restoreGroup != null && (
+        <div className="fixed inset-0 z-50 bg-[#09090D]/90 backdrop-blur flex items-center justify-center p-4">
+          <div className="fx-glass fx-card w-full max-w-lg max-h-[85vh] flex flex-col rounded-lg border border-panel-border">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-panel-border">
+              <div>
+                <h2 className="text-base font-semibold">Restore progress — Group {pad2(restoreGroup)}</h2>
+                {names(restoreGroup) && <div className="text-xs text-muted-foreground">{names(restoreGroup)}</div>}
+              </div>
+              <button onClick={() => setRestoreGroup(null)}
+                className="text-xs font-mono px-3 py-1.5 rounded border border-panel-border bg-white/[0.03] hover:bg-white/[0.07]">
+                Done
+              </button>
+            </div>
+            <div className="overflow-y-auto p-3 space-y-4">
+              <p className="text-xs text-secondary-foreground px-1">
+                Check off whatever this group has already completed. This writes straight to the server, so their
+                helper page picks it up immediately — even on a brand new device.
+              </p>
+              {Object.keys(DAY_TITLES).map(k => {
+                const day = Number(k);
+                const acts = byDay[day] ?? [];
+                return (
+                  <div key={day}>
+                    <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1.5 px-1">{DAY_TITLES[day]}</div>
+                    <ul className="space-y-1">
+                      {acts.map(a => {
+                        const done = groupCompleted[restoreGroup]?.has(a.id) ?? false;
+                        const busy = restoreBusy === `${restoreGroup}:${a.id}`;
+                        return (
+                          <li key={a.id}>
+                            <button
+                              onClick={() => toggleGroupActivity(restoreGroup, a.id)}
+                              disabled={busy}
+                              className={`w-full text-left flex items-center gap-2.5 px-2.5 py-2 rounded border transition-colors disabled:opacity-60 ${
+                                done ? "border-[#30A46C]/40 bg-[#30A46C]/[0.07]" : "border-panel-border bg-white/[0.02] hover:bg-white/[0.05]"
+                              }`}>
+                              <span className={`inline-flex items-center justify-center w-4 h-4 rounded border text-[10px] shrink-0 ${
+                                done ? "border-[#30A46C] text-[#30A46C]" : "border-panel-border text-transparent"
+                              }`}>✓</span>
+                              <span className="font-mono text-[10px] text-muted-foreground shrink-0">{a.lesson}</span>
+                              <span className={`text-sm truncate ${done ? "text-muted-foreground" : "text-secondary-foreground"}`}>{a.title}</span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
     </div>

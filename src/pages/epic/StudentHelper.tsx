@@ -74,23 +74,27 @@ export default function StudentHelper() {
     if (n >= 1 && n <= GROUP_COUNT) setGroup(n);
   }, []);
 
-  // Broadcast subscription — newest non-dismissed banner (scoped to cohort)
+  // Broadcast — newest non-dismissed banner (scoped to cohort). Realtime is
+  // the fast path; a short poll is the fallback in case a channel silently
+  // drops (which is what "announcements don't show up" looks like from here).
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+    const load = async () => {
       const { data } = await supabase
         .from("broadcasts").select("id,message,created_at")
         .eq("cohort", cohort).order("created_at", { ascending: false }).limit(1);
       if (cancelled) return;
       if (data && data[0]) setBroadcast(data[0] as Broadcast);
-    })();
+    };
+    load();
+    const poll = setInterval(load, 6000);
     const ch = supabase
       .channel("epic-broadcasts")
       .on("postgres_changes",
         { event: "INSERT", schema: "public", table: "broadcasts", filter: `cohort=eq.${cohort}` },
         (payload) => setBroadcast(payload.new as Broadcast))
       .subscribe();
-    return () => { cancelled = true; supabase.removeChannel(ch); };
+    return () => { cancelled = true; clearInterval(poll); supabase.removeChannel(ch); };
   }, [cohort]);
 
   const activity = useMemo(
@@ -224,11 +228,50 @@ export default function StudentHelper() {
     return () => { supabase.removeChannel(ch); clearInterval(poll); };
   }, [awaitingCheck, approved]);
 
-  // Load this group's completed activities (persists all week on this PC).
+  // Load this group's completed activities: localStorage first (instant),
+  // then merge in the server record (group_completed) — this is what lets an
+  // instructor-restored or another-device group pick up where they left off
+  // even if THIS browser's localStorage was wiped.
   useEffect(() => {
     if (group == null) return;
-    try { setCompleted(JSON.parse(localStorage.getItem(`epic_completed_${cohort}_${group}`) || "{}")); }
-    catch { setCompleted({}); }
+    let local: Completed = {};
+    try { local = JSON.parse(localStorage.getItem(`epic_completed_${cohort}_${group}`) || "{}"); }
+    catch { local = {}; }
+    setCompleted(local);
+
+    let cancelled = false;
+    (async () => {
+      const { data } = await (supabase as any).from("group_completed")
+        .select("activity_id, completed_at").eq("cohort", cohort).eq("group_no", group);
+      if (cancelled || !data) return;
+      setCompleted(prev => {
+        const next = { ...prev };
+        (data as { activity_id: string; completed_at: string }[]).forEach(row => {
+          if (!next[row.activity_id]) next[row.activity_id] = new Date(row.completed_at).getTime();
+        });
+        localStorage.setItem(`epic_completed_${cohort}_${group}`, JSON.stringify(next));
+        return next;
+      });
+    })();
+
+    // Live pickup if the instructor edits this group's checklist while open.
+    const ch = supabase
+      .channel(`epic-completed-${cohort}-${group}`)
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "group_completed", filter: `cohort=eq.${cohort}` },
+        (payload) => {
+          const row = (payload.new ?? payload.old) as { group_no: number; activity_id: string; completed_at?: string };
+          if (!row || row.group_no !== group) return;
+          setCompleted(prev => {
+            const next = { ...prev };
+            if (payload.eventType === "DELETE") delete next[row.activity_id];
+            else next[row.activity_id] = new Date(row.completed_at ?? Date.now()).getTime();
+            localStorage.setItem(`epic_completed_${cohort}_${group}`, JSON.stringify(next));
+            return next;
+          });
+        })
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(ch); };
   }, [group, cohort]);
 
   // Clock tick — drives the 22-hour additional-projects window + go-live flip.
@@ -237,7 +280,9 @@ export default function StudentHelper() {
     return () => clearInterval(t);
   }, []);
 
-  // When a check-off is approved, record that activity as completed.
+  // When a check-off is approved, record that activity as completed —
+  // locally right away, and on the server so it survives a lost device and
+  // shows up on the instructor's restore-progress checklist.
   useEffect(() => {
     if (!approved || !awaitingCheck || group == null) return;
     const aid = awaitingCheck.activityId;
@@ -247,6 +292,9 @@ export default function StudentHelper() {
       localStorage.setItem(`epic_completed_${cohort}_${group}`, JSON.stringify(next));
       return next;
     });
+    (supabase as any).from("group_completed")
+      .insert({ cohort, group_no: group, activity_id: aid })
+      .then(() => {});
   }, [approved, awaitingCheck, group, cohort]);
 
   // If the open activity is locked (e.g. once gating goes live), fall back to Setup.
@@ -661,6 +709,18 @@ export default function StudentHelper() {
                     className="rounded-md border border-panel-border max-w-full bg-white"
                   />
                   <figcaption className="text-[11px] text-muted-foreground">Wiring diagram — put each wire and part in the exact hole shown here.</figcaption>
+                </figure>
+              )}
+
+              {activity.manualImage && (
+                <figure className="space-y-1">
+                  <img
+                    src={`/diagrams/manual/${activity.manualImage}.webp`}
+                    alt={`Elegoo manual reference photo for ${activity.title}`}
+                    loading="lazy"
+                    className="rounded-md border border-panel-border max-w-full bg-white"
+                  />
+                  <figcaption className="text-[11px] text-muted-foreground">Straight from the Elegoo UNO Starter Kit manual — a second reference if the diagram above isn't enough.</figcaption>
                 </figure>
               )}
 
