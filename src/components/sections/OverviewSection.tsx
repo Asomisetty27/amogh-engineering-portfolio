@@ -6,6 +6,7 @@ import { useViewMode } from "@/contexts/ViewModeContext";
 import { Cpu, Radio, Zap, ArrowRight, Shield } from "lucide-react";
 import ThermalOSBanner from "@/components/ThermalOSBanner";
 import HeroHeader from "@/components/sections/HeroHeader";
+import SpecimenPlate from "@/components/sections/SpecimenPlate";
 import TiltCard from "@/components/ui/TiltCard";
 
 // The flagship charts pull in recharts (~380 KB pre-gzip) — lazy-loaded so
@@ -62,6 +63,9 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         {/* Hero */}
         <HeroHeader />
+
+        {/* PLATE 01 — cinematic establishing shot with the lens instrument view */}
+        <SpecimenPlate />
 
         {/* Value proposition — an editorial lede, not a boxed paragraph.
             Display type at reading scale with a champagne rule: the sentence

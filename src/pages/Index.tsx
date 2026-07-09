@@ -10,6 +10,8 @@ import ContactSection from "@/components/sections/ContactSection";
 import QuickviewSection from "@/components/sections/QuickviewSection";
 import ThermalField from "@/components/visual/ThermalField";
 import CursorHeat from "@/components/visual/CursorHeat";
+import { LensProvider } from "@/components/visual/lens";
+import ThermalLens from "@/components/visual/ThermalLens";
 import CommandPalette from "@/components/CommandPalette";
 
 export default function Index() {
@@ -50,6 +52,7 @@ export default function Index() {
 
   return (
     <ViewModeProvider>
+      <LensProvider>
       {booted && (
         <div className="min-h-screen bg-background relative">
           {/* Ambient layers — exactly two: the thermal-field signature and the
@@ -57,6 +60,8 @@ export default function Index() {
               gone; restraint is the material. */}
           <ThermalField />
           <CursorHeat />
+          {/* The instrument — engages only over Inspectable surfaces */}
+          <ThermalLens />
 
           {/* Blueprint grid — champagne ink at drafting-table density */}
           <div
@@ -109,6 +114,7 @@ export default function Index() {
           </main>
         </div>
       )}
+      </LensProvider>
     </ViewModeProvider>
   );
 }

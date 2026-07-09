@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Github, Zap, Package, Copy, Check, Globe } from "lucide-react";
+import InstrumentPlate from "@/components/visual/InstrumentPlate";
 
 const BTN_SPRING = { type: "spring" as const, stiffness: 400, damping: 22 };
 
@@ -34,7 +35,8 @@ export default function ThermalOSBanner() {
         style={{ background: "radial-gradient(ellipse 50% 100% at 50% 0%, rgba(212,175,55,.09), transparent)" }}
       />
 
-      <div className="relative">
+      <div className="relative grid gap-5 md:grid-cols-[1fr_224px]">
+      <div>
         <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[9px] font-mono tracking-[0.15em] uppercase fx-grad-text-green font-semibold">
@@ -206,6 +208,32 @@ export default function ThermalOSBanner() {
             PyPI
           </motion.a>
         </div>
+      </div>
+
+      {/* PLATE 02 — the cooling stack, same instrument language as the hero plate */}
+      <div className="hidden md:block">
+        <InstrumentPlate
+          src="/generated/theta-plate.webp"
+          alt="Macro of a GPU heatsink fin stack and copper vapor chamber under warm key light"
+          meta={{
+            id: "plate-02",
+            label: "PLATE 02 · COOLING STACK",
+            readouts: [
+              { k: "palette", v: "ironbow" },
+              { k: "state", v: "under load" },
+            ],
+            simulated: true,
+          }}
+          callouts={[
+            { x: 46, y: 30, label: "FIN STACK · 62.4°C", dx: 34 },
+            { x: 38, y: 74, label: "VAPOR CHAMBER · ΔT 4.1°C", dx: 30 },
+          ]}
+          caption="Plate 02 · cooling stack"
+          aspectRatio="4 / 5"
+          className="h-full"
+          style={{ minHeight: 280 }}
+        />
+      </div>
       </div>
     </motion.div>
   );

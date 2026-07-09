@@ -614,3 +614,9 @@
 .print-only {
   display: none;
 }
+
+/* Thermal Lens — discovery affordance pulse */
+@keyframes lens-hint-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
