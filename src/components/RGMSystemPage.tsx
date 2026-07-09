@@ -4,6 +4,7 @@ import { projects, type RGMStage, type FailureMode } from "@/data/portfolioData"
 import { useViewMode } from "@/contexts/ViewModeContext";
 import { ConfidenceBadgeTag, PanelHeader } from "@/components/ui/mission-ui";
 import { ChevronDown, AlertTriangle, CheckCircle2, Play, ArrowRight } from "lucide-react";
+import InspectableImage from "@/components/visual/InspectableImage";
 
 const RGMHologram = lazy(() => import("@/components/holograms/RGMHologram"));
 
@@ -56,7 +57,7 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
           <div className="panel-glass rounded-lg overflow-hidden">
             <PanelHeader>Setup Photo - VERIFIED</PanelHeader>
             <div className="p-2">
-              <img src={rgmProject.heroImage} alt="Complete RGM Setup" className="w-full rounded" loading="lazy" />
+              <InspectableImage src={rgmProject.heroImage!} alt="Complete RGM Setup" imgClassName="rounded" className="rounded overflow-hidden" meta={{ id: "rgm-setup", label: "RGM · FULL SETUP", readouts: [{ k: "view", v: "ironbow" }] }} />
               <div className="text-[10px] font-mono text-muted-foreground mt-1 px-1">
                 Source: Lab_Final_Report, p1 (Figure 1)
               </div>
@@ -86,7 +87,7 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
         <div className="p-4">
           {/* Block diagram */}
           <div className="mb-4 border border-panel-border rounded overflow-hidden">
-            <img src="/evidence/rgm-block-diagram.png" alt="RGM Block Diagram" className="w-full" loading="lazy" />
+            <InspectableImage src="/evidence/rgm-block-diagram.png" alt="RGM Block Diagram" meta={{ id: "rgm-block", label: "RGM · BLOCK DIAGRAM", readouts: [{ k: "view", v: "ironbow" }] }} />
             <div className="text-[10px] font-mono text-muted-foreground px-2 py-1 border-t border-panel-border flex items-center gap-2">
               <ConfidenceBadgeTag confidence="VERIFIED" />
               Lab_Final_Report, p2
@@ -229,7 +230,7 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
         <div className="panel-glass rounded-lg overflow-hidden">
           <PanelHeader>Last Step - Tilt Switch + I2C LCD</PanelHeader>
           <div className="p-2">
-            <img src="/evidence/rgm-last-step-schematic.png" alt="Last Step Schematic" className="w-full rounded" loading="lazy" />
+            <InspectableImage src="/evidence/rgm-last-step-schematic.png" alt="Last Step Schematic" imgClassName="rounded" className="rounded overflow-hidden" meta={{ id: "rgm-laststep", label: "RGM · LAST STEP", readouts: [{ k: "view", v: "ironbow" }] }} />
             <div className="text-[10px] font-mono text-muted-foreground mt-1 px-1 flex items-center gap-2">
               <ConfidenceBadgeTag confidence="VERIFIED" />
               Lab_Final_Report, p6
@@ -246,7 +247,7 @@ export default function RGMSystemPage({ onBack }: { onBack: () => void }) {
         <div className="panel-glass rounded-lg overflow-hidden">
           <PanelHeader>555 Timer Metal Detector</PanelHeader>
           <div className="p-2">
-            <img src="/evidence/ee241-lab6-555timer.jpg" alt="555 Timer Schematic" className="w-full rounded" loading="lazy" />
+            <InspectableImage src="/evidence/ee241-lab6-555timer.jpg" alt="555 Timer Schematic" imgClassName="rounded" className="rounded overflow-hidden" meta={{ id: "rgm-555", label: "555 TIMER · SCHEMATIC", readouts: [{ k: "view", v: "ironbow" }] }} />
             <div className="text-[10px] font-mono text-muted-foreground mt-1 px-1 flex items-center gap-2">
               <ConfidenceBadgeTag confidence="VERIFIED" />
               EE_241_Lab_6

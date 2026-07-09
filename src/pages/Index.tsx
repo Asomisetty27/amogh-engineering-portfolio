@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import MissionNav from "@/components/MissionNav";
 import { ViewModeProvider } from "@/contexts/ViewModeContext";
@@ -10,19 +11,38 @@ import ContactSection from "@/components/sections/ContactSection";
 import QuickviewSection from "@/components/sections/QuickviewSection";
 import ThermalField from "@/components/visual/ThermalField";
 import CursorHeat from "@/components/visual/CursorHeat";
-import { LensProvider } from "@/components/visual/lens";
-import ThermalLens from "@/components/visual/ThermalLens";
 import CommandPalette from "@/components/CommandPalette";
+
+const SECTIONS = ["overview", "projects", "experience", "skills", "contact", "quickview"] as const;
 
 export default function Index() {
   const [booted] = useState(true);
-  const [activeSection, setActiveSection] = useState("overview");
-  const [targetProjectId, setTargetProjectId] = useState<string | null>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { projectId } = useParams<{ projectId: string }>();
 
-  const handleNavigateToProject = useCallback((projectId: string) => {
-    setTargetProjectId(projectId);
-    setActiveSection("projects");
-  }, []);
+  // The URL is the source of truth: /experience renders the experience
+  // section, / is overview, /projects/:projectId deep-links a system view.
+  const seg = location.pathname.split("/")[1] || "overview";
+  const activeSection = (SECTIONS as readonly string[]).includes(seg) ? seg : "overview";
+
+  const handleNavigate = useCallback(
+    (s: string) => navigate(s === "overview" ? "/" : `/${s}`),
+    [navigate],
+  );
+
+  const handleNavigateToProject = useCallback(
+    (id: string) => navigate(`/projects/${id}`),
+    [navigate],
+  );
+
+  // Selecting a project inside the Systems view updates the URL without
+  // stacking history entries - back should leave the section, not replay
+  // every card click.
+  const handleSelectProject = useCallback(
+    (id: string) => navigate(`/projects/${id}`, { replace: true }),
+    [navigate],
+  );
 
   // Every tab lands at its own top. Instant (not smooth-scrolled): the exit/
   // enter animation is the transition - a competing scroll tween underneath
@@ -36,7 +56,7 @@ export default function Index() {
       case "overview":
         return <OverviewSection onNavigateToProject={handleNavigateToProject} />;
       case "projects":
-        return <ProjectsSection initialProjectId={targetProjectId} />;
+        return <ProjectsSection initialProjectId={projectId ?? null} onSelectProject={handleSelectProject} />;
       case "experience":
         return <ExperienceSection />;
       case "skills":
@@ -52,7 +72,6 @@ export default function Index() {
 
   return (
     <ViewModeProvider>
-      <LensProvider>
       {booted && (
         <div className="min-h-screen bg-background relative">
           {/* Ambient layers - exactly two: the thermal-field signature and the
@@ -60,8 +79,6 @@ export default function Index() {
               gone; restraint is the material. */}
           <ThermalField />
           <CursorHeat />
-          {/* The instrument - engages only over Inspectable surfaces */}
-          <ThermalLens />
 
           {/* Blueprint grid - champagne ink at drafting-table density */}
           <div
@@ -87,8 +104,8 @@ export default function Index() {
             }}
           />
 
-          <MissionNav activeSection={activeSection} onNavigate={(s) => { setActiveSection(s); if (s !== "projects") setTargetProjectId(null); }} />
-          <CommandPalette onNavigate={(s) => { setActiveSection(s); if (s !== "projects") setTargetProjectId(null); }} />
+          <MissionNav activeSection={activeSection} onNavigate={handleNavigate} />
+          <CommandPalette onNavigate={handleNavigate} />
 
           <main className="pt-20 pb-16 px-4 relative" style={{ zIndex: 10 }}>
             <AnimatePresence mode="wait">
@@ -114,7 +131,6 @@ export default function Index() {
           </main>
         </div>
       )}
-      </LensProvider>
     </ViewModeProvider>
   );
 }

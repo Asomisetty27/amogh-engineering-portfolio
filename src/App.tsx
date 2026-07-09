@@ -5,6 +5,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { FLEET_BASE, LEGACY_REDIRECTS, RESEARCH_BASE, SITE_BASE, THETA_BASE } from "./pages/thermalos/config.ts";
+import { LensProvider } from "@/components/visual/lens";
+import ThermalLens from "@/components/visual/ThermalLens";
 
 // Route-level code splitting: each page is its own chunk, loaded on demand.
 // Keeps the initial bundle small - visiting "/" no longer pulls in the admin
@@ -54,6 +56,10 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        {/* The Thermal Lens instrument is site-wide: any page can mount an
+            Inspectable surface and the reticle will engage over it. */}
+        <LensProvider>
+        <ThermalLens />
         <Suspense fallback={<RouteFallback />}>
           <Routes>
             {/* ══ EPIC 2026 - Arduino lab helper (la.amogh.site front door) ══ */}
@@ -63,6 +69,13 @@ const App = () => (
             <Route path="/epic/dashboard" element={<InstructorDashboard />} />
 
             <Route path="/" element={<Index />} />
+            {/* Portfolio sections — each is a real URL rendering the same
+                shell; Index derives the active section from the path. */}
+            {["overview", "projects", "experience", "skills", "contact", "quickview"].map((s) => (
+              <Route key={s} path={`/${s}`} element={<Index />} />
+            ))}
+            {/* Deep link straight into a project's system view */}
+            <Route path="/projects/:projectId" element={<Index />} />
 
             {/* ══ THETA - commercial surface moved to runtheta.com ══════════ */}
             <Route path={THETA_BASE} element={<RuntheaRedirect />} />
@@ -120,6 +133,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+        </LensProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

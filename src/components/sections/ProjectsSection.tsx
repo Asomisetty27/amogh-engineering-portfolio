@@ -1,10 +1,11 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   projects, systemDomains, type Project, type SystemDomain,
   type DiagramItem, type Subsystem,
 } from "@/data/portfolioData";
 import { useViewMode } from "@/contexts/ViewModeContext";
+import InspectableImage from "@/components/visual/InspectableImage";
 import {
   ConfidenceBadgeTag, StatusLight, PanelHeader, EvidencePending,
 } from "@/components/ui/mission-ui";
@@ -71,9 +72,11 @@ function ProjectHologram({ project }: { project: Project }) {
 
 interface ProjectsSectionProps {
   initialProjectId?: string | null;
+  /** Keeps the /projects/:projectId URL in sync with the selected system */
+  onSelectProject?: (id: string) => void;
 }
 
-export default function ProjectsSection({ initialProjectId }: ProjectsSectionProps) {
+export default function ProjectsSection({ initialProjectId, onSelectProject }: ProjectsSectionProps) {
   const { mode } = useViewMode();
   const [rgmFullView, setRgmFullView] = useState(false);
 
@@ -89,6 +92,20 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
   );
   const [detailTab, setDetailTab] = useState<DetailTab>("brief");
   const [expandedSubsystems, setExpandedSubsystems] = useState<Set<string>>(new Set());
+
+  // URL → state: a navigation to /projects/:projectId (deep link, history)
+  // selects that system without remounting the section.
+  useEffect(() => {
+    if (!initialProjectId) return;
+    const target = projects.find((p) => p.id === initialProjectId);
+    if (target && target.id !== selectedProject.id) {
+      setSelectedProject(target);
+      setActiveDomain(target.domain);
+      setDetailTab("brief");
+      setExpandedSubsystems(new Set());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialProjectId]);
 
   const domainProjects = projects.filter((p) => p.domain === activeDomain);
 
@@ -124,6 +141,7 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
                 if (firstProject) {
                   setSelectedProject(firstProject);
                   setDetailTab("brief");
+                  onSelectProject?.(firstProject.id);
                 }
               }}
               className={`fx-card text-left p-3 rounded-lg border relative overflow-hidden ${
@@ -174,7 +192,7 @@ export default function ProjectsSection({ initialProjectId }: ProjectsSectionPro
               return (
                 <motion.button
                   key={p.id}
-                  onClick={() => { setSelectedProject(p); setDetailTab("brief"); setExpandedSubsystems(new Set()); }}
+                  onClick={() => { setSelectedProject(p); setDetailTab("brief"); setExpandedSubsystems(new Set()); onSelectProject?.(p.id); }}
                   whileHover={{ x: 2 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 26 }}
@@ -677,7 +695,15 @@ function DiagramCard({ diagram }: { diagram: DiagramItem }) {
               <p className="text-xs text-secondary-foreground leading-relaxed">{diagram.description}</p>
               {diagram.imagePath && (
                 <div className="border border-panel-border rounded overflow-hidden bg-background">
-                  <img src={diagram.imagePath} alt={diagram.title} className="w-full h-auto" loading="lazy" />
+                  <InspectableImage
+                    src={diagram.imagePath}
+                    alt={diagram.title}
+                    meta={{
+                      id: `diagram-${diagram.title}`,
+                      label: diagram.title.toUpperCase(),
+                      readouts: [{ k: "view", v: "ironbow" }],
+                    }}
+                  />
                 </div>
               )}
               {diagram.conceptualNote && (
