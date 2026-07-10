@@ -31,7 +31,7 @@ export default function HeroHeader() {
     <div className="mb-12 relative select-none">
       {/* Radial warmth behind the name - champagne, not mint */}
       <div
-        className="absolute -inset-10 -z-10 pointer-events-none"
+        className="absolute -inset-y-10 -inset-x-2 -z-10 pointer-events-none"
         style={{
           background: "radial-gradient(ellipse 75% 65% at 16% 55%, rgba(212,175,55,0.06), transparent)",
         }}

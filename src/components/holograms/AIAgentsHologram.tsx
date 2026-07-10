@@ -47,7 +47,7 @@ const CHARS: Characteristic[] = [
     short: "TOOL-USE",
     cx: 310, cy: 68,
     color: "#ffaa00",
-    tagline: "Seamless connection to APIs, databases, and external software",
+    tagline: "Direct connection to APIs, databases, and external software",
     description: "Agents connect to external software, databases, and APIs (Salesforce, code repos, browsers) to execute real-world actions. Tool breadth determines the agent's effective action space - agents limited to chat cannot ship code or book travel.",
     details: ["REST/GraphQL API execution", "Browser automation", "Code interpreter + REPL", "File system + DB access", "Third-party SaaS integration"],
     ratings: { Claude: 4, Devin: 5, Operator: 5, Agentforce: 5 },

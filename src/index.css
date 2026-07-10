@@ -620,3 +620,9 @@
   0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
 }
+
+/* Specimen plate - wide cinema ratio on desktop, taller crop on phones.
+   aspect-ratio + min-height together force WIDTH from height and blow out
+   narrow viewports; the media query replaces the min-height entirely. */
+.specimen-plate { aspect-ratio: 21 / 9; }
+@media (max-width: 640px) { .specimen-plate { aspect-ratio: 16 / 10; } }

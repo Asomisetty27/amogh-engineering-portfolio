@@ -141,13 +141,11 @@ export default function SpecimenPlate() {
           simulated: true,
         }}
         thermal={(engaged) => <ThermalView engaged={engaged} />}
-        className="rounded-xl overflow-hidden"
+        className="rounded-xl overflow-hidden specimen-plate w-full max-w-full"
         style={{
           border: "1px solid rgba(212, 175, 55, 0.14)",
           boxShadow:
             "inset 0 1px 0 rgba(240,234,220,0.06), 0 20px 60px rgba(0,0,0,0.5)",
-          aspectRatio: "21 / 9",
-          minHeight: 200,
           background: "#0a0810",
         }}
       >

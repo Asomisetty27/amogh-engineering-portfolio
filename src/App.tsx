@@ -69,7 +69,7 @@ const App = () => (
             <Route path="/epic/dashboard" element={<InstructorDashboard />} />
 
             <Route path="/" element={<Index />} />
-            {/* Portfolio sections — each is a real URL rendering the same
+            {/* Portfolio sections - each is a real URL rendering the same
                 shell; Index derives the active section from the path. */}
             {["overview", "projects", "experience", "skills", "contact", "quickview"].map((s) => (
               <Route key={s} path={`/${s}`} element={<Index />} />
