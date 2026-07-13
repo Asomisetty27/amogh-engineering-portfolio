@@ -5,8 +5,7 @@
 // - Day 1-4 activities unlock in order: an activity opens only once every
 //   REQUIRED (non-optional) activity before it has been checked off. Optional
 //   activities (e.g. RGB, sound) never block the next one.
-// - Finishing a full day's required activities opens the Additional Exercises
-//   for 22 hours, then they close again until the next day's tasks are done.
+// - Additional Exercises are always open.
 //
 // Completion is recorded when an instructor approves a check-off, and stored
 // per cohort+group as { [activityId]: completedAtMs }.
@@ -35,7 +34,7 @@ GATED.forEach((a, i) => {
 export function isUnlocked(activity: Activity, completed: Completed, now: number): boolean {
   if (!gatingActive(now)) return true; // dormant until go-live: everything open
   if (ONRAMP.has(activity.id)) return true;
-  if (activity.day === 5) return additionalsOpen(completed, now);
+  if (activity.day === 5) return true;
   const req = REQ_BEFORE[activity.id];
   if (!req) return true; // not a gated activity (shouldn't happen for day<=4)
   return req.every((id) => id in completed);

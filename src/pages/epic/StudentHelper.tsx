@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CURRICULUM, DAY_TITLES, WIRE, GROUP_COUNT, THANKYOU_EMAIL, FIRST_AID, type Activity, type HelpType } from "./curriculum";
-import { isUnlocked, additionalsUntil, gatingActive, type Completed } from "./progress";
+import { isUnlocked, gatingActive, type Completed } from "./progress";
 import { readCohort, COHORT_LABEL } from "./cohort";
 
 const LS_GROUP = "epic_group";
@@ -274,7 +274,7 @@ export default function StudentHelper() {
     return () => { cancelled = true; supabase.removeChannel(ch); };
   }, [group, cohort]);
 
-  // Clock tick - drives the 22-hour additional-projects window + go-live flip.
+  // Clock tick drives the progressive-unlocking go-live flip.
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 30000);
     return () => clearInterval(t);
@@ -411,10 +411,6 @@ export default function StudentHelper() {
   const byDay: Record<number, Activity[]> = {};
   CURRICULUM.forEach(a => { (byDay[a.day] ||= []).push(a); });
 
-  const fmtLeft = (ms: number) => {
-    const h = Math.floor(ms / 3_600_000), m = Math.floor((ms % 3_600_000) / 60_000);
-    return h > 0 ? `${h}h ${m}m` : `${m}m`;
-  };
   const navItem = (a: Activity) => (
     <li key={a.id}>
       <button onClick={() => setActiveId(a.id)}
@@ -480,25 +476,12 @@ export default function StudentHelper() {
             const acts = byDay[day] ?? [];
             const gated = gatingActive(now);
 
-            // Additional Exercises - gated behind the 22-hour window once live.
+            // Additional Exercises stay open so every student can access them.
             if (day === 5) {
-              const until = additionalsUntil(completed);
-              const open = !gated || (until != null && now < until);
               return (
                 <div key={day} className="mb-4">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-2 flex-wrap">
-                    <span>{DAY_TITLES[day]}</span>
-                    {gated && open && until != null && (
-                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full border border-[#30A46C]/40 text-[#30A46C]">closes in {fmtLeft(until - now)}</span>
-                    )}
-                  </div>
-                  {open ? (
-                    <ul className="space-y-1">{acts.map(navItem)}</ul>
-                  ) : (
-                    <div className="text-[11px] leading-relaxed text-muted-foreground rounded border border-panel-border bg-white/[0.02] px-2.5 py-2">
-                      🔒 Finish today's required activities to unlock the bonus projects - they open for 22 hours.
-                    </div>
-                  )}
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">{DAY_TITLES[day]}</div>
+                  <ul className="space-y-1">{acts.map(navItem)}</ul>
                 </div>
               );
             }
