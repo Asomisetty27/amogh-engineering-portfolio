@@ -3,7 +3,7 @@
 
 export interface Activity {
   id: string;
-  day: number;       // 1–4 = regular days, 5 = additional exercises
+  day: number;       // 1-4 = regular days, 5 = additional exercises
   lesson: string;
   title: string;
   optional?: boolean;
@@ -15,7 +15,10 @@ export interface Activity {
   test: string[];
   trouble: string[];
   extension?: string;
-  challenge?: { prompt: string; code: string };
+  // Early-finisher scaffold: prompt first (they try it themselves), then
+  // progressive hints, then the fill-in-the-blanks code, and only as a last
+  // resort the full solution. The UI enforces that order.
+  challenge?: { prompt: string; hints?: string[]; code: string; solution?: string };
   calibration?: { note: string; code: string };
   // Real photo/diagram from the Elegoo UNO Starter Kit manual for this exact
   // lesson - /public/diagrams/manual/{manualImage}.webp. Shown as a secondary,
@@ -46,7 +49,7 @@ export const CURRICULUM: Activity[] = [
   {id:"intro", day:1, lesson:"Intro", title:"Arduino & the IDE", goal:"Meet the board and learn to upload a program.", materials:["Arduino UNO","USB cable"], wiring:[], code:"// Tools > Board > Arduino UNO\n// Tools > Port > (pick the port)\n// Paste code, click Verify (check), then Upload (arrow).", test:["The IDE shows \"Done uploading.\""], trouble:["Upload error → check Board and Port under Tools."]},
   {id:"blink", day:1, lesson:"Lesson 2", title:"LED Blink", goal:"Blink the Arduino's built-in light to prove your setup works.", materials:["Arduino UNO","USB cable"], wiring:[["Nothing to wire","built-in LED is on pin 13"]], code:"const int ledPin = 13;\nvoid setup() { pinMode(ledPin, OUTPUT); }\nvoid loop() {\n  digitalWrite(ledPin, HIGH);\n  delay(1000);\n  digitalWrite(ledPin, LOW);\n  delay(1000);\n}", test:["The \"L\" LED blinks on 1s, off 1s.","Change 1000 to 200 to blink faster."], trouble:["No blink → re-check Board and Port.","Port not found → replug USB, pick the port again."], extension:"Make the LED blink SOS in Morse code (... --- ...). Short = 200ms on, long = 600ms on, gaps of 200ms, then a longer pause before repeating."},
   {id:"led_resistor", day:1, lesson:"Lesson 3", title:"Brightness with Resistors", goal:"See how a resistor controls brightness. No code needed.", materials:["Arduino UNO","breadboard","an LED (any color)","220Ω (red-red-brown), 1kΩ (brown-black-red), 10kΩ (brown-black-orange) resistors","jumper wires"], wiring:[["Arduino 5V","\"+\" rail"],["Arduino GND","\"−\" rail"],["\"+\" rail","LED long leg"],["LED short leg","resistor"],["resistor","\"−\" rail"]], code:"// No code. Swap the resistor and compare brightness.", test:["220Ω = bright, 1kΩ = dimmer, 10kΩ = dimmest."], trouble:["Dark with every resistor → LED is backwards, flip it.","Unplug USB before swapping resistors."]},
-  {id:"pot", day:1, lesson:"Lesson 3", title:"Brightness with a Potentiometer", goal:"Use a knob to fade an LED smoothly.", materials:["Arduino UNO","breadboard","an LED (any color)","220Ω resistor (red-red-brown)","10K potentiometer (the blue knob marked 10K)","jumper wires"], wiring:[["Pot left leg","5V"],["Pot right leg","GND"],["Pot middle leg","A0"],["Pin ~9","220Ω → LED long leg"],["LED short leg","GND"]], code:"const int potPin = A0;\nconst int ledPin = 9;   // must be a ~ (PWM) pin\nvoid setup() { pinMode(ledPin, OUTPUT); }\nvoid loop() {\n  int v = analogRead(potPin);          // 0..1023\n  analogWrite(ledPin, map(v,0,1023,0,255));\n  delay(10);\n}", test:["Turn the knob: the LED fades up and down."], trouble:["Only on/off → use pin ~9, not a plain pin.","No change → middle leg to A0."], extension:"Map the knob so the LED stays fully off for the bottom third of the range (0–340), then fades from there. Hint: if v < 341, write 0."},
+  {id:"pot", day:1, lesson:"Lesson 3", title:"Brightness with a Potentiometer", goal:"Use a knob to fade an LED smoothly.", materials:["Arduino UNO","breadboard","an LED (any color)","220Ω resistor (red-red-brown)","10K potentiometer (the blue knob marked 10K)","jumper wires"], wiring:[["Pot left leg","5V"],["Pot right leg","GND"],["Pot middle leg","A0"],["Pin ~9","220Ω → LED long leg"],["LED short leg","GND"]], code:"const int potPin = A0;\nconst int ledPin = 9;   // must be a ~ (PWM) pin\nvoid setup() { pinMode(ledPin, OUTPUT); }\nvoid loop() {\n  int v = analogRead(potPin);          // 0..1023\n  analogWrite(ledPin, map(v,0,1023,0,255));\n  delay(10);\n}", test:["Turn the knob: the LED fades up and down."], trouble:["Only on/off → use pin ~9, not a plain pin.","No change → middle leg to A0."], extension:"Map the knob so the LED stays fully off for the bottom third of the range (0-340), then fades from there. Hint: if v < 341, write 0."},
   {
     id:"rgb", day:1, lesson:"Lesson 4", title:"RGB LED (the clear LED with 4 legs)", optional:true,
     goal:"Mix red, green, blue to make color patterns - 5 different patterns, back to back.",
@@ -454,7 +457,7 @@ void showPattern(byte rows[8]) {
 
 void setup() {
   lc.shutdown(0, false);   // wake up the display
-  lc.setIntensity(0, 8);   // brightness 0–15
+  lc.setIntensity(0, 8);   // brightness 0-15
   lc.clearDisplay(0);
 }
 
@@ -564,7 +567,7 @@ void loop() {}`,
       "Blank screen, OR a row of solid boxes → this is contrast, not a broken display. Turn the blue pot slowly all the way from one side to the other; the text appears somewhere in the lower-to-middle range.",
       "Turning the pot does nothing → V0 must go to the pot's MIDDLE leg, and the pot's TWO OUTER legs must go to 5V and GND. A loose outer leg means the knob has no effect.",
       "Backlight is off → LCD pin A (backlight +) to 5V, pin K (−) to GND.",
-      "Random characters or only half the screen → a D4–D7 wire (pins 5, 4, 3, 2) or EN (pin 11) is loose. Unplug USB and push them all the way in.",
+      "Random characters or only half the screen → a D4-D7 wire (pins 5, 4, 3, 2) or EN (pin 11) is loose. Unplug USB and push them all the way in.",
       "Still nothing → RW must go to GND, and re-seat every wire. The library is the built-in \"LiquidCrystal\" - installing LiquidCrystal.zip just adds the same one, so a missing library is not the cause.",
     ],
   },
@@ -658,6 +661,11 @@ void setTime(byte s, byte m, byte h, byte dow, byte d, byte mo, byte yr) {
     ],
     challenge:{
       prompt:"Inside loop() you already have the numbers hour, minute, second. Add a greeting that changes with the time of day - fill in the blanks:",
+      hints:[
+        "Write it on paper first: at what hour does 'morning' start for you? That number IS the first blank \u2014 the code just compares hour against it.",
+        "The second blank is where afternoon ENDS. The clock is 24-hour, so think: what hour does evening begin \u2014 17? 18? Any sensible number works.",
+        "The last blank is just a message, like the two above it. After morning and afternoon comes\u2026?",
+      ],
       code:
 `if (hour >= ___ && hour < 12) {
   Serial.println("Good morning!");
@@ -671,6 +679,19 @@ void setTime(byte s, byte m, byte h, byte dow, byte d, byte mo, byte yr) {
 // 1. Why does the chip store numbers in BCD instead of plain binary?
 // 2. SDA and SCL are shared by MANY I2C chips at once. How does the Arduino
 //    know it is talking to THIS clock and not some other chip?  (hint: 0x68)`,
+      solution:
+`if (hour >= 5 && hour < 12) {
+  Serial.println("Good morning!");
+} else if (hour >= 12 && hour < 18) {
+  Serial.println("Good afternoon!");
+} else {
+  Serial.println("Good evening!");
+}
+// Answers to think-about-its:
+// 1. BCD stores each decimal digit in its own 4 bits, so the chip can keep
+//    time in decimal without doing division - cheap hardware in 1980s tech.
+// 2. Every I2C chip has an ADDRESS. The clock answers to 0x68; the Arduino
+//    says the address first and only that chip replies.`,
     },
   },
 
@@ -688,7 +709,7 @@ void setTime(byte s, byte m, byte h, byte dow, byte d, byte mo, byte yr) {
     manualImage:"sound",
     code:
 `// The sound sensor has TWO outputs:
-//   A0 (analog)  → a number 0–1023 showing volume level
+//   A0 (analog)  → a number 0-1023 showing volume level
 //   D0 (digital) → HIGH or LOW (is it louder than the dial threshold?)
 
 int analogPin = A0;
@@ -703,7 +724,7 @@ void loop() {
   int volume = analogRead(analogPin);   // 0 = silence, 1023 = loudest possible
 
   // Build a simple bar chart using # characters
-  // map() scales 0–1023 to 0–20 (bar length)
+  // map() scales 0-1023 to 0-20 (bar length)
   int barLength = map(volume, 0, 1023, 0, 20);
 
   Serial.print("Volume: [");
@@ -731,10 +752,15 @@ void loop() {
       "CLAP never triggers → turn the blue dial and clap closer to the sensor.",
     ],
     challenge:{
-      prompt:"Right now the bar uses 20 slots. Change it to show a percentage (0–100%) instead, and add a label so the output looks like  'Volume: 47%':",
+      prompt:"Right now the bar uses 20 slots. Change it to show a percentage (0-100%) instead, and add a label so the output looks like  'Volume: 47%':",
+      hints:[
+        "What is the BIGGEST number analogRead can ever return? That's the top of the input range \u2014 the first blank.",
+        "A percentage runs from 0 to what? That's the second blank.",
+        "Look at the label you want: 'Volume: 47%'. The code already prints the number \u2014 what single character is missing at the end?",
+      ],
       code:
 `// Replace the bar section with this:
-int percent = map(volume, 0, ___, 0, ___);   // scale to 0–100
+int percent = map(volume, 0, ___, 0, ___);   // scale to 0-100
 
 Serial.print("Volume: ");
 Serial.print(percent);
@@ -742,6 +768,13 @@ Serial.println("___");   // what character makes it look like a percent?
 
 // Now try: at what percent does a normal speaking voice land?
 // At what percent does a clap land?`,
+      solution:
+`int percent = map(volume, 0, 1023, 0, 100);   // analogRead tops out at 1023
+
+Serial.print("Volume: ");
+Serial.print(percent);
+Serial.println("%");
+// Speaking voice usually lands ~20-40%; a close clap can spike past 80%.`,
     },
   },
 
@@ -797,7 +830,7 @@ void loop() {
     test:[
       "Serial Monitor at 9600 → temperature prints every second.",
       "Pinch the thermistor between your fingers → the temperature slowly rises.",
-      "Room temperature should read roughly 20–25 C (68–77 F).",
+      "Room temperature should read roughly 20-25 C (68-77 F).",
     ],
     trouble:[
       "Reading is way off or 'nan' → thermistor and 10k must share the A0 row (10k: A0→GND, thermistor: 5V→A0).",
@@ -806,6 +839,11 @@ void loop() {
     ],
     challenge:{
       prompt:"The temperature is built up one line at a time. Answer these, then check with the Serial Monitor:",
+      hints:[
+        "NTC stands for Negative Temperature Coefficient \u2014 'negative' tells you which way resistance moves when it heats up.",
+        "For question 2, just plug raw = 512 into the formula: 1023/512 is almost exactly 2, and (2 - 1) = 1. What is 10000 \u00d7 1?",
+        "For the alert: you already print tempC every loop. Wrap one more Serial.println in an if(...) that compares tempC to a number you pick.",
+      ],
       code:
 `// 1. When the room gets HOTTER, an NTC thermistor's resistance goes
 //    ___ (up / down), so the raw analogRead value goes ___ (up / down).
@@ -821,6 +859,15 @@ if (tempC > ___) {
 
 // Bonus: why does this use log()?  Hint: equal steps in temperature do
 // NOT cause equal steps in resistance - a thermistor is not linear.`,
+      solution:
+`// 1. Hotter → NTC resistance goes DOWN → analogRead value goes UP.
+// 2. resistance = 10000 * (1023/512 - 1) ≈ 10,000 ohms - at mid-scale the
+//    thermistor matches the fixed 10k resistor. That's how a divider works.
+// 3. Too-warm alert, added after the temperature print:
+if (tempC >= 30) {
+  Serial.println("Too warm! Open a window.");
+}
+// Cup your hands around the thermistor and watch it trip.`,
     },
   },
 
@@ -869,7 +916,7 @@ void setup() {
 }
 
 void loop() {
-  int knob  = analogRead(potPin);           // 0–1023
+  int knob  = analogRead(potPin);           // 0-1023
   int speed = map(knob, 0, 1023, 0, 255);  // scale to PWM range
 
   analogWrite(enablePin, speed);
@@ -891,6 +938,10 @@ void loop() {
     ],
     challenge:{
       prompt:"Add a push button on pin 9 to flip the motor direction when pressed. Fill in the blanks:",
+      hints:[
+        "INPUT_PULLUP means the pin rests at HIGH and pressing the button connects it to GND. So while pressed, digitalRead returns\u2026?",
+        "Direction is set by which of in1/in2 is HIGH. Scroll up to setup() \u2014 whatever it set, the reverse is the opposite pair.",
+      ],
       code:
 `// Add to setup():
 pinMode(9, INPUT_PULLUP);
@@ -907,6 +958,18 @@ if (digitalRead(9) == ___) {    // INPUT_PULLUP: LOW when pressed, or HIGH?
 //    (Think about static friction vs kinetic friction)
 // 2. What would happen if you set IN1=HIGH and IN2=HIGH at the same time?
 //    (Check the L293D datasheet if you're curious)`,
+      solution:
+`// Add to setup():
+pinMode(9, INPUT_PULLUP);
+
+// Add inside loop(), before the analogWrite:
+if (digitalRead(9) == LOW) {     // pull-up: pressed = LOW
+  digitalWrite(in1, LOW);        // opposite of what setup() chose
+  digitalWrite(in2, HIGH);
+  delay(300);
+}
+// (If your motor started reversed, swap LOW/HIGH here - 'reverse' just
+// means the opposite of whatever you had.)`,
     },
   },
 
@@ -951,6 +1014,10 @@ void loop() {
     ],
     challenge:{
       prompt:"Add a potentiometer (middle leg → A0, outer legs → 5V and GND) and steer the servo by hand. Fill in the blanks:",
+      hints:[
+        "analogRead always returns the same range, no matter what's attached. You used it in the sound lesson \u2014 what was the top value?",
+        "map() needs the input range to match reality: from 0 to that same top value.",
+      ],
       code:
 `// Replace loop() with this:
 void loop() {
@@ -962,6 +1029,15 @@ void loop() {
 
 // Think about it: a servo listens to pulse WIDTH, not voltage.
 // write(0) sends a ~1 ms pulse, write(180) a ~2 ms pulse. Why pulses?`,
+      solution:
+`void loop() {
+  int knob = analogRead(A0);               // 0 to 1023
+  int angle = map(knob, 0, 1023, 0, 180);  // full knob = full sweep
+  myServo.write(angle);
+  delay(15);
+}
+// Pulses beat voltage because a wire's voltage sags with distance and load;
+// a pulse WIDTH survives the trip intact.`,
     },
   },
 
@@ -1014,6 +1090,10 @@ void loop() {
     ],
     challenge:{
       prompt:"A full turn is 2048 steps. Work out the steps for part-turns and fill in the blanks:",
+      hints:[
+        "A quarter is one-FOURTH. What do you divide 2048 by to get a quarter?",
+        "45 degrees is half of 90. If a quarter turn is 512 steps, half of that is\u2026? Make it negative to spin the other way.",
+      ],
       code:
 `// Quarter turn (90 degrees):
 myStepper.step(2048 / ___);   // how many steps?
@@ -1026,6 +1106,17 @@ myStepper.step(___);
 
 // Think about it: why is a stepper better than a plain DC motor when you
 // need to stop at an EXACT position (like the hand of a clock)?`,
+      solution:
+`// Quarter turn (90 degrees):
+myStepper.step(2048 / 4);    // 512 steps
+
+// Half turn (180 degrees):
+myStepper.step(2048 / 2);    // 1024 steps
+
+// Exactly 45 degrees, the other direction:
+myStepper.step(-256);        // 2048/8, negative = reverse
+// Steppers move in fixed steps you can COUNT - no guessing where a DC
+// motor coasted to. That's why clocks and printers use them.`,
     },
   },
 
@@ -1040,7 +1131,7 @@ myStepper.step(___);
       ["74HC595 pin 12 (STCP, latch)","pin 11"],
       ["74HC595 pin 16 (VCC) & pin 10 (MR)","5V"],
       ["74HC595 pin 8 (GND) & pin 13 (OE)","GND"],
-      ["Outputs Q0–Q7","each → 220Ω → an LED → GND"],
+      ["Outputs Q0-Q7","each → 220Ω → an LED → GND"],
     ],
     manualImage:"shift_register",
     code:
@@ -1111,6 +1202,11 @@ void loop() {
     ],
     challenge:{
       prompt:"Add a 6th pattern of your own. A byte is 8 bits - one per LED (1 = on). Fill in the blanks:",
+      hints:[
+        "Write 8 slots on paper: _ _ _ _ _ _ _ _ \u2014 one per LED. 'Every other LED' means they alternate: on, off, on, off\u2026",
+        "'Only the two end LEDs' means the first and last slot are 1 and everything between is 0.",
+        "All eight on = all eight bits = 11111111 in binary. Count up what that is in decimal (128+64+32+16+8+4+2+1).",
+      ],
       code:
 `// Every OTHER LED on (binary 10101010):
 show(0b________);  // 8 digits
@@ -1122,6 +1218,17 @@ show(0b________);
 // 1. What number (0-255) lights ALL eight LEDs?  ___
 // 2. MSBFIRST sends the biggest bit first. What changes with LSBFIRST?
 // 3. How can 3 wires control 8 LEDs? What is the clock pin actually doing?`,
+      solution:
+`// Every OTHER LED on:
+show(0b10101010);
+
+// Only the two end LEDs:
+show(0b10000001);
+
+// 1. All eight on = 0b11111111 = 255.
+// 2. LSBFIRST sends the small bit first - the pattern comes out MIRRORED.
+// 3. The clock pin ticks once per bit: 'next bit please'. Eight ticks move
+//    eight bits down ONE wire - that's how 3 pins drive 8 LEDs.`,
     },
   },
 
@@ -1295,6 +1402,10 @@ void loop() {
     ],
     challenge:{
       prompt:"Turn it into a rough stopwatch that counts seconds since power-on. Fill in the blanks:",
+      hints:[
+        "millis() counts MILLIseconds. How many milliseconds are in one second?",
+        "delay(1000) freezes the whole loop \u2014 and refreshDisplay() has to run thousands of times a second to keep the digit lit. What would the display do during a frozen second?",
+      ],
       code:
 `void loop() {
   int seconds = millis() / ______;   // milliseconds per second?
@@ -1304,6 +1415,15 @@ void loop() {
 
 // Why can't we use delay(1000) to count seconds here?
 // (hint: what happens to refreshDisplay() while the code is delaying?)`,
+      solution:
+`void loop() {
+  int seconds = millis() / 1000;   // 1000 ms per second
+  sevseg.setNumber(seconds, -1);
+  sevseg.refreshDisplay();
+}
+// delay(1000) would stop refreshDisplay() from running, and the digit
+// would go dark (or ghost) for that whole second. millis() lets the loop
+// keep spinning while we just READ the clock.`,
     },
   },
 
@@ -1352,6 +1472,11 @@ void loop() {
     ],
     challenge:{
       prompt:"Count each NEW motion event (not every loop) and print the total. Fill in the blanks:",
+      hints:[
+        "You want the MOMENT it turns on: right now it's HIGH, but one loop ago it was\u2026? That's the first blank.",
+        "Each new event should add exactly one to the count.",
+        "The last line saves what you just read so NEXT loop can compare against it. Which variable did you just read?",
+      ],
       code:
 `int count = 0;
 int lastState = LOW;
@@ -1368,6 +1493,22 @@ void loop() {
 }
 
 // Why count only when it JUST changed, instead of every HIGH reading?`,
+      solution:
+`int count = 0;
+int lastState = LOW;
+
+void loop() {
+  int state = digitalRead(pirPin);
+  if (state == HIGH && lastState == LOW) {   // rising edge only
+    count = count + 1;
+    Serial.print("Motion events: ");
+    Serial.println(count);
+  }
+  lastState = state;
+  delay(50);
+}
+// Counting every loop while HIGH would count one wave of your hand as
+// hundreds of 'events'. Edge detection counts CHANGES, not states.`,
     },
   },
 
@@ -1408,6 +1549,10 @@ void loop() {
     ],
     challenge:{
       prompt:"Make the relay beat like a heart: two quick clicks, then a long pause. Fill in the blanks:",
+      hints:[
+        "Listen to your own heartbeat: lub-dub. How many quick clicks is that?",
+        "The pause is in milliseconds. One second = 1000 ms \u2014 a heart rests a bit longer than the clicks. Try something between 1000 and 2000 and tune it by ear.",
+      ],
       code:
 `void loop() {
   for (int i = 0; i < ___; i++) {   // how many quick clicks per beat?
@@ -1421,6 +1566,19 @@ void loop() {
 
 // A 5V relay lets the Arduino control a 120V lamp. Why keep the Arduino
 // side and the switched side completely separate?`,
+      solution:
+`void loop() {
+  for (int i = 0; i < 2; i++) {    // lub-dub = 2 quick clicks
+    digitalWrite(relayPin, HIGH);
+    delay(120);
+    digitalWrite(relayPin, LOW);
+    delay(120);
+  }
+  delay(1500);                     // rest between beats - tune to taste
+}
+// The two sides stay separate because 120V on the Arduino side wouldn't
+// just kill the board - it's a shock hazard. The relay's coil and switch
+// are physically isolated inside.`,
     },
   },
 
@@ -1467,6 +1625,10 @@ void loop() {
     ],
     challenge:{
       prompt:"Count tips, but ignore the bounces. Fill in the blanks:",
+      hints:[
+        "Same edge trick as the PIR counter: you want the moment it BECOMES HIGH, so one loop earlier it must have been\u2026?",
+        "The delay just needs to outlast the rattle \u2014 the ball settles in well under half a second. 100-300 ms works.",
+      ],
       code:
 `int tips = 0;
 int last = LOW;
@@ -1482,6 +1644,21 @@ void loop() {
 }
 
 // Waiting a moment after a change is called "debouncing." Why is it needed?`,
+      solution:
+`int tips = 0;
+int last = LOW;
+
+void loop() {
+  int now = digitalRead(tiltPin);
+  if (now == HIGH && last == LOW) {
+    tips++;
+    Serial.println(tips);
+    delay(150);          // let the ball stop rattling
+  }
+  last = now;
+}
+// A rolling metal ball makes and breaks contact dozens of times in a few
+// milliseconds. Without debouncing, one tip counts as twenty.`,
     },
   },
 
@@ -1539,6 +1716,10 @@ void loop() {
     ],
     challenge:{
       prompt:"Keep the counter between 0 and 20, like a volume knob that stops at the ends. Fill in the blanks:",
+      hints:[
+        "Read the comment on each line \u2014 one clamps the TOP of the range, one clamps the BOTTOM. The top of this knob is 20.",
+        "If the counter must never go below 0, what's the smallest value the second if should allow?",
+      ],
       code:
 `if (digitalRead(dtPin) != clk) counter++;
 else counter--;
@@ -1548,6 +1729,14 @@ if (counter < ___) counter = 0;    // don't go below the bottom
 
 // The knob spins forever, but the value stops at 0 and 20. This "clamping"
 // is everywhere in software. Where have you seen a value that can't go past a limit?`,
+      solution:
+`if (digitalRead(dtPin) != clk) counter++;
+else counter--;
+
+if (counter > 20) counter = 20;   // ceiling
+if (counter < 0)  counter = 0;    // floor
+// Clamping is everywhere: phone volume, game health bars, brightness
+// sliders - anything with a hard min and max.`,
     },
   },
 
@@ -1612,6 +1801,10 @@ void loop() {
     ],
     challenge:{
       prompt:"Print SHAKE! only when the board is moved hard. The values are about 16384 per 1 g. Fill in the blanks:",
+      hints:[
+        "1 g reads about 16384. So 2 g reads about\u2026? Multiply.",
+        "You want SHAKE! only for HARD moves \u2014 the threshold should be near that 2 g number (a little under is fine, e.g. 32000).",
+      ],
       code:
 `// abs() gives the size of a number, ignoring its sign.
 if (abs(x) > _____ || abs(y) > _____ || abs(z) > _____) {
@@ -1621,6 +1814,14 @@ if (abs(x) > _____ || abs(y) > _____ || abs(z) > _____) {
 // 1. What threshold means roughly 2 g of force?
 // 2. Sitting still, one axis reads about 16384 and the others near 0.
 //    Which axis is it, and why?`,
+      solution:
+`if (abs(x) > 32000 || abs(y) > 32000 || abs(z) > 32000) {
+  Serial.println("SHAKE!");
+}
+// 1. 2 g ≈ 2 × 16384 = 32768 (32000 is a comfortable trigger just below it).
+// 2. Sitting flat, the Z axis reads ~16384 - that's GRAVITY. An
+//    accelerometer can't tell 'sitting on a desk' from 'accelerating up
+//    at 1 g' - which is also why it knows which way is down.`,
     },
   },
 
@@ -1678,6 +1879,10 @@ void loop() {
     ],
     challenge:{
       prompt:"Make an access badge that greets ONE specific card. Run it once to see your card's first UID byte, then fill in the blank:",
+      hints:[
+        "Run the sketch first and tap YOUR card \u2014 the Serial Monitor prints its UID bytes. The first pair of characters after '0x' is your answer.",
+        "Type those two characters into the blank exactly as printed. Every card is different \u2014 your neighbor's number won't work for yours (that's the point!).",
+      ],
       code:
 `// Add this right after the UID printout:
 if (rfid.uid.uidByte[0] == 0x____) {   // put YOUR card's first byte here
@@ -1688,6 +1893,16 @@ if (rfid.uid.uidByte[0] == 0x____) {   // put YOUR card's first byte here
 
 // Real key-card systems keep a whole list of allowed IDs and check every
 // byte. Why is matching just ONE byte not safe in real life?`,
+      solution:
+`// Example - if the monitor printed 'UID: 0xA3 0x5F ...', then:
+if (rfid.uid.uidByte[0] == 0xA3) {   // YOUR first byte goes here
+  Serial.println("Access granted - welcome!");
+} else {
+  Serial.println("Unknown card - access denied.");
+}
+// One byte has only 256 possible values, so 1-in-256 random cards would
+// unlock your door. Real systems compare ALL bytes of the UID - and good
+// ones use cryptographic challenge-response, because UIDs can be cloned.`,
     },
   }
 ];
