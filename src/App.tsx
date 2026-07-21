@@ -35,6 +35,10 @@ const StudentHelper       = lazy(() => import("./pages/epic/StudentHelper.tsx"))
 const InstructorDashboard = lazy(() => import("./pages/epic/InstructorDashboard.tsx"));
 const IS_LAB_HOST = typeof window !== "undefined" && window.location.hostname.startsWith("epic.");
 
+// PolyUAS - Cal Poly's autonomous UAS program (hostname-routed to uas.amogh.site)
+const PolyUAS = lazy(() => import("./pages/uas/PolyUAS.tsx"));
+const IS_UAS_HOST = typeof window !== "undefined" && window.location.hostname.startsWith("uas.");
+
 const queryClient = new QueryClient();
 
 // Dark fallback (matches the site theme) so route transitions don't flash white.
