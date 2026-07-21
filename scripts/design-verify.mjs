@@ -105,7 +105,12 @@ const { preview } = await import("vite");
 const { chromium } = await import("@playwright/test");
 {
   const server = await preview({ preview: { port: 4181 } });
-  const browser = await chromium.launch();
+  // CHROMIUM_PATH allows sandboxed CI environments (nix, custom images) to
+  // point Playwright at a system-provided chromium instead of the bundled
+  // download, which often lacks its .so deps in minimal containers.
+  const browser = await chromium.launch(
+    process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {},
+  );
   const ROUTES = ["/", "/projects", "/experience", "/skills", "/contact", "/quickview", "/thermalos", "/uas"];
   let errors = [];
   let hscroll = [];
