@@ -226,7 +226,7 @@ export default function PolyUAS() {
           trace carries the full motor current.
         </p>
 
-        <div style={{ display: "grid", gap: 24, gridTemplateColumns: "1.4fr 1fr" }}>
+        <div style={{ display: "grid", gap: 24, gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
           <Card>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
               <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, letterSpacing: "0.22em",
