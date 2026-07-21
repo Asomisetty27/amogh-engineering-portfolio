@@ -72,6 +72,11 @@ const App = () => (
             <Route path="/epic" element={<StudentHelper />} />
             <Route path="/epic/dashboard" element={<InstructorDashboard />} />
 
+            {/* ══ PolyUAS - Cal Poly autonomous UAS (uas.amogh.site) ═════════ */}
+            {IS_UAS_HOST && <Route path="/" element={<PolyUAS />} />}
+            <Route path="/uas" element={<PolyUAS />} />
+
+
             <Route path="/" element={<Index />} />
             {/* Portfolio sections - each is a real URL rendering the same
                 shell; Index derives the active section from the path. */}
