@@ -160,7 +160,7 @@ export default function PolyUAS() {
 
       {/* Osiris */}
       <Section id="osiris" label="02 · Flagship aircraft" title="Osiris - heavy-lift autonomous quad">
-        <div style={{ display: "grid", gap: 24, gridTemplateColumns: "1.2fr 1fr" }}>
+        <div style={{ display: "grid", gap: 24, gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
           <Card accent>
             <Kv k="Class" v="~12 kg AUW modular quad" />
             <Kv k="Structure" v="Aluminum plates + carbon-fiber arms; blind-mate JX4 6-pin arm connectors (CAN + PWM + 48 V)" />
