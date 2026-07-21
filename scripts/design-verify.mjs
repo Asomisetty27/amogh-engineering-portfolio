@@ -106,7 +106,7 @@ const { chromium } = await import("@playwright/test");
 {
   const server = await preview({ preview: { port: 4181 } });
   const browser = await chromium.launch();
-  const ROUTES = ["/", "/projects", "/experience", "/skills", "/contact", "/quickview", "/thermalos"];
+  const ROUTES = ["/", "/projects", "/experience", "/skills", "/contact", "/quickview", "/thermalos", "/uas"];
   let errors = [];
   let hscroll = [];
   for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
