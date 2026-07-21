@@ -117,7 +117,7 @@ export default function PolyUAS() {
       {/* Hero */}
       <header style={{ padding: "120px 24px 88px", borderBottom: "1px solid hsl(var(--border))" }}>
         <div style={{ maxWidth: 1120, margin: "0 auto" }}>
-          <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 20 }}>
             <Chip>C-UASC · CSU California UAS Competition</Chip>
             <Chip>Cal Poly · SLO</Chip>
           </div>
