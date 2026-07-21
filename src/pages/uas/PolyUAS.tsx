@@ -239,7 +239,7 @@ export default function PolyUAS() {
               width: "100%", aspectRatio: "4 / 3", background: "hsl(258 20% 4%)",
               border: "1px solid hsl(var(--border))", borderRadius: 6, overflow: "hidden", position: "relative",
             }}>
-              {/* @ts-expect-error - custom element loaded from CDN */}
+              {/* custom element loaded from CDN (see useModelViewerScript) */}
               <model-viewer
                 src="/backplane.glb"
                 poster="/board-3d.png"
