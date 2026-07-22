@@ -241,6 +241,93 @@ type LoadState =
   | { kind: "error"; message: string }
   | { kind: "ready"; rows: Listing[] };
 
+// ── Apply Kit: every resource needed to apply, in one place ────────────────
+const RESUMES = [
+  { label: "FPGA / Hardware", href: "/apply/resume-fpga-hardware.pdf", use: "FPGA, digital design, embedded, chip startups" },
+  { label: "GPU / Systems", href: "/apply/resume-gpu-systems.pdf", use: "GPU, AI infrastructure, systems roles" },
+  { label: "Operations / Analytics", href: "/apply/resume-operations.pdf", use: "business operations, analyst, finance ops" },
+];
+const COVER_LETTERS = [
+  { label: "Etched (Firmware)", href: "/apply/coverletter-etched.pdf" },
+];
+const TARGETS = [
+  { tier: "FPGA / quant-dev (trading firms)", names: "Jane Street, Jump, Optiver, Tower, Citadel Securities, HRT, IMC, DRW" },
+  { tier: "Semiconductors", names: "NVIDIA, AMD, Intel, Qualcomm, Apple, Cadence, Synopsys, Skyworks, Marvell" },
+  { tier: "Hardware / AI-chip startups", names: "Etched, Atomic Semi, TETRAMEM" },
+];
+const FACTS: [string, string][] = [
+  ["Program", "B.S. Electrical Engineering, Cal Poly SLO"],
+  ["Graduation", "June 2028 (rising junior)"],
+  ["Work auth", "Authorized to work in the US"],
+  ["Email", "somisett@calpoly.edu"],
+  ["Phone", "(925) 236-2600"],
+  ["Links", "amogh.site / github.com/Asomisetty27 / linkedin.com/in/amoghsomisetty"],
+];
+
+function KitCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ background: PANEL, border: `1px solid ${FAINT}`, borderRadius: 4, padding: 18 }}>
+      <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: CHAMPAGNE, marginBottom: 12 }}>{title}</div>
+      {children}
+    </div>
+  );
+}
+
+function DownloadLink({ label, href, sub }: { label: string; href: string; sub?: string }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" style={{ display: "block", textDecoration: "none", padding: "8px 0", borderTop: `1px solid ${FAINT}` }}>
+      <div style={{ fontSize: 13, color: IVORY }}>
+        {label} <span style={{ color: CHAMPAGNE, fontFamily: MONO, fontSize: 10, letterSpacing: "0.12em" }}>PDF</span>
+      </div>
+      {sub ? <div style={{ fontFamily: MONO, fontSize: 11, color: MUTED, marginTop: 2 }}>{sub}</div> : null}
+    </a>
+  );
+}
+
+function ApplyKit() {
+  return (
+    <div style={{ marginBottom: 36 }}>
+      <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.28em", textTransform: "uppercase", color: MUTED, marginBottom: 14 }}>
+        Apply Kit
+      </div>
+      <div style={{ display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+        <KitCard title="Resumes">
+          {RESUMES.map((r) => <DownloadLink key={r.href} label={r.label} href={r.href} sub={`Use for: ${r.use}`} />)}
+        </KitCard>
+        <KitCard title="Cover letters">
+          {COVER_LETTERS.map((c) => <DownloadLink key={c.href} label={c.label} href={c.href} />)}
+          <div style={{ fontFamily: MONO, fontSize: 11, color: MUTED, marginTop: 10 }}>More added per role.</div>
+        </KitCard>
+        <KitCard title="Quick facts">
+          {FACTS.map(([k, v]) => (
+            <div key={k} style={{ padding: "5px 0", borderTop: `1px solid ${FAINT}` }}>
+              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: MUTED }}>{k}</div>
+              <div style={{ fontSize: 12, color: IVORY, marginTop: 2, wordBreak: "break-word" }}>{v}</div>
+            </div>
+          ))}
+          <div style={{ fontFamily: MONO, fontSize: 11, color: MUTED, marginTop: 10 }}>GPA omitted by policy. Route through referrals when possible.</div>
+        </KitCard>
+        <KitCard title="Target companies">
+          {TARGETS.map((t) => (
+            <div key={t.tier} style={{ padding: "6px 0", borderTop: `1px solid ${FAINT}` }}>
+              <div style={{ fontSize: 12, color: IVORY }}>{t.tier}</div>
+              <div style={{ fontFamily: MONO, fontSize: 11, color: MUTED, marginTop: 2, lineHeight: 1.5 }}>{t.names}</div>
+            </div>
+          ))}
+        </KitCard>
+        <KitCard title="Playbook">
+          <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12, color: MUTED, lineHeight: 1.7 }}>
+            <li>Star the GitHub trackers for daily new-posting pings.</li>
+            <li>LinkedIn: filter "past 24 hours", save searches, set alerts.</li>
+            <li>Cal Poly career fair (fall) is a top EE channel.</li>
+            <li>Referrals convert best: family at Wells Fargo, Cal Poly alumni at target firms.</li>
+          </ul>
+        </KitCard>
+      </div>
+    </div>
+  );
+}
+
 function ListingsView({ email }: { email: string }) {
   const [state, setState] = useState<LoadState>({ kind: "loading" });
 
@@ -321,6 +408,8 @@ function ListingsView({ email }: { email: string }) {
           </button>
         </div>
       </div>
+
+      <ApplyKit />
 
       {/* Body */}
       {state.kind === "loading" && (
