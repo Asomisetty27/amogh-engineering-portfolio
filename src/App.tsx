@@ -39,6 +39,9 @@ const IS_LAB_HOST = typeof window !== "undefined" && window.location.hostname.st
 const PolyUAS = lazy(() => import("./pages/uas/PolyUAS.tsx"));
 const IS_UAS_HOST = typeof window !== "undefined" && window.location.hostname.startsWith("uas.");
 
+// Private internships surface - gated to the account owner via Supabase auth.
+const Internships = lazy(() => import("./pages/internships/Internships.tsx"));
+
 const queryClient = new QueryClient();
 
 // Dark fallback (matches the site theme) so route transitions don't flash white.
@@ -75,6 +78,9 @@ const App = () => (
             {/* ══ PolyUAS - Cal Poly autonomous UAS (uas.amogh.site) ═════════ */}
             {IS_UAS_HOST && <Route path="/" element={<PolyUAS />} />}
             <Route path="/uas" element={<PolyUAS />} />
+
+            {/* ══ Internships - private, gated to account owner ══════════════ */}
+            <Route path="/internships" element={<Internships />} />
 
 
             <Route path="/" element={<Index />} />
