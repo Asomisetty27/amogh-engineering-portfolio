@@ -17,10 +17,21 @@ const ALLOWED_EMAILS = new Set([
 const LISTINGS_URL =
   "https://raw.githubusercontent.com/vanshb03/Summer2027-Internships/dev/.github/scripts/listings.json";
 
-const PROFILE_KEYWORDS = [
+// Tuned to a rising-junior BS EE profile: hardware / FPGA / digital design /
+// embedded / analog, plus FPGA and quant-DEVELOPER roles at trading firms.
+// EXCLUDE wins over INCLUDE, which screens out PhD/research and quantum roles
+// (and stops "quant" from substring-matching "quantum").
+const INCLUDE = [
   "fpga", "asic", "verilog", "rtl", "digital design", "hardware", "silicon",
-  "vlsi", "embedded", "electrical", "chip", "semiconductor", "quant", "soc",
-  "physical design", "design verification",
+  "vlsi", "embedded", "electrical", "electronics", "semiconductor", "physical design",
+  "design verification", "firmware", "analog", "mixed-signal", "pcb", "board design",
+  "power electronics", "signal integrity", "chip design", "hardware engineer",
+  "system on chip", "fpga engineer", "quant developer", "quantitative developer",
+  "quant trader", "quantitative trader", "quant trading", "quantitative trading",
+];
+const EXCLUDE = [
+  "quantum", "research scientist", "researcher", "phd", "ph.d", "postdoc",
+  "new grad", "new graduate",
 ];
 
 interface Listing {
@@ -58,7 +69,8 @@ function formatDate(unix: number): string {
 
 function matchesProfile(title: string): boolean {
   const t = title.toLowerCase();
-  return PROFILE_KEYWORDS.some((k) => t.includes(k));
+  if (EXCLUDE.some((k) => t.includes(k))) return false;
+  return INCLUDE.some((k) => t.includes(k));
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -289,7 +301,9 @@ function ListingsView({ email }: { email: string }) {
           </h1>
           <p style={{ color: MUTED, fontSize: 13, margin: "10px 0 0", maxWidth: 620, lineHeight: 1.55 }}>
             Live from the Summer 2027 community tracker, refreshed daily. Filtered
-            to Amogh's profile (FPGA / digital design / hardware / quant).
+            to Amogh's background: EE hardware, FPGA, digital design, embedded, and
+            analog, plus FPGA and quant-developer roles at trading firms. Research
+            and PhD-level roles excluded.
           </p>
         </div>
         <div style={{ fontFamily: MONO, fontSize: 11, color: MUTED, textAlign: "right" }}>
