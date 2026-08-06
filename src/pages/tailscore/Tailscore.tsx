@@ -2,8 +2,9 @@
 // Hostname-routed at tailscore.amogh.site, plus /tailscore for preview.
 // Standalone surface: no portfolio nav, no shared chrome, its own palette.
 import { useEffect, useState } from "react";
-import { Snapshot, fetchSnapshot, relTime } from "./api";
+import { Capper, LedgerRow, Snapshot, fetchLedger, fetchSnapshot, relTime } from "./api";
 import Board from "./Board";
+import CapperDetail from "./CapperDetail";
 import Leaderboard from "./Leaderboard";
 import {
   BG, BODY, CSS, DIM, DISPLAY, EMERALD, FAINT, FG, LABEL, LINE, MONO, NUM,
@@ -31,6 +32,8 @@ const Tailscore = () => {
   const [snap, setSnap] = useState<Snapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
+  const [ledger, setLedger] = useState<LedgerRow[] | null>(null);
+  const [selected, setSelected] = useState<Capper | null>(null);
 
   useEffect(() => {
     document.title = "Tailscore";
@@ -62,6 +65,20 @@ const Tailscore = () => {
     const clock = window.setInterval(() => setTick((t) => t + 1), 30_000);
     return () => { alive = false; window.clearInterval(poll); window.clearInterval(clock); };
   }, []);
+
+  // receipts load once in the background after first paint (sparklines + drill-down)
+  useEffect(() => {
+    let alive = true;
+    fetchLedger()
+      .then((rows) => { if (alive) setLedger(rows); })
+      .catch(() => { /* drill-down retries on open */ });
+    return () => { alive = false; };
+  }, []);
+
+  const openCapperByName = (name: string) => {
+    const c = snap?.cappers.find((x) => x.capper === name);
+    if (c) setSelected(c);
+  };
 
   // tick re-renders keep the relative timestamp honest between polls
   void tick;
@@ -144,10 +161,12 @@ const Tailscore = () => {
 
       {snap && (
         <>
-          <Board plays={snap.plays} />
-          <Leaderboard cappers={snap.cappers} />
+          <Board plays={snap.plays} onCapper={openCapperByName} />
+          <Leaderboard cappers={snap.cappers} ledger={ledger} onSelect={setSelected} />
         </>
       )}
+
+      {selected && <CapperDetail capper={selected} onClose={() => setSelected(null)} />}
 
       <footer style={{ borderTop: `1px solid ${LINE}` }}>
         <div style={{ ...WRAP, padding: "24px 20px", display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>

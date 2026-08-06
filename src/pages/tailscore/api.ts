@@ -40,6 +40,20 @@ export interface Capper {
   flat_pl: number;
   units_calibration: number | null;
   updated_at: string;
+  // closing line value, populated by the pipeline as live capture matures
+  clv?: number | null;
+}
+
+export interface LedgerRow {
+  capper: string;
+  posted_at: string;
+  description: string;
+  market_type: string | null;
+  sport: string | null;
+  result: "win" | "loss" | "push" | "void";
+  profit_units: number | null;
+  odds_american: number | null;
+  settled_by: string | null;
 }
 
 export interface Totals {
@@ -84,6 +98,22 @@ export async function fetchSnapshot(): Promise<Snapshot> {
       totals: (byKey.get("totals") as Totals) ?? {},
     },
   };
+}
+
+// receipts are heavy (up to 4000 rows), so they load once in the background
+// after first paint and are cached for the session
+let ledgerCache: Promise<LedgerRow[]> | null = null;
+
+export function fetchLedger(): Promise<LedgerRow[]> {
+  if (!ledgerCache) {
+    ledgerCache = get<LedgerRow[]>(
+      "/capper_ledger?select=*&order=posted_at.desc&limit=4000",
+    ).catch((e) => {
+      ledgerCache = null; // allow retry on next open
+      throw e;
+    });
+  }
+  return ledgerCache;
 }
 
 // ── formatting helpers ──────────────────────────────────────────────────────

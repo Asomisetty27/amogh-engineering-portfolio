@@ -1,4 +1,4 @@
-// Today's board: ranked play cards, live filters, capper chips with scores.
+// Today's board: ranked play cards, market tabs, live filters, capper chips.
 import { useMemo, useState } from "react";
 import { Play, fmtScore, relTime } from "./api";
 import {
@@ -6,7 +6,9 @@ import {
   MONO, NUM, PANEL, RED, SectionHead, TAG_COLOR, WRAP, scoreColor,
 } from "./ui";
 
-const CapperChips: React.FC<{ play: Play }> = ({ play }) => {
+const CapperChips: React.FC<{ play: Play; onCapper?: (name: string) => void }> = ({
+  play, onCapper,
+}) => {
   const [expanded, setExpanded] = useState(false);
   const list =
     play.cappers && play.cappers.length > 0
@@ -16,36 +18,51 @@ const CapperChips: React.FC<{ play: Play }> = ({ play }) => {
   const hidden = list.length - shown.length;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-      {shown.map((c, i) => (
-        <span
-          key={c.name}
-          title={i === 0 ? "posted it first" : undefined}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 5,
-            padding: "2px 8px",
-            borderRadius: 999,
-            border: `1px solid ${i === 0 ? "rgba(255,255,255,0.22)" : LINE}`,
-            fontFamily: BODY,
-            fontSize: 12,
-            color: DIM,
-          }}
-        >
-          {i === 0 && (
-            <span
-              aria-hidden
-              style={{ width: 4, height: 4, borderRadius: 999, background: FG, opacity: 0.7 }}
-            />
-          )}
-          {c.name}
-          {Number.isFinite(c.score) && (
-            <span style={{ ...NUM, fontSize: 11, color: scoreColor(c.score) }}>
-              {fmtScore(c.score)}
-            </span>
-          )}
-        </span>
-      ))}
+      {shown.map((c, i) => {
+        const inner = (
+          <>
+            {i === 0 && (
+              <span
+                aria-hidden
+                style={{ width: 4, height: 4, borderRadius: 999, background: FG, opacity: 0.7 }}
+              />
+            )}
+            {c.name}
+            {Number.isFinite(c.score) && (
+              <span style={{ ...NUM, fontSize: 11, color: scoreColor(c.score) }}>
+                {fmtScore(c.score)}
+              </span>
+            )}
+          </>
+        );
+        const style: React.CSSProperties = {
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 5,
+          padding: "2px 8px",
+          borderRadius: 999,
+          border: `1px solid ${i === 0 ? "rgba(255,255,255,0.22)" : LINE}`,
+          fontFamily: BODY,
+          fontSize: 12,
+          color: DIM,
+          background: "transparent",
+        };
+        const title = i === 0 ? "posted it first" : undefined;
+        return onCapper ? (
+          <button
+            key={c.name}
+            type="button"
+            className="ts-chipbtn"
+            title={title ? `${title}. Click for receipts` : "Click for receipts"}
+            onClick={() => onCapper(c.name)}
+            style={{ ...style, cursor: "pointer" }}
+          >
+            {inner}
+          </button>
+        ) : (
+          <span key={c.name} title={title} style={style}>{inner}</span>
+        );
+      })}
       {hidden > 0 && (
         <button
           type="button"
@@ -69,7 +86,9 @@ const CapperChips: React.FC<{ play: Play }> = ({ play }) => {
   );
 };
 
-const PlayCard: React.FC<{ play: Play; index: number }> = ({ play, index }) => {
+const PlayCard: React.FC<{ play: Play; index: number; onCapper?: (name: string) => void }> = ({
+  play, index, onCapper,
+}) => {
   const color = TAG_COLOR[play.tag] ?? GRAY;
   return (
     <article
@@ -109,7 +128,7 @@ const PlayCard: React.FC<{ play: Play; index: number }> = ({ play, index }) => {
       </p>
 
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <CapperChips play={play} />
+        <CapperChips play={play} onCapper={onCapper} />
         {play.stake_units != null && (
           <span
             title="suggested stake, quarter-Kelly"
@@ -125,7 +144,7 @@ const PlayCard: React.FC<{ play: Play; index: number }> = ({ play, index }) => {
 
 type Filter = "all" | "actionable" | "fade";
 type Order = "score" | "newest";
-type Market = "all" | "book" | "props";
+type Market = "all" | "book" | "props" | "consensus";
 
 // null market_type (stale rows) counts as a book play by directive
 const marketOf = (p: Play): "book" | "props" | "other" => {
@@ -144,6 +163,8 @@ const SegTab: React.FC<{
 }> = ({ active, onClick, count, first, children }) => (
   <button
     type="button"
+    role="tab"
+    aria-selected={active}
     onClick={onClick}
     className="ts-chipbtn"
     style={{
@@ -170,7 +191,9 @@ const SegTab: React.FC<{
   </button>
 );
 
-const Board: React.FC<{ plays: Play[] }> = ({ plays }) => {
+const Board: React.FC<{ plays: Play[]; onCapper?: (name: string) => void }> = ({
+  plays, onCapper,
+}) => {
   const [market, setMarket] = useState<Market>("all");
   const [filter, setFilter] = useState<Filter>("all");
   const [order, setOrder] = useState<Order>("score");
@@ -179,10 +202,16 @@ const Board: React.FC<{ plays: Play[] }> = ({ plays }) => {
     all: plays.length,
     book: plays.filter((p) => marketOf(p) === "book").length,
     props: plays.filter((p) => marketOf(p) === "props").length,
+    consensus: plays.filter((p) => p.consensus_count >= 2).length,
   }), [plays]);
 
   const shown = useMemo(() => {
-    const m = market === "all" ? plays : plays.filter((p) => marketOf(p) === market);
+    const m =
+      market === "all"
+        ? plays
+        : market === "consensus"
+          ? plays.filter((p) => p.consensus_count >= 2)
+          : plays.filter((p) => marketOf(p) === market);
     const f =
       filter === "actionable"
         ? m.filter((p) => p.tag === "TAIL" || p.tag === "LEAN")
@@ -190,8 +219,14 @@ const Board: React.FC<{ plays: Play[] }> = ({ plays }) => {
           ? m.filter((p) => p.tag === "FADE")
           : m;
     const s = [...f];
-    if (order === "score") s.sort((a, b) => b.play_score - a.play_score);
-    else s.sort((a, b) => +new Date(b.posted_at) - +new Date(a.posted_at));
+    if (market === "consensus") {
+      // consensus reads by agreement first, then confidence
+      s.sort((a, b) => b.consensus_count - a.consensus_count || b.play_score - a.play_score);
+    } else if (order === "score") {
+      s.sort((a, b) => b.play_score - a.play_score);
+    } else {
+      s.sort((a, b) => +new Date(b.posted_at) - +new Date(a.posted_at));
+    }
     return s;
   }, [plays, market, filter, order]);
 
@@ -223,6 +258,9 @@ const Board: React.FC<{ plays: Play[] }> = ({ plays }) => {
           <SegTab active={market === "props"} onClick={() => setMarket("props")} count={counts.props}>
             Props
           </SegTab>
+          <SegTab active={market === "consensus"} onClick={() => setMarket("consensus")} count={counts.consensus}>
+            Consensus
+          </SegTab>
         </div>
         <div style={{ display: "flex", gap: 8, marginLeft: "auto", flexWrap: "wrap", alignItems: "center" }}>
           <Chip active={filter === "all"} onClick={() => setFilter("all")}>All</Chip>
@@ -230,11 +268,21 @@ const Board: React.FC<{ plays: Play[] }> = ({ plays }) => {
             Tail + Lean
           </Chip>
           <Chip active={filter === "fade"} color={RED} onClick={() => setFilter("fade")}>Fade</Chip>
-          <span aria-hidden style={{ width: 1, height: 18, background: LINE }} />
-          <Chip active={order === "score"} onClick={() => setOrder("score")}>By score</Chip>
-          <Chip active={order === "newest"} onClick={() => setOrder("newest")}>Newest</Chip>
+          {market !== "consensus" && (
+            <>
+              <span aria-hidden style={{ width: 1, height: 18, background: LINE }} />
+              <Chip active={order === "score"} onClick={() => setOrder("score")}>By score</Chip>
+              <Chip active={order === "newest"} onClick={() => setOrder("newest")}>Newest</Chip>
+            </>
+          )}
         </div>
       </div>
+
+      {market === "consensus" && (
+        <p style={{ fontFamily: BODY, fontSize: 13, color: DIM, marginTop: -4, marginBottom: 16 }}>
+          Multiple cappers, one side. Discounted for copying in the score.
+        </p>
+      )}
 
       {!hasActionable && (
         <p style={{ fontFamily: BODY, fontSize: 14, color: DIM, marginBottom: 20 }}>
@@ -244,11 +292,13 @@ const Board: React.FC<{ plays: Play[] }> = ({ plays }) => {
 
       {shown.length === 0 ? (
         <p style={{ fontFamily: BODY, fontSize: 14, color: FAINT }}>
-          Nothing matches this filter right now.
+          {market === "consensus"
+            ? "No consensus plays right now. When two or more cappers land on one side, it shows here."
+            : "Nothing matches this filter right now."}
         </p>
       ) : (
         <div style={{ display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))" }}>
-          {shown.map((p, i) => <PlayCard key={p.play_key} play={p} index={i} />)}
+          {shown.map((p, i) => <PlayCard key={p.play_key} play={p} index={i} onCapper={onCapper} />)}
         </div>
       )}
     </section>

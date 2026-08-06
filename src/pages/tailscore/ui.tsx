@@ -49,6 +49,11 @@ export const EASE = "cubic-bezier(.16,1,.3,1)";
 
 export const CSS = `
 @keyframes ts-pulse { 0%{opacity:1;transform:scale(1)} 70%{opacity:0;transform:scale(2.6)} 100%{opacity:0} }
+@keyframes ts-fade { from{opacity:0} to{opacity:1} }
+.ts-scrim{animation:ts-fade .25s ${EASE} both}
+.ts-panel{animation:ts-in .35s ${EASE} both}
+.ts-rowbtn{cursor:pointer}
+.ts-rowbtn:focus-visible{outline:1px solid ${LINE_2};outline-offset:-1px}
 @keyframes ts-in { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
 @keyframes ts-bar { from{transform:scaleX(0)} to{transform:scaleX(1)} }
 .ts-card{animation:ts-in .5s ${EASE} both}
@@ -112,6 +117,27 @@ export const Chip: React.FC<{
     {children}
   </button>
 );
+
+// tiny cumulative P/L sparkline; colored by where the series ends
+export const Spark: React.FC<{ values: number[]; width?: number; height?: number }> = ({
+  values, width = 88, height = 22,
+}) => {
+  if (values.length < 2) return <span style={{ color: FAINT }}>-</span>;
+  const min = Math.min(0, ...values);
+  const max = Math.max(0, ...values);
+  const span = max - min || 1;
+  const x = (i: number) => (i / (values.length - 1)) * (width - 2) + 1;
+  const y = (v: number) => height - 2 - ((v - min) / span) * (height - 4);
+  const pts = values.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const last = values[values.length - 1];
+  const stroke = last > 0 ? EMERALD : last < 0 ? RED : GRAY;
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden>
+      <line x1={1} x2={width - 1} y1={y(0)} y2={y(0)} stroke={LINE_2} strokeDasharray="2 3" strokeWidth={1} />
+      <polyline points={pts} fill="none" stroke={stroke} strokeWidth={1.5} strokeLinejoin="round" />
+    </svg>
+  );
+};
 
 export const SectionHead: React.FC<{ index: string; sub: string; title: string; right?: React.ReactNode }> = ({
   index, sub, title, right,

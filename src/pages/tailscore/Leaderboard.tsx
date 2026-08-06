@@ -1,9 +1,10 @@
 // Capper leaderboard: the receipts. Sortable, searchable, honest about sample size.
+// Rows open the full receipts drill-down.
 import { useMemo, useState } from "react";
-import { Capper, fmtScore, fmtSigned } from "./api";
+import { Capper, LedgerRow, fmtScore, fmtSigned } from "./api";
 import {
   BODY, Bar, Chip, DIM, EMERALD, FAINT, FG, LABEL, LINE, MONO, NUM, PANEL,
-  RED, SectionHead, WRAP, scoreColor,
+  RED, SectionHead, Spark, WRAP, scoreColor,
 } from "./ui";
 
 type SortKey = "score" | "record" | "pl" | "price";
@@ -18,6 +19,18 @@ function valueRead(c: Capper): { text: string; color: string } {
   if (c.score < 0.5 && c.flat_pl < 0) return { text: "paying to lose", color: RED };
   return { text: "fairly priced", color: FAINT };
 }
+
+const CLV_TIP = "closing line value accrues as live capture matures";
+
+const clvCell = (c: Capper): { text: string; color: string; tip?: string } => {
+  const v = c.clv;
+  if (v == null || !Number.isFinite(v)) return { text: "-", color: FAINT, tip: CLV_TIP };
+  const pct = v * 100;
+  return {
+    text: `${pct > 0 ? "+" : ""}${pct.toFixed(1)}%`,
+    color: pct > 0 ? EMERALD : pct < 0 ? RED : DIM,
+  };
+};
 
 const RankCell: React.FC<{ rank: number }> = ({ rank }) => (
   <span
@@ -65,7 +78,9 @@ const SortButton: React.FC<{ active: boolean; onClick: () => void; children: Rea
   </button>
 );
 
-const FadeWatch: React.FC<{ cappers: Capper[] }> = ({ cappers }) => {
+const FadeWatch: React.FC<{ cappers: Capper[]; onSelect: (c: Capper) => void }> = ({
+  cappers, onSelect,
+}) => {
   const pool = cappers.filter((c) => c.n_graded >= 30);
   const fallback = pool.length >= 3 ? pool : cappers.filter((c) => c.n_graded >= 15);
   const worst = [...fallback].sort((a, b) => a.score - b.score).slice(0, 3);
@@ -89,7 +104,17 @@ const FadeWatch: React.FC<{ cappers: Capper[] }> = ({ cappers }) => {
       </div>
       <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
         {worst.map((c) => (
-          <div key={c.capper} style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+          <button
+            key={c.capper}
+            type="button"
+            className="ts-chipbtn"
+            onClick={() => onSelect(c)}
+            title="Click for receipts"
+            style={{
+              display: "flex", alignItems: "baseline", gap: 8,
+              background: "transparent", border: "none", padding: 0, cursor: "pointer",
+            }}
+          >
             <span style={{ ...NUM, fontSize: 14, color: RED }}>{fmtScore(c.score)}</span>
             <span style={{ fontFamily: BODY, fontSize: 13, color: FG }}>{c.capper}</span>
             <span style={{ ...NUM, fontSize: 11.5, color: DIM }}>
@@ -100,16 +125,40 @@ const FadeWatch: React.FC<{ cappers: Capper[] }> = ({ cappers }) => {
                 ${c.monthly_price_usd.toFixed(0)}/mo
               </span>
             )}
-          </div>
+          </button>
         ))}
       </div>
     </div>
   );
 };
 
-const Leaderboard: React.FC<{ cappers: Capper[] }> = ({ cappers }) => {
+const FORM_N = 20;
+
+const Leaderboard: React.FC<{
+  cappers: Capper[];
+  ledger: LedgerRow[] | null;
+  onSelect: (c: Capper) => void;
+}> = ({ cappers, ledger, onSelect }) => {
   const [sort, setSort] = useState<SortKey>("score");
   const [query, setQuery] = useState("");
+
+  // last FORM_N graded picks per capper, cumulative P/L, chronological
+  const form = useMemo(() => {
+    if (!ledger) return null;
+    const byCapper = new Map<string, LedgerRow[]>();
+    for (const r of ledger) {
+      // ledger is newest first; take the first FORM_N per capper
+      const arr = byCapper.get(r.capper);
+      if (!arr) byCapper.set(r.capper, [r]);
+      else if (arr.length < FORM_N) arr.push(r);
+    }
+    const out = new Map<string, number[]>();
+    for (const [name, rows] of byCapper) {
+      let run = 0;
+      out.set(name, [...rows].reverse().map((r) => (run += r.profit_units ?? 0)));
+    }
+    return out;
+  }, [ledger]);
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -128,6 +177,13 @@ const Leaderboard: React.FC<{ cappers: Capper[] }> = ({ cappers }) => {
   }, [cappers]);
 
   const ariaSort = (k: SortKey) => (sort === k ? ("descending" as const) : undefined);
+
+  const rowKey = (e: React.KeyboardEvent, c: Capper) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onSelect(c);
+    }
+  };
 
   return (
     <section style={{ ...WRAP, paddingBottom: 56 }}>
@@ -156,11 +212,15 @@ const Leaderboard: React.FC<{ cappers: Capper[] }> = ({ cappers }) => {
         }
       />
 
-      <FadeWatch cappers={cappers} />
+      <FadeWatch cappers={cappers} onSelect={onSelect} />
+
+      <p style={{ fontFamily: BODY, fontSize: 12.5, color: FAINT, margin: "0 0 12px" }}>
+        Click any capper for the full receipts: every graded pick, the P/L curve, and the splits.
+      </p>
 
       {/* wide: table */}
       <div className="ts-desktop" style={{ background: PANEL, border: `1px solid ${LINE}`, borderRadius: 6, overflowX: "auto" }}>
-        <table style={{ width: "100%", minWidth: 760, borderCollapse: "collapse" }}>
+        <table style={{ width: "100%", minWidth: 920, borderCollapse: "collapse" }}>
           <thead>
             <tr>
               <th style={{ ...LABEL, textAlign: "left", padding: "10px 12px", borderBottom: `1px solid ${LINE}` }}>#</th>
@@ -168,11 +228,17 @@ const Leaderboard: React.FC<{ cappers: Capper[] }> = ({ cappers }) => {
               <th aria-sort={ariaSort("score")} style={{ textAlign: "right", padding: "10px 12px", borderBottom: `1px solid ${LINE}` }}>
                 <SortButton active={sort === "score"} onClick={() => setSort("score")}>Score</SortButton>
               </th>
+              <th style={{ ...LABEL, textAlign: "right", padding: "10px 12px", borderBottom: `1px solid ${LINE}` }}>
+                Form
+              </th>
               <th aria-sort={ariaSort("record")} style={{ textAlign: "right", padding: "10px 12px", borderBottom: `1px solid ${LINE}` }}>
                 <SortButton active={sort === "record"} onClick={() => setSort("record")}>W-L-P</SortButton>
               </th>
               <th aria-sort={ariaSort("pl")} style={{ textAlign: "right", padding: "10px 12px", borderBottom: `1px solid ${LINE}` }}>
                 <SortButton active={sort === "pl"} onClick={() => setSort("pl")}>Flat P/L</SortButton>
+              </th>
+              <th style={{ ...LABEL, textAlign: "right", padding: "10px 12px", borderBottom: `1px solid ${LINE}` }}>
+                CLV
               </th>
               <th aria-sort={ariaSort("price")} style={{ textAlign: "right", padding: "10px 12px", borderBottom: `1px solid ${LINE}` }}>
                 <SortButton active={sort === "price"} onClick={() => setSort("price")}>Price</SortButton>
@@ -185,8 +251,17 @@ const Leaderboard: React.FC<{ cappers: Capper[] }> = ({ cappers }) => {
               const early = c.n_graded < 30;
               const sc = scoreColor(c.score);
               const v = valueRead(c);
+              const clv = clvCell(c);
               return (
-                <tr key={c.capper} className="ts-row">
+                <tr
+                  key={c.capper}
+                  className="ts-row ts-rowbtn"
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`${c.capper} receipts`}
+                  onClick={() => onSelect(c)}
+                  onKeyDown={(e) => rowKey(e, c)}
+                >
                   <td style={{ padding: 12, borderBottom: `1px solid ${LINE}` }}>
                     <RankCell rank={ranks.get(c.capper) ?? 0} />
                   </td>
@@ -203,11 +278,23 @@ const Leaderboard: React.FC<{ cappers: Capper[] }> = ({ cappers }) => {
                       </div>
                     </div>
                   </td>
+                  <td
+                    title={`cumulative P/L over the last ${FORM_N} graded picks`}
+                    style={{ padding: 12, borderBottom: `1px solid ${LINE}`, textAlign: "right" }}
+                  >
+                    {form ? <Spark values={form.get(c.capper) ?? []} /> : <span style={{ color: FAINT }}>-</span>}
+                  </td>
                   <td style={{ ...NUM, padding: 12, borderBottom: `1px solid ${LINE}`, textAlign: "right", fontSize: 13, color: DIM }}>
                     {c.wins}-{c.losses}-{c.pushes}
                   </td>
                   <td style={{ ...NUM, padding: 12, borderBottom: `1px solid ${LINE}`, textAlign: "right", fontSize: 13, color: c.flat_pl > 0 ? EMERALD : c.flat_pl < 0 ? RED : DIM }}>
                     {fmtSigned(c.flat_pl)}
+                  </td>
+                  <td
+                    title={clv.tip}
+                    style={{ ...NUM, padding: 12, borderBottom: `1px solid ${LINE}`, textAlign: "right", fontSize: 13, color: clv.color }}
+                  >
+                    {clv.text}
                   </td>
                   <td style={{ ...NUM, padding: 12, borderBottom: `1px solid ${LINE}`, textAlign: "right", fontSize: 13, color: DIM }}>
                     {c.monthly_price_usd != null ? `$${c.monthly_price_usd.toFixed(0)}` : "-"}
@@ -230,8 +317,11 @@ const Leaderboard: React.FC<{ cappers: Capper[] }> = ({ cappers }) => {
             const sc = scoreColor(c.score);
             const v = valueRead(c);
             return (
-              <div
+              <button
                 key={c.capper}
+                type="button"
+                onClick={() => onSelect(c)}
+                aria-label={`${c.capper} receipts`}
                 style={{
                   background: PANEL,
                   border: `1px solid ${LINE}`,
@@ -240,6 +330,9 @@ const Leaderboard: React.FC<{ cappers: Capper[] }> = ({ cappers }) => {
                   display: "flex",
                   flexDirection: "column",
                   gap: 10,
+                  textAlign: "left",
+                  cursor: "pointer",
+                  color: "inherit",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -260,7 +353,7 @@ const Leaderboard: React.FC<{ cappers: Capper[] }> = ({ cappers }) => {
                   </span>
                   <span style={{ ...LABEL, fontSize: 9, color: v.color, marginLeft: "auto" }}>{v.text}</span>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
