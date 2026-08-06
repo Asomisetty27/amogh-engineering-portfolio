@@ -114,7 +114,7 @@ const { chromium } = await import("@playwright/test");
   const browser = await chromium.launch(
     process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {},
   );
-  const ROUTES = ["/", "/projects", "/experience", "/skills", "/contact", "/quickview", "/thermalos", "/uas"];
+  const ROUTES = ["/", "/projects", "/experience", "/skills", "/contact", "/quickview", "/thermalos", "/uas", "/tailscore"];
   let errors = [];
   let hscroll = [];
   for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
