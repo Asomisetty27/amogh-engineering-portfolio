@@ -83,8 +83,13 @@ const App = () => (
             {IS_UAS_HOST && <Route path="/" element={<PolyUAS />} />}
             <Route path="/uas" element={<PolyUAS />} />
 
+            {/* ══ Tailscore - capper grading console (tailscore.amogh.site) ══ */}
+            {IS_TAILSCORE_HOST && <Route path="/" element={<Tailscore />} />}
+            <Route path="/tailscore" element={<Tailscore />} />
+
             {/* ══ Internships - private, gated to account owner ══════════════ */}
             <Route path="/internships" element={<Internships />} />
+
 
 
             <Route path="/" element={<Index />} />
