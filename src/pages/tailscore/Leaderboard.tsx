@@ -1,7 +1,9 @@
 // Capper leaderboard: the receipts. Sortable, searchable, honest about sample size.
 // Rows open the full receipts drill-down.
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { Capper, LedgerRow, fmtScore, fmtSigned } from "./api";
+import { DayBars } from "./Viz";
 import {
   BODY, Bar, Chip, DIM, EMERALD, FAINT, FG, LABEL, LINE, MONO, NUM, PANEL,
   RED, SectionHead, Spark, WRAP, scoreColor,
@@ -48,9 +50,13 @@ const RankCell: React.FC<{ rank: number }> = ({ rank }) => (
 const NameCell: React.FC<{ c: Capper }> = ({ c }) => (
   <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
     <span style={{ fontFamily: BODY, color: FG }}>{c.capper}</span>
-    {c.n_graded < 30 && <Chip color={FAINT}>early read</Chip>}
+    {c.n_graded < 30 && (
+      <Chip color={FAINT} href="#how-honesty" title="small sample; score stays humble. Click to learn why">
+        early read
+      </Chip>
+    )}
     {(c.units_calibration ?? 0) >= 0.6 && (
-      <Chip color={EMERALD} title="their stated unit sizes predict their own results">
+      <Chip color={EMERALD} href="#how-units" title="their stated unit sizes predict their own results. Click to learn more">
         honest sizing
       </Chip>
     )}
@@ -138,7 +144,8 @@ const Leaderboard: React.FC<{
   cappers: Capper[];
   ledger: LedgerRow[] | null;
   onSelect: (c: Capper) => void;
-}> = ({ cappers, ledger, onSelect }) => {
+  stamp?: string;
+}> = ({ cappers, ledger, onSelect, stamp }) => {
   const [sort, setSort] = useState<SortKey>("score");
   const [query, setQuery] = useState("");
 
@@ -186,12 +193,14 @@ const Leaderboard: React.FC<{
   };
 
   return (
-    <section style={{ ...WRAP, paddingBottom: 56 }}>
+    <section id="cappers" className="ts-anchor" style={{ ...WRAP, paddingBottom: 56 }}>
       <SectionHead
         index="02"
-        sub="Peer-relative ranking"
+        sub={stamp ?? "Peer-relative ranking"}
         title="Capper Leaderboard"
         right={
+          <>
+          <DayBars ledger={ledger} />
           <input
             className="ts-search"
             value={query}
@@ -209,6 +218,7 @@ const Leaderboard: React.FC<{
               width: 190,
             }}
           />
+          </>
         }
       />
 
@@ -238,7 +248,7 @@ const Leaderboard: React.FC<{
                 <SortButton active={sort === "pl"} onClick={() => setSort("pl")}>Flat P/L</SortButton>
               </th>
               <th style={{ ...LABEL, textAlign: "right", padding: "10px 12px", borderBottom: `1px solid ${LINE}` }}>
-                CLV
+                <a className="ts-gloss" href="#how-clv" title="what closing line value means">CLV</a>
               </th>
               <th aria-sort={ariaSort("price")} style={{ textAlign: "right", padding: "10px 12px", borderBottom: `1px solid ${LINE}` }}>
                 <SortButton active={sort === "price"} onClick={() => setSort("price")}>Price</SortButton>
@@ -253,7 +263,9 @@ const Leaderboard: React.FC<{
               const v = valueRead(c);
               const clv = clvCell(c);
               return (
-                <tr
+                <motion.tr
+                  layout
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                   key={c.capper}
                   className="ts-row ts-rowbtn"
                   tabIndex={0}
@@ -302,7 +314,7 @@ const Leaderboard: React.FC<{
                   <td style={{ ...LABEL, padding: 12, borderBottom: `1px solid ${LINE}`, fontSize: 9.5, color: v.color }}>
                     {v.text}
                   </td>
-                </tr>
+                </motion.tr>
               );
             })}
           </tbody>

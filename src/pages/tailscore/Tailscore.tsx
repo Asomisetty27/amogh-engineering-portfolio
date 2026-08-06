@@ -1,30 +1,72 @@
 // Tailscore. Public read-only console for the capper grading pipeline.
 // Hostname-routed at tailscore.amogh.site, plus /tailscore for preview.
 // Standalone surface: no portfolio nav, no shared chrome, its own palette.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Capper, LedgerRow, Snapshot, fetchLedger, fetchSnapshot, relTime } from "./api";
-import Board from "./Board";
+import Board, { Market } from "./Board";
 import CapperDetail from "./CapperDetail";
+import HowItWorks from "./HowItWorks";
 import Leaderboard from "./Leaderboard";
+import { ScoreStrip } from "./Viz";
 import {
-  BG, BODY, CSS, DIM, DISPLAY, EMERALD, FAINT, FG, LABEL, LINE, MONO, NUM,
-  PANEL, RED, WRAP,
+  BG, BODY, CSS, Cursor, DIM, DISPLAY, EMERALD, FAINT, FG, LABEL, LINE, MONO,
+  NUM, PANEL, RED, WRAP, useCountUp,
 } from "./ui";
 
 const StatBlock: React.FC<{ label: string; value: number | undefined; first?: boolean }> = ({
   label, value, first,
+}) => {
+  const live = useCountUp(value);
+  return (
+    <div
+      style={{
+        padding: "18px 22px 18px 20px",
+        borderLeft: first ? "none" : `1px solid ${LINE}`,
+        flex: "1 1 150px",
+      }}
+    >
+      <div style={{ ...NUM, fontSize: 27, fontWeight: 600, color: FG, letterSpacing: "-0.02em" }}>
+        {live != null ? live.toLocaleString() : "-"}
+      </div>
+      <div style={{ ...LABEL, marginTop: 6 }}>{label}</div>
+    </div>
+  );
+};
+
+type NavId = "board" | "consensus" | "cappers" | "how";
+
+const NavItem: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode }> = ({
+  active, onClick, children,
 }) => (
-  <div
+  <button
+    type="button"
+    onClick={onClick}
+    data-active={active}
+    className="ts-navitem ts-press"
     style={{
-      padding: "18px 22px 18px 20px",
-      borderLeft: first ? "none" : `1px solid ${LINE}`,
-      flex: "1 1 150px",
+      fontFamily: MONO,
+      fontSize: 10.5,
+      letterSpacing: "0.18em",
+      textTransform: "uppercase",
+      color: active ? FG : FAINT,
+      background: "transparent",
+      border: "none",
+      padding: "8px 14px",
+      cursor: "pointer",
     }}
   >
-    <div style={{ ...NUM, fontSize: 27, fontWeight: 600, color: FG, letterSpacing: "-0.02em" }}>
-      {value != null ? value.toLocaleString() : "-"}
+    {children}
+  </button>
+);
+
+const Skeleton: React.FC = () => (
+  <div style={{ ...WRAP, paddingTop: 40, display: "flex", flexDirection: "column", gap: 14 }}>
+    <div className="ts-skel" style={{ height: 88 }} />
+    <div style={{ display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))" }}>
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <div key={i} className="ts-skel" style={{ height: 150 }} />
+      ))}
     </div>
-    <div style={{ ...LABEL, marginTop: 6 }}>{label}</div>
   </div>
 );
 
@@ -34,6 +76,9 @@ const Tailscore = () => {
   const [tick, setTick] = useState(0);
   const [ledger, setLedger] = useState<LedgerRow[] | null>(null);
   const [selected, setSelected] = useState<Capper | null>(null);
+  const [market, setMarket] = useState<Market>("all");
+  const [inView, setInView] = useState<"board" | "cappers" | "how">("board");
+  const observed = useRef(false);
 
   useEffect(() => {
     document.title = "Tailscore";
@@ -80,6 +125,35 @@ const Tailscore = () => {
     if (c) setSelected(c);
   };
 
+  // active-section tracking for the masthead nav
+  useEffect(() => {
+    if (!snap || observed.current) return;
+    observed.current = true;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) setInView(e.target.id as "board" | "cappers" | "how");
+        }
+      },
+      { rootMargin: "-30% 0px -60% 0px" },
+    );
+    for (const id of ["board", "cappers", "how"]) {
+      const el = document.getElementById(id);
+      if (el) io.observe(el);
+    }
+    return () => io.disconnect();
+  }, [snap]);
+
+  const jump = (id: NavId) => {
+    if (id === "consensus") {
+      setMarket("consensus");
+      document.getElementById("board")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    if (id === "board" && market === "consensus") setMarket("all");
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
   // tick re-renders keep the relative timestamp honest between polls
   void tick;
   const updated = relTime(snap?.meta.lastSync ?? null);
@@ -96,11 +170,22 @@ const Tailscore = () => {
             <span style={{ fontFamily: MONO, fontSize: 15, fontWeight: 700, letterSpacing: "0.3em", color: FG }}>
               TAILSCORE
             </span>
-            <span aria-hidden style={{ fontFamily: MONO, fontSize: 15, color: EMERALD }}>_</span>
+            <Cursor />
           </div>
-          <div className="ts-desktop" style={{ ...LABEL, borderLeft: `1px solid ${LINE}`, paddingLeft: 14 }}>
-            Capper grading console
-          </div>
+          <nav className="ts-nav" aria-label="Sections" style={{ borderLeft: `1px solid ${LINE}`, paddingLeft: 8 }}>
+            <NavItem active={inView === "board" && market !== "consensus"} onClick={() => jump("board")}>
+              Board
+            </NavItem>
+            <NavItem active={inView === "board" && market === "consensus"} onClick={() => jump("consensus")}>
+              Consensus
+            </NavItem>
+            <NavItem active={inView === "cappers"} onClick={() => jump("cappers")}>
+              Cappers
+            </NavItem>
+            <NavItem active={inView === "how"} onClick={() => jump("how")}>
+              How it works
+            </NavItem>
+          </nav>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: "auto" }}>
             <span style={{ position: "relative", width: 7, height: 7 }}>
               <span style={{ position: "absolute", inset: 0, borderRadius: "50%", background: EMERALD }} />
@@ -126,10 +211,9 @@ const Tailscore = () => {
         >
           Every pick, graded independently.
         </h1>
-        <p style={{ fontFamily: BODY, fontSize: 16, lineHeight: 1.55, color: DIM, maxWidth: 640, marginTop: 16 }}>
-          A pipeline reads every play posted by roughly 70 paid Discord cappers, settles the
-          result against real box scores, and scores each capper with a Bayesian confidence
-          model. No self-reported records survive contact with it.
+        <p style={{ fontFamily: BODY, fontSize: 16, lineHeight: 1.55, color: DIM, maxWidth: 640, marginTop: 14 }}>
+          About 70 paid cappers, every play settled against real results, scored 0 to 1.
+          No self-reported records survive contact with it.
         </p>
       </div>
 
@@ -140,6 +224,7 @@ const Tailscore = () => {
           <StatBlock label="Cappers monitored" value={totals.cappers} />
           <StatBlock label="EV signals captured" value={totals.feed_signals} />
         </div>
+        {snap && <ScoreStrip cappers={snap.cappers} onSelect={setSelected} />}
       </section>
 
       {error && !snap && (
@@ -153,16 +238,24 @@ const Tailscore = () => {
         </div>
       )}
 
-      {!snap && !error && (
-        <div style={{ ...WRAP, paddingTop: 48 }}>
-          <div style={{ ...LABEL, color: FAINT }}>Loading board...</div>
-        </div>
-      )}
+      {!snap && !error && <Skeleton />}
 
       {snap && (
         <>
-          <Board plays={snap.plays} onCapper={openCapperByName} />
-          <Leaderboard cappers={snap.cappers} ledger={ledger} onSelect={setSelected} />
+          <Board
+            plays={snap.plays}
+            onCapper={openCapperByName}
+            market={market}
+            onMarket={setMarket}
+            stamp={`${snap.plays.length} live plays / synced ${updated}`}
+          />
+          <Leaderboard
+            cappers={snap.cappers}
+            ledger={ledger}
+            onSelect={setSelected}
+            stamp={`${snap.cappers.length} tracked / ${totals.graded ?? 0} graded`}
+          />
+          <HowItWorks />
         </>
       )}
 
@@ -171,7 +264,8 @@ const Tailscore = () => {
       <footer style={{ borderTop: `1px solid ${LINE}` }}>
         <div style={{ ...WRAP, padding: "24px 20px", display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
           <p style={{ ...LABEL, color: FAINT, margin: 0, letterSpacing: "0.1em", lineHeight: 1.6 }}>
-            Independent grading. No capper self-reported records. Peer-relative analytics, not betting advice.
+            <a className="ts-gloss" href="#how-settlement">Independent grading</a>. No capper
+            self-reported records. Peer-relative analytics, not betting advice.
           </p>
           <span style={{ ...LABEL, color: FAINT, marginLeft: "auto" }}>
             Data refreshes every 30 minutes

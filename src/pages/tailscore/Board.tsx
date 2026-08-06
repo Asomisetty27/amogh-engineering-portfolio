@@ -1,6 +1,8 @@
 // Today's board: ranked play cards, market tabs, live filters, capper chips.
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { Play, fmtScore, relTime } from "./api";
+import { TagMix } from "./Viz";
 import {
   BG, BODY, Bar, Chip, DIM, EMERALD, FAINT, FG, GRAY, LABEL, LINE, LINE_2,
   MONO, NUM, PANEL, RED, SectionHead, TAG_COLOR, WRAP, scoreColor,
@@ -91,8 +93,12 @@ const PlayCard: React.FC<{ play: Play; index: number; onCapper?: (name: string) 
 }) => {
   const color = TAG_COLOR[play.tag] ?? GRAY;
   return (
-    <article
-      className="ts-card ts-hover"
+    <motion.article
+      layout
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: Math.min(index, 8) * 0.045 }}
+      className="ts-hover"
       style={{
         background: PANEL,
         border: `1px solid ${LINE}`,
@@ -102,7 +108,6 @@ const PlayCard: React.FC<{ play: Play; index: number; onCapper?: (name: string) 
         display: "flex",
         flexDirection: "column",
         gap: 12,
-        animationDelay: `${Math.min(index, 8) * 45}ms`,
       }}
     >
       <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
@@ -138,13 +143,13 @@ const PlayCard: React.FC<{ play: Play; index: number; onCapper?: (name: string) 
           </span>
         )}
       </div>
-    </article>
+    </motion.article>
   );
 };
 
 type Filter = "all" | "actionable" | "fade";
 type Order = "score" | "newest";
-type Market = "all" | "book" | "props" | "consensus";
+export type Market = "all" | "book" | "props" | "consensus";
 
 // null market_type (stale rows) counts as a book play by directive
 const marketOf = (p: Play): "book" | "props" | "other" => {
@@ -191,10 +196,16 @@ const SegTab: React.FC<{
   </button>
 );
 
-const Board: React.FC<{ plays: Play[]; onCapper?: (name: string) => void }> = ({
-  plays, onCapper,
-}) => {
-  const [market, setMarket] = useState<Market>("all");
+const Board: React.FC<{
+  plays: Play[];
+  onCapper?: (name: string) => void;
+  market?: Market;
+  onMarket?: (m: Market) => void;
+  stamp?: string;
+}> = ({ plays, onCapper, market: marketProp, onMarket, stamp }) => {
+  const [marketState, setMarketState] = useState<Market>("all");
+  const market = marketProp ?? marketState;
+  const setMarket = onMarket ?? setMarketState;
   const [filter, setFilter] = useState<Filter>("all");
   const [order, setOrder] = useState<Order>("score");
 
@@ -233,8 +244,10 @@ const Board: React.FC<{ plays: Play[]; onCapper?: (name: string) => void }> = ({
   const hasActionable = plays.some((p) => p.tag === "TAIL" || p.tag === "LEAN");
 
   return (
-    <section style={{ ...WRAP, paddingTop: 44, paddingBottom: 56 }}>
-      <SectionHead index="01" sub="Live board" title="Today's Board" />
+    <section id="board" className="ts-anchor" style={{ ...WRAP, paddingTop: 44, paddingBottom: 56 }}>
+      <SectionHead index="01" sub={stamp ?? "Live board"} title="Today's Board" />
+
+      <TagMix plays={plays} />
 
       {/* market tabs: the top-level split, heavier than the filter chips below */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>

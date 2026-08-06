@@ -1,7 +1,7 @@
 // Tailscore design system: one dark instrument, hairline dividers, mono numerals.
 // Own palette (this surface is standalone), Isotherm rules still apply: animations
 // are transform/opacity only on the house ease, copy carries no em dashes.
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { PlayTag } from "./api";
 
 export const BG = "#060708";
@@ -54,6 +54,31 @@ export const CSS = `
 .ts-panel{animation:ts-in .35s ${EASE} both}
 .ts-rowbtn{cursor:pointer}
 .ts-rowbtn:focus-visible{outline:1px solid ${LINE_2};outline-offset:-1px}
+html{scroll-behavior:smooth}
+.ts-anchor{scroll-margin-top:74px}
+.ts-nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.ts-nav::-webkit-scrollbar{display:none}
+.ts-navitem{position:relative;white-space:nowrap;transition:opacity .18s ease}
+.ts-navitem:hover{opacity:.8}
+.ts-navitem::after{content:"";position:absolute;left:14px;right:14px;bottom:4px;height:1px;background:${EMERALD};opacity:0;transition:opacity .22s ${EASE}}
+.ts-navitem[data-active="true"]::after{opacity:1}
+.ts-dot{transition:opacity .18s ease;cursor:pointer}
+.ts-dot:hover{opacity:1}
+a.ts-gloss{color:inherit;text-decoration:none}
+a.ts-gloss:hover{opacity:.75}
+@keyframes ts-blink {0%,55%{opacity:1}56%,100%{opacity:0}}
+.ts-cursor{animation:ts-blink 1.1s step-end infinite}
+@keyframes ts-shimmer {from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.ts-skel{position:relative;overflow:hidden;background:${PANEL_2};border-radius:6px}
+.ts-skel::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent);animation:ts-shimmer 1.4s ${EASE} infinite}
+.ts-press{transition:transform .12s ${EASE}}
+.ts-press:active{transform:scale(.97)}
+@keyframes ts-pop {from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+.ts-pop{animation:ts-pop .4s ${EASE} both}
+@keyframes ts-grow-y {from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.ts-grow-y{transform-origin:bottom;animation:ts-grow-y .5s ${EASE} both}
+@keyframes ts-grow-x {from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.ts-grow-x{transform-origin:left;animation:ts-grow-x .5s ${EASE} both}
 @keyframes ts-in { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
 @keyframes ts-bar { from{transform:scaleX(0)} to{transform:scaleX(1)} }
 .ts-card{animation:ts-in .5s ${EASE} both}
@@ -93,29 +118,77 @@ export const Bar: React.FC<{ value: number; color: string; height?: number; anim
 export const Chip: React.FC<{
   active?: boolean;
   onClick?: () => void;
+  href?: string;
   color?: string;
   title?: string;
   children: React.ReactNode;
-}> = ({ active, onClick, color = DIM, title, children }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    title={title}
-    className={onClick ? "ts-chipbtn" : undefined}
-    style={{
-      ...LABEL,
-      fontSize: 9.5,
-      letterSpacing: "0.16em",
-      color: active ? BG : color,
-      background: active ? color : "transparent",
-      border: `1px solid ${active ? color : LINE}`,
-      borderRadius: 999,
-      padding: "5px 10px",
-      cursor: onClick ? "pointer" : "default",
-    }}
-  >
-    {children}
-  </button>
+}> = ({ active, onClick, href, color = DIM, title, children }) => {
+  const style: React.CSSProperties = {
+    ...LABEL,
+    fontSize: 9.5,
+    letterSpacing: "0.16em",
+    color: active ? BG : color,
+    background: active ? color : "transparent",
+    border: `1px solid ${active ? color : LINE}`,
+    borderRadius: 999,
+    padding: "5px 10px",
+    cursor: onClick || href ? "pointer" : "default",
+    display: "inline-block",
+    textDecoration: "none",
+  };
+  if (href && !onClick) {
+    return (
+      <a
+        href={href}
+        title={title}
+        className="ts-chipbtn"
+        style={style}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </a>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      className={onClick ? "ts-chipbtn" : undefined}
+      style={style}
+    >
+      {children}
+    </button>
+  );
+};
+
+// rAF count-up so stat numerals feel live without any CSS animation rule risk
+export function useCountUp(target: number | undefined, ms = 700): number | undefined {
+  const [shown, setShown] = useState<number | undefined>(undefined);
+  const fromRef = useRef(0);
+  useEffect(() => {
+    if (target == null) return;
+    const from = fromRef.current;
+    const start = performance.now();
+    let raf = 0;
+    const step = (t: number) => {
+      const k = Math.min(1, (t - start) / ms);
+      const eased = 1 - Math.pow(1 - k, 3);
+      setShown(Math.round(from + (target - from) * eased));
+      if (k < 1) raf = requestAnimationFrame(step);
+      else fromRef.current = target;
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [target, ms]);
+  return target == null ? undefined : shown ?? 0;
+}
+
+// the emerald terminal cursor: the surface's signature tick
+export const Cursor: React.FC<{ size?: number }> = ({ size = 15 }) => (
+  <span aria-hidden className="ts-cursor" style={{ fontFamily: MONO, fontSize: size, color: EMERALD }}>
+    _
+  </span>
 );
 
 // tiny cumulative P/L sparkline; colored by where the series ends
@@ -152,12 +225,13 @@ export const SectionHead: React.FC<{ index: string; sub: string; title: string; 
           fontFamily: DISPLAY,
           fontSize: "clamp(26px,3.6vw,40px)",
           fontWeight: 600,
-          letterSpacing: "-0.03em",
+          letterSpacing: "-0.035em",
           color: FG,
           margin: 0,
         }}
       >
         {title}
+        <Cursor size={20} />
       </h2>
     </div>
     {right && <div style={{ display: "flex", gap: 8, marginLeft: "auto", flexWrap: "wrap" }}>{right}</div>}
