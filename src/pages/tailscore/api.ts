@@ -7,6 +7,11 @@ const ANON =
 
 export type PlayTag = "TAIL" | "LEAN" | "PASS" | "STALE" | "FADE";
 
+export interface PlayCapper {
+  name: string;
+  score: number;
+}
+
 export interface Play {
   play_key: string;
   board_date: string;
@@ -18,6 +23,10 @@ export interface Play {
   stake_units: number | null;
   posted_at: string;
   corroborated: boolean;
+  // spread | moneyline | total | player_prop | team_prop | other; null on stale rows
+  market_type?: string | null;
+  // every capper riding the play, posting order (first entry posted it first)
+  cappers?: PlayCapper[];
 }
 
 export interface Capper {
