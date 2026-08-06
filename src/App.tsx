@@ -39,6 +39,10 @@ const IS_LAB_HOST = typeof window !== "undefined" && window.location.hostname.st
 const PolyUAS = lazy(() => import("./pages/uas/PolyUAS.tsx"));
 const IS_UAS_HOST = typeof window !== "undefined" && window.location.hostname.startsWith("uas.");
 
+// Tailscore - capper grading console (hostname-routed to tailscore.amogh.site)
+const Tailscore = lazy(() => import("./pages/tailscore/Tailscore.tsx"));
+const IS_TAILSCORE_HOST = typeof window !== "undefined" && window.location.hostname.startsWith("tailscore.");
+
 // Private internships surface - gated to the account owner via Supabase auth.
 const Internships = lazy(() => import("./pages/internships/Internships.tsx"));
 
@@ -79,8 +83,13 @@ const App = () => (
             {IS_UAS_HOST && <Route path="/" element={<PolyUAS />} />}
             <Route path="/uas" element={<PolyUAS />} />
 
+            {/* ══ Tailscore - capper grading console (tailscore.amogh.site) ══ */}
+            {IS_TAILSCORE_HOST && <Route path="/" element={<Tailscore />} />}
+            <Route path="/tailscore" element={<Tailscore />} />
+
             {/* ══ Internships - private, gated to account owner ══════════════ */}
             <Route path="/internships" element={<Internships />} />
+
 
 
             <Route path="/" element={<Index />} />
