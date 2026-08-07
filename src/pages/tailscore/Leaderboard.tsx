@@ -195,7 +195,7 @@ const Leaderboard: React.FC<{
   return (
     <section id="cappers" className="ts-anchor" style={{ ...WRAP, paddingBottom: 56 }}>
       <SectionHead
-        index="02"
+        index="03"
         sub={stamp ?? "Peer-relative ranking"}
         title="Capper Leaderboard"
         right={

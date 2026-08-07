@@ -7,6 +7,7 @@ import Board, { Market } from "./Board";
 import CapperDetail from "./CapperDetail";
 import HowItWorks from "./HowItWorks";
 import Leaderboard from "./Leaderboard";
+import Portfolio from "./Portfolio";
 import { ScoreStrip } from "./Viz";
 import {
   BG, BODY, CSS, Cursor, DIM, DISPLAY, EMERALD, FAINT, FG, LABEL, LINE, MONO,
@@ -33,7 +34,7 @@ const StatBlock: React.FC<{ label: string; value: number | undefined; first?: bo
   );
 };
 
-type NavId = "board" | "consensus" | "cappers" | "how";
+type NavId = "board" | "consensus" | "portfolio" | "cappers" | "how";
 
 const NavItem: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode }> = ({
   active, onClick, children,
@@ -77,7 +78,7 @@ const Tailscore = () => {
   const [ledger, setLedger] = useState<LedgerRow[] | null>(null);
   const [selected, setSelected] = useState<Capper | null>(null);
   const [market, setMarket] = useState<Market>("all");
-  const [inView, setInView] = useState<"board" | "cappers" | "how">("board");
+  const [inView, setInView] = useState<NavId>("board");
   const observed = useRef(false);
 
   useEffect(() => {
@@ -132,12 +133,12 @@ const Tailscore = () => {
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
-          if (e.isIntersecting) setInView(e.target.id as "board" | "cappers" | "how");
+          if (e.isIntersecting) setInView(e.target.id as NavId);
         }
       },
       { rootMargin: "-30% 0px -60% 0px" },
     );
-    for (const id of ["board", "cappers", "how"]) {
+    for (const id of ["board", "portfolio", "cappers", "how"]) {
       const el = document.getElementById(id);
       if (el) io.observe(el);
     }
@@ -178,6 +179,9 @@ const Tailscore = () => {
             </NavItem>
             <NavItem active={inView === "board" && market === "consensus"} onClick={() => jump("consensus")}>
               Consensus
+            </NavItem>
+            <NavItem active={inView === "portfolio"} onClick={() => jump("portfolio")}>
+              Portfolio
             </NavItem>
             <NavItem active={inView === "cappers"} onClick={() => jump("cappers")}>
               Cappers
@@ -249,6 +253,7 @@ const Tailscore = () => {
             onMarket={setMarket}
             stamp={`${snap.plays.length} live plays / synced ${updated}`}
           />
+          <Portfolio />
           <Leaderboard
             cappers={snap.cappers}
             ledger={ledger}

@@ -63,6 +63,30 @@ export interface Totals {
   feed_signals?: number;
 }
 
+// Weights are fractions of bankroll. The bankroll itself never reaches the
+// pipeline, so personalization is a multiplication done here in the browser.
+export interface PortfolioPlay {
+  day: string;
+  pick_id: string;
+  play_key: string;
+  description: string;
+  market_type: string | null;
+  play_score: number;
+  odds_american: number;
+  weight: number;
+  tag: PlayTag | null;
+  cappers: PlayCapper[];
+  commence_time: string | null;
+}
+
+export interface PortfolioLedgerRow {
+  day: string;
+  allocated_count: number;
+  total_weight: number;
+  realized_return: number | null;
+  cumulative_return: number | null;
+}
+
 export interface Meta {
   lastSync: string | null;
   totals: Totals;
@@ -115,6 +139,28 @@ export function fetchLedger(): Promise<LedgerRow[]> {
   }
   return ledgerCache;
 }
+
+export async function fetchPortfolio(): Promise<{
+  plays: PortfolioPlay[];
+  ledger: PortfolioLedgerRow[];
+}> {
+  const [plays, ledger] = await Promise.all([
+    get<PortfolioPlay[]>("/portfolio_today?select=*&order=weight.desc"),
+    get<PortfolioLedgerRow[]>("/portfolio_ledger?select=*&order=day"),
+  ]);
+  return { plays, ledger };
+}
+
+/** Stake rounding a bettor would actually use: dollars up to 200, then fives. */
+export function roundStake(dollars: number): number {
+  if (!Number.isFinite(dollars) || dollars <= 0) return 0;
+  return dollars < 200 ? Math.round(dollars) : Math.round(dollars / 5) * 5;
+}
+
+export const fmtMoney = (n: number) =>
+  `$${Math.round(n).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+
+export const fmtPct = (frac: number, digits = 2) => `${(frac * 100).toFixed(digits)}%`;
 
 // ── formatting helpers ──────────────────────────────────────────────────────
 export function relTime(iso: string | null): string {
