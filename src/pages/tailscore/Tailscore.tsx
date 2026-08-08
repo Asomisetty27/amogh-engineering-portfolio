@@ -2,11 +2,12 @@
 // Hostname-routed at tailscore.amogh.site, plus /tailscore for preview.
 // Standalone surface: no portfolio nav, no shared chrome, its own palette.
 import { useEffect, useRef, useState } from "react";
-import { Capper, LedgerRow, Snapshot, fetchLedger, fetchSnapshot, relTime } from "./api";
+import { Capper, EXECUTION_ENABLED, LedgerRow, Snapshot, fetchLedger, fetchSnapshot, relTime } from "./api";
 import Board, { Market } from "./Board";
 import CapperDetail from "./CapperDetail";
 import HowItWorks from "./HowItWorks";
 import Leaderboard from "./Leaderboard";
+import Execute from "./Execute";
 import Portfolio from "./Portfolio";
 import { LiveStatus, subscribeLive } from "./realtime";
 import { ScoreStrip } from "./Viz";
@@ -35,7 +36,7 @@ const StatBlock: React.FC<{ label: string; value: number | undefined; first?: bo
   );
 };
 
-type NavId = "board" | "consensus" | "portfolio" | "cappers" | "how";
+type NavId = "board" | "consensus" | "portfolio" | "execute" | "cappers" | "how";
 
 const NavItem: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode }> = ({
   active, onClick, children,
@@ -161,7 +162,7 @@ const Tailscore = () => {
       },
       { rootMargin: "-30% 0px -60% 0px" },
     );
-    for (const id of ["board", "portfolio", "cappers", "how"]) {
+    for (const id of ["board", "portfolio", "execute", "cappers", "how"]) {
       const el = document.getElementById(id);
       if (el) io.observe(el);
     }
@@ -206,6 +207,11 @@ const Tailscore = () => {
             <NavItem active={inView === "portfolio"} onClick={() => jump("portfolio")}>
               Portfolio
             </NavItem>
+            {EXECUTION_ENABLED && (
+              <NavItem active={inView === "execute"} onClick={() => jump("execute")}>
+                Execute
+              </NavItem>
+            )}
             <NavItem active={inView === "cappers"} onClick={() => jump("cappers")}>
               Cappers
             </NavItem>
@@ -286,6 +292,7 @@ const Tailscore = () => {
             stamp={`${snap.plays.length} live plays / synced ${updated}`}
           />
           <Portfolio />
+          <Execute />
           <Leaderboard
             cappers={snap.cappers}
             ledger={ledger}

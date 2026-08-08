@@ -76,7 +76,7 @@ const BLOCKS: { id: string; title: string; body: string }[] = [
 
 const HowItWorks: React.FC = () => (
   <section id="how" className="ts-anchor" style={{ ...WRAP, paddingBottom: 64 }}>
-    <SectionHead index="04" sub="Read this once" title="How it works" />
+    <SectionHead index="05" sub="Read this once" title="How it works" />
     <div
       style={{
         display: "grid",

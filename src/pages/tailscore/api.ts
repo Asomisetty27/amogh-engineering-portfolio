@@ -177,3 +177,113 @@ export function relTime(iso: string | null): string {
 export const fmtScore = (n: number) => (Number.isFinite(n) ? n.toFixed(2) : "-");
 export const fmtSigned = (n: number) =>
   `${n > 0 ? "+" : n < 0 ? "-" : ""}${Math.abs(n).toFixed(2)}u`;
+
+// ── execution surface ───────────────────────────────────────────────────────
+// Kalshi quotes for the plays the board can actually trade. Prices here are
+// probabilities already (a contract at 0.54 IS a 54% market), so nothing is
+// devigged. `net_edge` is the number that matters: our claimed edge minus
+// Kalshi's fee, which the exchange rounds UP to the whole cent.
+
+// Deploy order: the cloud tables land before the UI that reads them. Until
+// migrations/cloud/001_execution.sql is applied to the tailscore-cloud project,
+// these endpoints 404, so the section stays dark rather than firing requests that
+// fail. Flip to true in the same commit that applies the SQL.
+export const EXECUTION_ENABLED = false;
+
+export interface Quote {
+  pick_id: string;
+  play_key: string;
+  description: string;
+  ticker: string;
+  tag: PlayTag | null;
+  play_score: number | null;
+  market_prob: number;
+  yes_bid: number | null;
+  yes_ask: number;
+  score_edge: number;
+  model_prob: number;
+  fee_per_contract: number;
+  net_edge: number | null;
+  contracts_rec: number;
+  est_cost: number;
+  tradeable: boolean;
+  blocked_reason: string | null;
+  commence_time: string | null;
+  captured_at: string;
+}
+
+export interface Fill {
+  mode: "paper" | "live";
+  ticker: string;
+  contracts: number;
+  avg_price: number;
+  fee: number;
+  cost: number;
+  result: "win" | "loss" | "push" | "void" | null;
+  realized_pnl: number | null;
+  created_at: string;
+}
+
+export interface ExecState {
+  live_enabled: boolean;
+  kill_switch: boolean;
+  min_net_edge: number;
+  bankroll_usd: number;
+  max_cost_per_order: number;
+  daily_cost_cap: number;
+  spent_today: number;
+  generated_at: string | null;
+}
+
+export async function fetchExecution(): Promise<{
+  quotes: Quote[];
+  fills: Fill[];
+  state: ExecState | null;
+}> {
+  const [quotes, fills, state] = await Promise.all([
+    get<Quote[]>("/quotes_live?select=*&order=net_edge.desc"),
+    get<Fill[]>("/exec_fills?select=*&order=created_at.desc"),
+    get<ExecState[]>("/exec_state_public?select=*&limit=1"),
+  ]);
+  return { quotes, fills, state: state[0] ?? null };
+}
+
+/** Queue a paper order. The laptop polls, re-runs the gate, and fills or refuses. */
+export async function queueIntent(
+  accessToken: string,
+  pickId: string,
+  contracts?: number,
+): Promise<{ ok: boolean; reason?: string; intent_id?: number }> {
+  const res = await fetch(`${BASE}/rpc/queue_order_intent`, {
+    method: "POST",
+    headers: {
+      apikey: ANON,
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ pick_id: pickId, contracts: contracts ?? null }),
+  });
+  if (!res.ok) return { ok: false, reason: `${res.status} ${res.statusText}` };
+  return (await res.json()) as { ok: boolean; reason?: string; intent_id?: number };
+}
+
+/** Paper ledger rollup. Returns null until something has actually settled. */
+export function summarizeFills(fills: Fill[]) {
+  const settled = fills.filter((f) => f.result && f.realized_pnl !== null);
+  if (!fills.length) return null;
+  const staked = fills.reduce((a, f) => a + f.cost, 0);
+  const pnl = settled.reduce((a, f) => a + (f.realized_pnl ?? 0), 0);
+  return {
+    fills: fills.length,
+    settled: settled.length,
+    wins: settled.filter((f) => f.result === "win").length,
+    losses: settled.filter((f) => f.result === "loss").length,
+    fees: fills.reduce((a, f) => a + f.fee, 0),
+    staked,
+    pnl,
+    roi: staked > 0 && settled.length ? pnl / staked : null,
+  };
+}
+
+/** Probability as cents, the unit Kalshi actually quotes in. */
+export const fmtCents = (p: number) => `${Math.round(p * 100)}c`;
