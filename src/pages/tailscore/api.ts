@@ -184,11 +184,10 @@ export const fmtSigned = (n: number) =>
 // devigged. `net_edge` is the number that matters: our claimed edge minus
 // Kalshi's fee, which the exchange rounds UP to the whole cent.
 
-// Deploy order: the cloud tables land before the UI that reads them. Until
-// migrations/cloud/001_execution.sql is applied to the tailscore-cloud project,
-// these endpoints 404, so the section stays dark rather than firing requests that
-// fail. Flip to true in the same commit that applies the SQL.
-export const EXECUTION_ENABLED = false;
+// The cloud tables (migrations/cloud/001_execution.sql) are applied and the
+// pipeline is syncing into them, so the section reads live data. Set false to dark
+// the section without reverting, if the feed ever needs to be pulled in a hurry.
+export const EXECUTION_ENABLED = true;
 
 export interface Quote {
   pick_id: string;
