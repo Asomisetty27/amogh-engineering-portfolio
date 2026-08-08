@@ -8,6 +8,7 @@ import CapperDetail from "./CapperDetail";
 import HowItWorks from "./HowItWorks";
 import Leaderboard from "./Leaderboard";
 import Portfolio from "./Portfolio";
+import { LiveStatus, subscribeLive } from "./realtime";
 import { ScoreStrip } from "./Viz";
 import {
   BG, BODY, CSS, Cursor, DIM, DISPLAY, EMERALD, FAINT, FG, LABEL, LINE, MONO,
@@ -75,6 +76,7 @@ const Tailscore = () => {
   const [snap, setSnap] = useState<Snapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
+  const [live, setLive] = useState<LiveStatus>("connecting");
   const [ledger, setLedger] = useState<LedgerRow[] | null>(null);
   const [selected, setSelected] = useState<Capper | null>(null);
   const [market, setMarket] = useState<Market>("all");
@@ -98,18 +100,39 @@ const Tailscore = () => {
   useEffect(() => {
     let alive = true;
     let hasData = false;
+    let inflight = false;
     const load = async () => {
+      if (inflight) return;      // realtime bursts must not stampede the API
+      inflight = true;
       try {
         const s = await fetchSnapshot();
         if (alive) { hasData = true; setSnap(s); setError(null); }
       } catch (e) {
         if (alive && !hasData) setError(e instanceof Error ? e.message : "feed unavailable");
+      } finally {
+        inflight = false;
       }
     };
     load();
-    const poll = window.setInterval(load, 60_000);
+
+    // push: the pipeline writes, the page updates. Polling is the safety net,
+    // and a tab returning to the foreground refreshes on the spot (browsers
+    // throttle timers in background tabs, so the interval alone is not enough).
+    const unsubscribe = subscribeLive(load, (s) => { if (alive) setLive(s); });
+    const onVisible = () => { if (document.visibilityState === "visible") load(); };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+
+    const poll = window.setInterval(load, 30_000);
     const clock = window.setInterval(() => setTick((t) => t + 1), 30_000);
-    return () => { alive = false; window.clearInterval(poll); window.clearInterval(clock); };
+    return () => {
+      alive = false;
+      unsubscribe();
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+      window.clearInterval(poll);
+      window.clearInterval(clock);
+    };
   }, []);
 
   // receipts load once in the background after first paint (sparklines + drill-down)
@@ -190,12 +213,21 @@ const Tailscore = () => {
               How it works
             </NavItem>
           </nav>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: "auto" }}>
+          <div
+            style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: "auto" }}
+            title={live === "live"
+              ? "Connected. This page updates the moment the pipeline writes."
+              : "Refreshing on an interval while the live connection reconnects."}
+          >
             <span style={{ position: "relative", width: 7, height: 7 }}>
-              <span style={{ position: "absolute", inset: 0, borderRadius: "50%", background: EMERALD }} />
-              <span style={{ position: "absolute", inset: 0, borderRadius: "50%", background: EMERALD, animation: "ts-pulse 2.4s ease-out infinite" }} />
+              <span style={{ position: "absolute", inset: 0, borderRadius: "50%", background: live === "live" ? EMERALD : FAINT }} />
+              {live === "live" && (
+                <span style={{ position: "absolute", inset: 0, borderRadius: "50%", background: EMERALD, animation: "ts-pulse 2.4s ease-out infinite" }} />
+              )}
             </span>
-            <span style={{ ...LABEL, color: DIM }}>Synced {updated}</span>
+            <span style={{ ...LABEL, color: DIM }}>
+              {live === "live" ? "Live" : "Synced"} {updated}
+            </span>
           </div>
         </div>
       </header>
