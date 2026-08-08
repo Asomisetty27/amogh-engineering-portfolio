@@ -1,0 +1,1 @@
+GRANT SELECT ON public.broadcasts TO anon;
