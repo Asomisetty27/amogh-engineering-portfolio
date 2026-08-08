@@ -27,6 +27,10 @@ export interface Play {
   market_type?: string | null;
   // every capper riding the play, posting order (first entry posted it first)
   cappers?: PlayCapper[];
+  // the parse behind this pick has not been human-confirmed yet. It is ranked, so
+  // the board covers every capper, but it is excluded from capper scoring until
+  // confirmed: a mis-read play must not enter anyone's permanent record.
+  unconfirmed?: boolean;
 }
 
 export interface Capper {

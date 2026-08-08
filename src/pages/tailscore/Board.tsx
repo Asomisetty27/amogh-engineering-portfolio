@@ -123,6 +123,15 @@ const PlayCard: React.FC<{ play: Play; index: number; onCapper?: (name: string) 
             ⚡
           </span>
         )}
+        {play.unconfirmed && (
+          <span
+            title="Read from the post by the parser and not yet confirmed by a human. It is ranked here, but it is left out of the capper's score until it is checked."
+            style={{ ...LABEL, color: GRAY, fontSize: 9, border: `1px solid ${LINE}`,
+                     borderRadius: 3, padding: "2px 5px" }}
+          >
+            UNCONFIRMED
+          </span>
+        )}
         <span style={{ ...LABEL, marginLeft: "auto" }}>{relTime(play.posted_at)}</span>
       </div>
 
