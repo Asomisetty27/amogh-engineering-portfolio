@@ -34,7 +34,7 @@ export default function QuickviewSection() {
         </div>
         <div className="flex items-center gap-2">
           <a
-            href="/Amogh_Somisetty_Resume_Fall2026.pdf"
+            href="/Amogh_Somisetty_Resume_Summer2027.pdf"
             download
             className="px-4 py-1.5 text-xs font-mono rounded border border-primary/40 text-primary hover:bg-primary/10 transition-colors"
           >

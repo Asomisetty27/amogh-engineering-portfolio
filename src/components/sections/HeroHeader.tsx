@@ -144,7 +144,7 @@ export default function HeroHeader() {
         <span className="t-mono-xs" style={{ color: "var(--t-drift)" }}>SEEKING FALL 2026 CO-OP / INTERNSHIP</span>
         <span className="t-mono-xs" style={{ color: "var(--t-ghost)" }}>|</span>
         <a
-          href="/Amogh_Somisetty_Resume_Fall2026.pdf"
+          href="/Amogh_Somisetty_Resume_Summer2027.pdf"
           download
           className="t-mono-xs hover:opacity-75 transition-opacity"
           style={{ color: "var(--t-blueprint-ink)", textDecoration: "underline", textUnderlineOffset: 3, textDecorationColor: "rgba(212,175,55,0.35)" }}
