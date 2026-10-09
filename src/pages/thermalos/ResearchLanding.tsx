@@ -138,7 +138,7 @@ const FINDINGS = [
   {
     id: 'F7',
     statement: 'Peer-relative R_θ isolates degraded cooling units on production H100 fleets',
-    evidence: 'E009 (72× H100 SXM5)',
+    evidence: 'E009 (64× H100 SXM5 detection job)',
     headline: 'Blind-flagged 3 units incl. one invisible to any temperature threshold',
     confidence: 'partial',
   },
@@ -476,7 +476,7 @@ function ProductionEvidence() {
   return (
     <>
       <PlainWords>
-        We were given telemetry from a real production H100 cluster (72 GPUs, captured
+        We were given telemetry from a real production H100 cluster (64 GPUs in the detection job, captured
         during a cooling incident) and - without being told which units were bad - flagged
         three. One of them ran at 72 °C, a temperature that dozens of healthy GPUs in the
         same fleet exceed. No temperature alert could ever catch it. R_θ flagged it in
@@ -697,7 +697,7 @@ function Timeline() {
       body: '16/16-check validated thermal network model. Predicted H100/A100/B200/MI300X R_θ baselines and lead times ahead of hardware access.',
     },
     {
-      when: 'Jun 2026', tag: 'done', title: 'E009 - first production validation (72× H100)',
+      when: 'Jun 2026', tag: 'done', title: 'E009 - first production validation (64× H100)',
       body: 'Blind-flagged 3 degraded units on a production cluster during a real cooling incident. Sim prediction confirmed within 3% on real silicon. Fault-mode attribution + per-GPU digital twin.',
     },
     {
@@ -778,7 +778,7 @@ function AgentBlock() {
         </div>
         {[
           { label: 'Controlled rows',  value: '9,050',  sub: 'Stage 1 · Tesla T4 · E001–E004 v2' },
-          { label: 'Production samples', value: '29k',  sub: 'E009 · 72× H100 SXM5 · H100 calibration complete' },
+          { label: 'Production samples', value: '29k',  sub: 'E009 · 64× H100 detection job · H100 calibration complete' },
           { label: 'Validated findings', value: '7 + 1', sub: 'F1–F6 · F7 · diagnosis intelligence validated' },
           { label: 'Agent version',   value: 'v0.1.12', sub: 'live on PyPI · Helm/K8s deploy · cross-vendor NVML + amdsmi' },
           { label: 'Next validation', value: 'Delta', sub: 'NCSA Delta via ACCESS · A100 + AMD MI100 · first cross-vendor run' },
@@ -904,7 +904,7 @@ export default function ResearchLanding() {
         {/* ── Hero ──────────────────────────────────────────────────────── */}
         <div style={{ marginBottom: 72 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
-            <Badge color={T.healthy}>First production validation · 72× H100</Badge>
+            <Badge color={T.healthy}>First production validation · 64× H100</Badge>
             <Badge color={T.accent}>v0.1.12 on PyPI</Badge>
           </div>
           <h1 style={{
@@ -929,7 +929,7 @@ export default function ResearchLanding() {
             ThermalOS is GPU thermal-power forensics research. We compute effective thermal
             resistance from software telemetry alone - no thermocouple, no new sensors - and
             built a signature-matrix fault classifier (H100-calibrated, 282 tests green, cross-validated
-            against E009) that blind-detected three degraded units on a 72-GPU H100 cluster,
+            against E009) that blind-detected three degraded units in a 64-GPU H100 job,
             including one at 72 °C invisible to temperature thresholds.
           </p>
           <HeroFormula />
@@ -943,7 +943,7 @@ export default function ResearchLanding() {
 
         {/* ── Production evidence ──────────────────────────────────────── */}
         <section id="evidence" style={{ marginBottom: 64, scrollMarginTop: 80 }}>
-          <SectionLabel>Production Evidence - E009, 72× H100 SXM5, real cooling incident</SectionLabel>
+          <SectionLabel>Production Evidence - E009, 64× H100 SXM5, real cooling incident</SectionLabel>
           <ProductionEvidence />
         </section>
 

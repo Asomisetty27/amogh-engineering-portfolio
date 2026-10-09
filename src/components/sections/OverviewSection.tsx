@@ -85,7 +85,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
               color: "var(--t-text)",
             }}
           >
-            I'm an electrical engineer who works the full GPU stack: I built Theta (<span className="font-mono text-primary" style={{ fontSize: "0.85em" }}>pip install runtheta</span>), an open-source GPU-reliability tool that blind-flagged degraded units across 72 production H100s at Princeton - a flag Princeton's own diagnostics independently re-confirmed months later at +47.8% thermal resistance. On the hardware side I design Jetson AGX Orin carrier boards and sensor modules for Cal Poly's autonomous drone team, and I've built a RISC-V CPU from the RTL up. What ties it together is measurement discipline: <em style={{ color: "hsl(46 65% 62%)", fontStyle: "normal" }}>knowing when a number is real</em>. Seeking a Fall 2026 GPU / ML-hardware co-op or internship.
+            I'm an electrical engineer who works the full GPU stack: I built Theta (<span className="font-mono text-primary" style={{ fontSize: "0.85em" }}>pip install runtheta</span>), an open-source GPU-reliability tool that blind-flagged degraded units across 64 production H100s at Princeton - a flag Princeton's own diagnostics independently re-confirmed months later at +47.8% thermal resistance. On the hardware side I design Jetson AGX Orin carrier boards and sensor modules for Cal Poly's autonomous drone team, and I've built a RISC-V CPU from the RTL up. What ties it together is measurement discipline: <em style={{ color: "hsl(46 65% 62%)", fontStyle: "normal" }}>knowing when a number is real</em>. Seeking a Fall 2026 GPU / ML-hardware co-op or internship.
           </p>
         </div>
 
@@ -207,7 +207,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               {[
-                "Peer-Relative GPU Anomaly Detection → Theta, blind-validated on 72 Princeton H100s",
+                "Peer-Relative GPU Anomaly Detection → Theta, blind-validated on 64 Princeton H100s",
                 "Blind Flag Independently Re-Confirmed → Princeton's own DCGM diagnostic, +47.8% R_θ, 3 months later",
                 "Real-Time R_θ Thermal Forensics → NVML/DCGM telemetry pipeline",
                 "Jetson AGX Orin Carrier-Board Design → Poly UAS edge-AI autonomy stack",

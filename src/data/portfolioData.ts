@@ -351,7 +351,7 @@ export const projects: Project[] = [
     status: "ACTIVE",
     statusColor: "neon-green",
     heroSummary:
-      "Open-source GPU reliability agent (pip install runtheta · runtheta.com) that computes effective thermal resistance R_θ = ΔT/P from NVML / AMD amdsmi / DCGM telemetry to tell a busy-hot GPU from a failing-hot one. Peer-relative detection blind-flagged 3 degraded units on 72 Princeton H100s; the top flag was independently re-confirmed by Princeton's own diagnostics 3 months later at +47.8% thermal resistance, pre-throttle. Ships with a Helm/Kubernetes deployment, a Go node-labeler controller, and an H100-calibrated signature-matrix fault classifier. Cross-vendor second-fleet validation (NCSA Delta: A100 + AMD MI100) in progress; ICPE 2027 paper in preparation.",
+      "Open-source GPU reliability agent (pip install runtheta · runtheta.com) that computes effective thermal resistance R_θ = ΔT/P from NVML / AMD amdsmi / DCGM telemetry to tell a busy-hot GPU from a failing-hot one. Peer-relative detection blind-flagged 3 degraded units on 64 Princeton H100s; the top flag was independently re-confirmed by Princeton's own diagnostics 3 months later at +47.8% thermal resistance, pre-throttle. Ships with a Helm/Kubernetes deployment, a Go node-labeler controller, and an H100-calibrated signature-matrix fault classifier. Cross-vendor second-fleet validation (NCSA Delta: A100 + AMD MI100) in progress; two papers in preparation.",
     techStack: [
       "Python",
       "pynvml / NVML",
@@ -393,7 +393,7 @@ export const projects: Project[] = [
             "Cross-sectional detector comparing each GPU to matched-power node-mates via robust median-polish z-score; needs no warm-up, so it catches units degraded before the agent started.",
           details: [
             "Two-way (node × baseboard-ordinal) median polish removes HGX position structure (±11% of mean R_θ)",
-            "Blind-flagged 3 degraded units on 72 production H100s: one at robust-z +15.6, two invisible to temperature thresholds",
+            "Blind-flagged 3 degraded units on 64 production H100s: one at robust-z +15.6, two invisible to temperature thresholds",
             "Position-conditioned cross-node scan recovers all 3 at zero false positives (within-node alone finds 1)",
           ],
           confidence: "VERIFIED",
@@ -432,7 +432,7 @@ export const projects: Project[] = [
         "theta characterize: one-command, self-contained HTML fleet characterization report (peer-relative findings with cause attribution + the fleet R_θ(P) power-tier curve) - the shareable artifact a validation engineer hands over",
         "Diagnosis intelligence (signature classifier + H100 calibration) built and validated June 2026; SLURM/jobstats integration shipped (theta report <jobid>)",
         "Alert governor holds inferential alerts while a GPU is warming and circuit-breaks noisy GPUs to earn trust on a stranger's fleet",
-        "Characterization tests pin real incidents (e.g. the 72-H100 blind-flag) so regressions are caught; CI runs pytest on Python 3.10/3.11/3.12 + ruff + mypy",
+        "Characterization tests pin real incidents (e.g. the 64-H100 blind-flag) so regressions are caught; CI runs pytest on Python 3.10/3.11/3.12 + ruff + mypy",
       ],
       failureModes: [],
       improvements: [
@@ -446,7 +446,7 @@ export const projects: Project[] = [
       validationResults: [
         "Diagnosis intelligence: signature classifier cross-validated against E009-B hand analysis (3 Princeton degraded units), 282 tests green, reproduces all attributions",
         "H100 calibration: healthy R_θ median 0.0598 C/W (robust-σ 0.0072), nonlinear P-dependent curve (0.120→0.0585), position-conditioned HGX structure (±11% of mean)",
-        "Peer-relative method blind-flagged 3 degraded units on 72 production Princeton H100s; cross-node scan recovered all 3 at 0 false positives",
+        "Peer-relative method blind-flagged 3 degraded units on 64 production Princeton H100s; cross-node scan recovered all 3 at 0 false positives",
         "Blind flag independently re-confirmed: 3 months later Princeton's own DCGM diagnostics found the same unit at +47.8% thermal resistance and -2.6% GFLOPS at matched power - caught pre-throttle by Theta first",
         "Decision-Tree classifier: 100% 5-fold CV accuracy on Tesla T4 steady-state data (steady-state gating takes Naive Bayes 84% → 99.8%)",
         "Controlled Stage-1 study (Tesla T4, n=7, within-condition CV 1.8%): a 2 °C ambient delta drives a 3.5× change in power-recovery time, direct evidence of GPU thermal memory",
@@ -458,7 +458,7 @@ export const projects: Project[] = [
       verificationSummary: [
         { parameter: "R_θ idle vs load (Tesla T4)", value: "1.28 vs 0.72", unit: "°C/W", evidence_source: "Stage 1, F1", confidence: "VERIFIED" },
         { parameter: "R_θ healthy (H100 median)", value: "0.0598", unit: "°C/W", evidence_source: "E009 Princeton calibration", confidence: "VERIFIED" },
-        { parameter: "Blind-flagged degraded units", value: "3 / 72", unit: "H100s", evidence_source: "E009 production validation", confidence: "VERIFIED" },
+        { parameter: "Blind-flagged degraded units", value: "3 / 64", unit: "H100s", evidence_source: "E009 production validation", confidence: "VERIFIED" },
         { parameter: "Top anomaly robust-z", value: "+15.6", unit: "σ", evidence_source: "E009", confidence: "VERIFIED" },
         { parameter: "Independent re-confirmation", value: "+47.8", unit: "% R_θ (Princeton DCGM, 3 mo later)", evidence_source: "Princeton staff diagnostics", confidence: "VERIFIED" },
         { parameter: "Diagnosis intelligence tests", value: "282", unit: "green", evidence_source: "signature.py cross-validation", confidence: "VERIFIED" },
@@ -2182,7 +2182,7 @@ export const skills = {
   technical: [
     {
       name: "GPU Telemetry (NVML / DCGM)",
-      evidence: "Theta - blind-validated on 72 Princeton H100s",
+      evidence: "Theta - blind-validated on 64 Princeton H100s",
       confidence: "VERIFIED" as ConfidenceBadge,
     },
     {

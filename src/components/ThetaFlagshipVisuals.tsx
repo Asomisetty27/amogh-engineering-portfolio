@@ -114,9 +114,9 @@ export default function ThetaFlagshipVisuals() {
         </ChartCard>
 
         <ChartCard
-          title="Blind validation · 72 production H100s"
+          title="Blind validation · 64 production H100s"
           sub="robust-z, peer-relative"
-          foot="3 of 72 flagged degraded (peak +15.6σ); 2 were invisible to a fixed temperature threshold. Shaded band = the 69 healthy GPUs (±3σ); dashed line = the alert threshold."
+          foot="3 of 64 flagged degraded (peak +15.6σ); 2 were invisible to a fixed temperature threshold. Shaded band = the 61 healthy GPUs (±3σ); dashed line = the alert threshold."
         >
           <ResponsiveContainer width="100%" height={170}>
             <ScatterChart margin={{ top: 18, right: 16, left: -14, bottom: 0 }}>
