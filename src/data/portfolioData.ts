@@ -437,7 +437,7 @@ export const projects: Project[] = [
       failureModes: [],
       improvements: [
         "H100 calibration complete (June 2026); B200 calibration planned (Cal Poly AI Factory); A100 + AMD MI100 characterization runs planned on NCSA Delta (ACCESS allocation, ~3,000 GPU-hours) - the first cross-vendor validation",
-        "ICPE 2027 publication in preparation (cross-fleet, cross-vendor GPU thermal forensics), advised by ex-Intel silicon-validation faculty",
+        "Two publications in preparation (cross-fleet, cross-vendor GPU thermal forensics), advised by ex-Intel silicon-validation faculty",
         "Lead-time validation: hardware E-LT testbed planned fall 2026; simulation shows ~2.5-7.7 days at 0 false alarms",
         "Monitoring pipeline observability (Gap 1): track poll_latency, consecutive_poll_failures for GPU-hang detection; low effort, high research value",
         "TIM degradation attribution (Gap 3): multi-signal inference (fan + chassis + ECC) to distinguish pump-out from cooling failure; 2+ years of Cal Poly data could be publication-ready",

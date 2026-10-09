@@ -710,7 +710,7 @@ function Timeline() {
     },
     {
       when: 'Fall 2026', tag: 'open', title: 'Stage 2 - DGX B200 (Cal Poly AI Factory)',
-      body: '4-node deployment: cross-generation validation, longitudinal baselines, SLURM integration. Publication target: ICPE 2027.',
+      body: '4-node deployment: cross-generation validation, longitudinal baselines, SLURM integration. Publication venue to be decided.',
     },
   ];
   return (
@@ -802,7 +802,7 @@ function AgentBlock() {
           Publication track
         </div>
         <div style={{ fontFamily: FD, fontSize: 13, color: T.text, marginBottom: 6 }}>
-          ICPE 2027 (multi-fleet peer-relative validation)
+          Two manuscripts in preparation, venue TBD (multi-fleet peer-relative validation)
         </div>
         <div style={{ fontFamily: FD, fontSize: 12, color: T.muted, marginBottom: 20, lineHeight: 1.6 }}>
           Advisor: Souvik Kundu (ex-Intel yield engineering, Cal Poly EE).
