@@ -85,7 +85,7 @@ export default function OverviewSection({ onNavigateToProject }: OverviewSection
               color: "var(--t-text)",
             }}
           >
-            I'm an electrical engineer who works the full GPU stack: I built Theta (<span className="font-mono text-primary" style={{ fontSize: "0.85em" }}>pip install runtheta</span>), an open-source GPU-reliability tool that blind-flagged degraded units across 64 production H100s at Princeton - a flag Princeton's own diagnostics independently re-confirmed months later at +47.8% thermal resistance. On the hardware side I design Jetson AGX Orin carrier boards and sensor modules for Cal Poly's autonomous drone team, and I've built a RISC-V CPU from the RTL up. What ties it together is measurement discipline: <em style={{ color: "hsl(46 65% 62%)", fontStyle: "normal" }}>knowing when a number is real</em>. Seeking a Fall 2026 GPU / ML-hardware co-op or internship.
+            I'm an electrical engineer who works the full GPU stack: I built Theta (<span className="font-mono text-primary" style={{ fontSize: "0.85em" }}>pip install runtheta</span>), an open-source GPU-reliability tool that blind-flagged degraded units across 64 production H100s at Princeton - a flag Princeton's own diagnostics independently re-confirmed months later at +47.8% thermal resistance. On the hardware side I design Jetson AGX Orin carrier boards and sensor modules for Cal Poly's autonomous drone team, and I've built a RISC-V CPU from the RTL up. What ties it together is measurement discipline: <em style={{ color: "hsl(46 65% 62%)", fontStyle: "normal" }}>knowing when a number is real</em>. Seeking a Summer 2027 GPU / ML-hardware internship.
           </p>
         </div>
 

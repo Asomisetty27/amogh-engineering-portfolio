@@ -57,7 +57,7 @@ export default function QuickviewSection() {
             {personalInfo.name}
           </h1>
           <p className="text-sm text-primary print:text-black font-medium">
-            Electrical Engineer · Hardware, Embedded &amp; GPU Systems · Seeking Fall 2026 Co-op / Internship
+            Electrical Engineer · Hardware, Embedded &amp; GPU Systems · Seeking Summer 2027 Internship
           </p>
           <p className="text-xs text-muted-foreground print:text-gray-600">
             {personalInfo.title}, {personalInfo.university}
