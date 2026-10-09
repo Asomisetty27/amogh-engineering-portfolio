@@ -139,7 +139,7 @@ export default function HeroHeader() {
           SYS NOMINAL
         </span>
         <span className="t-mono-xs" style={{ color: "var(--t-ghost)" }}>|</span>
-        <span className="t-mono-xs" style={{ color: "var(--t-muted)" }}>CAL POLY EE · RISING JUNIOR</span>
+        <span className="t-mono-xs" style={{ color: "var(--t-muted)" }}>CAL POLY EE · THIRD-YEAR</span>
         <span className="t-mono-xs" style={{ color: "var(--t-ghost)" }}>|</span>
         <span className="t-mono-xs" style={{ color: "var(--t-drift)" }}>SEEKING SUMMER 2027 INTERNSHIP</span>
         <span className="t-mono-xs" style={{ color: "var(--t-ghost)" }}>|</span>
