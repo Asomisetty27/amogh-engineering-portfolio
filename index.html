@@ -2,6 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      // The portfolio is the static teardown page. Send the portfolio URLs there before the app loads
+      // (framing it inside the app broke WebGL lighting on phones). Subdomain surfaces keep their roots.
+      (function () {
+        var h = location.hostname, p = location.pathname.replace(/\/+$/, "") || "/";
+        if (/^(epic|uas|tailscore)\./.test(h)) return;
+        var portfolio = ["/", "/overview", "/projects", "/experience", "/skills", "/contact", "/quickview"];
+        if (portfolio.indexOf(p) >= 0 || /^\/projects\/[^/]+$/.test(p)) {
+          var hash = /^#d-[A-Za-z0-9]+$/.test(location.hash) ? location.hash : "";
+          location.replace("/teardown/" + hash);
+        }
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Amogh Somisetty · GPU &amp; ML Hardware · Cal Poly EE</title>
     <meta name="description" content="Cal Poly EE seeking a Summer 2027 GPU / ML-hardware internship: built Theta, an open-source GPU-reliability tool blind-validated on 64 Princeton H100s and independently re-confirmed by Princeton's own diagnostics; designs Jetson AGX Orin carrier boards for autonomous drones; RISC-V CPU from the RTL up.">
