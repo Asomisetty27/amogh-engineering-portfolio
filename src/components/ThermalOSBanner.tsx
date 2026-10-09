@@ -76,7 +76,7 @@ export default function ThermalOSBanner() {
 
         <p className="text-sm text-secondary-foreground leading-relaxed mb-4">
           The peer-relative thermal-resistance method flags degrading GPUs that fixed temperature thresholds miss. It was
-          <span className="text-[#EAD9A0] font-semibold"> blind-validated on 72 Princeton H100s</span>, and the top flag was
+          <span className="text-[#EAD9A0] font-semibold"> blind-validated on 64 Princeton H100s</span>, and the top flag was
           <span className="text-[#EAD9A0] font-semibold"> independently re-confirmed by Princeton&rsquo;s own diagnostics</span> three
           months later at +47.8% thermal resistance, caught pre-throttle. Now cross-vendor (NVIDIA NVML + AMD amdsmi), deployed
           via Helm on Kubernetes, with a second-fleet validation on NCSA Delta (A100 + AMD MI100) in progress.
@@ -100,7 +100,7 @@ export default function ThermalOSBanner() {
 
         <div className="grid grid-cols-3 gap-2 mb-4">
           {[
-            { v: "72", l: "Princeton H100s · blind" },
+            { v: "64", l: "Princeton H100s · blind" },
             { v: "+47.8%", l: "R_θ · independently re-confirmed" },
             { v: "v0.1.12", l: "pip install runtheta" },
           ].map((s) => (

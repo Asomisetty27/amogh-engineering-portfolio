@@ -17,7 +17,7 @@ const ALLOWED_EMAILS = new Set([
 const LISTINGS_URL =
   "https://raw.githubusercontent.com/vanshb03/Summer2027-Internships/dev/.github/scripts/listings.json";
 
-// Tuned to a rising-junior BS EE profile: hardware / FPGA / digital design /
+// Tuned to a third-year BS EE profile: hardware / FPGA / digital design /
 // embedded / analog, plus FPGA and quant-DEVELOPER roles at trading firms.
 // EXCLUDE wins over INCLUDE, which screens out PhD/research and quantum roles
 // (and stops "quant" from substring-matching "quantum").
@@ -257,7 +257,7 @@ const TARGETS = [
 ];
 const FACTS: [string, string][] = [
   ["Program", "B.S. Electrical Engineering, Cal Poly SLO"],
-  ["Graduation", "June 2028 (rising junior)"],
+  ["Graduation", "June 2028 (third-year)"],
   ["Work auth", "Authorized to work in the US"],
   ["Email", "somisett@calpoly.edu"],
   ["Phone", "(925) 236-2600"],
