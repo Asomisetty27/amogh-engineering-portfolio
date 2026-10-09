@@ -1,0 +1,1355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Amogh Somisetty, Cal Poly electrical engineering. Every project as a product teardown: GPU failure detection, hardware design, vision and ML, and software.">
+<meta property="og:title" content="Amogh Somisetty">
+<meta property="og:description" content="Amogh Somisetty, Cal Poly electrical engineering. Every project as a product teardown: GPU failure detection, hardware design, vision and ML, and software.">
+<meta property="og:image" content="https://www.amogh.site/teardown/backplane-iso.jpg">
+<meta name="theme-color" content="#050608">
+<title>Amogh Somisetty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@500;700&display=swap">
+<style>
+/* Layout: a product teardown on a seamless studio backdrop. A sticky 3D stage comes apart one
+   layer per chapter; a fixed rail keeps identity and contact in reach; labels hang off the
+   parts on leader lines. Single light world, by design. */
+:root{
+  --paper:#E8EAED;        /* studio sweep, cool-tinted (hue 215) */
+  --paper-2:#F4F5F7;
+  --ink:#101318;
+  --muted:#5A6371;
+  --hair:#CDD2D9;
+  /* one light source for the page: upper left, matching the 3D key light. Josh Comeau's layered,
+     hue-tinted shadows: offsets 2:1 vertical:horizontal, opacity falls as blur grows. */
+  --sc:215deg 22% 40%;
+  --sh-1:0.4px 0.8px 1px hsl(var(--sc) / .16), 0.8px 1.6px 2.2px -1px hsl(var(--sc) / .14);
+  --sh-2:0.4px 0.8px 1px hsl(var(--sc) / .12), 1.2px 2.4px 3px -.8px hsl(var(--sc) / .12), 3px 6px 8px -1.6px hsl(var(--sc) / .12), 7px 14px 18px -2.4px hsl(var(--sc) / .12);
+  --sh-3:0.4px 0.8px 1px hsl(var(--sc) / .1), 1.6px 3.2px 4px -.6px hsl(var(--sc) / .1), 4px 8px 10px -1.2px hsl(var(--sc) / .1), 9px 18px 23px -1.8px hsl(var(--sc) / .1), 20px 40px 50px -2.4px hsl(var(--sc) / .12);
+  --lip:inset 0 1px 0 rgba(255,255,255,.85);
+  --signal:#F2571B;       /* teardown orange: leader dots, active part */
+  --display:"Instrument Sans",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --hand:"Caveat","Bradley Hand","Segoe Print",cursive;
+  --spring:cubic-bezier(.2,.8,.2,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--display);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:6px}
+
+/* studio backdrop */
+.sweep{position:fixed;inset:0;z-index:0;background:
+  radial-gradient(55% 50% at 26% 16%,rgba(255,246,233,.95) 0%,rgba(255,246,233,.35) 38%,rgba(255,246,233,0) 66%),
+  radial-gradient(48% 42% at 58% 40%,rgba(255,255,255,.7) 0%,rgba(255,255,255,0) 70%),
+  radial-gradient(70% 60% at 88% 82%,rgba(196,208,226,.6) 0%,rgba(196,208,226,0) 62%),
+  linear-gradient(176deg,#EFF1F3 0%,#E6E9ED 48%,#D8DDE3 100%)}
+.grain{position:fixed;inset:0;z-index:5;pointer-events:none;opacity:.07;mix-blend-mode:soft-light;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")}
+.lens{position:fixed;inset:0;z-index:2;pointer-events:none;mix-blend-mode:multiply;
+  background:radial-gradient(130% 95% at 46% 40%,rgba(255,255,255,0) 58%,rgba(44,54,68,.16) 100%)}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:1;display:block}
+
+.floorfade{position:fixed;left:0;right:0;bottom:0;height:52vh;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(232,234,237,0) 0%,rgba(232,234,237,.84) 46%,#DEE2E7 80%);transition:opacity .8s var(--spring)}
+.floorfade.gone{opacity:0}
+svg#leaders{position:fixed;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:visible}
+
+/* rail */
+.rail{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:calc(12px + env(safe-area-inset-top,0px)) clamp(16px,3vw,32px) 12px;font-size:13.5px;
+  background:linear-gradient(180deg,rgba(240,242,244,.9),rgba(236,238,241,.62));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,205,211,.5)}
+.id{display:flex;align-items:baseline;gap:10px;min-width:0}
+.id b{font-weight:600;letter-spacing:-.01em;white-space:nowrap}
+.id span{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap}
+.acts{display:flex;gap:8px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--hair);background:rgba(247,247,248,.7);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);text-decoration:none;color:var(--ink);font:500 13px/1 var(--display);cursor:pointer;box-shadow:var(--lip),var(--sh-1);
+  transition:border-color .5s var(--spring),transform .5s var(--spring)}
+.pill:hover{border-color:#9AA1AA;transform:translateY(-1px)}
+.pill.dark{background:var(--ink);color:var(--paper-2);border-color:var(--ink)}
+.pill svg{width:15px;height:15px}
+.live{width:7px;height:7px;border-radius:50%;background:#2FA36B}
+
+/* bill of materials */
+.bom{position:fixed;left:clamp(16px,3vw,32px);top:50%;transform:translateY(-50%);z-index:10;list-style:none;margin:0;padding:14px 16px;display:grid;gap:2px;
+  background:rgba(244,245,247,.74);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--hair);border-radius:10px;box-shadow:var(--lip),var(--sh-2)}
+.bom{transition:opacity .5s var(--spring)}
+.bom.gone{opacity:0;pointer-events:none}
+.bom a{display:grid;grid-template-columns:22px auto;gap:8px;align-items:center;text-decoration:none;font-family:var(--mono);font-size:11.5px;color:var(--muted);padding:5px 0;transition:color .5s var(--spring)}
+.bom a i{height:1px;width:14px;background:currentColor;transition:width .6s var(--spring)}
+.bom a.on{color:var(--ink)}
+.bom a.on i{width:22px;background:var(--signal)}
+.bom .h{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--muted);margin-bottom:8px}
+
+/* chapters: scroll ranges that drive the stage */
+.story{position:relative;z-index:4;pointer-events:none}
+.ch{height:115vh}
+.ch:first-child{height:100vh}
+
+/* hero copy */
+.hero{position:fixed;left:50%;bottom:calc(6vh + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:5;text-align:center;width:min(760px,calc(100vw - 32px));
+  transition:opacity .7s var(--spring),transform .9s var(--spring)}
+.hero.gone{opacity:0;transform:translate(-50%,24px);pointer-events:none}
+.hero h1{font-size:clamp(40px,6.4vw,92px);font-weight:600;letter-spacing:-.045em;line-height:.95;margin:0 0 14px}
+.hero p{margin:0 auto;max-width:44ch;color:var(--muted);font-size:clamp(16px,1.4vw,18px)}
+.hero p b{color:var(--ink);font-weight:600}
+.hero .cue{margin-top:20px;font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--muted);display:inline-flex;gap:10px;align-items:center}
+.hero .cue i{display:block;width:18px;height:28px;border:1.5px solid var(--muted);border-radius:10px;position:relative}
+.hero .cue i::after{content:"";position:absolute;left:50%;top:6px;width:2px;height:6px;border-radius:2px;background:var(--muted);transform:translateX(-50%);animation:wheel 1.8s var(--spring) infinite}
+@keyframes wheel{0%{opacity:0;transform:translate(-50%,0)}30%{opacity:1}100%{opacity:0;transform:translate(-50%,10px)}}
+
+/* part label card */
+.card{position:fixed;z-index:6;width:min(380px,calc(100vw - 32px));background:rgba(250,250,251,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--hair);border-radius:12px;padding:18px 18px 16px;box-shadow:var(--lip),var(--sh-3);
+  opacity:0;transform:translateY(10px);transition:opacity .55s var(--spring),transform .7s var(--spring);pointer-events:none}
+.card.on{opacity:1;transform:none;pointer-events:auto}
+.card .pn{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--muted)}
+.card .pn b{color:var(--signal);font-weight:500}
+.card h2{font-size:26px;font-weight:600;letter-spacing:-.03em;line-height:1.08;margin:8px 0 8px}
+.card p{margin:0 0 10px;color:#3A4048;font-size:15px}
+.spec{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:10px 0 2px;padding-top:10px;border-top:1px dashed var(--hair);font-size:13.5px}
+.spec dt{font-family:var(--mono);font-size:11.5px;color:var(--muted);padding-top:2px;white-space:nowrap}
+.spec dd{margin:0}
+.spec dd b{font-weight:600}
+.note{font-family:var(--hand);font-size:22px;line-height:1.1;color:#2B5BD7;margin-top:10px;transform:rotate(-1.2deg);transform-origin:left}
+
+/* teardown card project list */
+.card .count{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:-2px 0 8px}
+.plist{list-style:none;margin:0 0 12px;padding:0;border-top:1px dashed var(--hair)}
+.plist a{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px dashed var(--hair);text-decoration:none}
+.plist a:hover b{color:var(--signal)}
+.plist .pid{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.plist .pt{min-width:0;display:flex;flex-direction:column}
+.plist b{font-weight:600;font-size:14.5px;line-height:1.25;transition:color .3s}
+.plist i{font-style:normal;font-size:12.5px;color:var(--muted);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plist .pw{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap}
+.seeall{height:32px;font-size:12.5px}
+
+/* catalog */
+.catalog{position:relative;z-index:7;background:var(--paper-2);border-top:1px solid var(--hair);padding:clamp(64px,8vw,112px) clamp(16px,5vw,72px) 8px}
+.cin{max-width:1200px;margin:0 auto}
+.chead h2{font-size:clamp(38px,5.6vw,80px);font-weight:600;letter-spacing:-.045em;line-height:.95;margin:0 0 14px}
+.chead p{color:var(--muted);max-width:56ch;margin:0 0 22px;font-size:17px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;position:sticky;top:calc(64px + env(safe-area-inset-top,0px));z-index:2;padding:10px 0;background:var(--paper-2)}
+.fp{height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--hair);background:#fff;box-shadow:var(--lip),var(--sh-1);font:500 13px/1 var(--display);color:var(--ink);cursor:pointer;transition:background .3s,color .3s,border-color .3s}
+.fp span{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:4px}
+.fp.on{background:var(--ink);color:var(--paper-2);border-color:var(--ink)}
+.fp.on span{color:#B9BEC4}
+.group{padding-top:44px;scroll-margin-top:120px}
+.gh{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--ink);padding-bottom:10px;margin-bottom:18px}
+.gpn{font-family:var(--mono);font-size:12px;color:var(--signal)}
+.gh h3{font-size:clamp(24px,2.6vw,34px);font-weight:600;letter-spacing:-.03em;margin:0}
+.gc{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:14px}
+.proj{background:#fff;border:1px solid var(--hair);border-radius:10px;box-shadow:var(--lip),var(--sh-1);padding:18px 18px 16px;display:flex;flex-direction:column;gap:6px;min-width:0;scroll-margin-top:130px;
+  transition:border-color .4s var(--spring),transform .5s var(--spring),box-shadow .5s var(--spring)}
+.proj:hover{border-color:#A3ABB6;transform:translateY(-2px);box-shadow:var(--lip),var(--sh-3)}
+.proj:target{border-color:var(--signal);box-shadow:0 0 0 3px rgba(242,87,27,.15)}
+.proj.flag{grid-column:1/-1}
+.proj.flag ul{columns:2;column-gap:28px}
+.ptop{display:flex;justify-content:space-between;align-items:center}
+.ptop .pid{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.st{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--hair);border-radius:999px;padding:2px 8px;color:#3A4048}
+.proj h4{font-size:21px;font-weight:600;letter-spacing:-.02em;margin:4px 0 0;line-height:1.15}
+.psub{color:#3A4048;font-size:14.5px}
+.pmeta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--muted);padding-bottom:6px;border-bottom:1px dashed var(--hair)}
+.proj ul{margin:6px 0 0;padding-left:18px;color:#3A4048;font-size:14.5px;display:grid;gap:6px}
+.proj.flag ul{display:block}
+.proj.flag li{break-inside:avoid;margin-bottom:8px}
+.ptags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:10px}
+.ptags span{font-family:var(--mono);font-size:11px;border:1px solid var(--hair);border-radius:999px;padding:2px 8px;color:var(--muted)}
+.plinks{display:flex;gap:14px;font-size:13.5px;font-weight:500;padding-top:4px}
+.plinks a{text-decoration:none;border-bottom:1px solid var(--hair)}
+.plinks a:hover{border-color:var(--ink)}
+@media (max-width:700px){ .proj.flag ul{columns:1} .filters{top:calc(60px + env(safe-area-inset-top,0px))} }
+
+/* datasheet overlay */
+html.locked{overflow:hidden}
+.sheet{position:fixed;inset:0;z-index:30;background:var(--paper-2);overflow-y:auto;overscroll-behavior:contain;opacity:0;transform:translateY(18px);transition:opacity .4s var(--spring),transform .55s var(--spring)}
+.sheet.on{opacity:1;transform:none}
+.sh-bar{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:calc(12px + env(safe-area-inset-top,0px)) clamp(16px,4vw,40px) 12px;background:rgba(247,247,248,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--hair)}
+.sh-crumb{display:flex;gap:12px;align-items:baseline;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.sh-crumb b{color:var(--signal);font-weight:500}
+.sh-nav{display:flex;gap:8px}
+.sh-in{max-width:1120px;margin:0 auto;padding:clamp(32px,5vw,64px) clamp(16px,4vw,40px) calc(80px + env(safe-area-inset-bottom,0px))}
+.sh-head .st{display:inline-block;margin-bottom:14px}
+.sh-head h2{font-size:clamp(40px,6vw,84px);font-weight:600;letter-spacing:-.045em;line-height:.95;margin:0 0 10px;text-wrap:balance}
+.sh-sub{font-size:clamp(17px,1.6vw,21px);color:var(--muted);margin:0 0 36px}
+.sh-grid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(24px,4vw,56px);align-items:start}
+.sh-spec{position:sticky;top:90px;border:1px solid var(--hair);border-radius:10px;background:#fff;padding:18px;box-shadow:var(--lip),var(--sh-2)}
+.sh-spec .k{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--signal);margin-bottom:10px}
+.sh-spec dl{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:0 0 12px;font-size:14px}
+.sh-spec dt{font-family:var(--mono);font-size:11px;color:var(--muted);padding-top:2px}
+.sh-spec dd{margin:0}
+.sh-body section{padding-bottom:30px;margin-bottom:30px;border-bottom:1px solid var(--hair)}
+.sh-body h3{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+.sh-body p{margin:0;font-size:17.5px;line-height:1.6;max-width:62ch}
+.sh-body ul{margin:0;padding-left:20px;display:grid;gap:10px;font-size:16.5px;max-width:66ch}
+.fig{margin:0;background:#fff;border:1px solid var(--hair);border-radius:10px;padding:18px;overflow-x:auto;box-shadow:var(--lip),var(--sh-1)}
+.fig img{display:block;width:100%;height:auto;border-radius:8px}
+.fig svg{display:block;min-width:620px}
+.figcap{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:10px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--hair);border:1px solid var(--hair);border-radius:10px;overflow:hidden;box-shadow:var(--sh-1)}
+.metrics div{background:#fff;padding:16px}
+.metrics b{display:block;font-size:clamp(24px,2.6vw,34px);font-weight:600;letter-spacing:-.03em;line-height:1.05;font-variant-numeric:tabular-nums}
+.metrics span{display:block;font-size:13px;color:var(--muted);margin-top:6px;line-height:1.35}
+.plinks .ds{color:var(--signal);border-color:rgba(242,87,27,.35)}
+@media (max-width:860px){ .sh-grid{grid-template-columns:minmax(0,1fr)} .sh-spec{position:static} .sh-nav .pill:not(.dark){display:none} }
+
+/* real photography */
+.photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.photos figure{margin:0;background:#fff;border:1px solid var(--hair);border-radius:10px;padding:10px;box-shadow:var(--lip),var(--sh-1)}
+.photos img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px}
+.photos img[src='dac-board.jpg'],.pthumb img[src='dac-board.jpg']{object-position:40% 100%}
+.pthumb{margin:-18px -18px 8px;border-bottom:1px solid var(--hair);background:#F4F5F7;border-radius:10px 10px 0 0;overflow:hidden}
+.pthumb img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.avatar{float:right;width:64px;height:64px;border-radius:50%;object-fit:cover;margin:0 0 8px 12px;box-shadow:0 0 0 3px #fff,var(--sh-2)}
+.who{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+.who img{width:72px;height:72px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px #fff,var(--sh-2)}
+.who b{display:block;font-size:17px;font-weight:600}
+.who span{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+@media (max-width:600px){ .photos{grid-template-columns:minmax(0,1fr)} }
+
+/* bench instruments */
+.lab{background:linear-gradient(180deg,#E9EBEE,#DADDE2);border:1px solid #BFC5CD;border-radius:12px;padding:12px;box-shadow:var(--lip),var(--sh-2)}
+.lab-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;margin:0 2px 8px;color:var(--muted)}
+.lab-model{color:var(--ink);font-weight:500;letter-spacing:.04em}
+.lab-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.lab-screen{display:block;width:100%;min-width:560px;border-radius:6px;border:6px solid #1A1D21;box-shadow:inset 0 0 0 1px #000,0 1px 0 #fff}
+.lab-ctl{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-top:10px;font-size:13px}
+.lab-ctl label{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;color:#3A4048}
+.lab-ctl select{font:inherit;padding:4px 6px;border-radius:6px;border:1px solid var(--hair);background:#fff}
+.lab-ctl input[type=range]{accent-color:var(--signal);width:110px}
+.lab-ctl span{min-width:52px;color:var(--ink)}
+.seg{display:inline-flex;border:1px solid var(--hair);border-radius:999px;overflow:hidden;background:#fff;box-shadow:var(--lip),var(--sh-1)}
+.seg button{border:0;background:none;padding:7px 12px;font:500 12.5px/1 var(--display);cursor:pointer;color:var(--muted)}
+.seg button.on{background:var(--ink);color:#fff}
+.pill.mini{height:32px;font-size:12.5px}
+.pill.dark:disabled{opacity:.5;cursor:default}
+.lab-log{margin-top:8px;background:#0A0E0C;border-radius:6px;padding:8px 10px;font-family:var(--mono);font-size:11.5px;color:#B9C7BF;min-height:118px}
+.lab-log .warn{color:#F2D420}.lab-log .ok{color:#3BD16F}.lab-log .bad{color:#FF5A2E}
+
+/* dark stage: glass UI over the product, light again for the index and contact */
+html.dark .rail{background:linear-gradient(180deg,rgba(6,7,9,.82),rgba(6,7,9,.42));border-bottom-color:rgba(255,255,255,.06);color:#ECEEF1}
+html.dark .id span{color:#8A94A1}
+html.dark .pill{background:rgba(22,24,28,.55);border-color:rgba(255,255,255,.12);color:#ECEEF1;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+html.dark .pill.dark{background:#F2F3F5;color:#0A0C0F;border-color:#F2F3F5}
+html.dark .bom{background:rgba(12,14,17,.6);border-color:rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+html.dark .bom a,html.dark .bom .h{color:#7C8693}
+html.dark .bom a.on{color:#F3F4F6}
+html.dark .card{background:rgba(12,14,17,.74);border-color:rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 30px 70px -30px rgba(0,0,0,.9)}
+html.dark .card h2,html.dark .plist b,html.dark .spec dd{color:#F3F4F6}
+html.dark .card p{color:#AEB7C2}
+html.dark .card .pn,html.dark .spec dt,html.dark .plist .pid,html.dark .plist i,html.dark .plist .pw,html.dark .card .count{color:#7C8693}
+html.dark .plist,html.dark .plist a,html.dark .spec{border-color:rgba(255,255,255,.1)}
+html.dark .avatar{box-shadow:0 0 0 3px rgba(255,255,255,.12),0 10px 30px -10px rgba(0,0,0,.8)}
+html.dark .hero h1{color:#F5F6F8;text-shadow:0 2px 40px rgba(0,0,0,.6)}
+html.dark .hero p{color:#9CA6B2}
+html.dark .hero p b{color:#FFFFFF}
+html.dark .hero .cue{color:#8A94A1}
+html.dark .hero .cue i{border-color:#8A94A1}
+html.dark .hero .cue i::after{background:#8A94A1}
+html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6,8,.78) 46%,#050608 82%)}
+
+/* rendered hero film (Blender Cycles), crossfades into the live scene on scroll */
+.film{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;background:#050608;pointer-events:none;transition:opacity .2s linear}
+.film.off{visibility:hidden}
+.replay{margin-left:14px;background:none;border:1px solid currentColor;border-radius:999px;color:inherit;font:500 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:6px 10px;cursor:pointer;opacity:.8}
+.replay:hover{opacity:1}
+
+.photos img.contain{object-fit:contain;background:#fff}
+.vid{margin:0;background:#0A0C0F;border:1px solid var(--hair);border-radius:10px;padding:10px;box-shadow:var(--lip),var(--sh-1);text-align:center}
+.vid video{max-height:520px;max-width:100%;border-radius:6px;background:#000}
+
+/* end */
+.end{position:relative;z-index:7;background:var(--paper-2);border-top:1px solid var(--hair);padding:clamp(64px,9vw,120px) clamp(16px,6vw,96px) calc(40px + env(safe-area-inset-bottom,0px))}
+.end .in{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(28px,5vw,72px);align-items:start}
+.end h2{font-size:clamp(38px,5.6vw,80px);font-weight:600;letter-spacing:-.045em;line-height:.95;margin:0 0 18px}
+.end p{color:var(--muted);max-width:46ch;margin:0 0 22px;font-size:17px}
+.score{border:1px solid var(--hair);border-radius:10px;padding:20px;background:#fff;box-shadow:var(--lip),var(--sh-2)}
+.score .k{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--muted)}
+.score .big{display:flex;align-items:baseline;gap:8px;margin:6px 0 12px}
+.score .big b{font-size:72px;font-weight:600;letter-spacing:-.05em;line-height:1}
+.score .big span{font-family:var(--mono);color:var(--muted)}
+.meter{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-bottom:14px}
+.meter i{height:8px;border-radius:2px;background:#DDE0E4}
+.meter i.f{background:var(--signal)}
+.score ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:14px}
+.score li{display:grid;grid-template-columns:18px 1fr;gap:8px}
+.score li::before{content:"+";font-family:var(--mono);color:#2FA36B}
+.mail{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.mail code{font-family:var(--mono);font-size:15px;background:#fff;border:1px solid var(--hair);border-radius:10px;padding:10px 14px;user-select:all}
+.foot{max-width:1100px;margin:56px auto 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:11.5px;color:var(--muted);border-top:1px solid var(--hair);padding-top:16px}
+
+@media (max-width:900px){
+  .bom{display:none}
+  .id span{display:none}
+  .end .in{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:560px){
+  .pill.hide-xs{display:none}
+  #sndL{display:none}
+  #snd{width:36px;padding:0;justify-content:center}
+  .acts{gap:6px}
+  .pill{padding:0 12px}
+  .id b{font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<div class="sweep" aria-hidden="true"></div>
+<canvas id="gl" aria-label="A 3D device coming apart layer by layer as you scroll"></canvas>
+<div class="floorfade" id="floorfade" aria-hidden="true"></div>
+<svg id="leaders" aria-hidden="true"><line id="ln" x1="0" y1="0" x2="0" y2="0" stroke="#121417" stroke-width="1" opacity="0"/><circle id="dt" r="4" fill="#F2571B" opacity="0"/><circle id="dt2" r="9" fill="none" stroke="#F2571B" stroke-width="1" opacity="0"/></svg>
+
+<header class="rail">
+  <div class="id"><b>Amogh Somisetty</b><span>Electrical Engineering · Cal Poly</span></div>
+  <div class="acts">
+    <span class="pill hide-xs" title="Status"><span class="live"></span>Summer 2027</span>
+    <button class="pill" id="snd" type="button" aria-pressed="false" title="Sound">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 6v4h2.6L9 13V3L5.1 6H2.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path id="sndWave" d="M11.2 5.6c1 .7 1 4.1 0 4.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".35"/></svg>
+      <span id="sndL">Sound off</span></button>
+    <a class="pill hide-xs" href="#projects">Projects</a>
+    <a class="pill hide-xs" href="#contact">Contact</a>
+    <a class="pill dark" href="resume.pdf" target="_blank" rel="noopener">Resume</a>
+  </div>
+</header>
+
+<nav aria-label="Parts">
+  <ol class="bom" id="bom"><li class="h">PROJECTS BY AREA</li></ol>
+</nav>
+
+<div class="hero" id="hero">
+  <h1>Amogh Somisetty</h1>
+  <p>Electrical engineer at Cal Poly. I build hardware and the software that watches it. Looking for a <b>Summer 2027</b> internship in hardware, GPU, or ML systems.</p>
+  <div class="cue"><i></i>SCROLL</div>
+</div>
+
+<article class="card" id="card" aria-live="polite"></article>
+
+<main class="story" id="story"></main>
+
+<section class="catalog" id="projects" aria-labelledby="catH"></section>
+
+<section class="end" id="contact" aria-labelledby="endH">
+  <div class="in">
+    <div>
+      <div class="who"><img src="headshot.jpg" alt="Amogh Somisetty" width="72" height="72"><div><b>Amogh Somisetty</b><span>Electrical Engineering, Cal Poly SLO</span></div></div>
+      <h2 id="endH">Contact</h2>
+      <p>I'm looking for a Summer 2027 internship in hardware, GPU, or ML systems. Email is the fastest way to reach me.</p>
+      <div class="mail"><code id="email">somisett@calpoly.edu</code><button class="pill" id="copy" type="button">Copy email</button></div>
+      <div class="mail" style="margin-top:12px">
+        <a class="pill" href="https://github.com/Asomisetty27" target="_blank" rel="noopener">GitHub</a>
+        <a class="pill" href="https://linkedin.com/in/amoghsomisetty" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="pill dark" href="resume.pdf" target="_blank" rel="noopener">Resume</a>
+        <button class="pill" id="again" type="button">Back to top ↑</button>
+      </div>
+    </div>
+    <aside class="score" aria-label="Summary">
+      <div class="k">AT A GLANCE</div>
+      <dl class="spec" style="border-top:0;padding-top:6px;margin-top:6px">
+        <dt>EDUCATION</dt><dd><b>B.S. Electrical Engineering, Cal Poly SLO, June 2028</b></dd>
+        <dt>SEEKING</dt><dd><b>Summer 2027 internship</b></dd>
+        <dt>RESEARCH</dt><dd><b>Theta: 3 of 64 H100s flagged at Princeton</b></dd>
+        <dt>EXPERIENCE</dt><dd><b>Natera, Optimization Engineering Intern</b></dd>
+        <dt>TEAMS</dt><dd><b>Poly UAS electrical lead; CodeBox projects lead</b></dd>
+        <dt>SKILLS</dt><dd><b>KiCad, SystemVerilog, Vivado, C, Python, Go, Kubernetes</b></dd>
+      </dl>
+    </aside>
+  </div>
+  <div class="foot"><span>San Luis Obispo, CA</span><span>3D rendered in your browser. The mainboard is ray-traced from my KiCad design.</span></div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script>
+(() => {
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = id => document.getElementById(id);
+
+/* ======================= content ======================= */
+// Every claim here is from the verified record. Order = physical stack, top to bottom.
+// Every project, grouped by the device layer that represents its category. Facts are from the
+// verified record (amogh_resume.md and the repos themselves). Private repos get no link.
+const CATS = [
+  { id:'about', pn:'01', name:'About', title:'Electrical engineering, Cal Poly SLO',
+    body:'Third-year B.S. Electrical Engineering student. I design boards, write firmware, and build software that monitors hardware for failures. Everything I have built is below, organized by area.',
+    spec:[['DEGREE','B.S. Electrical Engineering, June 2028'],['SEEKING','Summer 2027 internship: hardware, GPU, ML systems']] },
+  { id:'research', pn:'02', name:'Research', title:'Research' },
+  { id:'hardware', pn:'03', name:'Hardware', title:'Hardware design' },
+  { id:'ml', pn:'04', name:'Vision and ML', title:'Computer vision and ML' },
+  { id:'software', pn:'05', name:'Software', title:'Software products' },
+  { id:'experience', pn:'06', name:'Experience', title:'Work and leadership' },
+  { id:'outside', pn:'07', name:'Outside work', title:'Outside work',
+    body:'Four years of varsity wrestling. I still lift most days. Eleven years in Boy Scouts. CPR and First Aid certified.',
+    spec:[['WRESTLING','Varsity, 4 years'],['SCOUTS','11 years']] },
+];
+const PROJECTS = [
+  // ---------- research
+  { cat:'research', id:'R1', name:'Theta', sub:'GPU failure detection from telemetry', when:'Mar 2026 \u2013 present', ctx:'Independent research, advised by ex-Intel silicon-validation faculty', status:'Shipped', flagship:true,
+    facts:['Run blind on Princeton\u2019s cluster, flagged 3 of 64 H100s. Two never tripped a temperature alarm. Operators confirmed two: one replaced under RMA, one re-measured at +47.8% thermal resistance.',
+      'Found a flaw in my own method on a rented 8\u00d7A100 node: baseboard position alone moved healthy readings 52%. Rebuilt it position-conditioned; 3 of 3 flags, zero false positives.',
+      'Production software: pip install runtheta, 488 tests in CI, Kubernetes deployment (Helm chart, Go controller), NVIDIA NVML, DCGM and AMD amdsmi collectors.'],
+    tags:['Python','Go','Kubernetes','NVML / DCGM','Statistics'], links:[['runtheta.com','https://runtheta.com'],['GitHub','https://github.com/Asomisetty27/runtheta']] },
+  { cat:'research', id:'R2', name:'Theta operator agent', sub:'LLM layer on top of the detector', when:'Jul 2026', ctx:'Part of Theta', status:'Shipped',
+    facts:['Claude API tool-use loop over the same read-only tools Theta’s MCP server exposes, with an independent critic pass that checks each answer against the tool output.',
+      'Advisory only: no tool can fire an alert or drain a node. 15 tests run against an injected client.'],
+    tags:['Claude API','MCP','Python'] },
+  { cat:'research', id:'R3', name:'Fleet failure manuscripts', sub:'Two papers in preparation', when:'2026', ctx:'Theta research program', status:'In preparation',
+    facts:['Includes a five-fleet failure taxonomy across about 50,000 GPUs, plus the Princeton blind validation.'], tags:['Reliability','Datacenter GPUs'] },
+  // ---------- hardware
+  { cat:'hardware', id:'H1', name:'48 V DroneCAN backplane', sub:'power-dist-v1, rev A', when:'Jul – Sep 2026', ctx:'Poly UAS, Cal Poly drone team', status:'Fabricated, rev A',
+    facts:['2-layer 120 × 90 mm board in KiCad, ERC and DRC clean. Four 48 V pass-throughs sized to IPC-2221 for 14 A continuous and 30 A burst.',
+      'Replaced a hand-wired harness. Switchable 120 Ω CAN terminations and TVS protection; taken through fabrication and bring-up.'],
+    tags:['KiCad','48 V power','DroneCAN','IPC-2221'] },
+  { cat:'hardware', id:'H2', name:'Jetson AGX Orin carrier board', sub:'and sensor modules', when:'2026 – present', ctx:'Poly UAS', status:'In progress',
+    facts:['Carrier board and sensor modules that move the aircraft to onboard computer vision, within its size, weight, and power budget.'], tags:['Fusion 360','Power delivery','Edge AI'] },
+  { cat:'hardware', id:'H3', name:'RISC-V CPU (RV32I)', sub:'Multi-cycle core on an FPGA', when:'Coursework', ctx:'CPE 233', status:'Course project',
+    facts:['Full RV32I core from the RTL up: 10-operation ALU, FSM control unit, 32 × 32 register file. Timing closed in Vivado and brought up on a Basys-3.',
+      'Traced a branch-target bug to the exact RTL signal (PC-source mux left ungated by PCWrite) at the waveform level.'],
+    tags:['SystemVerilog','Vivado','FPGA'] },
+  { cat:'hardware', id:'H4', name:'DAC signal chain on a custom PCB', sub:'4-bit binary-weighted op-amp DAC', when:'Fall 2025', ctx:'EE 143, co-designed with Joyce Han', status:'Course project',
+    facts:['Simulated in LTspice, fabricated as a 2-layer OSH Park board driven by register-level AVR firmware, hand and reflow soldered.',
+      'Bench result: 62.5 mV per step within ±1 LSB across all 16 codes. Root-caused ADC source loading and a clipped bipolar input.'],
+    tags:['LTspice','AVR','PCB','Reflow'] },
+  { cat:'hardware', id:'H5', name:'9-stage electromechanical system', sub:'Sequenced chain reaction', when:'Coursework', ctx:'EE 241', status:'Course project',
+    facts:['Nine analog and digital stages driven by Arduino Mega firmware: capacitive touch, a 580 V strobe, Schmitt-trigger optical detection, a 555 frequency-shift metal detector, MOSFET electromagnet release.',
+      'Root-caused 6 hardware and firmware failure modes, including a MOSFET that would not switch because two supplies shared no ground.'],
+    tags:['Arduino','C/C++','Analog'] },
+  { cat:'hardware', id:'H6', name:'Pneumatic air motor', sub:'Design to manufacture', when:'Coursework', ctx:'IME 144', status:'Course project',
+    facts:['Parametric SolidWorks model and drawings with GD&T per ASME Y14.5. Machined six parts on a manual lathe and mill, measured to ±0.0001 in.'],
+    tags:['SolidWorks','GD&T','Machining'] },
+  { cat:'hardware', id:'H7', name:'FPV micro drone integration', sub:'Systems analysis of a commercial drone', when:'Coursework', ctx:'Analysis, not a build', status:'Analysis',
+    facts:['Mapped six coupled subsystems (propulsion, flight control, power, RF, video, structure) and documented five failure modes.'], tags:['Systems analysis'] },
+  { cat:'hardware', id:'H8', name:'RC car rewire', sub:'Toy RC car, taken apart and rewired', when:'Dec 2025', ctx:'Personal project', status:'Personal',
+    facts:['Took a toy RC car down to the chassis and traced its stock receiver board (KN-H023R-1: drive, steering, and LED channels).','Wired a separate board into the drive-motor leads and checked the circuit on a bench multimeter.'],
+    tags:['Teardown','Motor wiring','Bench test'] },
+  { cat:'hardware', id:'H9', name:'Engineering alloys', sub:'Phases, microstructure, and heat treatment', when:'Coursework', ctx:'MATE 210 / MATE 215', status:'Course project',
+    facts:['Phase-diagram reasoning on the Pb-Sn eutectic (61.9 wt% Sn, 183 \u00b0C): lever rule, cooling curves, hypo- and hypereutectic microstructures.','Cold work and recrystallization in \u03b1-brass, and heat treatment of steels around the Fe-C eutectoid (0.77 wt% C, 727 \u00b0C) with TTT diagrams.'],
+    tags:['Materials','Phase diagrams','Heat treatment'] },
+  { cat:'hardware', id:'H10', name:'Corrosion and prevention', sub:'Electrochemical failure in engineering systems', when:'Coursework', ctx:'MATE 210', status:'Course project',
+    facts:['The four-element corrosion model (anode, cathode, electrolyte, electrical path), galvanic-series reasoning, and design strategies that prevent it.'],
+    tags:['Materials','Corrosion','Failure analysis'] },
+  // ---------- vision and ML
+  { cat:'ml', id:'M1', name:'Pantry Shelf Vision', sub:'Shelf monitoring for a food pantry', when:'Aug 2026 – present', ctx:'Justice Centered Edge AI, funded, advised by Prof. Souvik Kundu', status:'In deployment',
+    facts:['3-stage YOLO11n pipeline reaching 0.920 mAP50 against a 0.898 baseline, chosen by a pre-registered ablation.',
+      'Live-tested against a real camera before deployment and fixed 4 defects that simulated frames never showed.',
+      'Runs on a Jetson Orin Nano with an Arduino Nicla Vision camera node.'],
+    tags:['PyTorch','YOLO11n','ONNX','Jetson'] },
+  { cat:'ml', id:'M2', name:'Vision-based object sorter', sub:'Hackathon winner, 1 of 24 teams', when:'Mar 2026', ctx:'CodeBox hackathon', status:'Won',
+    facts:['Owned the integration between a Python inference pipeline and an Arduino-driven servo; it classified objects from a live camera feed and sorted them.'], tags:['Python','OpenCV','Arduino'] },
+  { cat:'ml', id:'M3', name:'CodeBox starter repository', sub:'Computer vision and embedded control', when:'Sep 2025 – present', ctx:'CodeBox, Cal Poly', status:'Maintained',
+    facts:['Camera capture, model inference, serial communication, microcontroller firmware and setup docs, with component tests that isolate each stage before integration.'], tags:['Python','Embedded','Testing'] },
+  { cat:'ml', id:'M4', name:'study-den', sub:'Local activity tracker', when:'Aug 2026', ctx:'Personal project', status:'Prototype',
+    facts:['Samples a camera every few seconds, classifies activity with YOLOv8n, and logs to SQLite with a live dashboard. Nothing leaves the machine.'], tags:['YOLOv8','SQLite'] },
+  { cat:'ml', id:'M5', name:'PrecisionPharm', sub:'Drug metabolism prediction', when:'Feb 2025', ctx:'Personal project', status:'Prototype',
+    facts:['Random forest regressor predicting individual metabolism rates from CYP2C19 and CYP3A4 variants and liver and kidney markers, evaluated with MAE and R².'],
+    tags:['Python','scikit-learn'], links:[['GitHub','https://github.com/Asomisetty27/PrecisionPharm']] },
+  { cat:'ml', id:'M6', name:'tailscore', sub:'Bayesian ranking of posted sports picks', when:'Aug 2026', ctx:'Personal project', status:'Prototype',
+    facts:['Beta-distributed scoring with a break-even prior, closing-line value, recency decay and hierarchical shrinkage, checked with a walk-forward backtest. 338 tests.'], tags:['Python','Bayesian statistics'] },
+  // ---------- software
+  { cat:'software', id:'S1', name:'FUNCK', sub:'Event ticketing platform', when:'2025 – present', ctx:'Founder', status:'Live',
+    facts:['Mobile-first ticketing with payments and payouts. Rebuilt a broken email-verification pipeline that was blocking every new signup.'],
+    tags:['React','Supabase','Stripe'], links:[['funck.live','https://funck.live']] },
+  { cat:'software', id:'S2', name:'PEC Nexus', sub:'Operating system for a student consulting org', when:'2025 – 2026', ctx:'Poly Engineering Consulting', status:'Live',
+    facts:['Role-aware workflows for three kinds of engagements, with row-level security on every table.'], tags:['React','Supabase','RLS'], links:[['GitHub','https://github.com/Asomisetty27/pec-nexus-hub']] },
+  { cat:'software', id:'S3', name:'EPIC lab help queue', sub:'Live queue for an Arduino lab', when:'Jun – Jul 2026', ctx:'Cal Poly EPIC', status:'Shipped',
+    facts:['Students request a wiring check or help from their lab PC; instructors see one realtime queue with wait timers and alerts.'], tags:['TypeScript','React','Supabase realtime'] },
+  { cat:'software', id:'S4', name:'Claude Coach', sub:'macOS menu-bar app', when:'May – Jun 2026', ctx:'Personal project', status:'Prototype',
+    facts:['Native SwiftUI app plus a Python bridge on Claude Code hooks that tracks usage and recommends next actions. About 8,000 lines of Swift.'], tags:['Swift','SwiftUI','Python'] },
+  { cat:'software', id:'S5', name:'Interview Trainer', sub:'Mock technical interviews', when:'Sep 2026', ctx:'Personal project', status:'Prototype',
+    facts:['Measures latency to first word, talk ratio, silences and filler rate from the audio, then grades the transcript with an LLM on seven dimensions.'], tags:['JavaScript','Audio','LLM'] },
+  { cat:'software', id:'S6', name:'Blinn', sub:'Credit card rewards optimizer', when:'May 2025', ctx:'Contributor', status:'Prototype',
+    facts:['Recommends which card to use based on spending patterns; contributed to the app and its backend.'], tags:['JavaScript','Node.js'] },
+  // ---------- experience
+  { cat:'experience', id:'E1', name:'Natera', sub:'Optimization Engineering Intern, promoted from Lab Operations', when:'Jun – Sep 2025', ctx:'Clinical genetic testing, Pleasanton, CA', status:'Internship',
+    facts:['Cut validation and packaging cycle time from about 20 minutes to 10–12 on a high-throughput line, and wrote Python automation and documentation the team adopted.'], tags:['Python','Process improvement'] },
+  { cat:'experience', id:'E2', name:'Poly UAS', sub:'Electrical Lead, Avionics & Power', when:'Apr 2026 – present', ctx:'Cal Poly drone competition team', status:'Current',
+    facts:['Own the aircraft’s electrical system: the 48 V backplane and the Jetson carrier board above.'], tags:['Leadership','Hardware'] },
+  { cat:'experience', id:'E3', name:'CodeBox', sub:'Technical Projects Lead', when:'Sep 2025 – present', ctx:'Cal Poly software and embedded club', status:'Current',
+    facts:['Maintain the club’s starter repository and mentor newer members through setup and hardware debugging.'], tags:['Mentoring'] },
+  { cat:'experience', id:'E4', name:'Cal Poly EPIC', sub:'Lab Assistant, Arduino', when:'Jun – Aug 2026', ctx:'Engineering outreach for precollegiate students', status:'Summer 2026',
+    facts:['Taught embedded systems to precollegiate students and built the lab’s help queue.'], tags:['Teaching'] },
+  { cat:'experience', id:'E5', name:'Poly Engineering Consulting', sub:'President', when:'Sep 2024 – present', ctx:'Student consulting organization', status:'Current',
+    facts:['Lead client-facing engineering project teams.'], tags:['Leadership'] },
+  { cat:'experience', id:'E6', name:'CVS Pharmacy', sub:'Pharmacy Technician, state certified', when:'Summers 2023, 2024', ctx:'Dublin, CA', status:'Summer job',
+    facts:['Processed prescriptions under time pressure, where an error reaches a patient.'], tags:['Accuracy'] },
+];
+const byCat = id => PROJECTS.filter(p => p.cat === id);
+const THUMB = { H1:'backplane-iso.jpg', H4:'dac-board.jpg', H8:'rc-chassis.jpg' };
+const PARTS = CATS;
+
+/* ======================= build the page skeleton ======================= */
+const story = $('story'), bom = $('bom');
+const heroCh = document.createElement('section'); heroCh.className = 'ch'; heroCh.dataset.i = -1; story.appendChild(heroCh);
+PARTS.forEach((p, i) => {
+  const s = document.createElement('section'); s.className = 'ch'; s.id = 'part-' + (i+1); s.dataset.i = i;
+  s.setAttribute('aria-label', p.name); story.appendChild(s);
+  const li = document.createElement('li');
+  li.innerHTML = `<a href="#part-${i+1}"><i></i>${String(i+1).padStart(2,'0')} ${p.name}</a>`;
+  bom.appendChild(li);
+});
+const tail = document.createElement('section'); tail.className = 'ch'; tail.style.height = '60vh'; story.appendChild(tail);
+const bomLinks = [...bom.querySelectorAll('a')];
+
+/* ======================= renderer + studio ======================= */
+const canvas = $('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:false, powerPreference:'high-performance' });
+renderer.setClearColor(0x050608, 1);
+renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.12;
+renderer.physicallyCorrectLights = true;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 200);
+
+// A virtual photo studio: a soft grey room with large softboxes, baked to an environment map.
+// This is what makes the aluminum and glass read like a product shot.
+(function studio(){
+  const env = new THREE.Scene();
+  const room = new THREE.Mesh(new THREE.BoxGeometry(40, 20, 40), new THREE.MeshBasicMaterial({ color:0x060708, side:THREE.BackSide }));
+  env.add(room);
+  // softboxes with real falloff (bright core, soft edge) instead of flat cards; warm key, cool fill
+  const fall = (() => { const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d');
+    const g = x.createRadialGradient(128,128,10,128,128,128); g.addColorStop(0,'#fff'); g.addColorStop(.42,'#d9dadb'); g.addColorStop(1,'#232527');   // opaque: fades toward the room, no transparency in the PMREM bake
+    x.fillStyle = g; x.fillRect(0,0,256,256); return new THREE.CanvasTexture(c); })();
+  const tint = { 6:[1,.95,.88], 4.2:[1,.93,.84], 3:[.82,.9,1], 2.4:[.8,.88,1] };
+  const box = (w,h,x,y,z,ry,rx,int) => { const t = tint[int] || [1,1,1]; const m = new THREE.Mesh(new THREE.PlaneGeometry(w,h), new THREE.MeshBasicMaterial({ color:new THREE.Color(int*t[0],int*t[1],int*t[2]), map:fall, side:THREE.DoubleSide }));
+    m.position.set(x,y,z); m.rotation.set(rx||0, ry||0, 0); env.add(m); };
+  box(22, 1.4, 0, 9.5, 0, 0, Math.PI/2, 6);        // long overhead strip
+  box(1.2, 14, -15, 3, -2, Math.PI/2, 0, 4.2);     // warm vertical strip, left
+  box(1.2, 14, 15, 3, 2, -Math.PI/2, 0, 3);        // cool vertical strip, right
+  box(24, 1, 0, 3, -19, 0, 0, 2.4);                // cool rim strip behind
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(40,40), new THREE.MeshBasicMaterial({ color:0x0B0C0E })); floor.rotation.x = -Math.PI/2; floor.position.y = -9.9; env.add(floor);
+  const pm = new THREE.PMREMGenerator(renderer);
+  scene.environment = pm.fromScene(env, 0.035).texture;
+})();
+// three-point lighting: warm key upper left (shadows fall down-right, matching the page's CSS shadows),
+// cool fill opposite at ~4:1, cool rim from behind to separate the stack from the backdrop
+const keyL = new THREE.DirectionalLight(0xFFEBD2, 2.9); keyL.position.set(-4, 16, 5); keyL.castShadow = true;
+const fillL = new THREE.DirectionalLight(0xC9D8FF, .14); fillL.position.set(9, 5, 6); scene.add(fillL);
+const rimL = new THREE.DirectionalLight(0xCFE0FF, 2.6); rimL.position.set(-3, 6, -12); scene.add(rimL);
+const rim2 = new THREE.DirectionalLight(0xB8CEFF, 2.0); rim2.position.set(11, 4, -8); scene.add(rim2);
+const sweepL = new THREE.DirectionalLight(0xFFFFFF, 0); sweepL.position.set(-12, 9, 6); scene.add(sweepL);
+let sweepT = -1;   // a highlight travels across the metal each time a layer lifts
+keyL.shadow.mapSize.set(2048, 2048); keyL.shadow.bias = -0.0004; keyL.shadow.radius = 6;
+Object.assign(keyL.shadow.camera, { left:-9, right:9, top:9, bottom:-9, near:1, far:40 }); scene.add(keyL);
+scene.add(new THREE.HemisphereLight(0xE8E4DE, 0x0C0E12, 0.08));
+
+/* ======================= textures ======================= */
+function tex(w, h, draw, aniso = 8){ const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = Math.min(aniso, renderer.capabilities.getMaxAnisotropy()); return t; }
+const brushed = tex(512, 512, (x, w, h) => { x.fillStyle = '#B9BEC4'; x.fillRect(0,0,w,h);
+  for (let i = 0; i < 2200; i++){ const y = Math.random()*h, a = Math.random()*.035, c = Math.random() < .5 ? 255 : 110; x.fillStyle = `rgba(${c},${c},${c},${a})`; x.fillRect(0, y, w, .5 + Math.random()*.8); } });
+const pcbTex = tex(1024, 1536, (x, w, h) => {
+  x.fillStyle = '#0E3A2C'; x.fillRect(0,0,w,h);
+  for (let i = 0; i < 9000; i++){ x.fillStyle = `rgba(0,0,0,${Math.random()*.06})`; x.fillRect(Math.random()*w, Math.random()*h, 2, 2); }
+  x.strokeStyle = '#C8A24A'; x.lineCap = 'round'; x.lineJoin = 'round';
+  const rnd = (a, b) => a + Math.random()*(b-a);
+  for (let i = 0; i < 70; i++){ x.lineWidth = rnd(2, 5); x.globalAlpha = rnd(.55, .9); x.beginPath(); let px = rnd(60, w-60), py = rnd(60, h-60); x.moveTo(px, py);
+    for (let k = 0; k < 4; k++){ if (k % 2) px = Math.max(40, Math.min(w-40, px + rnd(-260, 260))); else py = Math.max(40, Math.min(h-40, py + rnd(-260, 260))); x.lineTo(px, py); }
+    x.stroke(); x.globalAlpha = 1; x.fillStyle = '#D9B65C'; x.beginPath(); x.arc(px, py, x.lineWidth*1.6, 0, Math.PI*2); x.fill(); }
+  x.fillStyle = '#E9EDE8'; x.font = '600 26px IBM Plex Mono, monospace';
+  [['U1  THETA', 380, 600], ['J1  DRONECAN 48V', 90, 120], ['U3  RV32I', 640, 1180], ['U7  DAC 4-BIT', 120, 1300], ['TP4', 880, 300], ['C12', 760, 920], ['REV 3', 860, 1460], ['CAL POLY EE', 70, 1460]]
+    .forEach(([s, px, py]) => x.fillText(s, px, py));
+  x.strokeStyle = '#E9EDE8'; x.lineWidth = 2; x.strokeRect(24, 24, w-48, h-48);
+  for (const [px, py] of [[52,52],[w-52,52],[52,h-52],[w-52,h-52]]){ x.fillStyle = '#C8A24A'; x.beginPath(); x.arc(px, py, 22, 0, Math.PI*2); x.fill(); x.fillStyle = '#0B0D0F'; x.beginPath(); x.arc(px, py, 12, 0, Math.PI*2); x.fill(); }
+});
+const chipTex = tex(512, 512, (x, w, h) => { x.fillStyle = '#16181B'; x.fillRect(0,0,w,h);
+  x.fillStyle = '#8A9099'; x.font = '600 64px IBM Plex Mono, monospace'; x.textAlign = 'center'; x.fillText('THETA', w/2, h/2 - 6);
+  x.font = '500 24px IBM Plex Mono, monospace'; x.fillText('Rθ = ΔT / P', w/2, h/2 + 40); x.fillText('64 × H100 · 3 FLAGGED', w/2, h/2 + 76);
+  x.beginPath(); x.arc(46, 46, 12, 0, Math.PI*2); x.fill(); });
+const battTex = tex(768, 1024, (x, w, h) => { const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0,'#C9CED4'); g.addColorStop(.5,'#E8EBEE'); g.addColorStop(1,'#BFC4CA'); x.fillStyle = g; x.fillRect(0,0,w,h);
+  x.fillStyle = '#121417'; x.fillRect(60, 80, w-120, 230);
+  x.fillStyle = '#F7F7F8'; x.font = '600 52px Instrument Sans, sans-serif'; x.fillText('Li-ion Polymer', 100, 175);
+  x.font = '500 28px IBM Plex Mono, monospace'; x.fillText('3.85 V  \u00b7  4500 mAh  \u00b7  17.3 Wh', 100, 240);
+  x.fillStyle = '#3A4048'; x.font = '500 22px IBM Plex Mono, monospace';
+  ['Rechargeable lithium-ion battery', 'Do not puncture, crush, or heat', 'Rev. 3'].forEach((t, i) => x.fillText(t, 70, 400 + i*40)); });
+const labelTex = (s, sub) => tex(512, 128, (x, w, h) => { x.fillStyle = '#121417'; x.fillRect(0,0,w,h); x.fillStyle = '#E9EDE8'; x.font = '600 40px IBM Plex Mono, monospace'; x.fillText(s, 24, 58); x.fillStyle = '#8A9099'; x.font = '500 22px IBM Plex Mono, monospace'; x.fillText(sub, 24, 98); });
+
+/* ======================= geometry helpers ======================= */
+function rounded(w, d, r){ const s = new THREE.Shape(), x = -w/2, y = -d/2;
+  s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r); s.lineTo(x + w, y + d - r); s.quadraticCurveTo(x + w, y + d, x + w - r, y + d);
+  s.lineTo(x + r, y + d); s.quadraticCurveTo(x, y + d, x, y + d - r); s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y); return s; }
+function slab(w, d, h, r, bevel = .02){ const g = new THREE.ExtrudeGeometry(rounded(w - bevel*2, d - bevel*2, Math.max(.001, r - bevel)), { depth:h - bevel*2, bevelEnabled:true, bevelThickness:bevel, bevelSize:bevel, bevelSegments:4, curveSegments:12 });
+  g.rotateX(-Math.PI/2); g.translate(0, bevel, 0); g.computeVertexNormals();
+  // planar UVs from the top view so textures map across the face
+  const p = g.attributes.position, uv = new Float32Array(p.count*2);
+  for (let i = 0; i < p.count; i++){ uv[i*2] = (p.getX(i) + w/2)/w; uv[i*2+1] = 1 - (p.getZ(i) + d/2)/d; }
+  g.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); return g; }
+
+/* ======================= materials ======================= */
+const M = {
+  alu: new THREE.MeshStandardMaterial({ color:0xC7CBD0, metalness:1, roughness:.32, map:brushed, envMapIntensity:1.1 }),
+  aluDark: new THREE.MeshStandardMaterial({ color:0x5C636C, metalness:1, roughness:.38, envMapIntensity:1 }),
+  glass: new THREE.MeshPhysicalMaterial({ color:0x050608, metalness:0, roughness:.12, clearcoat:1, clearcoatRoughness:.06, envMapIntensity:.55 }),
+  pcb: new THREE.MeshStandardMaterial({ map:pcbTex, roughness:.55, metalness:.15 }),
+  chip: new THREE.MeshStandardMaterial({ map:chipTex, roughness:.42, metalness:.2 }),
+  ihs: new THREE.MeshStandardMaterial({ color:0xD5D8DC, metalness:1, roughness:.22, envMapIntensity:1.2 }),
+  batt: new THREE.MeshStandardMaterial({ map:battTex, metalness:.65, roughness:.3, envMapIntensity:1 }),
+  black: new THREE.MeshStandardMaterial({ color:0x15171A, roughness:.4, metalness:.3 }),
+  lens: new THREE.MeshPhysicalMaterial({ color:0x05070A, roughness:.02, clearcoat:1, metalness:.1, envMapIntensity:2 }),
+  gold: new THREE.MeshStandardMaterial({ color:0xD4AF5A, metalness:1, roughness:.28 }),
+  comp: new THREE.MeshStandardMaterial({ color:0x2A2D31, roughness:.5, metalness:.2 }),
+  cap: new THREE.MeshStandardMaterial({ color:0xB58A5A, roughness:.6, metalness:.05 }),
+  screw: new THREE.MeshStandardMaterial({ color:0x9EA4AB, metalness:1, roughness:.25 }),
+};
+
+/* ======================= the device ======================= */
+const W = 4.2, D = 6.6;                          // footprint
+const device = new THREE.Group(); scene.add(device);
+const layers = [];                               // one group per PART, in stack order
+function layer(i, build, base, lift, slide = [0,0]){
+  const g = new THREE.Group();
+  layers[i] = { g, base, lift, slide, v:0, vel:0, target:0, anchorLocal:new THREE.Vector3() };
+  build(g); device.add(g); g.position.y = base; return g;
+}
+// 07 base: bottom case (aluminum tub)
+layer(6, g => {
+  const tub = new THREE.Mesh(slab(W, D, .34, .52), M.alu); g.add(tub);
+  const inner = new THREE.Mesh(slab(W - .24, D - .24, .02, .4), M.aluDark); inner.position.y = .3; g.add(inner);
+  const plate = new THREE.Mesh(new THREE.PlaneGeometry(1.6, .4), new THREE.MeshStandardMaterial({ map:labelTex('THETA v2', 'POSITION-CONDITIONED'), roughness:.5 }));
+  plate.rotation.x = -Math.PI/2; plate.position.set(.9, .33, 2.6); g.add(plate);
+  layers[6].anchorLocal = new THREE.Vector3(W/2 - .1, .3, D/2 - .4);
+}, 0, -1.3);
+// 06 ports: connector strip along one edge
+layer(5, g => {
+  const bar = new THREE.Mesh(slab(.5, D - 1.2, .26, .1), M.aluDark); bar.position.x = -W/2 + .45; g.add(bar);
+  for (let k = 0; k < 3; k++){ const port = new THREE.Mesh(slab(.24, .7, .14, .07, .01), M.black); port.position.set(-W/2 + .45, .2, -1.6 + k*1.6); g.add(port);
+    const pins = new THREE.Mesh(new THREE.BoxGeometry(.06, .02, .46), M.gold); pins.position.set(-W/2 + .45, .33, -1.6 + k*1.6); g.add(pins); }
+  layers[5].anchorLocal = new THREE.Vector3(-W/2 + .45, .3, -1.6);
+}, .34, .2, [-2.6, 0]);
+// 05 battery pouch
+layer(4, g => {
+  const cell = new THREE.Mesh(slab(W - 1.3, D * .52, .3, .22, .04), M.batt); cell.position.set(.3, 0, 1.25); g.add(cell);
+  const tab = new THREE.Mesh(new THREE.BoxGeometry(.5, .04, .4), M.gold); tab.position.set(.3, .15, -.65); g.add(tab);
+  layers[4].anchorLocal = new THREE.Vector3(W/2 - .4, .3, 2.6);
+}, .36, .9, [2.2, .4]);
+// 04 sensor array: camera module
+layer(3, g => {
+  const body = new THREE.Mesh(slab(1.7, 1.2, .3, .2), M.black); body.position.set(.6, 0, -2.2); g.add(body);
+  [[.15,-2.2],[1.05,-2.2]].forEach(([x, z]) => { const ring = new THREE.Mesh(new THREE.CylinderGeometry(.34, .34, .1, 48), M.alu); ring.position.set(x, .32, z); g.add(ring);
+    const glassL = new THREE.Mesh(new THREE.CylinderGeometry(.26, .26, .12, 48), M.lens); glassL.position.set(x, .34, z); g.add(glassL); });
+  const flex = new THREE.Mesh(new THREE.BoxGeometry(.4, .02, 1), new THREE.MeshStandardMaterial({ color:0xC77A2A, roughness:.5 })); flex.position.set(.6, .02, -1.2); g.add(flex);
+  layers[3].anchorLocal = new THREE.Vector3(1.05, .4, -2.2);
+}, .72, 2.4, [3.4, -.6]);
+// 03 mainboard
+layer(2, g => {
+  // Amogh's real power-dist-v1 backplane, ray-traced top-down in KiCad 10, on a board of the same aspect.
+  const BW = W - .36, BD = BW*1.315;
+  M.real = new THREE.MeshStandardMaterial({ color:0xB4B4B4, roughness:.62, metalness:0, envMapIntensity:.35 });
+  new THREE.TextureLoader().load('backplane.jpg', t => { t.encoding = THREE.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); M.real.map = t; M.real.needsUpdate = true; });
+  const board = new THREE.Mesh(slab(BW, BD, .06, .12, .008), M.real); g.add(board);
+  // raised headers where the render shows them, so the board has relief at grazing angles
+  const hdr = (x, z) => { const b = new THREE.Mesh(new THREE.BoxGeometry(.1, .1, .62), M.black); b.position.set(x, .11, z); g.add(b);
+    for (let k = 0; k < 6; k++){ const pin = new THREE.Mesh(new THREE.BoxGeometry(.025, .26, .025), M.gold); pin.position.set(x, .22, z + (k - 2.5)*.1); g.add(pin); } };
+  hdr(-1.18, -1.05); hdr(-1.25, 1.35); hdr(1.28, -1.3); hdr(1.2, 1.15);
+  layers[2].anchorLocal = new THREE.Vector3(-1.2, .1, 2.6);
+}, 1.0, 3.0);
+// 02 processor: package with heat spreader
+layer(1, g => {
+  const sub = new THREE.Mesh(slab(1.7, 1.7, .08, .08, .01), new THREE.MeshStandardMaterial({ color:0x123326, roughness:.45, metalness:.2 })); g.add(sub);
+  const ihs = new THREE.Mesh(slab(1.3, 1.3, .16, .12, .02), M.ihs); ihs.position.y = .08; g.add(ihs);
+  const die = new THREE.Mesh(new THREE.PlaneGeometry(1.12, 1.12), M.chip); die.rotation.x = -Math.PI/2; die.position.y = .245; g.add(die);
+  for (let k = 0; k < 16; k++){ const side = k % 4, t = (Math.floor(k/4) - 1.5)*.3, r = .76;
+    const c = new THREE.Mesh(new THREE.BoxGeometry(.08, .05, .045), M.cap);
+    c.position.set([t, r, t, -r][side], .105, [-r, t, r, t][side]); c.rotation.y = side % 2 ? Math.PI/2 : 0; g.add(c); }
+  g.position.x = 0; g.children.forEach(c => c.position.z += .3);
+  layers[1].anchorLocal = new THREE.Vector3(.65, .25, .95);
+}, 1.08, 4.3);
+// 01 enclosure: aluminum frame + black glass, screws
+layer(0, g => {
+  const frame = new THREE.Mesh(slab(W, D, .18, .52), M.alu); g.add(frame);
+  const glassTop = new THREE.Mesh(slab(W - .1, D - .1, .06, .47, .02), M.glass); glassTop.position.y = .16; g.add(glassTop);
+  const logo = new THREE.Mesh(new THREE.PlaneGeometry(1.8, .45), new THREE.MeshBasicMaterial({ map:tex(512,128,(x,w,h)=>{x.clearRect(0,0,w,h);x.fillStyle='rgba(235,238,242,.92)';x.font='600 64px Instrument Sans, sans-serif';x.textAlign='center';x.fillText('AMOGH',w/2,72);x.font='500 26px IBM Plex Mono, monospace';x.fillStyle='rgba(235,238,242,.6)';x.fillText('REV. 3 · CAL POLY EE',w/2,112);}), transparent:true, depthWrite:false }));
+  logo.rotation.x = -Math.PI/2; logo.position.set(0, .225, 1.9); g.add(logo);
+  const fine = new THREE.Mesh(new THREE.PlaneGeometry(2.6, .32), new THREE.MeshBasicMaterial({ transparent:true, depthWrite:false, map:tex(1024,128,(x,w,h)=>{x.clearRect(0,0,w,h);x.fillStyle='rgba(235,238,242,.38)';x.font='500 26px IBM Plex Mono, monospace';x.textAlign='center';
+    x.fillText('AMOGH SOMISETTY \u00b7 ELECTRICAL ENGINEERING',w/2,46);x.fillText('CAL POLY SAN LUIS OBISPO \u00b7 CLASS OF 2028',w/2,92);}) }));
+  fine.rotation.x = -Math.PI/2; fine.position.set(0, .225, 2.75); g.add(fine);
+  layers[0].anchorLocal = new THREE.Vector3(W/2 - .3, .22, -D/2 + .5);
+}, 1.3, 6.2);
+// screws: they back out before the lid lifts
+const screws = [];
+[[-W/2 + .32, -D/2 + .32],[W/2 - .32, -D/2 + .32],[-W/2 + .32, D/2 - .32],[W/2 - .32, D/2 - .32]].forEach(([x, z]) => {
+  const s = new THREE.Group(); const head = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, .05, 32), M.screw); const shaft = new THREE.Mesh(new THREE.CylinderGeometry(.04, .04, .4, 16), M.screw);
+  shaft.position.y = -.2; s.add(head, shaft); s.position.set(x, 1.52, z); device.add(s);
+  screws.push({ s, v:0, vel:0, target:0, from:new THREE.Vector3(x, 1.52, z), to:new THREE.Vector3(W/2 + 1.1, -1.12, -1.2 + screws.length*.55) }); });
+
+// teardown mat: dark rubber with a 5 mm grid, ruler edges, and a marked screw zone
+const matTex = tex(2048, 1536, (x, w, h) => {
+  x.fillStyle = '#1D232B'; x.fillRect(0,0,w,h);
+  for (let i = 0; i < 26000; i++){ x.fillStyle = `rgba(255,255,255,${Math.random()*.018})`; x.fillRect(Math.random()*w, Math.random()*h, 1.5, 1.5); }
+  const s = 32; x.lineWidth = 1;
+  for (let i = 0; i <= w; i += s){ x.strokeStyle = i % (s*5) ? 'rgba(160,190,220,.07)' : 'rgba(160,190,220,.16)'; x.beginPath(); x.moveTo(i,0); x.lineTo(i,h); x.stroke(); }
+  for (let j = 0; j <= h; j += s){ x.strokeStyle = j % (s*5) ? 'rgba(160,190,220,.07)' : 'rgba(160,190,220,.16)'; x.beginPath(); x.moveTo(0,j); x.lineTo(w,j); x.stroke(); }
+  x.fillStyle = 'rgba(210,225,240,.55)'; x.font = '500 18px IBM Plex Mono, monospace';
+  for (let i = 0; i <= w; i += s){ const big = i % (s*5) === 0; x.fillRect(i, 0, 1.5, big ? 26 : 12); if (big && i) x.fillText(String(i/s*5), i + 4, 40); }
+  for (let j = 0; j <= h; j += s){ const big = j % (s*5) === 0; x.fillRect(0, j, big ? 26 : 12, 1.5); if (big && j) x.fillText(String(j/s*5), 30, j + 6); }
+  x.fillStyle = 'rgba(210,225,240,.42)'; x.font = '600 24px IBM Plex Mono, monospace';
+  x.fillText('ESD SAFE  \u00b7  1 SQ = 5 MM', 80, h - 48);
+  x.textAlign = 'right'; x.fillText('AMOGH SOMISETTY  \u00b7  CAL POLY EE', w - 70, h - 48);
+});
+// backdrop: near-black falloff with a warm spill (upper left) and a cool spill (behind right)
+const sky = new THREE.Mesh(new THREE.SphereGeometry(90, 48, 24), new THREE.ShaderMaterial({ side:THREE.BackSide, depthWrite:false, fog:false,
+  vertexShader:'varying vec3 vD; void main(){ vD = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+  fragmentShader:`varying vec3 vD; void main(){ float up = vD.y;
+    vec3 c = mix(vec3(.018,.02,.025), vec3(.085,.092,.11), smoothstep(-.15,.7,up));
+    c += vec3(.20,.13,.07)*pow(max(dot(vD, normalize(vec3(-.6,.45,.25))),0.),7.);
+    c += vec3(.018,.03,.055)*pow(max(dot(vD, normalize(vec3(.75,.15,-.6))),0.),6.);
+    gl_FragColor = vec4(pow(c, vec3(2.2)), 1.); }` }));
+scene.add(sky);
+scene.fog = new THREE.Fog(0x050608, 34, 82);   // starts past the farthest camera (phones sit ~26 out)
+const gloss = new THREE.Mesh(new THREE.PlaneGeometry(220, 220), new THREE.MeshPhysicalMaterial({ color:0x08090B, roughness:.3, metalness:0, clearcoat:.6, clearcoatRoughness:.2, envMapIntensity:.9 }));
+gloss.rotation.x = -Math.PI/2; gloss.position.y = -2.58; gloss.receiveShadow = true; scene.add(gloss);
+// showroom: a satin plinth under the mat with a warm LED strip at its base, a back wall with
+// vertical light slits, and ceiling downlights pooling on the floor
+const satin = new THREE.MeshStandardMaterial({ color:0x111317, roughness:.45, metalness:.35, envMapIntensity:.8 });
+const plinth = new THREE.Mesh(slab(17.6, 13.6, 1.2, .35, .06), satin); plinth.position.set(.9, -2.56, .2); plinth.castShadow = plinth.receiveShadow = true; scene.add(plinth);
+const led = new THREE.MeshBasicMaterial({ color:new THREE.Color(2.6, 1.9, 1.15), toneMapped:false, fog:false });
+[[0, 6.62, 17.2, .05],[0, -6.22, 17.2, .05],[-8.62, .2, .05, 12.9],[10.42, .2, .05, 12.9]].forEach(([x, z, w, d]) => {
+  const strip = new THREE.Mesh(new THREE.BoxGeometry(w, .04, d), led); strip.position.set(x === 0 ? .9 : x, -2.54, z); scene.add(strip); });
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(140, 40), new THREE.MeshStandardMaterial({ color:0x0B0C0F, roughness:.85 })); wall.position.set(0, 10, -34); scene.add(wall);
+const slitMat = new THREE.MeshBasicMaterial({ color:new THREE.Color(1.5, 1.15, .8), toneMapped:false });
+for (let i = -4; i <= 4; i++){ const slit = new THREE.Mesh(new THREE.PlaneGeometry(.18, 16), slitMat); slit.position.set(i*8.5, 6, -33.8); scene.add(slit); }
+const poolTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d');
+  const g = x.createRadialGradient(128,128,4,128,128,128); g.addColorStop(0,'rgba(255,236,210,.9)'); g.addColorStop(.35,'rgba(255,236,210,.32)'); g.addColorStop(1,'rgba(255,236,210,0)');
+  x.fillStyle = g; x.fillRect(0,0,256,256); return new THREE.CanvasTexture(c); })();
+[[-17, -12], [19, -10], [-2, -22]].forEach(([x, z]) => {
+  const pool = new THREE.Mesh(new THREE.PlaneGeometry(9, 9), new THREE.MeshBasicMaterial({ map:poolTex, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending, opacity:.28 }));
+  pool.rotation.x = -Math.PI/2; pool.position.set(x, -2.57, z); scene.add(pool);
+  const len = 22, cg = new THREE.ConeGeometry(2.2, len, 32, 1, true); cg.translate(0, -len/2, 0);
+  const cone = new THREE.Mesh(cg, new THREE.ShaderMaterial({ transparent:true, depthWrite:false, blending:THREE.AdditiveBlending, side:THREE.DoubleSide, fog:false,
+    vertexShader:'varying float vY; varying vec3 vN; varying vec3 vV; void main(){ vY = -position.y; vec4 mv = modelViewMatrix*vec4(position,1.); vN = normalize(normalMatrix*normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }',
+    fragmentShader:'varying float vY; varying vec3 vN; varying vec3 vV; void main(){ float t = clamp(vY/22.,0.,1.); float a = pow(abs(dot(vN,vV)),2.)*(1.-t*.7)*.011; gl_FragColor = vec4(vec3(1.,.92,.8)*a,1.); }' }));
+  cone.position.set(x, 19.4, z); scene.add(cone); });
+// visible beam from the key light, with dust drifting in it
+const beam = (() => { const len = 17, g = new THREE.ConeGeometry(5.2, len, 48, 1, true); g.translate(0, -len/2, 0); g.rotateX(-Math.PI/2);
+  const m = new THREE.ShaderMaterial({ transparent:true, depthWrite:false, blending:THREE.AdditiveBlending, side:THREE.DoubleSide, fog:false,
+    uniforms:{ uLen:{ value:len } },
+    vertexShader:'varying float vZ; varying vec3 vN; varying vec3 vV; void main(){ vZ = -position.z; vec4 mv = modelViewMatrix*vec4(position,1.); vN = normalize(normalMatrix*normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }',
+    fragmentShader:'uniform float uLen; varying float vZ; varying vec3 vN; varying vec3 vV; void main(){ float t = clamp(vZ/uLen,0.,1.); float edge = pow(abs(dot(vN,vV)),1.6); float a = edge*(1.-t)*(.15+.85*smoothstep(0.,.18,t))*.055; gl_FragColor = vec4(vec3(1.,.9,.76)*a, 1.); }' });
+  const mesh = new THREE.Mesh(g, m); mesh.position.set(-4, 15, 5); mesh.lookAt(0, 0, 0); return mesh; })();
+scene.add(beam);
+const dust = (() => { const n = 380, pos = new Float32Array(n*3), seed = new Float32Array(n);
+  for (let i = 0; i < n; i++){ const t = Math.random(), r = Math.sqrt(Math.random())*4.6*t; const a = Math.random()*Math.PI*2;
+    const p = new THREE.Vector3(Math.cos(a)*r, Math.sin(a)*r, -t*16).applyQuaternion(beam.quaternion).add(beam.position);
+    pos.set([p.x, p.y, p.z], i*3); seed[i] = Math.random()*100; }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const pts = new THREE.Points(g, new THREE.PointsMaterial({ color:0xFFE9CC, size:.045, transparent:true, opacity:.55, depthWrite:false, blending:THREE.AdditiveBlending, fog:false }));
+  pts.userData = { base:pos.slice(), seed }; return pts; })();
+scene.add(dust);
+const mat = new THREE.Mesh(new THREE.PlaneGeometry(16, 12), new THREE.MeshStandardMaterial({ map:matTex, roughness:.92, metalness:0 }));
+mat.rotation.x = -Math.PI/2; mat.position.set(.9, -1.335, .2); mat.receiveShadow = true; scene.add(mat);
+const tray = new THREE.Mesh(slab(1.2, 2.9, .12, .2, .02), new THREE.MeshStandardMaterial({ color:0x2A2E34, metalness:.8, roughness:.62, envMapIntensity:.5 }));   // satin, so it does not mirror the strip light tray.position.set(W/2 + 1.1, -1.33, -.25); scene.add(tray);
+const nylon = new THREE.MeshStandardMaterial({ color:0x111316, roughness:.55 });
+const spudger = new THREE.Group(); { const b = new THREE.Mesh(slab(.16, 3.2, .1, .07, .02), nylon); const tip = new THREE.Mesh(new THREE.ConeGeometry(.08, .4, 4), nylon);
+  tip.rotation.x = Math.PI/2; tip.position.set(0, .05, 1.8); spudger.add(b, tip); spudger.position.set(-W/2 - 1.2, -1.33, .8); spudger.rotation.y = .22; scene.add(spudger); }
+const tweezers = new THREE.Group(); [-.035, .035].forEach(o => { const arm = new THREE.Mesh(new THREE.BoxGeometry(.05, .03, 2.4), M.screw); arm.rotation.y = o*1.2; arm.position.set(o*4, -1.31, 0); tweezers.add(arm); });
+tweezers.position.set(-W/2 - .7, 0, -2.2); tweezers.rotation.y = -.5; scene.add(tweezers);
+
+// contact shadow
+const shadowTex = tex(256, 256, (x, w, h) => { const g = x.createRadialGradient(w/2,h/2,10,w/2,h/2,w/2); g.addColorStop(0,'rgba(18,20,23,.55)'); g.addColorStop(.6,'rgba(18,20,23,.18)'); g.addColorStop(1,'rgba(18,20,23,0)'); x.fillStyle = g; x.fillRect(0,0,w,h); });
+const shadow = new THREE.Mesh(new THREE.PlaneGeometry(W*2.1, D*1.9), new THREE.MeshBasicMaterial({ map:shadowTex, transparent:true, opacity:.6, depthWrite:false, toneMapped:false }));
+shadow.rotation.x = -Math.PI/2; shadow.position.y = -1.32; scene.add(shadow);
+scene.traverse(o => { if (o.isMesh && o !== mat && o !== shadow && !(o.material && o.material.transparent)) { o.castShadow = true; o.receiveShadow = true; } });
+device.position.y = 0;
+
+/* ======================= choreography ======================= */
+// chapter c (0..7): 0 = hero (assembled), c = k means part k-1 is the focus and parts 0..k-1 are lifted.
+const sections = [...story.children];
+function scrollState(){
+  const vh = innerHeight; let f = -1, prog = 0;
+  for (let i = 0; i < sections.length; i++){ const r = sections[i].getBoundingClientRect();
+    if (r.top <= vh*.5 && r.bottom > vh*.5){ f = +sections[i].dataset.i; prog = (vh*.5 - r.top)/r.height; break; }
+    if (r.top > vh*.5){ break; } f = sections[i].dataset.i === undefined ? PARTS.length - 1 : +sections[i].dataset.i; prog = 1; }
+  return { focus: isNaN(f) ? PARTS.length - 1 : f, prog };
+}
+const SPRING = { k:170, c:26 };                  // the one motion system (Josh Comeau's default)
+function spring(o, dt){ const a = SPRING.k*(o.target - o.v) - SPRING.c*o.vel; o.vel += a*dt; o.v += o.vel*dt; }
+
+const camState = { yaw:{v:.62,vel:0,target:.62}, pitch:{v:.46,vel:0,target:.46}, dist:{v:19,vel:0,target:19}, look:{v:-1.6,vel:0,target:-1.6} };
+let focus = -1, lastFocus = -2;
+
+function choreograph(){
+  const { focus:f, prog } = scrollState(); focus = f;
+  // explosion targets: parts at or above the focus are lifted
+  layers.forEach((L, i) => { L.target = f >= i ? 1 : 0; });
+  screws.forEach(sc => sc.target = f >= 0 ? 1 : 0);
+  // camera: slow orbit across the whole scroll, framed on the focused part
+  const total = PARTS.length + 1, t = Math.max(0, Math.min(1, (f + 1 + prog)/total));
+  camState.yaw.target = .62 - t*1.35;
+  camState.pitch.target = f < 0 ? .46 : .56 - t*.12;
+  const wide = innerWidth < 700;
+  camState.dist.target = (f < 0 ? 19 : 19.5) * (wide ? 1.35 : 1);
+  const L = f >= 0 ? layers[f] : null;
+  camState.look.target = (L ? (L.base + L.lift*.85) : -1.6) - (wide && L ? 3.4 : 0);
+  $('hero').classList.toggle('gone', f >= 0); $('floorfade').classList.toggle('gone', f >= 0);
+  bom.classList.toggle('gone', $('projects').getBoundingClientRect().top < innerHeight*.85);
+  const dk = $('projects').getBoundingClientRect().top > 70; document.documentElement.classList.toggle('dark', dk); ln.setAttribute('stroke', dk ? '#E6E9ED' : '#121417');
+  bomLinks.forEach((a, i) => a.classList.toggle('on', i === f));
+  if (f !== lastFocus){ onFocus(f, lastFocus); lastFocus = f; }
+}
+
+/* ======================= label card + leader line ======================= */
+const card = $('card'), ln = $('ln'), dt = $('dt'), dt2 = $('dt2');
+function fillCard(c){
+  const items = byCat(c.id);
+  const head = `<div class="pn"><span>${c.pn} / 07</span><b>${c.name.toUpperCase()}</b></div><h2>${c.title}</h2>`;
+  if (!items.length){ card.innerHTML = (c.id === 'about' ? `<img class="avatar" src="headshot.jpg" alt="Amogh Somisetty">` : '') + head + `<p>${c.body}</p><dl class="spec">${c.spec.map(([k, v]) => `<dt>${k}</dt><dd><b>${v}</b></dd>`).join('')}</dl>`; return; }
+  card.innerHTML = head + `<p class="count">${items.length} ${items.length === 1 ? 'entry' : 'entries'}</p><ul class="plist">${items.map(p =>
+    `<li><a href="#d-${p.id}"><span class="pid">${p.id}</span><span class="pt"><b>${p.name}</b><i>${p.ctx}</i></span><span class="pw">${p.when}</span></a></li>`).join('')}</ul>
+    <a class="pill seeall" href="#cat-${c.id}">See all ${c.name.toLowerCase()} below \u2193</a>`;
+}
+function onFocus(f, prev){
+  if (!reduce && f !== prev) sweepT = 0;
+  if (f >= 0){ card.classList.remove('on'); clearTimeout(onFocus.t); onFocus.t = setTimeout(() => { fillCard(PARTS[f]); card.classList.add('on'); }, prev >= 0 ? 260 : 120); }
+  else card.classList.remove('on');
+  if (soundOn && f > prev) sfx(f === 0 ? 'screws' : 'lift');
+  if (soundOn && f < prev && f >= -1) sfx('seat');
+}
+const v3 = new THREE.Vector3();
+function placeCard(){
+  const on = focus >= 0 && card.classList.contains('on');
+  const op = on ? 1 : 0; ln.setAttribute('opacity', op*.85); dt.setAttribute('opacity', op); dt2.setAttribute('opacity', op*.6);
+  if (focus < 0) return;
+  const L = layers[focus]; v3.copy(L.anchorLocal).applyMatrix4(L.g.matrixWorld).project(camera);
+  const ax = (v3.x*.5 + .5)*innerWidth, ay = (-v3.y*.5 + .5)*innerHeight;
+  const narrow = innerWidth < 900, cw = card.offsetWidth, ch = card.offsetHeight;
+  let cx, cy, ex, ey;
+  if (narrow){ cx = (innerWidth - cw)/2; cy = innerHeight - ch - 16 - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('padding-bottom')) || 0); ex = cx + cw*.5; ey = cy; }
+  else {
+    // the card sits on the side of the part that has room, so it never covers what it labels
+    const right = ax < innerWidth*.56;
+    const br = bom.getBoundingClientRect(), bomR = br.width && !bom.classList.contains('gone') ? br.right + 24 : 16;   // fixed elements have no offsetParent
+    cx = right ? Math.min(innerWidth - cw - 32, Math.max(ax + 90, innerWidth*.62)) : Math.max(bomR, Math.min(ax - 90 - cw, innerWidth*.38 - cw));
+    cy = Math.max(84, Math.min(innerHeight - ch - 24, ay - ch*.35)); ex = right ? cx : cx + cw; ey = cy + 30; }
+  card.style.left = cx + 'px'; card.style.top = cy + 'px';
+  ln.setAttribute('x1', ax); ln.setAttribute('y1', ay); ln.setAttribute('x2', ex); ln.setAttribute('y2', ey);
+  dt.setAttribute('cx', ax); dt.setAttribute('cy', ay); dt2.setAttribute('cx', ax); dt2.setAttribute('cy', ay);
+  const pulse = 1 + .35*Math.sin(performance.now()/380); dt2.setAttribute('r', 9*pulse);
+}
+
+/* ======================= sound (opt-in, synthesized) ======================= */
+let soundOn = false, ac = null;
+$('snd').addEventListener('click', () => {
+  soundOn = !soundOn; $('snd').setAttribute('aria-pressed', soundOn); $('sndL').textContent = soundOn ? 'Sound on' : 'Sound off';
+  $('sndWave').setAttribute('opacity', soundOn ? 1 : .35);
+  if (soundOn){ try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); sfx('seat'); } catch { soundOn = false; } }
+});
+function noise(dur){ const b = ac.createBuffer(1, ac.sampleRate*dur, ac.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random()*2 - 1; const s = ac.createBufferSource(); s.buffer = b; return s; }
+function click(at, freq = 3200, gain = .35){ const s = noise(.03), f = ac.createBiquadFilter(), g = ac.createGain(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 6;
+  g.gain.setValueAtTime(gain, at); g.gain.exponentialRampToValueAtTime(.0008, at + .03); s.connect(f).connect(g).connect(ac.destination); s.start(at); }
+function sfx(kind){ if (!ac) return; const t = ac.currentTime + .01;
+  if (kind === 'screws'){ for (let i = 0; i < 4; i++){ for (let k = 0; k < 3; k++) click(t + i*.11 + k*.028, 2600 + k*500, .22); } }
+  if (kind === 'lift'){ const s = noise(.5), f = ac.createBiquadFilter(), g = ac.createGain(); f.type = 'bandpass'; f.Q.value = 1.2; f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(2400, t + .45);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.12, t + .12); g.gain.exponentialRampToValueAtTime(.0001, t + .5); s.connect(f).connect(g).connect(ac.destination); s.start(t); click(t + .02, 1800, .3); }
+  if (kind === 'seat'){ click(t, 1400, .35); click(t + .045, 2200, .2); }
+}
+
+/* ======================= loop ======================= */
+const FX = (() => { if (!THREE.EffectComposer || !THREE.UnrealBloomPass) return null;
+  const rt = renderer.capabilities.isWebGL2 && THREE.WebGLMultisampleRenderTarget ? new THREE.WebGLMultisampleRenderTarget(4, 4, { format:THREE.RGBAFormat }) : undefined;
+  const c = new THREE.EffectComposer(renderer, rt); c.addPass(new THREE.RenderPass(scene, camera));
+  const bloom = new THREE.UnrealBloomPass(new THREE.Vector2(4, 4), .36, .42, .86); c.addPass(bloom);
+  const grade = new THREE.ShaderPass({ uniforms:{ tDiffuse:{ value:null }, uTime:{ value:0 }, uRes:{ value:new THREE.Vector2(1,1) } },
+    vertexShader:'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+    fragmentShader:`uniform sampler2D tDiffuse; uniform float uTime; uniform vec2 uRes; varying vec2 vUv;
+      void main(){ vec2 d = vUv - .5; float r = length(d);
+        vec3 c = vec3(texture2D(tDiffuse, vUv + d*.0026*r).r, texture2D(tDiffuse, vUv).g, texture2D(tDiffuse, vUv - d*.0026*r).b);
+        c = pow(max(c, 0.), vec3(1./2.2));
+        float l = dot(c, vec3(.2126,.7152,.0722));
+        c += mix(vec3(-.010,.002,.020), vec3(.022,.010,-.012), smoothstep(.15,.85,l));
+        c = mix(c, c*c*(3.-2.*c), .16);
+        c *= mix(1., .58, smoothstep(.32, .98, r*1.3));
+        float n = fract(sin(dot(vUv*uRes + uTime, vec2(12.9898,78.233)))*43758.5453);
+        c += (n - .5)*.032;
+        gl_FragColor = vec4(c, 1.); }` });
+  c.addPass(grade); return { c, bloom, grade }; })();
+function resize(){ renderer.setSize(innerWidth, innerHeight, false);
+  if (FX){ FX.c.setSize(innerWidth, innerHeight); FX.bloom.setSize(innerWidth, innerHeight); FX.grade.uniforms.uRes.value.set(innerWidth, innerHeight); } camera.aspect = innerWidth/innerHeight; camera.fov = innerWidth < 700 ? 40 : 30; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize();
+let prevT = performance.now(), mouseX = 0, mouseY = 0;
+addEventListener('pointermove', e => { mouseX = e.clientX/innerWidth - .5; mouseY = e.clientY/innerHeight - .5; }, { passive:true });
+
+function frame(now){
+  requestAnimationFrame(frame);
+  const dtS = Math.min(1/30, (now - prevT)/1000); prevT = now;
+  choreograph();
+  const step = reduce ? (o => { o.v = o.target; o.vel = 0; }) : (o => spring(o, dtS));
+  layers.forEach(L => { step(L);
+    // narrow screens get shorter sideways moves so parts never leave the frame
+    const e = L.v, k = innerWidth < 700 ? .4 : 1; L.g.position.set(L.slide[0]*e*k, L.base + L.lift*e, L.slide[1]*e*k);
+    L.g.rotation.z = (L.slide[0] ? -.04 : 0)*e; });
+  screws.forEach((sc, i) => { sc.target = focus >= 0 ? 1 : 0; step(sc);
+    // back out (spin + rise), then arc over to the mat and lie flat in a row
+    const k = Math.max(0, Math.min(1, sc.v)), up = Math.min(1, k*2.2), over = Math.max(0, (k - .35)/.65);
+    sc.s.position.lerpVectors(sc.from, sc.to, over); sc.s.position.y += up*(1 - over)*.9 + Math.sin(over*Math.PI)*1.2;
+    sc.s.rotation.set(0, k*Math.PI*8, over*Math.PI/2); });
+  Object.values(camState).forEach(step);
+  if (!reduce){ const k = Math.min(1, now/2600), e2 = 1 - Math.pow(1 - k, 3); keyL.position.x = -11 + e2*6; }
+  const yaw = camState.yaw.v + mouseX*.06, pitch = camState.pitch.v - mouseY*.03, dist = camState.dist.v, ly = camState.look.v;
+  camera.position.set(Math.sin(yaw)*Math.cos(pitch)*dist, ly + Math.sin(pitch)*dist, Math.cos(yaw)*Math.cos(pitch)*dist);
+  camera.lookAt(0, ly, 0);
+  shadow.material.opacity = .6 - layers[6].v*.15;
+  // reveal sweep and drifting dust
+  if (sweepT >= 0){ sweepT += dtS/1.5; const k = Math.min(1, sweepT); sweepL.position.x = -14 + k*28; sweepL.intensity = Math.sin(k*Math.PI)*2.4; if (k >= 1) sweepT = -1; }
+  { const a = dust.geometry.attributes.position, b = dust.userData.base, sd = dust.userData.seed, tt = now/1000;
+    for (let i = 0; i < sd.length; i++){ a.array[i*3] = b[i*3] + Math.sin(tt*.15 + sd[i])*.25; a.array[i*3+1] = b[i*3+1] + Math.sin(tt*.11 + sd[i]*1.7)*.3; a.array[i*3+2] = b[i*3+2] + Math.cos(tt*.13 + sd[i])*.25; }
+    a.needsUpdate = true; }
+  if (FX){ FX.grade.uniforms.uTime.value = now*.001 % 100; FX.c.render(); } else renderer.render(scene, camera);
+  placeCard();
+}
+requestAnimationFrame(frame);
+
+/* ======================= catalog ======================= */
+(function catalog(){
+  const root = $('projects'), cats = CATS.filter(c => byCat(c.id).length);
+  const esc = t => String(t);
+  root.innerHTML = `<div class="cin"><div class="chead"><h2 id="catH">Projects</h2><p>${PROJECTS.length} entries across research, hardware, machine learning, software, and work. Each group matches a layer of the device above.</p>
+    <div class="filters" role="toolbar" aria-label="Filter projects"><button class="fp on" data-f="all" type="button">All</button>${cats.map(c => `<button class="fp" data-f="${c.id}" type="button">${c.name} <span>${byCat(c.id).length}</span></button>`).join('')}</div></div>
+    ${cats.map(c => `<div class="group" id="cat-${c.id}" data-g="${c.id}"><div class="gh"><span class="gpn">${c.pn}</span><h3>${c.title}</h3><span class="gc">${byCat(c.id).length}</span></div>
+      <div class="pgrid">${byCat(c.id).map(p => `<article class="proj${p.flagship ? ' flag' : ''}" id="p-${p.id}">
+        ${THUMB[p.id] ? `<div class="pthumb"><img src="${THUMB[p.id]}" alt="" loading="lazy"></div>` : ''}
+        <div class="ptop"><span class="pid">${p.id}</span><span class="st">${p.status}</span></div>
+        <h4>${p.name}</h4><div class="psub">${p.sub}</div>
+        <div class="pmeta"><span>${p.ctx}</span><span>${p.when}</span></div>
+        <ul>${p.facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>
+        <div class="ptags">${p.tags.map(t => `<span>${t}</span>`).join('')}</div>
+        <div class="plinks"><a href="#d-${p.id}" class="ds">Datasheet \u2192</a>${p.links ? p.links.map(([l, u]) => `<a href="${u}" target="_blank" rel="noopener">${l} \u2197</a>`).join('') : ''}</div>
+      </article>`).join('')}</div></div>`).join('')}</div>`;
+  root.querySelectorAll('.fp').forEach(b => b.addEventListener('click', () => {
+    root.querySelectorAll('.fp').forEach(x => x.classList.toggle('on', x === b));
+    root.querySelectorAll('.group').forEach(g => g.hidden = !(b.dataset.f === 'all' || g.dataset.g === b.dataset.f));
+  }));
+})();
+
+/* ======================= datasheets: one full case study per project ======================= */
+// Depth for each project, from the verified record. Projects without an entry here still get a
+// datasheet built from their summary facts.
+const DETAIL = {
+  R1:{ lab:'theta', role:'Creator and lead researcher', team:'Solo', tools:'Python, Go, Kubernetes, Helm, NVML, DCGM, AMD amdsmi, SLURM',
+    problem:'Datacenters alarm on GPU temperature, but temperature mostly reflects how hard a GPU is working. A GPU whose cooling is degrading can sit under a light job and look normal until it throttles or fails.',
+    built:['A peer-relative detector: effective thermal resistance Rθ = ΔT / P, computed by two-way median polish across position- and power-matched peers, with a permutation-null test gating every claim before a signal counts.',
+      'A signature-matrix fault classifier (6-axis fingerprint, 3-valued evidence model) that reproduces all three Princeton attributions.',
+      'Cross-vendor collectors behind one hardware layer: NVIDIA NVML and DCGM, AMD amdsmi, Redfish BMC.',
+      'Production packaging: pip install runtheta, a Helm chart and a Go controller that writes gpu-health node labels, 488 tests in CI across Python 3.10 to 3.12.'],
+    fig:'theta', figCap:'How a reading becomes a flag.',
+    results:[['3 / 64','H100s flagged blind at Princeton'],['2','of them invisible to temperature thresholds'],['+47.8%','thermal resistance, re-measured on a confirmed flag'],['0','false positives after position conditioning']],
+    learned:'Stage 1 ran on a free Colab Tesla T4 (n = 7): a 2 °C ambient change drove a 3.5× change in power-recovery time. The most important later result was a flaw I found in my own method. On a rented 8×A100 node, baseboard position alone moved healthy readings 52% at matched power. Rebuilding the detector around position is what made the Princeton result hold up.' },
+  R2:{ role:'Designer and developer', team:'Part of Theta', tools:'Claude API, MCP, Python, pytest',
+    problem:'Operators want to know why a GPU was flagged. A language model that can also take actions on a production fleet is a liability.',
+    built:['A tool-use loop on the Claude API that answers operator questions by calling Theta’s live tools instead of guessing.','The agent sees exactly the read-only tool registry that Theta’s MCP server exposes.','An independent critic pass audits each answer against the tool evidence, with one bounded revision.','Read-only by construction: no tool can fire an alert, drain a node, or change a threshold.'],
+    fig:'agent', figCap:'The answer path. Every arrow is read-only.',
+    results:[['15','tests against an injected client, no network'],['0','tools that can act on the fleet']],
+    learned:'The strongest guardrail is structural. Prompting a model to be careful is weaker than never giving it a tool that can do damage.' },
+  R3:{ role:'Author', team:'Theta research program', tools:'LaTeX, Python, survival analysis',
+    problem:'Most GPU reliability work studies one fleet. I wanted to know which failure patterns hold across very different fleets and cooling regimes.',
+    built:['“Peer-Relative Thermal Resistance as a Fleet Health Signal”: the detection method and the Princeton blind validation.','“GPU Failures Remember Events, Not Trajectories”: a failure taxonomy across five production fleets (Titan, Summit, Marconi100, GWDG, and Princeton’s Della).','The five-fleet study is a meta-analysis of mostly public fleet data. Princeton is the one live deployment.'],
+    results:[['~50,000','GPUs across five fleets'],['~62,000','service lives'],['2','manuscripts in preparation']], learned:'Venue not yet decided.' },
+  H1:{ lab:'can', role:'Designer, electrical lead', team:'Poly UAS, Cal Poly drone competition team', tools:'KiCad, IPC-2221, bench power, oscilloscope',
+    problem:'The team’s 12S heavy-lift quadcopter ran its power and CAN wiring through a hand-wired harness.',
+    built:['A 2-layer, 120 × 90 mm backplane in KiCad, ERC and DRC clean, replacing the harness.','Four independent 48 V pass-throughs sized per IPC-2221 on 2 oz copper for 14 A continuous and 30 A burst.','Dual-line CAN TVS protection and switchable 120 Ω bus terminations.','A written bring-up procedure and a dimensioned drawing for the mechanical team. Taken through fabrication and bring-up.'],
+    img:'backplane-iso.jpg', figCap:'Ray-traced from the KiCad file (KiCad 10). Rev A; the final tray outline is pending.',
+    results:[['14 A','continuous per pass-through'],['30 A','burst'],['4','independent 48 V channels'],['0','ERC and DRC errors']] },
+  H2:{ role:'Hardware designer', team:'Poly UAS; teammates own the autonomy software', tools:'Autodesk Fusion (schematic and layout)',
+    problem:'The aircraft is flown from the ground. Onboard computer vision needs a compute module wired into the airframe’s power and sensors.',
+    built:['Carrier board and sensor modules for an NVIDIA Jetson AGX Orin.','Power delivery sized to the airframe’s size, weight, and power budget.','Camera and sensor interfacing for the onboard vision pipeline.'],
+    results:[['In layout','not yet fabricated']] },
+  H3:{ lab:'riscv', role:'Designer', team:'Course project', tools:'SystemVerilog, Vivado, Basys-3 (Artix-7)',
+    problem:'Build a working RISC-V processor from the RTL up and run it on real hardware.',
+    built:['Full RV32I base ISA with a 10-operation ALU and a 2-state FSM control unit (fetch, execute).','32 × 32 register file with two read ports and one write port, dual-port memory.','4-source PC mux (PC+4, jalr, branch, jal) and I/S/B/U/J immediate generation.','Synthesis, placement, routing, and static timing in Vivado; brought up on a Basys-3.'],
+    fig:'riscv', figCap:'Datapath. The highlighted mux is where the bug was.',
+    photos:[['otter-datapath.jpg','OTTER datapath (CPE 233 course reference).','contain']],
+    results:[['RV32I','full base ISA'],['10','ALU operations'],['2','FSM states'],['32 × 32','register file']],
+    learned:'Branch targets came out wrong. At the waveform level the cause was the PC-source mux not being gated by PCWrite. Asserting PCWrite only in the execute state fixed it.' },
+  H4:{ lab:'dac', role:'Co-designer, with Joyce Han', team:'EE 143 capstone, IEEE-format report, Dec 2025', tools:'LTspice, Fusion 360, OSH Park, AVR, oscilloscope, DMM',
+    problem:'Take an audio signal all the way through digital and back: condition it, sample it, and rebuild it with a DAC we designed and fabricated ourselves.',
+    built:['Binary-weighted 4-bit DAC (LM1458, 1206 resistor ladder 80k / 40k / 20k / 10k with 10k feedback, ±12 V) on a 1 × 1 in 2-layer PCB.','Full chain: audio source, summing-amp level shifter, Arduino 10-bit ADC, our DAC, oscilloscope and speaker.','Nine-lab build including a Fusion 360 chassis, bench instrumentation, and hand and reflow soldering.'],
+    fig:'dac', figCap:'The ladder, and the ideal 16-code transfer the board matched within ±1 LSB.',
+    photos:[['dac-board.jpg','The fabricated 1 × 1 in board.'],['dac-scope.jpg','Measured on a Keysight MSO-X 2022A: the DAC stepping through its codes.']],
+    results:[['62.5 mV','per step'],['±1 LSB','across all 16 codes'],['1 × 1 in','2-layer board'],['3','failure modes resolved']],
+    learned:'The ADC loaded the source, fixed with a voltage-follower buffer. The bipolar audio fell outside the ADC’s 0 to 5 V window, fixed with a DC offset. Audible quantization distortion is a real limit of 4 bits, so we documented it instead of hiding it.' },
+  H5:{ lab:'metal', role:'Builder', team:'EE 241', tools:'Arduino Mega, oscilloscope, breadboard and perfboard',
+    problem:'Nine physical stages across capacitive, optical, electromagnetic, and RF domains, where any single failure stops the whole sequence.',
+    built:['Capacitive-touch input (5-note sequence, 2.2 MΩ RC), relay isolation, a ~580 V strobe, Schmitt-trigger optical detection with ambient rejection.','Solenoid actuation, a 555-timer metal detector, MOSFET electromagnet release, a tilt switch, and an I2C LCD.','Firmware that sequences all nine stages end to end.'],
+    fig:'nine', figCap:'The nine stages in order.',
+    video:['rgm-demo.mp4','The full run, start to finish.'],
+    photos:[['rgm-complete-setup.jpg','The complete build.'],['rgm-block-diagram.png','Block diagram of the sequence.','contain'],['ee241-lab6-circuit.png','555 metal-detector schematic.','contain'],['rgm-last-step-schematic.png','Last stage: tilt switch and I2C LCD.','contain']],
+    results:[['9','stages in one sequence'],['6','failure modes root-caused'],['8,760 → 8,310 Hz','metal detector shift (5.1%)']],
+    learned:'The MOSFET would not switch reliably. The logic was right; the Arduino on USB and the 9 V supply shared no ground. Separately, the metal detector false-triggered on oscillator drift until I replaced percent-change math with a fixed 150 Hz threshold, a 5-reading streak, and a 600 ms release delay.' },
+  H8:{ role:'Builder', team:'Personal project', tools:'Screwdriver, bench multimeter',
+    photos:[['rc-chassis.jpg','Down to the chassis.'],['rc-stock.jpg','The stock receiver board: drive, steering, and LED channels.'],['rc-rewire.jpg','A separate board wired into the drive-motor leads.']] },
+  H6:{ role:'Designer and machinist', team:'IME 144', tools:'SolidWorks, GD&T (ASME Y14.5), lathe, mill, micrometers',
+    problem:'Design a working pneumatic air motor and make every part by hand.',
+    built:['Parametric SolidWorks parts and assembly with mates and interference checks, and engineering drawings with GD&T.','Manual lathe and mill work: facing, turning, boring, threading, milling, drilling, broaching, with feeds and speeds per material.','Six parts: crank disk, cylinder, flywheel, frame, mainshaft, piston.'],
+    results:[['6','precision parts'],['±0.0001 in','measured with micrometers']],
+    photos:[['ime144-air-motor.jpg','Air motor assembly (IME 144 manual reference).','contain']] },
+  M1:{ role:'Lead developer', team:'Justice Centered Edge AI, funded, advised by Prof. Souvik Kundu', tools:'PyTorch, YOLO11n, ONNX, Jetson Orin Nano, Arduino Nicla Vision',
+    problem:'A food pantry needs to know which shelves are running low. A detector trained on retail shelves made confident mistakes on the pantry’s real shelves.',
+    built:['A 3-stage training pipeline: SKU-110K pretraining, a gap fine-tune, and a 15-frame on-site fine-tune.','The deployment model was chosen by a pre-registered ablation, with the decision rule fixed before results existed.','Region conditioning that removed every observed false positive without breaking cases that already worked.','Deployment on a Jetson Orin Nano with an Arduino Nicla Vision camera node.'],
+    fig:'pantry', figCap:'Training pipeline and the result that chose the deployed model.',
+    results:[['0.920','mAP50, deployed model'],['0.898','mAP50, COCO-only baseline'],['4','defects found in a live-camera test'],['3','training stages']],
+    learned:'In the live test, the staff digest reported “All 0 shelves OK” while every frame was being rejected by its own safety check. Three of the four defects never appeared with simulated frames. A monitoring system’s failures live in the seam between sensor and model.' },
+  M2:{ role:'Integration lead', team:'CodeBox hackathon team', tools:'Python, OpenCV, Arduino', problem:'Build a working object sorter in one hackathon.',
+    built:['Owned the link between the Python inference pipeline and the Arduino-driven servo.','Tested classification accuracy, end-to-end latency, and serial reliability, and documented the lighting conditions that caused failures.'],
+    results:[['1st','of 24 teams'],['Live','camera classification and sorting at the deadline']] },
+  M3:{ role:'Technical Projects Lead', team:'CodeBox', tools:'Python, OpenCV, serial, microcontroller firmware', problem:'New members lost weeks to setup before building anything.',
+    built:['A starter repository covering camera capture, model inference, serial communication, firmware, and setup docs.','Component tests that isolate camera, inference, and communication failures before integration.','Two hands-on workshops for about 20 students on Python, OpenCV, and microcontroller interfacing; mentored 5 newer members.'],
+    results:[['2','workshops'],['~20','students'],['5','members mentored']] },
+  S1:{ role:'Founder and developer', team:'FUNCK', tools:'React, Supabase (Postgres, Auth, Edge Functions), Stripe Connect, Resend',
+    problem:'Small event organizers need ticketing that works on a phone at the door, with payouts to the organizer.',
+    built:['A mobile-first event platform with ticket sales, organizer payouts, and email.','Diagnosed and rebuilt a broken email-verification pipeline (missing queue infrastructure) that was blocking every new signup.','Fixed iOS Safari layout bugs around safe areas and the viewport.'],
+    fig:'funck', figCap:'Architecture.', results:[['Live','at funck.live']] },
+  S3:{ role:'Designer and developer', team:'Cal Poly EPIC 2026', tools:'TypeScript, React, Supabase realtime',
+    problem:'In a room of high school students wiring Arduinos, the instructor cannot see who is stuck.',
+    built:['Per-group help requests from each lab PC, and one live instructor queue with wait timers, stale-request flags, and phone alerts.','A 4-day, 12-activity curriculum (LEDs, sensors, motor control) with verified code, wiring diagrams, and a self-serve troubleshooter.'],
+    fig:'epic', figCap:'Request flow.', results:[['12','activities over 4 days'],['Realtime','across every lab PC']] },
+  E1:{ role:'Lab Operations Intern, promoted to Optimization Engineering Intern', team:'Natera, clinical genetic testing', tools:'Python, process mapping',
+    problem:'A high-throughput clinical validation and packaging line was slow, with redundant verification steps and manual lookups.',
+    built:['Mapped the workflow with the lab, operations, and manufacturing teams and removed redundant verification steps.','Built Python automation for barcode validation and pathology-report retrieval.','Standardized the packaging workflow and wrote the reference documentation the team adopted.'],
+    fig:'natera', figCap:'Cycle time per batch. Observed estimate; a formal time study was pending.',
+    results:[['>40%','faster validation and packaging'],['Promoted','within one internship']] },
+};
+
+/* ---------- diagrams (SVG, drawn from the real designs) ---------- */
+const FIG = (() => {
+  const ink = '#121417', mut = '#5E6570', hair = '#C9CDD3', sig = '#F2571B', bg = '#FFFFFF';
+  const box = (x, y, w, h, t, sub, hot) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${hot ? '#FFF1EA' : bg}" stroke="${hot ? sig : ink}" stroke-width="${hot ? 1.6 : 1}"/>
+    <text x="${x + w/2}" y="${y + h/2 + (sub ? -3 : 4)}" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-size="13" font-weight="600" fill="${ink}">${t}</text>
+    ${sub ? `<text x="${x + w/2}" y="${y + h/2 + 13}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="${mut}">${sub}</text>` : ''}`;
+  const arrow = (x1, y1, x2, y2) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${ink}" stroke-width="1.2" marker-end="url(#ah)"/>`;
+  const defs = `<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="${ink}"/></marker></defs>`;
+  const svg = (w, h, inner) => `<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">${defs}${inner}</svg>`;
+  const chain = (items, w = 760, bw = 128) => { const gap = (w - items.length*bw)/(items.length - 1); let out = '';
+    items.forEach(([t, s, hot], i) => { const x = i*(bw + gap); out += box(x, 20, bw, 58, t, s, hot); if (i < items.length - 1) out += arrow(x + bw + 2, 49, x + bw + gap - 3, 49); }); return svg(w, 100, out); };
+  return {
+    theta: () => chain([['Telemetry','NVML / DCGM'],['Steady state','gate'],['Rθ = ΔT / P','per GPU',true],['Peer compare','median polish'],['Permutation','null test'],['Flag','node label']], 820, 118),
+    agent: () => chain([['Operator','question'],['Claude','tool use'],['Read-only tools','MCP registry',true],['Draft','answer'],['Critic','audit'],['Operator','advisory']], 820, 118),
+    nine: () => { const st = [['Touch','2.2 MΩ RC'],['Relay','BC548'],['Strobe','~580 V'],['Optical','Schmitt'],['Solenoid',''],['Metal det.','555, 8.76 kHz'],['Magnet','MOSFET',true],['Tilt',''],['LCD','I2C']];
+      let out = ''; st.forEach(([t, s, h], i) => { const r = Math.floor(i/5), c = r ? 4 - (i - 5) : i, x = 10 + c*160, y = 14 + r*96; out += box(x, y, 128, 56, t, s, h);
+        if (i < st.length - 1){ if (i === 4) out += arrow(x + 64, y + 58, x + 64, y + 94); else if (r === 0) out += arrow(x + 130, y + 28, x + 158, y + 28); else out += arrow(x - 2, y + 28, x - 30, y + 28); } });
+      return svg(800, 180, out) + `<p class="figcap" style="margin-top:4px">Highlighted: the stage with the shared-ground bug.</p>`; },
+    riscv: () => svg(820, 250,
+      box(10, 95, 92, 56, 'PC', '') + box(140, 20, 120, 56, 'PC mux', '4 sources', true) + box(140, 170, 120, 56, 'Memory', 'dual port') +
+      box(300, 95, 130, 56, 'Decoder', 'FSM: fetch / exec') + box(470, 20, 120, 56, 'Imm gen', 'I S B U J') + box(470, 170, 120, 56, 'Reg file', '32 × 32') +
+      box(640, 95, 120, 56, 'ALU', '10 ops') +
+      arrow(102, 123, 138, 198) + arrow(260, 198, 298, 130) + arrow(430, 112, 468, 52) + arrow(430, 134, 468, 196) + arrow(590, 52, 638, 112) + arrow(590, 196, 638, 134) +
+      `<path d="M700 93 C700 -10 200 -10 200 18" fill="none" stroke="${ink}" stroke-width="1.2" marker-end="url(#ah)"/>` + arrow(140, 48, 70, 93) +
+      `<text x="152" y="92" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="${sig}">gated by PCWrite</text>`),
+    dac: () => { let lad = ''; const rs = ['80k','40k','20k','10k'];
+      rs.forEach((r, i) => { const y = 24 + i*44; lad += `<text x="8" y="${y + 4}" font-family="IBM Plex Mono,monospace" font-size="11" fill="${mut}">D${i}</text>
+        <line x1="34" y1="${y}" x2="70" y2="${y}" stroke="${ink}"/><rect x="70" y="${y - 8}" width="56" height="16" rx="3" fill="${bg}" stroke="${ink}"/>
+        <text x="98" y="${y + 4}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="${ink}">${r}</text><line x1="126" y1="${y}" x2="170" y2="${y}" stroke="${ink}"/>`; });
+      lad += `<line x1="170" y1="24" x2="170" y2="156" stroke="${ink}"/><line x1="170" y1="90" x2="206" y2="90" stroke="${ink}"/>
+        <path d="M206 60 L206 120 L262 90 Z" fill="${bg}" stroke="${ink}"/><text x="214" y="94" font-family="IBM Plex Mono,monospace" font-size="10" fill="${ink}">LM1458</text>
+        <line x1="262" y1="90" x2="300" y2="90" stroke="${ink}"/><text x="304" y="94" font-family="IBM Plex Mono,monospace" font-size="11" fill="${ink}">V out</text>
+        <rect x="200" y="20" width="56" height="16" rx="3" fill="${bg}" stroke="${ink}"/><text x="228" y="32" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10.5">10k</text>
+        <line x1="170" y1="28" x2="200" y2="28" stroke="${ink}"/><line x1="256" y1="28" x2="280" y2="28" stroke="${ink}"/><line x1="280" y1="28" x2="280" y2="90" stroke="${ink}"/>`;
+      let st = '', px = 420, py = 170, sx = 23, sy = 9.4; st += `<line x1="${px}" y1="${py}" x2="${px + 16*sx + 10}" y2="${py}" stroke="${hair}"/><line x1="${px}" y1="${py}" x2="${px}" y2="${py - 15*sy - 14}" stroke="${hair}"/>`;
+      let d = `M${px} ${py}`; for (let c = 0; c < 16; c++){ const y = py - c*sy; d += ` L${px + c*sx} ${y} L${px + (c + 1)*sx} ${y}`; }
+      st += `<path d="${d}" fill="none" stroke="${sig}" stroke-width="1.8"/><text x="${px}" y="${py + 16}" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="${mut}">code 0</text>
+        <text x="${px + 16*sx - 40}" y="${py + 16}" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="${mut}">code 15</text>
+        <text x="${px + 6}" y="${py - 15*sy - 18}" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="${mut}">937.5 mV (15 × 62.5)</text>`;
+      return svg(820, 200, lad + st); },
+    pantry: () => chain([['SKU-110K','pretrain'],['Gap','fine-tune'],['On-site','15 frames'],['Ablation','pre-registered',true],['ONNX','export'],['Jetson','+ Nicla Vision']], 820, 118) +
+      svg(820, 96, (() => { const bar = (y, v, l, hot) => `<text x="0" y="${y + 14}" font-family="IBM Plex Mono,monospace" font-size="11" fill="${mut}">${l}</text>
+        <rect x="190" y="${y}" width="${(v - .85)/.08*560}" height="20" rx="4" fill="${hot ? sig : hair}"/><text x="${200 + (v - .85)/.08*560}" y="${y + 15}" font-family="IBM Plex Mono,monospace" font-size="12" fill="${ink}">${v.toFixed(3)}</text>`;
+        return bar(14, .898, 'COCO-only baseline', false) + bar(52, .920, 'Deployed (3-stage)', true) + `<text x="190" y="92" font-family="IBM Plex Mono,monospace" font-size="10" fill="${mut}">mAP50, axis starts at 0.85</text>`; })()),
+    funck: () => chain([['React PWA','phone at the door'],['Supabase Auth','accounts'],['Postgres','RLS',true],['Edge functions','server logic'],['Stripe Connect','payouts'],['Resend','email']], 820, 118),
+    epic: () => chain([['Student PC','per group'],['Help request','wiring, stuck, done'],['Supabase','realtime',true],['Instructor','live queue'],['Alert','sound, buzz']], 760, 128),
+    natera: () => svg(820, 110, `<text x="0" y="30" font-family="IBM Plex Mono,monospace" font-size="11" fill="${mut}">Before</text><rect x="90" y="16" width="${20*30}" height="22" rx="4" fill="${hair}"/><text x="${100 + 600}" y="32" font-family="IBM Plex Mono,monospace" font-size="12" fill="${ink}">~20 min</text>
+      <text x="0" y="74" font-family="IBM Plex Mono,monospace" font-size="11" fill="${mut}">After</text><rect x="90" y="60" width="${10*30}" height="22" rx="4" fill="${sig}"/><rect x="${90 + 300}" y="60" width="60" height="22" rx="0" fill="${sig}" opacity=".35"/><text x="${100 + 360}" y="76" font-family="IBM Plex Mono,monospace" font-size="12" fill="${ink}">10–12 min</text>`),
+  };
+})();
+
+/* ======================= bench instruments: one interactive simulation per project ======================= */
+// Each instrument is driven by the project's own numbers from the record. Where the record has no
+// measured waveform (CAN ringing, branch-bug timing), the panel says it is an illustration.
+const LAB = (() => {
+  const C = { screen:'#0A0E0C', grid:'rgba(150,170,160,.16)', axis:'rgba(150,170,160,.34)', ch1:'#F2D420', ch2:'#3BD16F', ch3:'#4FB3FF', hot:'#FF5A2E', txt:'#B9C7BF' };
+  let live = [];                                   // running instruments, stopped when the sheet closes
+  const stopAll = () => { live.forEach(l => l.stop()); live = []; };
+  function canvas(el, h){ const wrap = document.createElement('div'); wrap.className = 'lab-scroll'; const c = document.createElement('canvas'); c.className = 'lab-screen'; c.style.height = h + 'px'; wrap.appendChild(c); el.appendChild(wrap); return c; }
+  function fit(c){ const d = Math.min(2, devicePixelRatio || 1), w = c.clientWidth, h = c.clientHeight;
+    if (c.width !== w*d || c.height !== h*d){ c.width = w*d; c.height = h*d; } const x = c.getContext('2d'); x.setTransform(d,0,0,d,0,0); return { x, w, h }; }
+  function grid(x, w, h, nx = 10, ny = 8){ x.fillStyle = C.screen; x.fillRect(0,0,w,h);
+    x.lineWidth = 1; for (let i = 0; i <= nx; i++){ x.strokeStyle = i === nx/2 ? C.axis : C.grid; x.beginPath(); x.moveTo(i*w/nx + .5, 0); x.lineTo(i*w/nx + .5, h); x.stroke(); }
+    for (let j = 0; j <= ny; j++){ x.strokeStyle = j === ny/2 ? C.axis : C.grid; x.beginPath(); x.moveTo(0, j*h/ny + .5); x.lineTo(w, j*h/ny + .5); x.stroke(); } }
+  function label(x, t, px, py, col = C.txt, size = 11){ x.font = `500 ${size}px IBM Plex Mono, monospace`; x.fillStyle = col; x.fillText(t, px, py); }
+  function trace(x, pts, col){ x.strokeStyle = col; x.lineWidth = 1.8; x.shadowColor = col; x.shadowBlur = 6; x.beginPath();
+    pts.forEach(([px, py], i) => i ? x.lineTo(px, py) : x.moveTo(px, py)); x.stroke(); x.shadowBlur = 0; }
+  function loop(fn){ let on = true, raf; const tick = t => { if (!on) return; if (!document.hidden) fn(t); raf = requestAnimationFrame(tick); }; raf = requestAnimationFrame(tick);
+    const h = { stop(){ on = false; cancelAnimationFrame(raf); } }; live.push(h); return h; }
+  function panel(el, html){ const p = document.createElement('div'); p.className = 'lab-ctl'; p.innerHTML = html; el.appendChild(p); return p; }
+  function head(el, model, note){ const h = document.createElement('div'); h.className = 'lab-head'; h.innerHTML = `<span class="lab-model">${model}</span><span class="lab-note">${note}</span>`; el.appendChild(h); }
+  const fmtV = v => Math.abs(v) >= 1 ? v.toFixed(2) + ' V' : (v*1000).toFixed(1) + ' mV';
+  const fmtT = s => s >= 1e-3 ? (s*1e3).toFixed(s >= 1e-2 ? 0 : 1) + ' ms' : (s*1e6).toFixed(0) + ' µs';
+
+  /* ---------------- DAC: oscilloscope, staircase and audio through the chain ---------------- */
+  function dac(el){
+    head(el, 'MSO-X 2022A · simulated', '4-bit DAC: 62.5 mV per code, 16 codes');
+    const cv = canvas(el, 280);
+    const ctl = panel(el, `<div class="seg" role="group" aria-label="Signal"><button data-m="ramp" class="on" type="button">Code ramp</button><button data-m="audio" type="button">Audio through ADC → DAC</button></div>
+      <label>Time/div <select data-k="tdiv"><option value="0.0005">500 µs</option><option value="0.001" selected>1 ms</option><option value="0.002">2 ms</option><option value="0.005">5 ms</option></select></label>
+      <label>Volts/div <select data-k="vdiv"><option value="0.1">100 mV</option><option value="0.2" selected>200 mV</option><option value="0.5">500 mV</option></select></label>
+      <label class="aud">Tone <input data-k="f" type="range" min="80" max="900" value="220"><span data-o="f">220 Hz</span></label>
+      <button data-a="listen" class="pill mini aud" type="button">Listen</button><button data-a="run" class="pill mini" type="button">Stop</button>`);
+    const st = { m:'ramp', tdiv:.001, vdiv:.2, f:220, run:true, t0:0 }, LSB = .0625, codeTime = .0006;
+    const q4 = v => Math.max(0, Math.min(15, Math.round(v/LSB)));          // 4-bit output code
+    const aud = ctl.querySelectorAll('.aud'); const showAud = () => aud.forEach(a => a.style.display = st.m === 'audio' ? '' : 'none'); showAud();
+    ctl.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.m){ st.m = b.dataset.m; ctl.querySelectorAll('[data-m]').forEach(x => x.classList.toggle('on', x === b)); showAud(); }
+      if (b.dataset.a === 'run'){ st.run = !st.run; b.textContent = st.run ? 'Stop' : 'Run'; }
+      if (b.dataset.a === 'listen') listen(); });
+    ctl.addEventListener('input', e => { const k = e.target.dataset.k; if (!k) return; st[k] = +e.target.value; const o = ctl.querySelector(`[data-o="${k}"]`); if (o) o.textContent = e.target.value + ' Hz'; });
+    let ac; function listen(){ try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume();
+      const sr = ac.sampleRate, dur = 1.6, buf = ac.createBuffer(1, sr*dur, sr), d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++){ const t = i/sr, half = i < d.length/2;   // first half: clean tone, second half: through 4 bits
+        const s = Math.sin(2*Math.PI*st.f*t); d[i] = .25*(half ? s : ((q4((s + 1)/2*15*LSB) / 15)*2 - 1)); }
+      const src = ac.createBufferSource(); src.buffer = buf; src.connect(ac.destination); src.start(); } catch {} }
+    let tNow = 0;
+    loop(now => {
+      if (st.run) tNow = now/1000;
+      const { x, w, h } = fit(cv); grid(x, w, h);
+      const span = st.tdiv*10, toY = v => h/2 - (v - .4)/st.vdiv*(h/8);
+      const out = [], inp = [];
+      for (let i = 0; i <= w; i++){
+        const t = tNow + i/w*span;
+        let v, vin = null;
+        if (st.m === 'ramp'){ const code = Math.floor(t/codeTime) % 16; v = code*LSB; }
+        else { const s = Math.sin(2*Math.PI*st.f*t); vin = (s + 1)/2*15*LSB; v = q4(vin)*LSB; }
+        v += (Math.random() - .5)*.006;                                   // a few mV of bench noise, well under 1 LSB
+        out.push([i, toY(v)]); if (vin !== null) inp.push([i, toY(vin)]);
+      }
+      if (inp.length) trace(x, inp, C.ch2);
+      trace(x, out, C.ch1);
+      label(x, `1  ${fmtV(st.vdiv)}/`, 10, 16, C.ch1); if (inp.length) label(x, `2  ${fmtV(st.vdiv)}/`, 110, 16, C.ch2);
+      label(x, `${fmtT(st.tdiv)}/div`, w - 110, 16);
+      label(x, st.m === 'ramp' ? 'Step 62.5 mV   Codes 16   Max 937.5 mV' : 'Ch2 = conditioned input   Ch1 = 4-bit DAC output', 10, h - 10);
+      if (!st.run) label(x, 'STOP', w - 46, h - 10, C.hot);
+    });
+  }
+
+  /* ---------------- 9-stage machine: 555 metal detector + firmware monitor ---------------- */
+  function metal(el){
+    head(el, 'Frequency counter + Arduino serial · simulated', '555 oscillator: 8,760 Hz baseline, 8,310 Hz with the marble');
+    const cv = canvas(el, 230);
+    const log = document.createElement('div'); log.className = 'lab-log'; el.appendChild(log);
+    const ctl = panel(el, `<button data-a="drop" class="pill mini dark" type="button">Drop the steel marble</button>
+      <div class="seg" role="group" aria-label="Firmware"><button data-fw="new" class="on" type="button">Fixed firmware</button><button data-fw="old" type="button">Original firmware</button></div>
+      <button data-a="reset" class="pill mini" type="button">Reset</button>`);
+    const BASE = 8760, MARBLE = 8310, TRIP = 150, STREAK_N = 5, RELEASE_MS = 600;
+    const st = { marble:false, fw:'new', streak:0, tripped:false, tripAt:0, freq:BASE, lines:[], last:0, falseTrips:0 };
+    ctl.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.a === 'drop'){ st.marble = true; b.disabled = true; }
+      if (b.dataset.a === 'reset'){ Object.assign(st, { marble:false, streak:0, tripped:false, lines:[], falseTrips:0 }); ctl.querySelector('[data-a="drop"]').disabled = false; }
+      if (b.dataset.fw){ st.fw = b.dataset.fw; ctl.querySelectorAll('[data-fw]').forEach(x => x.classList.toggle('on', x === b)); Object.assign(st, { streak:0, tripped:false, lines:[], falseTrips:0, marble:false }); ctl.querySelector('[data-a="drop"]').disabled = false; } });
+    const say = (t, cls = '') => { st.lines.push(`<div class="${cls}">${t}</div>`); if (st.lines.length > 7) st.lines.shift(); log.innerHTML = st.lines.join(''); };
+    loop(now => {
+      if (now - st.last > 120){ st.last = now;                              // one reading every 120 ms
+        // the oscillator drifts; occasional spikes are what false-triggered the original firmware (illustrative size)
+        const drift = (Math.random() - .5)*70 + (Math.random() < .06 ? -(150 + Math.random()*120) : 0);
+        st.freq = (st.marble ? MARBLE : BASE) + drift;
+        const delta = BASE - st.freq;
+        if (!st.tripped){
+          if (st.fw === 'old'){ const pct = delta/BASE*100; if (pct > 1.7){ st.tripped = true; st.tripAt = now; if (!st.marble) st.falseTrips++; say(`${st.freq.toFixed(0)} Hz  Δ${pct.toFixed(1)}%  TRIP on one reading${st.marble ? '' : '  (no marble: false trigger)'}`, st.marble ? 'ok' : 'bad'); } else say(`${st.freq.toFixed(0)} Hz  Δ${pct.toFixed(1)}%`); }
+          else { st.streak = delta >= TRIP ? st.streak + 1 : 0;
+            say(`${st.freq.toFixed(0)} Hz  Δ${delta.toFixed(0)} Hz  streak ${st.streak}/${STREAK_N}`, delta >= TRIP ? 'warn' : '');
+            if (st.streak >= STREAK_N){ st.tripped = true; st.tripAt = now; say(`TRIP after ${STREAK_N} readings. Releasing in ${RELEASE_MS} ms.`, 'ok'); } }
+        } else if (st.fw === 'old' && !st.marble && now - st.tripAt > 1500){ st.tripped = false; }
+      }
+      const { x, w, h } = fit(cv); grid(x, w, h, 10, 6);
+      const cyc = 6, f = st.freq, pts = []; for (let i = 0; i <= w; i++){ const ph = (i/w*cyc*f/BASE) % 1; pts.push([i, ph < .5 ? h*.48 : h*.84]); }
+      trace(x, pts, C.ch1);
+      x.font = '600 30px IBM Plex Mono, monospace'; x.fillStyle = C.ch1; x.fillText(`${st.freq.toFixed(0)} Hz`, 12, 40);
+      label(x, st.marble ? 'marble present' : 'no marble', 14, 60, st.marble ? C.ch2 : C.txt);
+      const rel = st.tripped && now - st.tripAt > RELEASE_MS;
+      label(x, rel ? 'ELECTROMAGNET RELEASED' : st.tripped ? 'releasing…' : 'electromagnet holding', w - 210, 22, rel ? C.hot : C.txt);
+      if (st.fw === 'old') label(x, `false trips: ${st.falseTrips}`, w - 130, h - 10, st.falseTrips ? C.hot : C.txt);
+    });
+  }
+
+  /* ---------------- RISC-V: logic analyzer on the PCWrite bug ---------------- */
+  function riscv(el){
+    head(el, 'Waveform viewer · simplified model', 'Multi-cycle core, FETCH then EXEC; branch at 0x08 jumps to 0x20');
+    const cv = canvas(el, 262);
+    const ctl = panel(el, `<div class="seg" role="group" aria-label="Design"><button data-b="bug" class="on" type="button">Original (PCWrite ungated)</button><button data-b="fix" type="button">Fixed (PCWrite in EXEC only)</button></div>`);
+    let bug = true;
+    ctl.addEventListener('click', e => { const b = e.target.closest('[data-b]'); if (!b) return; bug = b.dataset.b === 'bug'; ctl.querySelectorAll('[data-b]').forEach(x => x.classList.toggle('on', x === b)); });
+    // program: 0x00 addi, 0x04 addi, 0x08 beq (taken, target 0x20), 0x20 add, 0x24 sw
+    function run(){ const cyc = []; let pc = 0, mux = 0;
+      for (let k = 0; k < 10; k++){ const state = k % 2 ? 'EXEC' : 'FETCH', isBr = pc === 0x08;
+        // mux selects the branch target only while the branch executes; in the original design PC also loads during FETCH
+        const sel = state === 'EXEC' && isBr ? 'branch' : 'pc+4', next = sel === 'branch' ? 0x20 : pc + 4;
+        const write = bug ? true : state === 'EXEC';
+        cyc.push({ state, pc, sel, write }); if (write) pc = next; }
+      return cyc; }
+    loop(() => {
+      const { x, w, h } = fit(cv); x.fillStyle = C.screen; x.fillRect(0,0,w,h);
+      const cyc = run(), L = 92, cw = (w - L - 10)/cyc.length, rows = ['CLK','STATE','PCWrite','PC_SEL','PC'], rh = (h - 48)/rows.length;
+      rows.forEach((r, i) => label(x, r, 10, 20 + i*rh + rh/2, C.txt));
+      cyc.forEach((c, k) => { const x0 = L + k*cw;
+        x.strokeStyle = C.grid; x.beginPath(); x.moveTo(x0 + .5, 6); x.lineTo(x0 + .5, h - 6); x.stroke();
+        const y0 = 20; trace(x, [[x0, y0 + rh*.75],[x0, y0 + rh*.25],[x0 + cw/2, y0 + rh*.25],[x0 + cw/2, y0 + rh*.75],[x0 + cw, y0 + rh*.75]], C.ch2);
+        label(x, c.state, x0 + 6, 20 + rh*1 + rh/2 + 4, c.state === 'EXEC' ? C.ch1 : C.txt, 10.5);
+        const wy = 20 + rh*2; trace(x, [[x0, wy + rh*(c.write ? .25 : .75)],[x0 + cw, wy + rh*(c.write ? .25 : .75)]], c.write && c.state === 'FETCH' ? C.hot : C.ch3);
+        label(x, c.sel, x0 + 6, 20 + rh*3 + rh/2 + 4, c.sel === 'branch' ? C.ch1 : C.txt, 10.5);
+        const wrong = bug && c.pc !== 0 && ![0x00,0x04,0x08,0x20,0x24,0x28].includes(c.pc);
+        label(x, '0x' + c.pc.toString(16).padStart(2,'0'), x0 + 6, 20 + rh*4 + rh/2 + 4, c.pc === 0x20 || c.pc === 0x24 ? C.ch2 : C.ch1, 10.5); });
+      const pcs = cyc.filter(c => c.state === 'FETCH').map(c => '0x' + c.pc.toString(16).padStart(2,'0'));
+      label(x, bug ? `fetched: ${pcs.join(' → ')}   PC loads every cycle; branch never fires` : `fetched: ${pcs.join(' → ')}   branch lands on 0x20`, 10, h - 12, bug ? C.hot : C.ch2, 11);
+      x.strokeStyle = C.grid; x.beginPath(); x.moveTo(0, h - 30.5); x.lineTo(w, h - 30.5); x.stroke();
+    });
+  }
+
+  /* ---------------- Theta: telemetry console (same model verified earlier: 0 false flags across 10 seeds) ---------------- */
+  function theta(el){
+    head(el, 'Fleet telemetry console · simulated', '16 GPUs; temperature alarm at 85 °C vs Theta’s peer-relative Rθ');
+    const cv = canvas(el, 250);
+    const ctl = panel(el, `<label>Break GPU <select data-k="gpu">${Array.from({length:16},(_, i) => `<option value="${i}" ${i === 9 ? 'selected' : ''}>gpu${i}</option>`).join('')}</select></label>
+      <label>Cooling damage <input data-k="dmg" type="range" min="0" max="50" value="34"><span data-o="dmg">+34%</span></label>
+      <label>Job load <input data-k="hide" type="range" min="25" max="100" value="55"><span data-o="hide">55%</span></label>`);
+    let rng = 7; const r = () => (rng = (rng*16807) % 2147483647)/2147483647, g = () => Math.sqrt(-2*Math.log(r() || 1e-9))*Math.cos(2*Math.PI*r());
+    const TDP = 700, ALARM = 85, Z = 4; const fl = Array.from({length:16}, () => ({ Tin:23 + r()*1.5, R0:.077 + Math.max(-2, Math.min(2, g()))*.0021, T:60, Rh:.077, st:0, z:0, flag:false, load:.75 + r()*.2 }));
+    const sel = { gpu:9, dmg:.34, hide:.55 };
+    ctl.addEventListener('input', e => { const k = e.target.dataset.k; if (!k) return; const v = +e.target.value; sel[k] = k === 'gpu' ? v : v/100;
+      const o = ctl.querySelector(`[data-o="${k}"]`); if (o) o.textContent = k === 'dmg' ? `+${v}%` : `${v}%`; });
+    let last = 0;
+    function step(){ fl.forEach((u, i) => { const d = i === sel.gpu ? sel.dmg : 0, ld = i === sel.gpu ? sel.hide : u.load;
+        const P = Math.max(60, TDP*ld + g()*4), Tt = u.Tin + u.R0*(1 + d)*P; u.T += (Tt - u.T)*.08 + g()*.08; if (Math.abs(Tt - u.T) < 1.2) u.Rh += ((u.T - u.Tin)/P - u.Rh)*.25; u.P = P; });
+      const rs = fl.map(u => u.Rh).sort((a,b) => a-b), med = (rs[7] + rs[8])/2, mad = rs.map(v => Math.abs(v - med)).sort((a,b) => a-b)[8]*1.4826 || 1e-4;
+      fl.forEach(u => { u.z = (u.Rh - med)/mad; u.st = u.z >= Z ? u.st + 1 : 0; u.flag = u.st >= 6; }); }
+    for (let i = 0; i < 120; i++) step();
+    loop(now => {
+      if (now - last > 250){ last = now; step(); }
+      const { x, w, h } = fit(cv); x.fillStyle = C.screen; x.fillRect(0,0,w,h);
+      label(x, 'GPU   TEMP     POWER   Rθ vs PEERS   TEMP ALARM   THETA', 12, 20, C.txt, 11);
+      const rows = fl.map((u, i) => ({ u, i })), rh = (h - 34)/16;
+      rows.forEach(({ u, i }) => { const y = 34 + i*rh + rh*.7, me = i === sel.gpu;
+        if (me){ x.fillStyle = 'rgba(242,212,32,.07)'; x.fillRect(0, 34 + i*rh, w, rh); }
+        label(x, `gpu${String(i).padEnd(2)}`, 12, y, me ? C.ch1 : C.txt, 10.5);
+        label(x, `${u.T.toFixed(1)}°C`, 62, y, u.T >= ALARM ? C.hot : C.txt, 10.5);
+        label(x, `${u.P.toFixed(0)} W`, 130, y, C.txt, 10.5);
+        const bx = 190, bw = Math.min(140, Math.max(1, (u.z + 3)/16*140)); x.fillStyle = u.flag ? C.hot : u.z > 3 ? '#C9A227' : C.ch3; x.globalAlpha = .75; x.fillRect(bx, y - 8, bw, 8); x.globalAlpha = 1;
+        label(x, `${u.z >= 0 ? '+' : ''}${u.z.toFixed(1)}σ`, bx + 146, y, u.flag ? C.hot : C.txt, 10.5);
+        label(x, u.T >= ALARM ? 'ALARM' : 'quiet', 380, y, u.T >= ALARM ? C.hot : C.txt, 10.5);
+        label(x, u.flag ? 'FLAGGED' : 'ok', 470, y, u.flag ? C.hot : C.ch2, 10.5); });
+    });
+  }
+
+  /* ---------------- Backplane: CAN bus with and without the 120 ohm termination ---------------- */
+  function can(el){
+    head(el, 'CAN bus probe · illustration', 'The backplane has switchable 120 Ω terminations at each end of the bus');
+    const cv = canvas(el, 230);
+    const ctl = panel(el, `<div class="seg" role="group" aria-label="Termination"><button data-t="1" class="on" type="button">Terminated (120 Ω)</button><button data-t="0" type="button">Unterminated</button></div>`);
+    let term = true; ctl.addEventListener('click', e => { const b = e.target.closest('[data-t]'); if (!b) return; term = b.dataset.t === '1'; ctl.querySelectorAll('[data-t]').forEach(x => x.classList.toggle('on', x === b)); });
+    const bits = [1,0,0,1,0,1,1,0,1,0,0,0,1,1,0,1];
+    loop(now => {
+      const { x, w, h } = fit(cv); grid(x, w, h);
+      const bw = w/12, off = (now/18) % bw, hi = [], lo = [];
+      for (let i = 0; i <= w; i++){ const p = i + off, k = Math.floor(p/bw), dom = bits[k % bits.length] === 0, prev = bits[(k + bits.length - 1) % bits.length] === 0;
+        const tIn = (p % bw)/bw, edge = dom !== prev, ring = edge && !term ? Math.exp(-tIn*14)*Math.sin(tIn*70)*.55 : 0;
+        const vd = dom ? 2 : 0;   // differential volts, dominant ~2 V, recessive 0 V
+        hi.push([i, h*.5 - (2.5 + vd/2 + ring)*h/10]); lo.push([i, h*.5 - (2.5 - vd/2 - ring)*h/10 + h*.22]); }
+      trace(x, hi, C.ch1); trace(x, lo, C.ch2);
+      label(x, '1 CAN_H', 10, 16, C.ch1); label(x, '2 CAN_L', 90, 16, C.ch2);
+      label(x, term ? 'clean edges' : 'reflections ring at every edge', w - 230, 16, term ? C.ch2 : C.hot);
+    });
+  }
+
+  return { mount(kind, el){ ({ dac, metal, riscv, theta, can })[kind](el); }, stopAll };
+})();
+
+/* ---------- the datasheet view ---------- */
+const sheet = document.createElement('div'); sheet.className = 'sheet'; sheet.id = 'sheet'; sheet.hidden = true;
+sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-labelledby', 'shName');
+document.body.appendChild(sheet);
+const ORDER = PROJECTS.map(p => p.id);
+let sheetReturn = null;
+function openSheet(id, push = true){
+  const p = PROJECTS.find(x => x.id === id); if (!p) return;
+  const d = DETAIL[id] || {}, cat = CATS.find(c => c.id === p.cat), i = ORDER.indexOf(id);
+  const prev = PROJECTS[(i - 1 + ORDER.length) % ORDER.length], next = PROJECTS[(i + 1) % ORDER.length];
+  // TEAM only when it adds something the context line and status do not already say
+  const lead = String(d.team || '').split(/[,;]/)[0].trim().toLowerCase();
+  const team = d.team && !String(p.ctx).toLowerCase().includes(lead) && lead !== String(p.status).toLowerCase() ? d.team : '';
+  const spec = [['ID', p.id], ['AREA', cat.name], ['ROLE', d.role], ['CONTEXT', p.ctx], ['TEAM', team], ['DATES', p.when], ['STATUS', p.status], ['TOOLS', d.tools || p.tags.join(', ')]].filter(r => r[1]);
+  const built = d.built || p.facts;
+  const fig = d.img ? `<figure class="fig"><img src="${d.img}" alt="${p.name}, ray-traced render" loading="lazy"><figcaption class="figcap">${d.figCap || ''}</figcaption></figure>`
+    : d.fig ? `<figure class="fig">${FIG[d.fig]()}${d.figCap ? `<figcaption class="figcap">${d.figCap}</figcaption>` : ''}</figure>` : '';
+  sheet.innerHTML = `<div class="sh-bar"><div class="sh-crumb"><span>${cat.pn} ${cat.name}</span><b>${p.id}</b></div>
+      <div class="sh-nav"><button class="pill" data-go="${prev.id}" type="button">← ${prev.id}</button><button class="pill" data-go="${next.id}" type="button">${next.id} →</button><button class="pill dark" data-close type="button">Close</button></div></div>
+    <article class="sh-in">
+      <header class="sh-head"><div class="st">${p.status}</div><h2 id="shName">${p.name}</h2><p class="sh-sub">${p.sub}</p></header>
+      <div class="sh-grid">
+        <aside class="sh-spec"><div class="k">DATASHEET</div><dl>${spec.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+          ${p.links ? `<div class="plinks">${p.links.map(([l, u]) => `<a href="${u}" target="_blank" rel="noopener">${l} ↗</a>`).join('')}</div>` : ''}</aside>
+        <div class="sh-body">
+          ${d.problem ? `<section><h3>The problem</h3><p>${d.problem}</p></section>` : ''}
+          <section><h3>${d.problem ? 'What I built' : 'Overview'}</h3><ul>${built.map(b => `<li>${b}</li>`).join('')}</ul></section>
+          ${fig ? `<section><h3>How it works</h3>${fig}</section>` : ''}
+          ${d.lab ? `<section><h3>Try it: simulated bench</h3><div class="lab" id="labMount"></div></section>` : ''}
+          ${d.video ? `<section><h3>Demo</h3><figure class="vid"><video src="${d.video[0]}" controls playsinline preload="metadata"></video><figcaption class="figcap">${d.video[1]}</figcaption></figure></section>` : ''}
+          ${d.photos ? `<section><h3>On the bench</h3><div class="photos">${d.photos.map(([src, cap, fit]) => `<figure><img src="${src}" alt="${cap}" loading="lazy"${fit === 'contain' ? ' class="contain"' : ''}><figcaption class="figcap">${cap}</figcaption></figure>`).join('')}</div></section>` : ''}
+          ${d.results ? `<section><h3>Results</h3><div class="metrics">${d.results.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('')}</div></section>` : ''}
+          ${d.learned ? `<section><h3>What I learned</h3><p>${d.learned}</p></section>` : ''}
+          <div class="ptags">${p.tags.map(t => `<span>${t}</span>`).join('')}</div>
+        </div>
+      </div>
+    </article>`;
+  LAB.stopAll(); if (d.lab) LAB.mount(d.lab, sheet.querySelector('#labMount'));
+  sheet.hidden = false; document.documentElement.classList.add('locked'); sheet.scrollTop = 0;
+  if (push) history.replaceState(null, '', '#d-' + id);
+  requestAnimationFrame(() => sheet.classList.add('on'));
+  sheetReturn = sheetReturn || document.activeElement; sheet.querySelector('[data-close]').focus();
+}
+function closeSheet(){ LAB.stopAll(); sheet.classList.remove('on'); document.documentElement.classList.remove('locked');
+  setTimeout(() => { sheet.hidden = true; }, 380); history.replaceState(null, '', location.pathname + location.search);
+  if (sheetReturn && sheetReturn.focus) sheetReturn.focus(); sheetReturn = null; }
+sheet.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) return openSheet(g.dataset.go); if (e.target.closest('[data-close]')) closeSheet(); });
+addEventListener('keydown', e => { if (sheet.hidden) return; if (e.key === 'Escape') closeSheet();
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){ const i = ORDER.indexOf((location.hash.match(/#d-(\w+)/) || [])[1]); if (i >= 0) openSheet(ORDER[(i + (e.key === 'ArrowRight' ? 1 : -1) + ORDER.length) % ORDER.length]); } });
+document.addEventListener('click', e => { const a = e.target.closest('a[href^="#d-"]'); if (!a) return; e.preventDefault(); openSheet(a.getAttribute('href').slice(3)); });
+const dl = /^#d-(\w+)$/.exec(location.hash); if (dl) setTimeout(() => openSheet(dl[1], false), 300);
+
+/* ======================= hero film ======================= */
+(function film(){
+  const v = $('film'), heroCh = story.children[0];
+  if (!v) return;
+  if (reduce){ v.removeAttribute('autoplay'); v.pause(); }
+  else { const go = () => v.play().catch(() => {}); v.readyState >= 2 ? go() : v.addEventListener('canplay', go, { once:true }); }
+  $('replay').addEventListener('click', () => { v.currentTime = 0; v.classList.remove('off'); v.play().catch(() => {}); });
+  const fade = () => { const r = heroCh.getBoundingClientRect(), k = Math.max(0, Math.min(1, -r.top/(innerHeight*.55)));
+    v.style.opacity = String(1 - k); const off = k >= 1; v.classList.toggle('off', off); if (off && !v.paused) v.pause(); };
+  addEventListener('scroll', fade, { passive:true }); fade();
+  v.addEventListener('error', () => v.classList.add('off'));   // missing file: the live scene is the hero
+})();
+
+/* ======================= page ======================= */
+$('again').addEventListener('click', () => scrollTo({ top:0, behavior: reduce ? 'auto' : 'smooth' }));
+$('copy').addEventListener('click', () => { const b = $('copy'), t = $('email').textContent;
+  const done = ok => { b.textContent = ok ? 'Copied' : 'Select and copy'; setTimeout(() => b.textContent = 'Copy email', 1600); };
+  const sel = () => { const r = document.createRange(); r.selectNodeContents($('email')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+  try { navigator.clipboard.writeText(t).then(() => done(true), () => { sel(); done(false); }); } catch { sel(); done(false); } });
+// deep link to a part (#part-3)
+const m = /^#part-(\d)$/.exec(location.hash); if (m){ const el = $('part-' + m[1]); if (el) requestAnimationFrame(() => scrollTo(0, el.offsetTop + el.offsetHeight*.3)); }
+})();
+</script>
+
+</body>
+</html>

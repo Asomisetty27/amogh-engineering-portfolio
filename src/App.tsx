@@ -11,7 +11,7 @@ import ThermalLens from "@/components/visual/ThermalLens";
 // Route-level code splitting: each page is its own chunk, loaded on demand.
 // Keeps the initial bundle small - visiting "/" no longer pulls in the admin
 // workspace or the three.js GPU scene (those live in their own route chunks).
-const Index            = lazy(() => import("./pages/Index.tsx"));
+const Teardown         = lazy(() => import("./pages/Teardown.tsx"));
 const NotFound         = lazy(() => import("./pages/NotFound.tsx"));
 const ThermalOSLayout  = lazy(() => import("./pages/thermalos/ThermalOSLayout.tsx"));
 const ResearchLanding  = lazy(() => import("./pages/thermalos/ResearchLanding.tsx"));
@@ -92,14 +92,12 @@ const App = () => (
 
 
 
-            <Route path="/" element={<Index />} />
-            {/* Portfolio sections - each is a real URL rendering the same
-                shell; Index derives the active section from the path. */}
+            {/* Portfolio: the teardown (public/teardown/). Old section and project URLs land on it too. */}
+            <Route path="/" element={<Teardown />} />
             {["overview", "projects", "experience", "skills", "contact", "quickview"].map((s) => (
-              <Route key={s} path={`/${s}`} element={<Index />} />
+              <Route key={s} path={`/${s}`} element={<Teardown />} />
             ))}
-            {/* Deep link straight into a project's system view */}
-            <Route path="/projects/:projectId" element={<Index />} />
+            <Route path="/projects/:projectId" element={<Teardown />} />
 
             {/* ══ THETA - commercial surface moved to runtheta.com ══════════ */}
             <Route path={THETA_BASE} element={<RuntheaRedirect />} />
