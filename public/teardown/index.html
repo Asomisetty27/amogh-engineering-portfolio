@@ -500,6 +500,10 @@ const bomLinks = [...bom.querySelectorAll('a')];
 // on any device and matches the intro exactly. Blender also exports where each part sits on
 // screen in every frame (anchors), which is what the label cards point at.
 const canvas = $('gl'), g2 = canvas.getContext('2d', { alpha:false });
+// a second canvas on top holds the next rendered frame; the compositor crossfades the two by opacity,
+// so motion is continuous between renders and each canvas only repaints when its frame changes
+const top2 = canvas.cloneNode(); top2.removeAttribute('id'); top2.setAttribute('aria-hidden', 'true'); top2.style.zIndex = 1; top2.style.opacity = 0; top2.style.willChange = 'opacity';
+canvas.after(top2); const g3 = top2.getContext('2d', { alpha:false }); let topKey = '';
 const SEQS = { l:{ dir:'seq/l/' }, p:{ dir:'seq/p/' } }, SHIPPED = ['l'];   // add 'p' once the portrait set is published
 let seq = null, want = 1, shown = 0, drawnKey = '', introT = -1, introDone = false;
 
@@ -517,7 +521,9 @@ async function preload(s){
   const N = s.meta.frames, order = [], seen = new Set(), push = i => { if (i >= 1 && i <= N && !seen.has(i)){ seen.add(i); order.push(i); } };
   for (let i = 1; i <= s.meta.intro; i++) push(i);
   for (const step of [12, 6, 3, 1]) for (let i = s.meta.intro; i <= N; i += step) push(i);
-  let next = 0; const worker = async () => { while (next < order.length){ await fetchFrame(s, order[next++]); } };
+  // frames near where the reader is scrolled jump the queue, so early scrolling isn't coarse
+  let next = 0; const near = () => { const c = Math.round(want); for (let d = 0; d <= 24; d++) for (const i of [c + d, c - d]) if (i >= 1 && i <= N && s.blobs[i] === undefined) return i; return 0; };
+  const worker = async () => { for (;;){ const i = seq === s && near(); if (i){ await fetchFrame(s, i); continue; } while (next < order.length && s.blobs[order[next]] !== undefined) next++; if (next >= order.length) return; await fetchFrame(s, order[next++]); } };
   await Promise.all([worker(), worker(), worker(), worker()]);
 }
 function pump(s){
@@ -526,7 +532,7 @@ function pump(s){
   for (let d = 0; d <= WIN && s.dec.size < 3; d++) for (const i of d ? [c + d, c - d] : [c]){
     if (i < 1 || i > N || !s.blobs[i] || s.bmp.has(i) || s.dec.has(i) || s.dec.size >= 3) continue;
     s.dec.add(i);
-    createImageBitmap(s.blobs[i]).then(b => { s.dec.delete(i); if (Math.abs(i - Math.round(want)) <= WIN + 6){ s.bmp.set(i, b); drawnKey = ''; } else b.close(); }, () => s.dec.delete(i));
+    createImageBitmap(s.blobs[i]).then(b => { s.dec.delete(i); if (Math.abs(i - Math.round(want)) <= WIN + 6){ s.bmp.set(i, b); if (Math.abs(i - shown) < 2) drawnKey = topKey = ''; } else b.close(); }, () => s.dec.delete(i));
   }
 }
 function nearest(s, i){
@@ -543,14 +549,19 @@ function fit(s){
 // cover the screen, so a frame change is a straight pixel copy with no resampling on the main thread
 function sizeCanvas(){
   if (!seq || !seq.meta) return; const M = seq.meta, { k, dx, dy } = fit(seq);
-  if (canvas.width !== M.w || canvas.height !== M.h){ canvas.width = M.w; canvas.height = M.h; }
-  Object.assign(canvas.style, { inset:'auto', left:dx + 'px', top:dy + 'px', width:M.w*k + 'px', height:M.h*k + 'px' }); drawnKey = '';
+  for (const c of [canvas, top2]){
+    if (c.width !== M.w || c.height !== M.h){ c.width = M.w; c.height = M.h; }
+    Object.assign(c.style, { position:'fixed', display:'block', inset:'auto', left:dx + 'px', top:dy + 'px', width:M.w*k + 'px', height:M.h*k + 'px' }); }
+  drawnKey = topKey = '';
 }
 function draw(){
   if (!seq || !seq.meta) return;
-  const i = nearest(seq, Math.round(shown)); if (!i) return;
-  const key = seq.dir + i + ':' + canvas.width; if (key === drawnKey) return; drawnKey = key;
-  g2.drawImage(seq.bmp.get(i), 0, 0);
+  const i0 = Math.floor(shown), t = shown - i0, b0 = seq.bmp.get(i0), b1 = seq.bmp.get(i0 + 1);
+  const lo = b0 ? i0 : nearest(seq, Math.round(shown)); if (!lo) return;
+  const k0 = seq.dir + lo + ':' + canvas.width; if (k0 !== drawnKey){ drawnKey = k0; g2.drawImage(seq.bmp.get(lo), 0, 0); }
+  const blend = b0 && b1 && !reduce && t > .02;
+  if (blend){ const k1 = seq.dir + (i0 + 1) + ':' + canvas.width; if (k1 !== topKey){ topKey = k1; g3.drawImage(b1, 0, 0); } }
+  const op = blend ? String(Math.round(t*50)/50) : '0'; if (top2.style.opacity !== op) top2.style.opacity = op;
 }
 async function chooseSeq(){
   const portrait = innerHeight > innerWidth*1.15;
