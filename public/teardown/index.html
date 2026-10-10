@@ -500,10 +500,6 @@ const bomLinks = [...bom.querySelectorAll('a')];
 // on any device and matches the intro exactly. Blender also exports where each part sits on
 // screen in every frame (anchors), which is what the label cards point at.
 const canvas = $('gl'), g2 = canvas.getContext('2d', { alpha:false });
-// a second canvas on top holds the next rendered frame; the compositor crossfades the two by opacity,
-// so motion is continuous between renders and each canvas only repaints when its frame changes
-const top2 = canvas.cloneNode(); top2.removeAttribute('id'); top2.setAttribute('aria-hidden', 'true'); top2.style.zIndex = 1; top2.style.opacity = 0; top2.style.willChange = 'opacity';
-canvas.after(top2); const g3 = top2.getContext('2d', { alpha:false }); let topKey = '';
 const SEQS = { l:{ dir:'seq/l/' }, p:{ dir:'seq/p/' } }, SHIPPED = ['l'];   // add 'p' once the portrait set is published
 let seq = null, want = 1, shown = 0, drawnKey = '', introT = -1, introDone = false;
 
@@ -532,7 +528,7 @@ function pump(s){
   for (let d = 0; d <= WIN && s.dec.size < 3; d++) for (const i of d ? [c + d, c - d] : [c]){
     if (i < 1 || i > N || !s.blobs[i] || s.bmp.has(i) || s.dec.has(i) || s.dec.size >= 3) continue;
     s.dec.add(i);
-    createImageBitmap(s.blobs[i]).then(b => { s.dec.delete(i); if (Math.abs(i - Math.round(want)) <= WIN + 6){ s.bmp.set(i, b); if (Math.abs(i - shown) < 2) drawnKey = topKey = ''; } else b.close(); }, () => s.dec.delete(i));
+    createImageBitmap(s.blobs[i]).then(b => { s.dec.delete(i); if (Math.abs(i - Math.round(want)) <= WIN + 6){ s.bmp.set(i, b); if (Math.abs(i - shown) < 2) drawnKey = ''; } else b.close(); }, () => s.dec.delete(i));
   }
 }
 function nearest(s, i){
@@ -549,19 +545,14 @@ function fit(s){
 // cover the screen, so a frame change is a straight pixel copy with no resampling on the main thread
 function sizeCanvas(){
   if (!seq || !seq.meta) return; const M = seq.meta, { k, dx, dy } = fit(seq);
-  for (const c of [canvas, top2]){
-    if (c.width !== M.w || c.height !== M.h){ c.width = M.w; c.height = M.h; }
-    Object.assign(c.style, { position:'fixed', display:'block', inset:'auto', left:dx + 'px', top:dy + 'px', width:M.w*k + 'px', height:M.h*k + 'px' }); }
-  drawnKey = topKey = '';
+  if (canvas.width !== M.w || canvas.height !== M.h){ canvas.width = M.w; canvas.height = M.h; }
+  Object.assign(canvas.style, { inset:'auto', left:dx + 'px', top:dy + 'px', width:M.w*k + 'px', height:M.h*k + 'px' }); drawnKey = '';
 }
 function draw(){
   if (!seq || !seq.meta) return;
-  const i0 = Math.floor(shown), t = shown - i0, b0 = seq.bmp.get(i0), b1 = seq.bmp.get(i0 + 1);
-  const lo = b0 ? i0 : nearest(seq, Math.round(shown)); if (!lo) return;
-  const k0 = seq.dir + lo + ':' + canvas.width; if (k0 !== drawnKey){ drawnKey = k0; g2.drawImage(seq.bmp.get(lo), 0, 0); }
-  const blend = b0 && b1 && !reduce && t > .02;
-  if (blend){ const k1 = seq.dir + (i0 + 1) + ':' + canvas.width; if (k1 !== topKey){ topKey = k1; g3.drawImage(b1, 0, 0); } }
-  const op = blend ? String(Math.round(t*50)/50) : '0'; if (top2.style.opacity !== op) top2.style.opacity = op;
+  const i = nearest(seq, Math.round(shown)); if (!i) return;
+  const key = seq.dir + i + ':' + canvas.width; if (key === drawnKey) return; drawnKey = key;
+  g2.drawImage(seq.bmp.get(i), 0, 0);
 }
 async function chooseSeq(){
   const portrait = innerHeight > innerWidth*1.15;
