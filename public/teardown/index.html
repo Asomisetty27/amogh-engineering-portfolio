@@ -618,6 +618,7 @@ function anchorXY(f){
   const a = M.anchors[i0 - 1][f], b = M.anchors[i1 - 1][f], { k, dx, dy } = fit(seq);
   return [dx + (a[0] + (b[0] - a[0])*t)*M.w*k, dy + (a[1] + (b[1] - a[1])*t)*M.h*k];
 }
+const GUIDE = 72;   // room for the AI guide button, bottom right
 function placeCard(){
   const on = focus >= 0 && card.classList.contains('on');
   const op = on ? 1 : 0; ln.setAttribute('opacity', op*.85); dt.setAttribute('opacity', op); dt2.setAttribute('opacity', op*.6);
@@ -628,13 +629,13 @@ function placeCard(){
   if (narrow){
     // above or below the part, whichever side leaves it in view
     cx = (innerWidth - cw)/2; const below = ay < innerHeight*.5;
-    cy = below ? innerHeight - ch - 16 : Math.max(76, Math.min(ay - ch - 40, innerHeight*.5 - ch)); ex = cx + cw*.5; ey = below ? cy : cy + ch; }
+    cy = below ? innerHeight - ch - 16 - GUIDE : Math.max(76, Math.min(ay - ch - 40, innerHeight*.5 - ch)); ex = cx + cw*.5; ey = below ? cy : cy + ch; }
   else {
     // the card sits on the side of the part that has room, so it never covers what it labels
     const right = ax < innerWidth*.56;
     const br = bom.getBoundingClientRect(), bomR = br.width && !bom.classList.contains('gone') ? br.right + 24 : 16;   // fixed elements have no offsetParent
     cx = right ? Math.min(innerWidth - cw - 32, Math.max(ax + 90, innerWidth*.62)) : Math.max(bomR, Math.min(ax - 90 - cw, innerWidth*.38 - cw));
-    cy = Math.max(84, Math.min(innerHeight - ch - 24, ay - ch*.35)); ex = right ? cx : cx + cw; ey = cy + 30; }
+    cy = Math.max(84, Math.min(innerHeight - ch - 24 - GUIDE, ay - ch*.35)); ex = right ? cx : cx + cw; ey = cy + 30; }
   card.style.left = cx + 'px'; card.style.top = cy + 'px';
   ln.setAttribute('x1', ax); ln.setAttribute('y1', ay); ln.setAttribute('x2', ex); ln.setAttribute('y2', ey);
   dt.setAttribute('cx', ax); dt.setAttribute('cy', ay); dt2.setAttribute('cx', ax); dt2.setAttribute('cy', ay);
@@ -1088,6 +1089,16 @@ addEventListener('keydown', e => { if (sheet.hidden) return; if (e.key === 'Esca
   if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){ const i = ORDER.indexOf((location.hash.match(/#d-(\w+)/) || [])[1]); if (i >= 0) openSheet(ORDER[(i + (e.key === 'ArrowRight' ? 1 : -1) + ORDER.length) % ORDER.length]); } });
 document.addEventListener('click', e => { const a = e.target.closest('a[href^="#d-"]'); if (!a) return; e.preventDefault(); openSheet(a.getAttribute('href').slice(3)); });
 const dl = /^#d-(\w+)$/.exec(location.hash); if (dl) setTimeout(() => openSheet(dl[1], false), 300);
+
+/* ======================= AI guide (ElevenLabs agent, answers only from this page's text) ======================= */
+// loaded once the page is idle so the widget never competes with the scroll stage for frames
+(function guide(){
+  let done = false; const go = () => { if (done) return; done = true;
+    const el = document.createElement('elevenlabs-convai'); el.setAttribute('agent-id', 'agent_0201m4pvdphde00s07v11yxqq3rb'); el.setAttribute('avatar-image-url', new URL('guide.png', location.href).href);   /* static avatar: an animated orb would redraw every frame */ document.body.appendChild(el);
+    const s = document.createElement('script'); s.src = 'https://unpkg.com/@elevenlabs/convai-widget-embed@0.18.2'; s.async = true; document.body.appendChild(s); };
+  const idle = window.requestIdleCallback ? f => requestIdleCallback(f, { timeout:4000 }) : f => setTimeout(f, 2500);
+  document.readyState === 'complete' ? idle(go) : addEventListener('load', () => idle(go), { once:true });
+})();
 
 /* ======================= page ======================= */
 $('again').addEventListener('click', () => scrollTo({ top:0, behavior: reduce ? 'auto' : 'smooth' }));
