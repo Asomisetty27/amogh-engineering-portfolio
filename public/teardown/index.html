@@ -261,6 +261,9 @@ html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6
 
 .photos img.contain{object-fit:contain;background:#fff}
 .vid{margin:0;background:#0A0C0F;border:1px solid var(--hair);border-radius:10px;padding:10px;box-shadow:var(--lip),var(--sh-1);text-align:center}
+.fig.illus{margin-bottom:28px}
+.illus img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:6px;background:#0C0E11;display:block}
+.tag-illus{font:500 10.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#F2571B;margin-right:6px}
 .vid video{max-height:520px;max-width:100%;border-radius:6px;background:#000}
 
 /* end */
@@ -609,7 +612,8 @@ function fillCard(c){
 function onFocus(f, prev){
   if (f >= 0){ card.classList.remove('on'); clearTimeout(onFocus.t); onFocus.t = setTimeout(() => { fillCard(PARTS[f]); card.classList.add('on'); }, prev >= 0 ? 260 : 120); }
   else card.classList.remove('on');
-  if (soundOn && f > prev) sfx(f === 0 ? 'screws' : 'lift');
+  // each layer has its own material sound (lid, processor, camera, battery, ports, base); the mainboard keeps the generic lift
+  if (soundOn && f > prev){ if (f === 0){ sfx('screws'); setTimeout(() => sfx('layer0'), 900); } else sfx(SFX['layer' + f] ? 'layer' + f : 'lift'); }
   if (soundOn && f < prev && f >= -1) sfx('seat');
 }
 // where the focused part sits on screen right now: Blender's per-frame anchor, through the same fit as the image
@@ -646,7 +650,7 @@ function placeCard(){
 // Recorded-style foley (ElevenLabs sound effects), fetched only once a visitor turns sound on.
 // The synthesized clicks below remain as the fallback if a file fails to load.
 let soundOn = false, ac = null; const SFX = {};
-function loadSfx(){ ['screws', 'lift', 'seat'].forEach(k => { if (SFX[k] !== undefined) return; SFX[k] = null;
+function loadSfx(){ ['screws', 'lift', 'seat', 'layer0', 'layer1', 'layer3', 'layer4', 'layer5', 'layer6'].forEach(k => { if (SFX[k] !== undefined) return; SFX[k] = null;
   fetch('sfx/' + k + '.mp3').then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(b => ac.decodeAudioData(b)).then(buf => { SFX[k] = buf; }, () => {}); }); }
 $('snd').addEventListener('click', () => {
   soundOn = !soundOn; $('snd').setAttribute('aria-pressed', soundOn); $('sndL').textContent = soundOn ? 'Sound on' : 'Sound off';
@@ -708,7 +712,7 @@ $('replay') && $('replay').addEventListener('click', () => { if (!seq || reduce)
 // Depth for each project, from the verified record. Projects without an entry here still get a
 // datasheet built from their summary facts.
 const DETAIL = {
-  R1:{ lab:'theta', role:'Creator and lead researcher', team:'Solo', tools:'Python, Go, Kubernetes, Helm, NVML, DCGM, AMD amdsmi, SLURM',
+  R1:{ illus:['illus-r1.webp','Eight GPUs on one baseboard, one running warmer than its matched neighbors. Theta flags the outlier against its peers, not against a fixed temperature.'], lab:'theta', role:'Creator and lead researcher', team:'Solo', tools:'Python, Go, Kubernetes, Helm, NVML, DCGM, AMD amdsmi, SLURM',
     problem:'Datacenters alarm on GPU temperature, but temperature mostly reflects how hard a GPU is working. A GPU whose cooling is degrading can sit under a light job and look normal until it throttles or fails.',
     built:['A peer-relative detector: effective thermal resistance Rθ = ΔT / P, computed by two-way median polish across position- and power-matched peers, with a permutation-null test gating every claim before a signal counts.',
       'A signature-matrix fault classifier (6-axis fingerprint, 3-valued evidence model) that reproduces all three Princeton attributions.',
@@ -765,13 +769,13 @@ const DETAIL = {
     built:['Parametric SolidWorks parts and assembly with mates and interference checks, and engineering drawings with GD&T.','Manual lathe and mill work: facing, turning, boring, threading, milling, drilling, broaching, with feeds and speeds per material.','Six parts: crank disk, cylinder, flywheel, frame, mainshaft, piston.'],
     results:[['6','precision parts'],['±0.0001 in','measured with micrometers']],
     photos:[['ime144-air-motor.jpg','Air motor assembly (IME 144 manual reference).','contain']] },
-  M1:{ role:'Lead developer', team:'Justice Centered Edge AI, funded, advised by Prof. Souvik Kundu', tools:'PyTorch, YOLO11n, ONNX, Jetson Orin Nano, Arduino Nicla Vision',
+  M1:{ illus:['illus-m1.webp','A camera watching pantry shelves for low stock, with inference on a small edge computer. A generic scene, not the deployed pantry.'], role:'Lead developer', team:'Justice Centered Edge AI, funded, advised by Prof. Souvik Kundu', tools:'PyTorch, YOLO11n, ONNX, Jetson Orin Nano, Arduino Nicla Vision',
     problem:'A food pantry needs to know which shelves are running low. A detector trained on retail shelves made confident mistakes on the pantry’s real shelves.',
     built:['A 3-stage training pipeline: SKU-110K pretraining, a gap fine-tune, and a 15-frame on-site fine-tune.','The deployment model was chosen by a pre-registered ablation, with the decision rule fixed before results existed.','Region conditioning that removed every observed false positive without breaking cases that already worked.','Deployment on a Jetson Orin Nano with an Arduino Nicla Vision camera node.'],
     fig:'pantry', figCap:'Training pipeline and the result that chose the deployed model.',
     results:[['0.920','mAP50, deployed model'],['0.898','mAP50, COCO-only baseline'],['4','defects found in a live-camera test'],['3','training stages']],
     learned:'In the live test, the staff digest reported “All 0 shelves OK” while every frame was being rejected by its own safety check. Three of the four defects never appeared with simulated frames. A monitoring system’s failures live in the seam between sensor and model.' },
-  M2:{ role:'Technical Projects Lead', team:'CodeBox', tools:'Python, OpenCV, serial, microcontroller firmware', problem:'New members lost weeks to setup before building anything.',
+  M2:{ illus:['illus-m2.webp','A workshop bench of the kind the starter repo is built for: a USB camera, a microcontroller on a breadboard, and objects to detect.'], role:'Technical Projects Lead', team:'CodeBox', tools:'Python, OpenCV, serial, microcontroller firmware', problem:'New members lost weeks to setup before building anything.',
     built:['A starter repository covering camera capture, model inference, serial communication, firmware, and setup docs.','Component tests that isolate camera, inference, and communication failures before integration.','Two hands-on workshops for about 20 students on Python, OpenCV, and microcontroller interfacing; mentored 5 newer members.'],
     results:[['2','workshops'],['~20','students'],['5','members mentored']] },
   S1:{ role:'Founder and developer', team:'FUNCK', tools:'React, Supabase (Postgres, Auth, Edge Functions), Stripe Connect, Resend',
@@ -784,11 +788,17 @@ const DETAIL = {
     built:['Per-group help requests from each lab PC, and one live instructor queue with wait timers, stale-request flags, and phone alerts.','A 4-day, 12-activity curriculum (LEDs, sensors, motor control) with verified code, wiring diagrams, and a self-serve troubleshooter.'],
     fig:'epic', figCap:'Request flow.', results:[['12','activities over 4 days'],['Realtime','across every lab PC']],
     shotsTitle:'The live tool', photos:[['epic-queue.jpg','The student start screen: each lab PC picks its group (live at amogh.site/epic).','contain']] },
-  E1:{ role:'Lab Operations Intern, promoted to Optimization Engineering Intern', team:'Natera, clinical genetic testing', tools:'Python, process mapping',
+  E1:{ illus:['illus-e1.webp','A clinical specimen packaging bench: capped tube racks, a barcode scanner, and insulated shippers. A generic scene, not Natera’s lab.'], role:'Lab Operations Intern, promoted to Optimization Engineering Intern', team:'Natera, clinical genetic testing', tools:'Python, process mapping',
     problem:'A high-throughput clinical validation and packaging line was slow, with redundant verification steps and manual lookups.',
     built:['Mapped the workflow with the lab, operations, and manufacturing teams and removed redundant verification steps.','Built Python automation for barcode validation and pathology-report retrieval.','Standardized the packaging workflow and wrote the reference documentation the team adopted.'],
     fig:'natera', figCap:'Cycle time per batch. Observed estimate; a formal time study was pending.',
     results:[['>40%','faster validation and packaging'],['Promoted','within one internship']] },
+  E2:{ illus:['illus-e2.webp','A heavy-lift quadcopter with its power distribution board exposed, the part of the aircraft this role owns.'] },
+  H7:{ illus:['illus-h7.webp','An FPV micro drone pulled apart into the subsystems the analysis mapped: motors and props, frame, flight controller, battery, video transmitter, camera.'] },
+  H9:{ illus:['illus-h9.webp','A hypoeutectic Pb-Sn alloy: dark primary lead-rich dendrites surrounded by lamellar eutectic.'] },
+  H10:{ illus:['illus-h10.webp','Galvanic corrosion at a stainless bolt in an aluminum plate. With water as the electrolyte, the aluminum is the anode and corrodes in a ring around the joint.'] },
+  M3:{ illus:['illus-m3.webp','The whole setup: one webcam on the monitor, sampled every few seconds, with inference and storage on the same machine.'] },
+  E4:{ illus:['illus-e4.webp','A classroom Arduino lab, one group per bench PC, wiring LEDs and sensors on breadboards. A generic scene, not the EPIC room.'] },
 };
 
 /* ---------- diagrams (SVG, drawn from the real designs) ---------- */
@@ -1065,6 +1075,7 @@ function openSheet(id, push = true){
         <aside class="sh-spec"><div class="k">DATASHEET</div><dl>${spec.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
           ${p.links ? `<div class="plinks">${p.links.map(([l, u]) => `<a href="${u}" target="_blank" rel="noopener">${l} ↗</a>`).join('')}</div>` : ''}</aside>
         <div class="sh-body">
+          ${d.illus ? `<figure class="fig illus"><img src="${d.illus[0]}" alt="Illustration: ${d.illus[1]}" loading="lazy"><figcaption class="figcap"><b class="tag-illus">Illustration (AI-generated)</b> ${d.illus[1]}</figcaption></figure>` : ''}
           ${d.problem ? `<section><h3>The problem</h3><p>${d.problem}</p></section>` : ''}
           <section><h3>${d.problem ? 'What I built' : 'Overview'}</h3><ul>${built.map(b => `<li>${b}</li>`).join('')}</ul></section>
           ${fig ? `<section><h3>How it works</h3>${fig}</section>` : ''}
@@ -1104,6 +1115,12 @@ const dl = /^#d-(\w+)$/.exec(location.hash); if (dl) setTimeout(() => openSheet(
       show_area: ({ area }) => { const n = AREAS[area]; if (!n) return 'No area ' + area + '.';
         if (!sheet.hidden) closeSheet(); const c = $('part-' + n);
         scrollTo({ top: c.offsetTop + c.offsetHeight*.35, behavior: reduce ? 'auto' : 'smooth' }); return 'Showing ' + area + '.'; } }; });
+    // tell the guide what is on screen, read when a conversation starts ("tell me about this one")
+    let lastView = '';
+    const view = () => { const m = /^#d-(\w+)$/.exec(location.hash), pr = m && PROJECTS.find(x => x.id === m[1]);
+      if (pr && !sheet.hidden) return 'the datasheet for ' + pr.id + ', ' + pr.name;
+      return focus >= 0 ? 'the ' + PARTS[focus].name + ' area of the page' : 'the top of the page (the intro)'; };
+    setInterval(() => { const v = view(); if (v !== lastView){ lastView = v; el.setAttribute('dynamic-variables', JSON.stringify({ current_view: v })); } }, 700);
     const s = document.createElement('script'); s.src = 'https://unpkg.com/@elevenlabs/convai-widget-embed@0.18.2'; s.async = true; document.body.appendChild(s); };
   const idle = window.requestIdleCallback ? f => requestIdleCallback(f, { timeout:4000 }) : f => setTimeout(f, 2500);
   document.readyState === 'complete' ? idle(go) : addEventListener('load', () => idle(go), { once:true });
