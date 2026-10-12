@@ -1095,6 +1095,13 @@ const dl = /^#d-(\w+)$/.exec(location.hash); if (dl) setTimeout(() => openSheet(
 (function guide(){
   let done = false; const go = () => { if (done) return; done = true;
     const el = document.createElement('elevenlabs-convai'); el.setAttribute('agent-id', 'agent_0201m4pvdphde00s07v11yxqq3rb'); el.setAttribute('avatar-image-url', new URL('guide.png', location.href).href);   /* static avatar: an animated orb would redraw every frame */ document.body.appendChild(el);
+    // the guide can move the page: open a project's datasheet, or scroll the device to an area's layer
+    const AREAS = { about:1, research:2, hardware:3, vision_ml:4, software:5, experience:6, outside_work:7 };
+    el.addEventListener('elevenlabs-convai:call', ev => { ev.detail.config.clientTools = {
+      show_project: ({ id }) => { if (!ORDER.includes(id)) return 'No project ' + id + ' on this page.'; openSheet(id); return 'Opened datasheet ' + id + '.'; },
+      show_area: ({ area }) => { const n = AREAS[area]; if (!n) return 'No area ' + area + '.';
+        if (!sheet.hidden) closeSheet(); const c = $('part-' + n);
+        scrollTo({ top: c.offsetTop + c.offsetHeight*.35, behavior: reduce ? 'auto' : 'smooth' }); return 'Showing ' + area + '.'; } }; });
     const s = document.createElement('script'); s.src = 'https://unpkg.com/@elevenlabs/convai-widget-embed@0.18.2'; s.async = true; document.body.appendChild(s); };
   const idle = window.requestIdleCallback ? f => requestIdleCallback(f, { timeout:4000 }) : f => setTimeout(f, 2500);
   document.readyState === 'complete' ? idle(go) : addEventListener('load', () => idle(go), { once:true });
