@@ -1,0 +1,22 @@
+WEBVTT
+
+00:00:00.500 --> 00:00:04.700
+[Introductions: Amogh Somisetty, Arya Geejo, Arjanveer Samra]
+
+00:00:04.820 --> 00:00:06.300
+And this is our final project.
+
+00:00:06.380 --> 00:00:09.100
+Our light detector and strobe light's in there.
+
+00:00:09.200 --> 00:00:14.100
+It activates after the piano, which activates the solenoid and goes into the metal detector,
+
+00:00:14.280 --> 00:00:17.500
+which drops the ball and then activates the LCD.
+
+00:00:17.640 --> 00:00:20.300
+Right now, it's blank. It'll turn all white after.
+
+00:00:20.720 --> 00:00:22.300
+So I'm gonna do the code.

@@ -416,9 +416,9 @@ const PROJECTS = [
     facts:['Simulated in LTspice, fabricated as a 2-layer OSH Park board driven by register-level AVR firmware, hand and reflow soldered.',
       'Bench result: 62.5 mV per step within ±1 LSB across all 16 codes. Root-caused ADC source loading and a clipped bipolar input.'],
     tags:['LTspice','AVR','PCB','Reflow'] },
-  { cat:'hardware', id:'H5', name:'9-stage electromechanical system', sub:'Sequenced chain reaction', when:'Coursework', ctx:'EE 241', status:'Course project',
+  { cat:'hardware', id:'H5', name:'9-stage electromechanical system', sub:'Sequenced chain reaction', when:'Winter 2026', ctx:'EE 241, with Arya Geejo and Arjanveer Samra', status:'Course project',
     facts:['Nine analog and digital stages driven by Arduino Mega firmware: capacitive touch, a 580 V strobe, Schmitt-trigger optical detection, a 555 frequency-shift metal detector, MOSFET electromagnet release.',
-      'Root-caused 6 hardware and firmware failure modes, including a MOSFET that would not switch because two supplies shared no ground.'],
+      'As a team of three, root-caused 6 hardware and firmware failure modes, including a MOSFET that would not switch because two supplies shared no ground.'],
     tags:['Arduino','C/C++','Analog'] },
   { cat:'hardware', id:'H6', name:'Pneumatic air motor', sub:'Design to manufacture', when:'Coursework', ctx:'IME 144', status:'Course project',
     facts:['Parametric SolidWorks model and drawings with GD&T per ASME Y14.5. Machined six parts on a manual lathe and mill, measured to ±0.0001 in.'],
@@ -750,14 +750,14 @@ const DETAIL = {
     photos:[['dac-board.jpg','The fabricated 1 × 1 in board.'],['dac-scope.jpg','Measured on a Keysight MSO-X 2022A: the DAC stepping through its codes.']],
     results:[['62.5 mV','per step'],['±1 LSB','across all 16 codes'],['1 × 1 in','2-layer board'],['3','failure modes resolved']],
     learned:'The ADC loaded the source, fixed with a voltage-follower buffer. The bipolar audio fell outside the ADC’s 0 to 5 V window, fixed with a DC offset. Audible quantization distortion is a real limit of 4 bits, so we documented it instead of hiding it.' },
-  H5:{ lab:'metal', role:'Builder', team:'EE 241', tools:'Arduino Mega, oscilloscope, breadboard and perfboard',
+  H5:{ lab:'metal', role:'Firmware, integration, and debugging; all three of us built and debugged every stage', team:'Three-person team: Amogh Somisetty, Arya Geejo, Arjanveer Samra', tools:'Arduino Mega, oscilloscope, breadboard and perfboard',
     problem:'Nine physical stages across capacitive, optical, electromagnetic, and RF domains, where any single failure stops the whole sequence.',
     built:['Capacitive-touch input (5-note sequence, 2.2 MΩ RC), relay isolation, a ~580 V strobe, Schmitt-trigger optical detection with ambient rejection.','Solenoid actuation, a 555-timer metal detector, MOSFET electromagnet release, a tilt switch, and an I2C LCD.','Firmware that sequences all nine stages end to end.'],
     fig:'nine', figCap:'The nine stages in order.',
-    video:['rgm-demo.mp4','The full run, start to finish.'],
+    video:['rgm-demo.mp4','The full run, start to finish, with Arya Geejo and Arjanveer Samra.','rgm-demo.vtt'],
     photos:[['rgm-complete-setup.jpg','The complete build.'],['rgm-block-diagram.png','Block diagram of the sequence.','contain'],['ee241-lab6-circuit.png','555 metal-detector schematic.','contain'],['rgm-last-step-schematic.png','Last stage: tilt switch and I2C LCD.','contain']],
     results:[['9','stages in one sequence'],['6','failure modes root-caused'],['8,760 → 8,310 Hz','metal detector shift (5.1%)']],
-    learned:'The MOSFET would not switch reliably. The logic was right; the Arduino on USB and the 9 V supply shared no ground. Separately, the metal detector false-triggered on oscillator drift until I replaced percent-change math with a fixed 150 Hz threshold, a 5-reading streak, and a 600 ms release delay.' },
+    learned:'The MOSFET would not switch reliably. The logic was right; the Arduino on USB and the 9 V supply shared no ground. Separately, the metal detector false-triggered on oscillator drift until we replaced percent-change math with a fixed 150 Hz threshold, a 5-reading streak, and a 600 ms release delay.' },
   H8:{ role:'Builder', team:'Personal project', tools:'Screwdriver, bench multimeter',
     photos:[['rc-chassis.jpg','Down to the chassis.'],['rc-stock.jpg','The stock receiver board: drive, steering, and LED channels.'],['rc-rewire.jpg','A separate board wired into the drive-motor leads.']] },
   H6:{ role:'Designer and machinist', team:'IME 144', tools:'SolidWorks, GD&T (ASME Y14.5), lathe, mill, micrometers',
@@ -1069,7 +1069,7 @@ function openSheet(id, push = true){
           <section><h3>${d.problem ? 'What I built' : 'Overview'}</h3><ul>${built.map(b => `<li>${b}</li>`).join('')}</ul></section>
           ${fig ? `<section><h3>How it works</h3>${fig}</section>` : ''}
           ${d.lab ? `<section><h3>Try it: simulated bench</h3><div class="lab" id="labMount"></div></section>` : ''}
-          ${d.video ? `<section><h3>Demo</h3><figure class="vid"><video src="${d.video[0]}" controls playsinline preload="metadata"></video><figcaption class="figcap">${d.video[1]}</figcaption></figure></section>` : ''}
+          ${d.video ? `<section><h3>Demo</h3><figure class="vid"><video src="${d.video[0]}" controls playsinline preload="metadata">${d.video[2] ? `<track kind="captions" src="${d.video[2]}" srclang="en" label="English" default>` : ''}</video><figcaption class="figcap">${d.video[1]}</figcaption></figure></section>` : ''}
           ${d.photos ? `<section><h3>${d.shotsTitle || 'On the bench'}</h3><div class="photos">${d.photos.map(([src, cap, fit]) => `<figure><img src="${src}" alt="${cap}" loading="lazy"${fit === 'contain' ? ' class="contain"' : ''}><figcaption class="figcap">${cap}</figcaption></figure>`).join('')}</div></section>` : ''}
           ${d.results ? `<section><h3>Results</h3><div class="metrics">${d.results.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('')}</div></section>` : ''}
           ${d.learned ? `<section><h3>What I learned</h3><p>${d.learned}</p></section>` : ''}
