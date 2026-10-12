@@ -215,24 +215,38 @@ html.locked{overflow:hidden}
 .who span{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
 @media (max-width:600px){ .photos{grid-template-columns:minmax(0,1fr)} }
 
-/* bench instruments */
-.lab{background:linear-gradient(180deg,#E9EBEE,#DADDE2);border:1px solid #BFC5CD;border-radius:12px;padding:12px;box-shadow:var(--lip),var(--sh-2)}
-.lab-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;margin:0 2px 8px;color:var(--muted)}
-.lab-model{color:var(--ink);font-weight:500;letter-spacing:.04em}
-.lab-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.lab-screen{display:block;width:100%;min-width:560px;border-radius:6px;border:6px solid #1A1D21;box-shadow:inset 0 0 0 1px #000,0 1px 0 #fff}
-.lab-ctl{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-top:10px;font-size:13px}
-.lab-ctl label{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;color:#3A4048}
-.lab-ctl select{font:inherit;padding:4px 6px;border-radius:6px;border:1px solid var(--hair);background:#fff}
+/* bench instruments: a dark instrument chassis, a recessed glass screen, keys that light */
+.lab{background:linear-gradient(180deg,#2D3136,#1E2125 55%,#191B1E);border:1px solid #0D0E10;border-radius:14px;padding:12px 14px 14px;color:#D5DAE0;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -1px 0 rgba(0,0,0,.6),0 14px 30px -14px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.16)}
+.lab + .lab{margin-top:16px}
+.lab-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px 14px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;margin:0 2px 10px;color:#8B949F}
+.lab-model{display:inline-flex;align-items:center;gap:8px;color:#E6E9ED;font-weight:600;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase}
+.lab-model::before{content:'';width:7px;height:7px;border-radius:50%;background:#3BD16F;box-shadow:0 0 6px #3BD16F,0 0 1px #3BD16F}
+.lab-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:9px;background:#08090B;padding:7px;box-shadow:inset 0 2px 7px rgba(0,0,0,.85),0 1px 0 rgba(255,255,255,.07)}
+.lab-screen{display:block;width:100%;min-width:560px;border-radius:4px}
+.lab-ctl{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center;margin-top:12px;font-size:13px}
+.lab-ctl label{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;color:#A9B1BB}
+.lab-ctl select{font:inherit;padding:5px 8px;border-radius:6px;border:1px solid #3A3F46;background:#121417;color:#E6E9ED}
 .lab-ctl input[type=range]{accent-color:var(--signal);width:110px}
-.lab-ctl span{min-width:52px;color:var(--ink)}
+.lab-ctl span{min-width:52px;color:#E6E9ED}
 .seg{display:inline-flex;border:1px solid var(--hair);border-radius:999px;overflow:hidden;background:#fff;box-shadow:var(--lip),var(--sh-1)}
 .seg button{border:0;background:none;padding:7px 12px;font:500 12.5px/1 var(--display);cursor:pointer;color:var(--muted)}
 .seg button.on{background:var(--ink);color:#fff}
+.lab .seg{border-color:#3A3F46;background:#15171A;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.4);border-radius:8px}
+.lab .seg button{color:#A9B1BB;border-right:1px solid #2A2E33}
+.lab .seg button:last-child{border-right:0}
+.lab .seg button.on{background:linear-gradient(180deg,#3E444B,#33383E);color:#fff;box-shadow:inset 0 -2px 0 var(--signal)}
 .pill.mini{height:32px;font-size:12.5px}
 .pill.dark:disabled{opacity:.5;cursor:default}
-.lab-log{margin-top:8px;background:#0A0E0C;border-radius:6px;padding:8px 10px;font-family:var(--mono);font-size:11.5px;color:#B9C7BF;min-height:118px}
+:root .lab .pill{background:linear-gradient(180deg,#363B41,#2A2E33);border-color:#454B53;color:#E6E9ED;border-radius:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.4)}
+:root .lab .pill.dark{background:linear-gradient(180deg,#F5672E,#DE4A12);border-color:#B83C0E;color:#fff}
+:root .lab .pill.on{box-shadow:inset 0 -2px 0 #3BD16F,inset 0 1px 0 rgba(255,255,255,.08)}
+:root .lab .pill:not(.on)[data-x]{box-shadow:inset 0 -2px 0 #FF5A2E}
+.lab-log{margin-top:10px;background:#0A0E0C;border-radius:7px;padding:9px 11px;font-family:var(--mono);font-size:11.5px;line-height:1.55;color:#B9C7BF;min-height:64px;box-shadow:inset 0 2px 6px rgba(0,0,0,.7)}
+.lab-log b{color:#E6E9ED;font-weight:600}
+.lab-pre{white-space:pre-wrap;margin:10px 0 0;min-height:150px}
 .lab-log .warn{color:#F2D420}.lab-log .ok{color:#3BD16F}.lab-log .bad{color:#FF5A2E}
+@media (max-width:600px){ .lab{padding:10px 10px 12px} .lab-head{font-size:10.5px} }
 
 /* dark stage: glass UI over the product, light again for the index and contact */
 html.dark .rail{background:linear-gradient(180deg,rgba(6,7,9,.94),rgba(6,7,9,.7));border-bottom-color:rgba(255,255,255,.06);color:#ECEEF1}
@@ -503,7 +517,7 @@ const bomLinks = [...bom.querySelectorAll('a')];
 // on any device and matches the intro exactly. Blender also exports where each part sits on
 // screen in every frame (anchors), which is what the label cards point at.
 const canvas = $('gl'), g2 = canvas.getContext('2d', { alpha:false });
-const SEQS = { l:{ dir:'seq/l/' }, p:{ dir:'seq/p/' } }, SHIPPED = ['l'];   // add 'p' once the portrait set is published
+const SEQS = { l:{ dir:'seq/l/' }, p:{ dir:'seq/p/' } }, SHIPPED = ['l', 'p'];   // landscape and portrait sets are both published
 let seq = null, want = 1, shown = 0, drawnKey = '', introT = -1, introDone = false;
 
 async function loadMeta(s){ try { const r = await fetch(s.dir + 'anchors.json'); if (!r.ok) return false; s.meta = await r.json(); s.blobs = new Array(s.meta.frames + 1); s.bmp = new Map(); s.dec = new Set(); return true; } catch { return false; } }
@@ -731,7 +745,7 @@ const DETAIL = {
     problem:'Most GPU reliability work studies one fleet. I wanted to know which failure patterns hold across very different fleets and cooling regimes.',
     built:['“Peer-Relative Thermal Resistance as a Fleet Health Signal”: the detection method and the Princeton blind validation.','“GPU Failures Remember Events, Not Trajectories”: a failure taxonomy across five production fleets (Titan, Summit, Marconi100, GWDG, and Princeton’s Della).','The five-fleet study is a meta-analysis of mostly public fleet data. Princeton is the one live deployment.'],
     results:[['~50,000','GPUs across five fleets'],['~62,000','service lives'],['2','manuscripts in preparation']], learned:'Venue not yet decided.' },
-  H1:{ lab:'can', role:'Designer, electrical lead', team:'Poly UAS, Cal Poly drone competition team', tools:'KiCad, IPC-2221, bench power, oscilloscope',
+  H1:{ lab:['can','ipc'], role:'Designer, electrical lead', team:'Poly UAS, Cal Poly drone competition team', tools:'KiCad, IPC-2221, bench power, oscilloscope',
     problem:'The team’s 12S heavy-lift quadcopter ran its power and CAN wiring through a hand-wired harness.',
     built:['A 2-layer, 120 × 90 mm backplane in KiCad, ERC and DRC clean, replacing the harness.','Four independent 48 V pass-throughs sized per IPC-2221 on 2 oz copper for 14 A continuous and 30 A burst.','Dual-line CAN TVS protection and switchable 120 Ω bus terminations.','A written bring-up procedure and a dimensioned drawing for the mechanical team. Taken through fabrication and bring-up.'],
     img:'backplane-iso.jpg', figCap:'Ray-traced from the KiCad file (KiCad 10). Rev A; the final tray outline is pending.',
@@ -769,7 +783,7 @@ const DETAIL = {
     built:['Parametric SolidWorks parts and assembly with mates and interference checks, and engineering drawings with GD&T.','Manual lathe and mill work: facing, turning, boring, threading, milling, drilling, broaching, with feeds and speeds per material.','Six parts: crank disk, cylinder, flywheel, frame, mainshaft, piston.'],
     results:[['6','precision parts'],['±0.0001 in','measured with micrometers']],
     photos:[['ime144-air-motor.jpg','Air motor assembly (IME 144 manual reference).','contain']] },
-  M1:{ illus:['illus-m1.webp','A camera watching pantry shelves for low stock, with inference on a small edge computer. A generic scene, not the deployed pantry.'], role:'Lead developer', team:'Justice Centered Edge AI, funded, advised by Prof. Souvik Kundu', tools:'PyTorch, YOLO11n, ONNX, Jetson Orin Nano, Arduino Nicla Vision',
+  M1:{ lab:'digest', illus:['illus-m1.webp','A camera watching pantry shelves for low stock, with inference on a small edge computer. A generic scene, not the deployed pantry.'], role:'Lead developer', team:'Justice Centered Edge AI, funded, advised by Prof. Souvik Kundu', tools:'PyTorch, YOLO11n, ONNX, Jetson Orin Nano, Arduino Nicla Vision',
     problem:'A food pantry needs to know which shelves are running low. A detector trained on retail shelves made confident mistakes on the pantry’s real shelves.',
     built:['A 3-stage training pipeline: SKU-110K pretraining, a gap fine-tune, and a 15-frame on-site fine-tune.','The deployment model was chosen by a pre-registered ablation, with the decision rule fixed before results existed.','Region conditioning that removed every observed false positive without breaking cases that already worked.','Deployment on a Jetson Orin Nano with an Arduino Nicla Vision camera node.'],
     fig:'pantry', figCap:'Training pipeline and the result that chose the deployed model.',
@@ -783,7 +797,7 @@ const DETAIL = {
     built:['A mobile-first event platform with ticket sales, organizer payouts, and email.','Diagnosed and rebuilt a broken email-verification pipeline (missing queue infrastructure) that was blocking every new signup.','Fixed iOS Safari layout bugs around safe areas and the viewport.'],
     fig:'funck', figCap:'Architecture.', results:[['Live','at funck.live']],
     shotsTitle:'The live site', photos:[['funck-phone.jpg','funck.live on a phone, captured Oct 2026.','contain'],['funck-desktop.jpg','The same page on desktop.','contain']] },
-  S3:{ role:'Designer and developer', team:'Cal Poly EPIC 2026', tools:'TypeScript, React, Supabase realtime',
+  S3:{ lab:'queue', role:'Designer and developer', team:'Cal Poly EPIC 2026', tools:'TypeScript, React, Supabase realtime',
     problem:'In a room of high school students wiring Arduinos, the instructor cannot see who is stuck.',
     built:['Per-group help requests from each lab PC, and one live instructor queue with wait timers, stale-request flags, and phone alerts.','A 4-day, 12-activity curriculum (LEDs, sensors, motor control) with verified code, wiring diagrams, and a self-serve troubleshooter.'],
     fig:'epic', figCap:'Request flow.', results:[['12','activities over 4 days'],['Realtime','across every lab PC']],
@@ -795,10 +809,11 @@ const DETAIL = {
     results:[['>40%','faster validation and packaging'],['Promoted','within one internship']] },
   E2:{ illus:['illus-e2.webp','A heavy-lift quadcopter with its power distribution board exposed, the part of the aircraft this role owns.'] },
   H7:{ illus:['illus-h7.webp','An FPV micro drone pulled apart into the subsystems the analysis mapped: motors and props, frame, flight controller, battery, video transmitter, camera.'] },
-  H9:{ illus:['illus-h9.webp','A hypoeutectic Pb-Sn alloy: dark primary lead-rich dendrites surrounded by lamellar eutectic.'] },
-  H10:{ illus:['illus-h10.webp','Galvanic corrosion at a stainless bolt in an aluminum plate. With water as the electrolyte, the aluminum is the anode and corrodes in a ring around the joint.'] },
+  H9:{ lab:'phase', illus:['illus-h9.webp','A hypoeutectic Pb-Sn alloy: dark primary lead-rich dendrites surrounded by lamellar eutectic.'] },
+  H10:{ lab:'galv', illus:['illus-h10.webp','Galvanic corrosion at a stainless bolt in an aluminum plate. With water as the electrolyte, the aluminum is the anode and corrodes in a ring around the joint.'] },
   M3:{ illus:['illus-m3.webp','The whole setup: one webcam on the monitor, sampled every few seconds, with inference and storage on the same machine.'] },
   E4:{ illus:['illus-e4.webp','A classroom Arduino lab, one group per bench PC, wiring LEDs and sensors on breadboards. A generic scene, not the EPIC room.'] },
+  M5:{ lab:'beta' },
 };
 
 /* ---------- diagrams (SVG, drawn from the real designs) ---------- */
@@ -853,10 +868,11 @@ const FIG = (() => {
 })();
 
 /* ======================= bench instruments: one interactive simulation per project ======================= */
-// Each instrument is driven by the project's own numbers from the record. Where the record has no
+// Each instrument is driven by the project's own numbers and, where the project has code, its own
+// logic ported line for line (pantry digest, EPIC triage, tailscore prior). Where the record has no
 // measured waveform (CAN ringing, branch-bug timing), the panel says it is an illustration.
 const LAB = (() => {
-  const C = { screen:'#0A0E0C', grid:'rgba(150,170,160,.16)', axis:'rgba(150,170,160,.34)', ch1:'#F2D420', ch2:'#3BD16F', ch3:'#4FB3FF', hot:'#FF5A2E', txt:'#B9C7BF' };
+  const C = { screen:'#0A0E0C', grid:'rgba(150,170,160,.15)', axis:'rgba(150,170,160,.36)', ch1:'#F2D420', ch2:'#3BD16F', ch3:'#4FB3FF', hot:'#FF5A2E', txt:'#B9C7BF', dim:'#7E8B84' };
   let live = [];                                   // running instruments, stopped when the sheet closes
   const stopAll = () => { live.forEach(l => l.stop()); live = []; };
   function canvas(el, h){ const wrap = document.createElement('div'); wrap.className = 'lab-scroll'; const c = document.createElement('canvas'); c.className = 'lab-screen'; c.style.height = h + 'px'; wrap.appendChild(c); el.appendChild(wrap); return c; }
@@ -864,59 +880,94 @@ const LAB = (() => {
     if (c.width !== w*d || c.height !== h*d){ c.width = w*d; c.height = h*d; } const x = c.getContext('2d'); x.setTransform(d,0,0,d,0,0); return { x, w, h }; }
   function grid(x, w, h, nx = 10, ny = 8){ x.fillStyle = C.screen; x.fillRect(0,0,w,h);
     x.lineWidth = 1; for (let i = 0; i <= nx; i++){ x.strokeStyle = i === nx/2 ? C.axis : C.grid; x.beginPath(); x.moveTo(i*w/nx + .5, 0); x.lineTo(i*w/nx + .5, h); x.stroke(); }
-    for (let j = 0; j <= ny; j++){ x.strokeStyle = j === ny/2 ? C.axis : C.grid; x.beginPath(); x.moveTo(0, j*h/ny + .5); x.lineTo(w, j*h/ny + .5); x.stroke(); } }
-  function label(x, t, px, py, col = C.txt, size = 11){ x.font = `500 ${size}px IBM Plex Mono, monospace`; x.fillStyle = col; x.fillText(t, px, py); }
-  function trace(x, pts, col){ x.strokeStyle = col; x.lineWidth = 1.8; x.shadowColor = col; x.shadowBlur = 6; x.beginPath();
+    for (let j = 0; j <= ny; j++){ x.strokeStyle = j === ny/2 ? C.axis : C.grid; x.beginPath(); x.moveTo(0, j*h/ny + .5); x.lineTo(w, j*h/ny + .5); x.stroke(); }
+    // minor ticks on the centre axes, five per division, like a real graticule
+    x.strokeStyle = C.axis; x.beginPath();
+    for (let i = 0; i <= nx*5; i++){ const px = Math.round(i*w/(nx*5)) + .5; x.moveTo(px, h/2 - 3); x.lineTo(px, h/2 + 3); }
+    for (let j = 0; j <= ny*5; j++){ const py = Math.round(j*h/(ny*5)) + .5; x.moveTo(w/2 - 3, py); x.lineTo(w/2 + 3, py); }
+    x.stroke(); }
+  function label(x, t, px, py, col = C.txt, size = 11, weight = 500){ x.font = `${weight} ${size}px IBM Plex Mono, monospace`; x.fillStyle = col; x.fillText(t, px, py); return x.measureText(t).width; }
+  function trace(x, pts, col, lw = 1.8){ x.strokeStyle = col; x.lineWidth = lw; x.shadowColor = col; x.shadowBlur = 7; x.beginPath();
     pts.forEach(([px, py], i) => i ? x.lineTo(px, py) : x.moveTo(px, py)); x.stroke(); x.shadowBlur = 0; }
+  // phosphor afterglow: the last few sweeps stay faintly lit, so noise reads as a trace with body
+  function phosphor(){ const hist = {}; return (x, pts, col, id = col) => { const H = hist[id] || (hist[id] = []); H.push(pts); if (H.length > 4) H.shift();
+    H.forEach((p, i) => { x.globalAlpha = i === H.length - 1 ? 1 : .1*(i + 1); trace(x, p, col); }); x.globalAlpha = 1; }; }
+  function rr(x, X, Y, W, H, r){ x.beginPath(); if (x.roundRect) x.roundRect(X, Y, W, H, r); else x.rect(X, Y, W, H); }
+  function badge(x, t, px, py, col){ x.font = '600 10.5px IBM Plex Mono, monospace'; const tw = x.measureText(t).width + 12;
+    x.fillStyle = col; rr(x, px, py - 12, tw, 16, 3); x.fill(); x.fillStyle = '#0A0E0C'; x.fillText(t, px + 6, py); return tw; }
+  // measurement bar along the bottom of a scope screen
+  function meas(x, w, h, items){ x.fillStyle = 'rgba(14,18,16,.96)'; x.fillRect(0, h - 24, w, 24); x.strokeStyle = C.axis; x.beginPath(); x.moveTo(0, h - 24.5); x.lineTo(w, h - 24.5); x.stroke();
+    let px = 10; items.forEach(([k, v, col]) => { px += label(x, k, px, h - 8, C.dim, 10) + 6; px += label(x, v, px, h - 8, col || C.txt, 11) + 18; }); }
+  // the glass: a soft vignette and one diagonal reflection, drawn over every screen
+  function glass(x, w, h){ let g = x.createRadialGradient(w/2, h/2, Math.min(w, h)*.3, w/2, h/2, Math.max(w, h)*.72);
+    g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.36)'); x.fillStyle = g; x.fillRect(0, 0, w, h);
+    g = x.createLinearGradient(0, 0, w*.55, h); g.addColorStop(0, 'rgba(255,255,255,.06)'); g.addColorStop(.5, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, w, h); }
   function loop(fn){ let on = true, raf; const tick = t => { if (!on) return; if (!document.hidden) fn(t); raf = requestAnimationFrame(tick); }; raf = requestAnimationFrame(tick);
     const h = { stop(){ on = false; cancelAnimationFrame(raf); } }; live.push(h); return h; }
+  function screen(cv, draw){ return loop(now => { const { x, w, h } = fit(cv); draw(x, w, h, now); glass(x, w, h); }); }
   function panel(el, html){ const p = document.createElement('div'); p.className = 'lab-ctl'; p.innerHTML = html; el.appendChild(p); return p; }
   function head(el, model, note){ const h = document.createElement('div'); h.className = 'lab-head'; h.innerHTML = `<span class="lab-model">${model}</span><span class="lab-note">${note}</span>`; el.appendChild(h); }
+  function logBox(el, cls = ''){ const d = document.createElement(cls ? 'pre' : 'div'); d.className = 'lab-log ' + cls; el.appendChild(d); let last = ''; return html => { if (html !== last){ last = html; d.innerHTML = html; } }; }
+  // segmented keys: the pressed key lights, the others in its group go dark
+  function seg(ctl, attr, fn){ ctl.addEventListener('click', e => { const b = e.target.closest(`[data-${attr}]`); if (!b) return;
+    b.parentElement.querySelectorAll(`[data-${attr}]`).forEach(x => x.classList.toggle('on', x === b)); fn(b.dataset[attr], b); }); }
+  function drag(cv, fn){ let on = false; const at = e => { const r = cv.getBoundingClientRect(); fn((e.clientX - r.left)/r.width, (e.clientY - r.top)/r.height); };
+    cv.addEventListener('pointerdown', e => { on = true; cv.setPointerCapture(e.pointerId); at(e); });
+    cv.addEventListener('pointermove', e => { if (on) at(e); }); cv.addEventListener('pointerup', () => on = false); cv.addEventListener('pointercancel', () => on = false); cv.style.touchAction = 'pan-y'; cv.style.cursor = 'crosshair'; }
   const fmtV = v => Math.abs(v) >= 1 ? v.toFixed(2) + ' V' : (v*1000).toFixed(1) + ' mV';
   const fmtT = s => s >= 1e-3 ? (s*1e3).toFixed(s >= 1e-2 ? 0 : 1) + ' ms' : (s*1e6).toFixed(0) + ' µs';
+  const mmss = s => `${String(Math.floor(s/60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
   /* ---------------- DAC: oscilloscope, staircase and audio through the chain ---------------- */
   function dac(el){
-    head(el, 'MSO-X 2022A · simulated', '4-bit DAC: 62.5 mV per code, 16 codes');
-    const cv = canvas(el, 280);
+    head(el, 'MSO-X 2022A · simulated', '4-bit DAC: 62.5 mV per code, 16 codes. Drag on the screen to place a cursor.');
+    const cv = canvas(el, 300);
     const ctl = panel(el, `<div class="seg" role="group" aria-label="Signal"><button data-m="ramp" class="on" type="button">Code ramp</button><button data-m="audio" type="button">Audio through ADC → DAC</button></div>
       <label>Time/div <select data-k="tdiv"><option value="0.0005">500 µs</option><option value="0.001" selected>1 ms</option><option value="0.002">2 ms</option><option value="0.005">5 ms</option></select></label>
       <label>Volts/div <select data-k="vdiv"><option value="0.1">100 mV</option><option value="0.2" selected>200 mV</option><option value="0.5">500 mV</option></select></label>
       <label class="aud">Tone <input data-k="f" type="range" min="80" max="900" value="220"><span data-o="f">220 Hz</span></label>
       <button data-a="listen" class="pill mini aud" type="button">Listen</button><button data-a="run" class="pill mini" type="button">Stop</button>`);
-    const st = { m:'ramp', tdiv:.001, vdiv:.2, f:220, run:true, t0:0 }, LSB = .0625, codeTime = .0006;
+    const st = { m:'ramp', tdiv:.001, vdiv:.2, f:220, run:true, cy:null }, LSB = .0625, codeTime = .0006;
     const q4 = v => Math.max(0, Math.min(15, Math.round(v/LSB)));          // 4-bit output code
     const aud = ctl.querySelectorAll('.aud'); const showAud = () => aud.forEach(a => a.style.display = st.m === 'audio' ? '' : 'none'); showAud();
-    ctl.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
-      if (b.dataset.m){ st.m = b.dataset.m; ctl.querySelectorAll('[data-m]').forEach(x => x.classList.toggle('on', x === b)); showAud(); }
+    seg(ctl, 'm', v => { st.m = v; showAud(); });
+    ctl.addEventListener('click', e => { const b = e.target.closest('[data-a]'); if (!b) return;
       if (b.dataset.a === 'run'){ st.run = !st.run; b.textContent = st.run ? 'Stop' : 'Run'; }
       if (b.dataset.a === 'listen') listen(); });
     ctl.addEventListener('input', e => { const k = e.target.dataset.k; if (!k) return; st[k] = +e.target.value; const o = ctl.querySelector(`[data-o="${k}"]`); if (o) o.textContent = e.target.value + ' Hz'; });
+    ctl.addEventListener('change', e => { const k = e.target.dataset.k; if (k) st[k] = +e.target.value; });
+    drag(cv, (fx, fy) => { st.cy = Math.max(0, Math.min(1, fy)); });
     let ac; function listen(){ try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume();
       const sr = ac.sampleRate, dur = 1.6, buf = ac.createBuffer(1, sr*dur, sr), d = buf.getChannelData(0);
       for (let i = 0; i < d.length; i++){ const t = i/sr, half = i < d.length/2;   // first half: clean tone, second half: through 4 bits
         const s = Math.sin(2*Math.PI*st.f*t); d[i] = .25*(half ? s : ((q4((s + 1)/2*15*LSB) / 15)*2 - 1)); }
       const src = ac.createBufferSource(); src.buffer = buf; src.connect(ac.destination); src.start(); } catch {} }
-    let tNow = 0;
-    loop(now => {
+    let tNow = 0; const glow = phosphor();
+    screen(cv, (x, w, h, now) => {
       if (st.run) tNow = now/1000;
-      const { x, w, h } = fit(cv); grid(x, w, h);
-      const span = st.tdiv*10, toY = v => h/2 - (v - .4)/st.vdiv*(h/8);
-      const out = [], inp = [];
+      const ph = h - 24; grid(x, w, ph);
+      // triggered display: every sweep starts on the same phase, so the trace stands still like on the bench
+      const period = st.m === 'ramp' ? 16*codeTime : 1/st.f, t0 = Math.floor(tNow/period)*period;
+      const span = st.tdiv*10, toY = v => ph/2 - (v - .4)/st.vdiv*(ph/8);
+      const out = [], inp = []; let vmax = -1, vmin = 9, sum = 0;
       for (let i = 0; i <= w; i++){
-        const t = tNow + i/w*span;
-        let v, vin = null;
-        if (st.m === 'ramp'){ const code = Math.floor(t/codeTime) % 16; v = code*LSB; }
-        else { const s = Math.sin(2*Math.PI*st.f*t); vin = (s + 1)/2*15*LSB; v = q4(vin)*LSB; }
+        const t = t0 + i/w*span; let v, vin = null;
+        if (st.m === 'ramp'){ const code = Math.floor((t - t0)/codeTime) % 16; v = code*LSB; }
+        else { const s = Math.sin(2*Math.PI*st.f*(t - t0)); vin = (s + 1)/2*15*LSB; v = q4(vin)*LSB; }
+        vmax = Math.max(vmax, v); vmin = Math.min(vmin, v); sum += v;
         v += (Math.random() - .5)*.006;                                   // a few mV of bench noise, well under 1 LSB
         out.push([i, toY(v)]); if (vin !== null) inp.push([i, toY(vin)]);
       }
-      if (inp.length) trace(x, inp, C.ch2);
-      trace(x, out, C.ch1);
-      label(x, `1  ${fmtV(st.vdiv)}/`, 10, 16, C.ch1); if (inp.length) label(x, `2  ${fmtV(st.vdiv)}/`, 110, 16, C.ch2);
-      label(x, `${fmtT(st.tdiv)}/div`, w - 110, 16);
-      label(x, st.m === 'ramp' ? 'Step 62.5 mV   Codes 16   Max 937.5 mV' : 'Ch2 = conditioned input   Ch1 = 4-bit DAC output', 10, h - 10);
-      if (!st.run) label(x, 'STOP', w - 46, h - 10, C.hot);
+      if (inp.length) glow(x, inp, C.ch2);
+      glow(x, out, C.ch1);
+      const gy = toY(0); if (gy > 6 && gy < ph - 6){ x.fillStyle = C.ch1; x.beginPath(); x.moveTo(0, gy - 6); x.lineTo(9, gy); x.lineTo(0, gy + 6); x.fill(); }
+      let bx = 8; bx += badge(x, `1  ${fmtV(st.vdiv)}/`, bx, 18, C.ch1) + 6; if (inp.length) badge(x, `2  ${fmtV(st.vdiv)}/`, bx, 18, C.ch2);
+      label(x, `${fmtT(st.tdiv)}/div   Trig ↑ 1`, w - 160, 18);
+      if (!st.run) label(x, 'STOP', w - 46, 36, C.hot, 11, 600);
+      if (st.cy !== null){ const y = st.cy*h; if (y < ph){ const v = .4 + (ph/2 - y)/(ph/8)*st.vdiv;
+        x.strokeStyle = C.ch3; x.setLineDash([5, 4]); x.beginPath(); x.moveTo(0, y + .5); x.lineTo(w, y + .5); x.stroke(); x.setLineDash([]);
+        label(x, `Y1 ${fmtV(v)} = code ${(v/LSB).toFixed(2)}`, w - 230, y > 30 ? y - 6 : y + 16, C.ch3); } }
+      meas(x, w, h, [['Freq', `${(1/period).toFixed(1)} Hz`, C.ch1], ['Vpp', fmtV(vmax - vmin), C.ch1], ['Mean', fmtV(sum/(w + 1)), C.ch1], ['Step', '62.5 mV']]);
     });
   }
 
@@ -924,18 +975,20 @@ const LAB = (() => {
   function metal(el){
     head(el, 'Frequency counter + Arduino serial · simulated', '555 oscillator: 8,760 Hz baseline, 8,310 Hz with the marble');
     const cv = canvas(el, 230);
-    const log = document.createElement('div'); log.className = 'lab-log'; el.appendChild(log);
+    const say0 = logBox(el);
     const ctl = panel(el, `<button data-a="drop" class="pill mini dark" type="button">Drop the steel marble</button>
       <div class="seg" role="group" aria-label="Firmware"><button data-fw="new" class="on" type="button">Fixed firmware</button><button data-fw="old" type="button">Original firmware</button></div>
       <button data-a="reset" class="pill mini" type="button">Reset</button>`);
     const BASE = 8760, MARBLE = 8310, TRIP = 150, STREAK_N = 5, RELEASE_MS = 600;
     const st = { marble:false, fw:'new', streak:0, tripped:false, tripAt:0, freq:BASE, lines:[], last:0, falseTrips:0 };
-    ctl.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
+    const clear = () => { Object.assign(st, { marble:false, streak:0, tripped:false, lines:[], falseTrips:0 }); ctl.querySelector('[data-a="drop"]').disabled = false; };
+    ctl.addEventListener('click', e => { const b = e.target.closest('[data-a]'); if (!b) return;
       if (b.dataset.a === 'drop'){ st.marble = true; b.disabled = true; }
-      if (b.dataset.a === 'reset'){ Object.assign(st, { marble:false, streak:0, tripped:false, lines:[], falseTrips:0 }); ctl.querySelector('[data-a="drop"]').disabled = false; }
-      if (b.dataset.fw){ st.fw = b.dataset.fw; ctl.querySelectorAll('[data-fw]').forEach(x => x.classList.toggle('on', x === b)); Object.assign(st, { streak:0, tripped:false, lines:[], falseTrips:0, marble:false }); ctl.querySelector('[data-a="drop"]').disabled = false; } });
-    const say = (t, cls = '') => { st.lines.push(`<div class="${cls}">${t}</div>`); if (st.lines.length > 7) st.lines.shift(); log.innerHTML = st.lines.join(''); };
-    loop(now => {
+      if (b.dataset.a === 'reset') clear(); });
+    seg(ctl, 'fw', v => { st.fw = v; clear(); });
+    const say = (t, cls = '') => { st.lines.push(`<div class="${cls}">${t}</div>`); if (st.lines.length > 7) st.lines.shift(); say0(st.lines.join('')); };
+    const glow = phosphor();
+    screen(cv, (x, w, h, now) => {
       if (now - st.last > 120){ st.last = now;                              // one reading every 120 ms
         // the oscillator drifts; occasional spikes are what false-triggered the original firmware (illustrative size)
         const drift = (Math.random() - .5)*70 + (Math.random() < .06 ? -(150 + Math.random()*120) : 0);
@@ -948,11 +1001,11 @@ const LAB = (() => {
             if (st.streak >= STREAK_N){ st.tripped = true; st.tripAt = now; say(`TRIP after ${STREAK_N} readings. Releasing in ${RELEASE_MS} ms.`, 'ok'); } }
         } else if (st.fw === 'old' && !st.marble && now - st.tripAt > 1500){ st.tripped = false; }
       }
-      const { x, w, h } = fit(cv); grid(x, w, h, 10, 6);
-      const cyc = 6, f = st.freq, pts = []; for (let i = 0; i <= w; i++){ const ph = (i/w*cyc*f/BASE) % 1; pts.push([i, ph < .5 ? h*.48 : h*.84]); }
-      trace(x, pts, C.ch1);
-      x.font = '600 30px IBM Plex Mono, monospace'; x.fillStyle = C.ch1; x.fillText(`${st.freq.toFixed(0)} Hz`, 12, 40);
-      label(x, st.marble ? 'marble present' : 'no marble', 14, 60, st.marble ? C.ch2 : C.txt);
+      grid(x, w, h, 10, 6);
+      const cyc = 6, f = st.freq, pts = []; for (let i = 0; i <= w; i++){ const ph = (i/w*cyc*f/BASE) % 1; pts.push([i, (ph < .5 ? h*.48 : h*.84) + (Math.random() - .5)*1.2]); }
+      glow(x, pts, C.ch1);
+      label(x, `${st.freq.toFixed(0)} Hz`, 12, 44, C.ch1, 30, 600);
+      label(x, st.marble ? 'marble present' : 'no marble', 14, 64, st.marble ? C.ch2 : C.txt);
       const rel = st.tripped && now - st.tripAt > RELEASE_MS;
       label(x, rel ? 'ELECTROMAGNET RELEASED' : st.tripped ? 'releasing…' : 'electromagnet holding', w - 210, 22, rel ? C.hot : C.txt);
       if (st.fw === 'old') label(x, `false trips: ${st.falseTrips}`, w - 130, h - 10, st.falseTrips ? C.hot : C.txt);
@@ -964,18 +1017,17 @@ const LAB = (() => {
     head(el, 'Waveform viewer · simplified model', 'Multi-cycle core, FETCH then EXEC; branch at 0x08 jumps to 0x20');
     const cv = canvas(el, 262);
     const ctl = panel(el, `<div class="seg" role="group" aria-label="Design"><button data-b="bug" class="on" type="button">Original (PCWrite ungated)</button><button data-b="fix" type="button">Fixed (PCWrite in EXEC only)</button></div>`);
-    let bug = true;
-    ctl.addEventListener('click', e => { const b = e.target.closest('[data-b]'); if (!b) return; bug = b.dataset.b === 'bug'; ctl.querySelectorAll('[data-b]').forEach(x => x.classList.toggle('on', x === b)); });
+    let bug = true; seg(ctl, 'b', v => bug = v === 'bug');
     // program: 0x00 addi, 0x04 addi, 0x08 beq (taken, target 0x20), 0x20 add, 0x24 sw
-    function run(){ const cyc = []; let pc = 0, mux = 0;
+    function run(){ const cyc = []; let pc = 0;
       for (let k = 0; k < 10; k++){ const state = k % 2 ? 'EXEC' : 'FETCH', isBr = pc === 0x08;
         // mux selects the branch target only while the branch executes; in the original design PC also loads during FETCH
         const sel = state === 'EXEC' && isBr ? 'branch' : 'pc+4', next = sel === 'branch' ? 0x20 : pc + 4;
         const write = bug ? true : state === 'EXEC';
         cyc.push({ state, pc, sel, write }); if (write) pc = next; }
       return cyc; }
-    loop(() => {
-      const { x, w, h } = fit(cv); x.fillStyle = C.screen; x.fillRect(0,0,w,h);
+    screen(cv, (x, w, h) => {
+      x.fillStyle = C.screen; x.fillRect(0,0,w,h);
       const cyc = run(), L = 92, cw = (w - L - 10)/cyc.length, rows = ['CLK','STATE','PCWrite','PC_SEL','PC'], rh = (h - 48)/rows.length;
       rows.forEach((r, i) => label(x, r, 10, 20 + i*rh + rh/2, C.txt));
       cyc.forEach((c, k) => { const x0 = L + k*cw;
@@ -984,7 +1036,6 @@ const LAB = (() => {
         label(x, c.state, x0 + 6, 20 + rh*1 + rh/2 + 4, c.state === 'EXEC' ? C.ch1 : C.txt, 10.5);
         const wy = 20 + rh*2; trace(x, [[x0, wy + rh*(c.write ? .25 : .75)],[x0 + cw, wy + rh*(c.write ? .25 : .75)]], c.write && c.state === 'FETCH' ? C.hot : C.ch3);
         label(x, c.sel, x0 + 6, 20 + rh*3 + rh/2 + 4, c.sel === 'branch' ? C.ch1 : C.txt, 10.5);
-        const wrong = bug && c.pc !== 0 && ![0x00,0x04,0x08,0x20,0x24,0x28].includes(c.pc);
         label(x, '0x' + c.pc.toString(16).padStart(2,'0'), x0 + 6, 20 + rh*4 + rh/2 + 4, c.pc === 0x20 || c.pc === 0x24 ? C.ch2 : C.ch1, 10.5); });
       const pcs = cyc.filter(c => c.state === 'FETCH').map(c => '0x' + c.pc.toString(16).padStart(2,'0'));
       label(x, bug ? `fetched: ${pcs.join(' → ')}   PC loads every cycle; branch never fires` : `fetched: ${pcs.join(' → ')}   branch lands on 0x20`, 10, h - 12, bug ? C.hot : C.ch2, 11);
@@ -1002,20 +1053,21 @@ const LAB = (() => {
     let rng = 7; const r = () => (rng = (rng*16807) % 2147483647)/2147483647, g = () => Math.sqrt(-2*Math.log(r() || 1e-9))*Math.cos(2*Math.PI*r());
     const TDP = 700, ALARM = 85, Z = 4; const fl = Array.from({length:16}, () => ({ Tin:23 + r()*1.5, R0:.077 + Math.max(-2, Math.min(2, g()))*.0021, T:60, Rh:.077, st:0, z:0, flag:false, load:.75 + r()*.2 }));
     const sel = { gpu:9, dmg:.34, hide:.55 };
-    ctl.addEventListener('input', e => { const k = e.target.dataset.k; if (!k) return; const v = +e.target.value; sel[k] = k === 'gpu' ? v : v/100;
-      const o = ctl.querySelector(`[data-o="${k}"]`); if (o) o.textContent = k === 'dmg' ? `+${v}%` : `${v}%`; });
+    const set = e => { const k = e.target.dataset.k; if (!k) return; const v = +e.target.value; sel[k] = k === 'gpu' ? v : v/100;
+      const o = ctl.querySelector(`[data-o="${k}"]`); if (o) o.textContent = k === 'dmg' ? `+${v}%` : `${v}%`; };
+    ctl.addEventListener('input', set); ctl.addEventListener('change', set);
     let last = 0;
     function step(){ fl.forEach((u, i) => { const d = i === sel.gpu ? sel.dmg : 0, ld = i === sel.gpu ? sel.hide : u.load;
         const P = Math.max(60, TDP*ld + g()*4), Tt = u.Tin + u.R0*(1 + d)*P; u.T += (Tt - u.T)*.08 + g()*.08; if (Math.abs(Tt - u.T) < 1.2) u.Rh += ((u.T - u.Tin)/P - u.Rh)*.25; u.P = P; });
       const rs = fl.map(u => u.Rh).sort((a,b) => a-b), med = (rs[7] + rs[8])/2, mad = rs.map(v => Math.abs(v - med)).sort((a,b) => a-b)[8]*1.4826 || 1e-4;
       fl.forEach(u => { u.z = (u.Rh - med)/mad; u.st = u.z >= Z ? u.st + 1 : 0; u.flag = u.st >= 6; }); }
     for (let i = 0; i < 120; i++) step();
-    loop(now => {
+    screen(cv, (x, w, h, now) => {
       if (now - last > 250){ last = now; step(); }
-      const { x, w, h } = fit(cv); x.fillStyle = C.screen; x.fillRect(0,0,w,h);
+      x.fillStyle = C.screen; x.fillRect(0,0,w,h);
       label(x, 'GPU   TEMP     POWER   Rθ vs PEERS   TEMP ALARM   THETA', 12, 20, C.txt, 11);
-      const rows = fl.map((u, i) => ({ u, i })), rh = (h - 34)/16;
-      rows.forEach(({ u, i }) => { const y = 34 + i*rh + rh*.7, me = i === sel.gpu;
+      const rh = (h - 34)/16;
+      fl.forEach((u, i) => { const y = 34 + i*rh + rh*.7, me = i === sel.gpu;
         if (me){ x.fillStyle = 'rgba(242,212,32,.07)'; x.fillRect(0, 34 + i*rh, w, rh); }
         label(x, `gpu${String(i).padEnd(2)}`, 12, y, me ? C.ch1 : C.txt, 10.5);
         label(x, `${u.T.toFixed(1)}°C`, 62, y, u.T >= ALARM ? C.hot : C.txt, 10.5);
@@ -1030,24 +1082,390 @@ const LAB = (() => {
   /* ---------------- Backplane: CAN bus with and without the 120 ohm termination ---------------- */
   function can(el){
     head(el, 'CAN bus probe · illustration', 'The backplane has switchable 120 Ω terminations at each end of the bus');
-    const cv = canvas(el, 230);
-    const ctl = panel(el, `<div class="seg" role="group" aria-label="Termination"><button data-t="1" class="on" type="button">Terminated (120 Ω)</button><button data-t="0" type="button">Unterminated</button></div>`);
-    let term = true; ctl.addEventListener('click', e => { const b = e.target.closest('[data-t]'); if (!b) return; term = b.dataset.t === '1'; ctl.querySelectorAll('[data-t]').forEach(x => x.classList.toggle('on', x === b)); });
-    const bits = [1,0,0,1,0,1,1,0,1,0,0,0,1,1,0,1];
-    loop(now => {
-      const { x, w, h } = fit(cv); grid(x, w, h);
-      const bw = w/12, off = (now/18) % bw, hi = [], lo = [];
-      for (let i = 0; i <= w; i++){ const p = i + off, k = Math.floor(p/bw), dom = bits[k % bits.length] === 0, prev = bits[(k + bits.length - 1) % bits.length] === 0;
-        const tIn = (p % bw)/bw, edge = dom !== prev, ring = edge && !term ? Math.exp(-tIn*14)*Math.sin(tIn*70)*.55 : 0;
+    const cv = canvas(el, 250);
+    const ctl = panel(el, `<div class="seg" role="group" aria-label="Termination"><button data-t="1" class="on" type="button">Terminated (120 Ω each end)</button><button data-t="0" type="button">Unterminated</button></div>`);
+    let term = true; seg(ctl, 't', v => term = v === '1');
+    const bits = [1,0,0,1,0,1,1,0,1,0,0,0,1,1,0,1], glow = phosphor();
+    screen(cv, (x, w, h) => {
+      const ph = h - 24; grid(x, w, ph);
+      const bw = w/12, hi = [], lo = [];
+      for (let i = 0; i <= w; i++){ const k = Math.floor(i/bw), dom = bits[k % bits.length] === 0, prev = bits[(k + bits.length - 1) % bits.length] === 0;
+        const tIn = (i % bw)/bw, edge = dom !== prev, ring = edge && !term ? Math.exp(-tIn*14)*Math.sin(tIn*70)*.55 : 0, n = (Math.random() - .5)*.04;
         const vd = dom ? 2 : 0;   // differential volts, dominant ~2 V, recessive 0 V
-        hi.push([i, h*.5 - (2.5 + vd/2 + ring)*h/10]); lo.push([i, h*.5 - (2.5 - vd/2 - ring)*h/10 + h*.22]); }
-      trace(x, hi, C.ch1); trace(x, lo, C.ch2);
-      label(x, '1 CAN_H', 10, 16, C.ch1); label(x, '2 CAN_L', 90, 16, C.ch2);
-      label(x, term ? 'clean edges' : 'reflections ring at every edge', w - 230, 16, term ? C.ch2 : C.hot);
+        hi.push([i, ph*.5 - (2.5 + vd/2 + ring + n)*ph/10]); lo.push([i, ph*.5 - (2.5 - vd/2 - ring + n)*ph/10 + ph*.22]); }
+      glow(x, hi, C.ch1); glow(x, lo, C.ch2);
+      let bx = 8; bx += badge(x, '1 CAN_H  1 V/', bx, 18, C.ch1) + 6; badge(x, '2 CAN_L  1 V/', bx, 18, C.ch2);
+      label(x, term ? 'clean edges' : 'reflections ring at every edge', w - 230, 18, term ? C.ch2 : C.hot);
+      meas(x, w, h, [['Vdiff dominant', '2.0 V', C.ch1], ['Recessive', '0 V'], ['Bus load', term ? '60 Ω (2 × 120 Ω)' : 'open', term ? C.ch2 : C.hot]]);
     });
   }
 
-  return { mount(kind, el){ ({ dac, metal, riscv, theta, can })[kind](el); }, stopAll };
+  /* ---------------- Backplane: IPC-2221 trace sizing, the formula the pass-throughs were sized with ---------------- */
+  function ipc(el){
+    head(el, 'IPC-2221 trace calculator · live math', 'The 48 V pass-throughs: 14 A continuous, 30 A burst, 2 oz copper');
+    const cv = canvas(el, 220);
+    const ctl = panel(el, `<div class="seg" role="group" aria-label="Current"><button data-i="14" class="on" type="button">14 A continuous</button><button data-i="30" type="button">30 A burst</button></div>
+      <div class="seg" role="group" aria-label="Copper"><button data-oz="1" type="button">1 oz</button><button data-oz="2" class="on" type="button">2 oz</button></div>
+      <div class="seg" role="group" aria-label="Layer"><button data-l="ext" class="on" type="button">Outer layer</button><button data-l="int" type="button">Inner layer</button></div>
+      <label>Trace width <input data-k="wmm" type="range" min="0.5" max="10" step="0.1" value="4"><span data-o="wmm">4.0 mm</span></label>`);
+    const st = { I:14, oz:2, l:'ext', wmm:4 };
+    seg(ctl, 'i', v => st.I = +v); seg(ctl, 'oz', v => st.oz = +v); seg(ctl, 'l', v => st.l = v);
+    ctl.addEventListener('input', e => { if (e.target.dataset.k !== 'wmm') return; st.wmm = +e.target.value; ctl.querySelector('[data-o="wmm"]').textContent = st.wmm.toFixed(1) + ' mm'; });
+    const OZ = 1.378, K = l => l === 'ext' ? .048 : .024;                       // mil of copper per oz/ft²; IPC-2221 k
+    const area = (wmm, oz) => wmm/0.0254*oz*OZ;                                 // mil²
+    const rise = (I, wmm, oz, l) => Math.pow(I/(K(l)*Math.pow(area(wmm, oz), .725)), 1/.44);
+    const need = (I, dT, oz, l) => Math.pow(I/(K(l)*Math.pow(dT, .44)), 1/.725)/(oz*OZ)*0.0254;   // mm
+    screen(cv, (x, w, h) => {
+      x.fillStyle = C.screen; x.fillRect(0, 0, w, h);
+      const dT = rise(st.I, st.wmm, st.oz, st.l), t = Math.min(1, dT/80);
+      // cross-section to scale in width against a 10 mm ruler (thickness exaggerated)
+      const L = 22, R = Math.max(260, w*.5), px = (R - L)/10, y0 = 112, th = st.oz*9;
+      x.fillStyle = '#2A3A2E'; x.fillRect(L - 6, y0, R - L + 12, 36); label(x, 'FR-4', L, y0 + 26, C.dim, 10);
+      if (st.l === 'int'){ x.fillStyle = '#2A3A2E'; x.fillRect(L - 6, y0 - th - 18, R - L + 12, 18); }
+      const cu = [201 + (255 - 201)*t, 139 + (90 - 139)*t, 78 + (46 - 78)*t].map(Math.round);
+      x.shadowColor = `rgb(${cu})`; x.shadowBlur = 4 + 22*t; x.fillStyle = `rgb(${cu})`; x.fillRect(L, y0 - th, st.wmm*px, th); x.shadowBlur = 0;
+      x.strokeStyle = C.axis; x.beginPath(); for (let mm = 0; mm <= 10; mm++){ const X = L + mm*px + .5; x.moveTo(X, y0 + 44); x.lineTo(X, y0 + (mm % 5 ? 50 : 54)); } x.moveTo(L, y0 + 44.5); x.lineTo(R, y0 + 44.5); x.stroke();
+      [0, 5, 10].forEach(mm => label(x, mm + ' mm', L + mm*px - 8, y0 + 68, C.dim, 10));
+      label(x, `${st.I} A through ${st.wmm.toFixed(1)} mm of ${st.oz} oz copper`, L, 30, C.txt, 11);
+      label(x, `${area(st.wmm, st.oz).toFixed(0)} mil² cross-section`, L, 48, C.dim, 10.5);
+      const RX = R + 30, col = dT <= 20 ? C.ch2 : dT <= 45 ? C.ch1 : C.hot;
+      label(x, 'Temperature rise', RX, 30, C.dim, 10.5);
+      label(x, `${dT.toFixed(1)} °C`, RX, 66, col, 32, 600);
+      label(x, `${st.I} A needs, for a 10 °C rise:  ${need(st.I, 10, st.oz, st.l).toFixed(2)} mm`, RX, 100, C.txt, 10.5);
+      label(x, `${st.I} A needs, for a 20 °C rise:  ${need(st.I, 20, st.oz, st.l).toFixed(2)} mm`, RX, 118, C.txt, 10.5);
+      label(x, `${st.I} A needs, for a 30 °C rise:  ${need(st.I, 30, st.oz, st.l).toFixed(2)} mm`, RX, 136, C.txt, 10.5);
+      label(x, 'IPC-2221: I = k·ΔT^0.44·A^0.725, k 0.048 outer, 0.024 inner. Steady state; a short burst heats less.', L, h - 12, C.dim, 9.5);
+    });
+  }
+
+  /* ---------------- Engineering alloys: Pb-Sn phase diagram with the lever rule ---------------- */
+  function phase(el){
+    head(el, 'Pb-Sn phase diagram · live lever rule', 'Eutectic 61.9 wt% Sn at 183 °C; α holds up to 18.3 wt% Sn, β from 97.8. Drag on the diagram.');
+    const cv = canvas(el, 310);
+    const say = logBox(el);
+    const ctl = panel(el, `<button data-a="cool" class="pill mini dark" type="button">Cool slowly from the melt</button>
+      <div class="seg" role="group" aria-label="Alloy"><button data-c="10" type="button">10 wt% Sn</button><button data-c="40" class="on" type="button">40 (hypo)</button><button data-c="61.9" type="button">61.9 (eutectic)</button><button data-c="80" type="button">80 (hyper)</button></div>`);
+    const E = 61.9, TE = 183, A = 18.3, B = 97.8, TPb = 327, TSn = 232;
+    const st = { C:40, T:150, cool:false };
+    // solvus curves are drawn from the textbook diagram's shape (about 2 wt% and 99 wt% at room temperature): approximate
+    const ca = T => 2 + (A - 2)*Math.pow(Math.max(0, T)/TE, 2), cb = T => 99 - (99 - B)*Math.pow(Math.max(0, T)/TE, 2);
+    function state(C, T){
+      if (T >= TE){
+        if (C <= E){ const cl = E*(TPb - T)/(TPb - TE), cs = A*(TPb - T)/(TPb - TE);
+          if (C >= cl) return { r:'L', ph:[['L', C, 1]] };
+          if (C <= cs) return { r:'α', ph:[['α', C, 1]] };
+          return { r:'α + L', ph:[['α', cs, (cl - C)/(cl - cs)], ['L', cl, (C - cs)/(cl - cs)]] }; }
+        const cl = E + (100 - E)*(T - TE)/(TSn - TE), cs = B + (100 - B)*(T - TE)/(TSn - TE);
+        if (C <= cl) return { r:'L', ph:[['L', C, 1]] };
+        if (C >= cs) return { r:'β', ph:[['β', C, 1]] };
+        return { r:'β + L', ph:[['L', cl, (cs - C)/(cs - cl)], ['β', cs, (C - cl)/(cs - cl)]] };
+      }
+      const a = ca(T), b = cb(T);
+      if (C <= a) return { r:'α', ph:[['α', C, 1]] };
+      if (C >= b) return { r:'β', ph:[['β', C, 1]] };
+      const s = { r:'α + β', ph:[['α', a, (b - C)/(b - a)], ['β', b, (C - a)/(b - a)]] };
+      if (C > A && C < B) s.micro = C <= E ? [['primary α', (E - C)/(E - A)], ['eutectic', (C - A)/(E - A)]] : [['primary β', (C - E)/(B - E)], ['eutectic', (B - C)/(B - E)]];
+      return s;
+    }
+    seg(ctl, 'c', v => { st.C = +v; st.cool = false; });
+    ctl.addEventListener('click', e => { if (e.target.closest('[data-a="cool"]')){ st.T = 340; st.cool = true; } });
+    let box = null; drag(cv, (fx, fy) => { if (!box) return; const X = fx*box.w, Y = fy*box.h;
+      if (X < box.x0 - 10 || X > box.x1 + 10) return; st.cool = false;
+      st.C = Math.max(0, Math.min(100, (X - box.x0)/(box.x1 - box.x0)*100)); st.T = Math.max(0, Math.min(350, (box.y1 - Y)/(box.y1 - box.y0)*350)); });
+    // schematic microstructure, re-rendered only when the phase picture changes
+    const N = 150, off = document.createElement('canvas'); off.width = off.height = N; const ox = off.getContext('2d'); let key = '';
+    let sd = 11; const rnd = () => (sd = (sd*16807) % 2147483647)/2147483647;
+    const seeds = Array.from({ length:26 }, () => [rnd()*N, rnd()*N]), small = Array.from({ length:90 }, () => [rnd()*N, rnd()*N]);
+    const COL = { α:[66,70,77], β:[214,208,194], L:[112,121,132] };
+    function micro(s){
+      const k = s.r + '|' + (s.micro ? Math.round(s.micro[0][1]*40) : s.ph.map(p => Math.round(p[2]*40)).join(','));
+      if (k === key) return; key = k;
+      const img = ox.createImageData(N, N), d = img.data, AREA = N*N*Math.PI/4;
+      let host = 'L', blob = null, f = 0, eut = false, pre = null, pf = 0;
+      if (s.r === 'α' || s.r === 'β') host = s.r;
+      else if (s.r === 'α + L' || s.r === 'β + L'){ host = 'L'; blob = s.r[0]; f = s.ph.find(p => p[0] === blob)[2]; }
+      else if (s.r === 'α + β'){
+        if (s.micro){ eut = true; blob = s.micro[0][0].slice(-1); f = s.micro[0][1]; }
+        else { const maj = s.ph[0][2] >= .5 ? s.ph[0] : s.ph[1], min = maj === s.ph[0] ? s.ph[1] : s.ph[0]; host = maj[0]; pre = min[0]; pf = min[2]; } }
+      const rb = Math.sqrt(f*AREA/(seeds.length*Math.PI)), rp = Math.sqrt(pf*AREA/(small.length*Math.PI));
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++){
+        let d1 = 1e9, d2 = 1e9, ki = 0;
+        for (let i = 0; i < seeds.length; i++){ const dx = x - seeds[i][0], dy = y - seeds[i][1], q = dx*dx + dy*dy; if (q < d1){ d2 = d1; d1 = q; ki = i; } else if (q < d2) d2 = q; }
+        let ph = host, shade = 0;
+        if (blob){ const [sx, sy] = seeds[ki], an = Math.atan2(y - sy, x - sx), rr2 = rb*(1 + .2*Math.sin(6*an + ki)); if (Math.sqrt(d1) < rr2) ph = blob;
+          else if (eut){ const th = (ki % 7)*.9, v = Math.sin(((x - N/2)*Math.cos(th) + (y - N/2)*Math.sin(th))*1.15); ph = v > .156 ? 'α' : 'β'; } }
+        else if (host !== 'L' && Math.sqrt(d2) - Math.sqrt(d1) < 1.1) shade = -38;           // grain boundary
+        if (pre){ for (const [px, py] of small){ const dx = x - px, dy = y - py; if (dx*dx + dy*dy < rp*rp){ ph = pre; break; } } }
+        const c = COL[ph], o = (y*N + x)*4, n = ph === 'L' ? (rnd() - .5)*10 : (rnd() - .5)*6;
+        d[o] = c[0] + shade + n; d[o + 1] = c[1] + shade + n; d[o + 2] = c[2] + shade + n; d[o + 3] = 255; }
+      ox.putImageData(img, 0, 0);
+    }
+    let lastT = 0;
+    screen(cv, (x, w, h, now) => {
+      const dt = Math.min(.05, (now - (lastT || now))/1000); lastT = now;
+      if (st.cool){ st.T -= dt*40; if (st.T <= 25){ st.T = 25; st.cool = false; } }
+      x.fillStyle = C.screen; x.fillRect(0, 0, w, h);
+      const x0 = 46, x1 = w - 200, y0 = 14, y1 = h - 34; box = { x0, x1, y0, y1, w, h };
+      const X = c => x0 + c/100*(x1 - x0), Y = T => y1 - T/350*(y1 - y0);
+      x.strokeStyle = C.grid; x.beginPath(); for (let c = 0; c <= 100; c += 20){ x.moveTo(X(c) + .5, y0); x.lineTo(X(c) + .5, y1); } for (let T = 0; T <= 350; T += 50){ x.moveTo(x0, Y(T) + .5); x.lineTo(x1, Y(T) + .5); } x.stroke();
+      for (let c = 0; c <= 100; c += 20) label(x, String(c), X(c) - 6, y1 + 14, C.dim, 10);
+      for (let T = 0; T <= 300; T += 100) label(x, String(T), x0 - 30, Y(T) + 4, C.dim, 10);
+      label(x, 'wt% Sn', x1 - 44, y1 + 28, C.dim, 10); label(x, '°C', x0 - 30, y0 + 10, C.dim, 10);
+      const line = (pts, col = C.ch2) => { x.strokeStyle = col; x.lineWidth = 1.6; x.beginPath(); pts.forEach(([c, T], i) => i ? x.lineTo(X(c), Y(T)) : x.moveTo(X(c), Y(T))); x.stroke(); };
+      line([[0, TPb], [E, TE], [100, TSn]]); line([[0, TPb], [A, TE], [B, TE], [100, TSn]]);
+      const sa = [], sb = []; for (let T = TE; T >= 0; T -= 6){ sa.push([ca(T), T]); sb.push([cb(T), T]); } line(sa, C.ch3); line(sb, C.ch3);
+      [['L', 45, 285], ['α + L', 22, 225], ['β + L', 84, 197], ['α', 3, 150], ['β', 96.5, 150], ['α + β', 50, 95]].forEach(([t, c, T]) => label(x, t, X(c), Y(T), C.dim, 11));
+      const s = state(st.C, st.T);
+      x.strokeStyle = 'rgba(242,212,32,.45)'; x.setLineDash([4, 4]); x.beginPath(); x.moveTo(X(st.C), y0); x.lineTo(X(st.C), y1); x.stroke(); x.setLineDash([]);
+      if (s.ph.length === 2){ const [p, q] = s.ph; trace(x, [[X(p[1]), Y(st.T)], [X(q[1]), Y(st.T)]], C.hot, 2); [p, q].forEach(r => { x.fillStyle = C.hot; x.beginPath(); x.arc(X(r[1]), Y(st.T), 3.5, 0, 7); x.fill(); }); }
+      x.fillStyle = C.ch1; x.shadowColor = C.ch1; x.shadowBlur = 10; x.beginPath(); x.arc(X(st.C), Y(st.T), 5, 0, 7); x.fill(); x.shadowBlur = 0;
+      micro(s); const cx = w - 95, cy = (h - 20)/2, R = 72;
+      x.save(); x.beginPath(); x.arc(cx, cy, R, 0, 7); x.clip(); x.drawImage(off, cx - 75, cy - 75); x.restore();
+      x.strokeStyle = '#2E3338'; x.lineWidth = 5; x.beginPath(); x.arc(cx, cy, R + 2, 0, 7); x.stroke(); x.lineWidth = 1;
+      label(x, 'microstructure, schematic', cx - 86, h - 12, C.dim, 10);
+      const lines = [`<div><b>${st.C.toFixed(1)} wt% Sn at ${st.T.toFixed(0)} °C</b>: ${s.r}</div>`];
+      if (s.ph.length === 2) s.ph.forEach(([n, c, f]) => lines.push(`<div>${n}: ${c.toFixed(1)} wt% Sn, mass fraction <span class="warn">${f.toFixed(2)}</span> (lever rule)</div>`));
+      if (s.micro) lines.push(`<div class="ok">Microconstituents, set at 183 °C: ${s.micro.map(([n, f]) => `${n} ${f.toFixed(2)}`).join(', ')}</div>`);
+      if (st.T < TE && st.C <= A && st.C > ca(st.T)) lines.push('<div>Below the solvus: β precipitates out of the α grains.</div>');
+      say(lines.join(''));
+    });
+  }
+
+  /* ---------------- Corrosion: galvanic compatibility with the four-element model ---------------- */
+  function galv(el){
+    head(el, 'Galvanic compatibility check · anodic index', 'MIL-STD-889 style index in volts; the more anodic metal is the one that corrodes');
+    const M = [['Gold', 0], ['Silver', .15], ['Nickel, titanium', .30], ['Copper', .35], ['Brass, bronze', .40], ['Stainless steel, 300 series', .50], ['Tin-lead solder', .65], ['Lead', .70], ['Aluminum, 2000 series', .75], ['Carbon steel', .85], ['Aluminum, 6061 or 5052', .90], ['Galvanized steel', 1.20], ['Zinc', 1.25], ['Magnesium', 1.75]];
+    const ENV = { harsh:[.15, 'outdoor or salt'], normal:[.25, 'indoor'], ctrl:[.50, 'climate-controlled'] };
+    const cv = canvas(el, 236);
+    const say = logBox(el);
+    const opts = s => M.map(([n], i) => `<option value="${i}" ${i === s ? 'selected' : ''}>${n}</option>`).join('');
+    const ctl = panel(el, `<label>Bolt <select data-k="a">${opts(5)}</select></label><label>Plate <select data-k="b">${opts(10)}</select></label>
+      <div class="seg" role="group" aria-label="Environment"><button data-e="harsh" class="on" type="button">Outdoor</button><button data-e="normal" type="button">Indoor</button><button data-e="ctrl" type="button">Controlled</button></div>
+      <button data-x="el" class="pill mini on" type="button">Electrolyte: water</button><button data-x="path" class="pill mini on" type="button">Metal-to-metal contact</button>`);
+    const st = { a:5, b:10, env:'harsh', el:true, path:true, dmg:0 };
+    seg(ctl, 'e', v => st.env = v);
+    ctl.addEventListener('change', e => { const k = e.target.dataset.k; if (k){ st[k] = +e.target.value; st.dmg = 0; } });
+    ctl.addEventListener('click', e => { const b = e.target.closest('[data-x]'); if (!b) return; const k = b.dataset.x; st[k] = !st[k]; b.classList.toggle('on', st[k]);
+      b.textContent = k === 'el' ? (st.el ? 'Electrolyte: water' : 'Electrolyte: kept dry') : (st.path ? 'Metal-to-metal contact' : 'Insulating washer and sleeve'); });
+    let sd = 5; const rnd = () => (sd = (sd*16807) % 2147483647)/2147483647; const ions = Array.from({ length:26 }, () => ({ p:rnd(), s:rnd() }));
+    const pits = Array.from({ length:60 }, () => [rnd(), rnd()]); let lastT = 0;
+    screen(cv, (x, w, h, now) => {
+      const dt = Math.min(.05, (now - (lastT || now))/1000); lastT = now;
+      const [an, va] = M[st.a], [bn, vb] = M[st.b], dv = Math.abs(va - vb), lim = ENV[st.env][0];
+      const cell = dv > 0 && st.el && st.path, boltAnode = va > vb, anode = boltAnode ? an : bn, cath = boltAnode ? bn : an;
+      if (cell) st.dmg = Math.min(1, st.dmg + dt*dv*.25*(boltAnode ? 3 : 1));
+      x.fillStyle = C.screen; x.fillRect(0, 0, w, h);
+      const cx = Math.min(200, w*.3), py = 130, pw = Math.min(330, w*.56), L = cx - pw/2;
+      // plate, bolt head and shank, side view
+      x.fillStyle = '#8E969E'; x.fillRect(L, py, pw, 20);
+      x.fillStyle = '#AEB6BF'; x.fillRect(cx - 9, py - 6, 18, 72);
+      if (!st.path){ x.fillStyle = '#E8E2D0'; x.fillRect(cx - 30, py - 6, 60, 6); x.fillRect(cx - 11, py, 2, 20); x.fillRect(cx + 9, py, 2, 20); }
+      x.fillStyle = '#C3CAD2'; x.fillRect(cx - 26, py - 28, 52, 22);
+      if (st.el){ x.fillStyle = 'rgba(79,179,255,.22)'; x.fillRect(L, py - 7, pw, 7); [[.15, 5], [.78, 6], [.9, 4]].forEach(([fx, r]) => { x.beginPath(); x.arc(L + fx*pw, py - 4, r, Math.PI, 0); x.fill(); }); }
+      // corrosion: white product and pits on whichever part is the anode
+      if (st.dmg > 0){ x.fillStyle = `rgba(235,232,222,${.25 + .6*st.dmg})`;
+        pits.slice(0, Math.ceil(st.dmg*60)).forEach(([u, v]) => { if (boltAnode){ x.fillRect(cx - 26 + u*52, py - 28 + v*22, 2.5, 2.5); }
+          else { const r = 32 + u*70*st.dmg, s = v < .5 ? -1 : 1; x.fillRect(cx + s*r, py - 2 + v*4, 3, 2); } }); }
+      if (cell){ const t = now/1000;
+        ions.forEach(io => { const ph = (io.p + t*(.25 + io.s*.3)) % 1, sx = boltAnode ? cx + (io.s - .5)*48 : cx + (io.s < .5 ? -1 : 1)*(30 + io.s*90), sy = (boltAnode ? py - 30 : py - 6) - ph*34;
+          x.globalAlpha = 1 - ph; x.fillStyle = C.ch3; x.beginPath(); x.arc(sx, sy, 2, 0, 7); x.fill(); }); x.globalAlpha = 1;
+        label(x, boltAnode ? 'metal ions leave the bolt' : 'metal ions leave the plate', cx - 80, 24, C.ch3, 10.5);
+        label(x, `e⁻ flow through the joint, ${boltAnode ? 'bolt → plate' : 'plate → bolt'}`, cx - 80, h - 14, C.ch1, 10.5); }
+      label(x, `bolt: ${an}`, cx - 26, py - 36, C.dim, 10); label(x, `plate: ${bn}`, cx + 16, py + 38, C.dim, 10);
+      const RX = Math.max(cx + pw/2 + 24, w*.62);
+      label(x, 'ΔV, anodic index', RX, 30, C.dim, 10.5);
+      label(x, `${dv.toFixed(2)} V`, RX, 64, !dv ? C.ch2 : dv > lim ? C.hot : C.ch2, 30, 600);
+      label(x, `limit ${lim.toFixed(2)} V (${ENV[st.env][1]})`, RX, 86, C.txt, 10.5);
+      const verdict = !dv ? 'Same metal: no galvanic cell' : !st.el ? 'No electrolyte: the cell is open' : !st.path ? 'No electrical path: the cell is open' : dv > lim ? 'Exceeds the limit: expect attack' : 'Within the limit';
+      label(x, verdict, RX, 108, cell && dv > lim ? C.hot : C.ch2, 11, 600);
+      const lines = [];
+      lines.push(`<div>Four elements: anode <span class="${dv ? 'ok' : 'bad'}">${dv ? 'yes' : 'no'}</span>, cathode <span class="${dv ? 'ok' : 'bad'}">${dv ? 'yes' : 'no'}</span>, electrolyte <span class="${st.el ? 'ok' : 'bad'}">${st.el ? 'yes' : 'no'}</span>, electrical path <span class="${st.path ? 'ok' : 'bad'}">${st.path ? 'yes' : 'no'}</span>. Remove any one and the cell stops.</div>`);
+      if (dv) lines.push(`<div>Anode, corrodes: <b>${anode}</b>. Cathode, protected: <b>${cath}</b>.</div>`);
+      if (dv) lines.push(boltAnode ? '<div class="bad">Small anode, large cathode: the whole plate drives current into the bolt, so the bolt fails fast. Pick a bolt that is cathodic to the plate.</div>'
+        : '<div class="ok">Large anode, small cathode: the attack spreads over the plate around the joint. This is the favorable way round.</div>');
+      say(lines.join(''));
+    });
+  }
+
+  /* ---------------- Pantry: the shelf monitor, with its real guard, state machine and digest ---------------- */
+  function digest(el){
+    head(el, 'Shelf monitor console · simulated', 'Logic ported from the monitor code: OOD guard, 1 h persistence, LOW under 40%, EMPTY under 15%');
+    const cv = canvas(el, 220);
+    const show = logBox(el, 'lab-pre');
+    const ctl = panel(el, `<div class="seg" role="group" aria-label="Scenario"><button data-s="ok" class="on" type="button">Normal</button><button data-s="moved" type="button">Camera bumped</button><button data-s="early" type="button">Calibrated too early</button><button data-s="person" type="button">Person in frame</button></div>
+      <div class="seg" role="group" aria-label="Digest version"><button data-v="old" type="button">Digest as found</button><button data-v="new" class="on" type="button">Digest after the fix</button></div>
+      <label>Shelf B2 stock <input data-k="occ" type="range" min="0" max="100" value="62"><span data-o="occ">62%</span></label>
+      <button data-a="hour" class="pill mini" type="button">Skip ahead 1 h</button>`);
+    const ROIS = ['shelf_A1', 'shelf_A2', 'shelf_A3', 'shelf_B1', 'shelf_B2', 'shelf_B3'], BASE = { shelf_A1:.82, shelf_A2:.64, shelf_A3:.91, shelf_B1:.47, shelf_B3:.73 };
+    // brightness and scene-match values for each scenario; -0.10, 35 and 143 are the values measured in the live-camera test
+    const SC = { ok:{ b:143, ref:143, ncc:.81 }, moved:{ b:143, ref:143, ncc:-.10 }, early:{ b:143, ref:35, ncc:.81 }, person:{ b:143, ref:143, ncc:.81, person:true } };
+    const st = { s:'ok', v:'new', occ:.62, clock:9*3600, last:0, state:{}, reason:'', live:{} };
+    const reset = () => { st.state = {}; st.clock = 9*3600; st.last = 0; };
+    seg(ctl, 's', v => { st.s = v; reset(); }); seg(ctl, 'v', v => st.v = v);
+    ctl.addEventListener('input', e => { if (e.target.dataset.k !== 'occ') return; st.occ = +e.target.value/100; ctl.querySelector('[data-o="occ"]').textContent = e.target.value + '%'; });
+    ctl.addEventListener('click', e => { if (e.target.closest('[data-a="hour"]')){ st.clock += 3600; tick(); } });
+    const LEVELS = [[.15, 'EMPTY'], [.40, 'LOW'], [1.01, 'OK']], level = o => (LEVELS.find(([t]) => o < t) || [0, 'OK'])[1];
+    function guard(){ const g = SC[st.s];
+      if (g.b < g.ref*.5 || g.b > g.ref*1.5) return `brightness out of range (${g.b} vs ref ${g.ref})`;
+      if (g.ncc < .35) return `scene mismatch (ncc ${g.ncc.toFixed(2)}): camera moved or blocked`;
+      if (g.person) return 'person in frame: reading delayed, frame never stored';
+      return ''; }
+    function update(readings){ const now = st.clock;
+      if (!readings){ Object.values(st.state).forEach(s => s.stale = true); return; }
+      for (const [roi, occ] of Object.entries(readings)){
+        const s = st.state[roi] || (st.state[roi] = { state:'OK', occ, candidate:null, candidate_since:null, since:now, stale:false });
+        s.occ = occ; s.stale = false; const lvl = level(occ);
+        if (lvl === s.state){ s.candidate = s.candidate_since = null; }
+        else if (s.candidate === lvl){ if (now - s.candidate_since >= 3600){ s.state = lvl; s.since = now; s.candidate = s.candidate_since = null; } }
+        else { s.candidate = lvl; s.candidate_since = now; } } }
+    function tick(){ st.reason = guard();
+      st.live = Object.fromEntries(ROIS.map(r => [r, Math.max(0, Math.min(1, (r === 'shelf_B2' ? st.occ : BASE[r]) + (Math.random() - .5)*.02))]));
+      update(st.reason ? null : st.live); }
+    const ago = ts => { const m = Math.floor((st.clock - ts)/60); return m >= 60 ? `${Math.floor(m/60)}h ${m % 60}m` : `${m}m`; };
+    function render(){ const attention = [], ok = [], stale = [], fixed = st.v === 'new';
+      for (const roi of Object.keys(st.state).sort()){ const s = st.state[roi], name = roi.replace('_', ' ');
+        if (s.stale) stale.push(`  ${name}: no recent reading (last state ${s.state})`);
+        else if (s.state === 'EMPTY') attention.push(`  ${name}: EMPTY for ${ago(s.since)}, refill from backstock`);
+        else if (s.state === 'LOW') attention.push(`  ${name}: LOW (${Math.round(s.occ*100)}% full) for ${ago(s.since)}`);
+        else ok.push(`  ${name}: OK (${Math.round(s.occ*100)}% full)`); }
+      const hh = Math.floor(st.clock/3600) % 24, lines = [`Pantry shelf digest, ${((hh + 11) % 12) + 1}:${String(Math.floor(st.clock/60) % 60).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`, ''];
+      if (fixed && !Object.keys(st.state).length) return lines.concat(['<span class="bad">NO READINGS YET.</span>', '  The monitor has not successfully read any shelf, so it cannot say', '  whether stock is fine. Check that the camera is powered, pointed at', '  the shelves, and unblocked, then re-run calibration.']).join('\n');
+      if (attention.length) lines.push('<span class="warn">NEEDS ATTENTION:</span>', ...attention, '');
+      if (stale.length) lines.push('<span class="bad">CAMERA COULD NOT READ (check lens/lighting):</span>', ...stale, '');
+      if (fixed && !ok.length) lines.push('<span class="bad">No shelf is currently readable, so nothing below is confirmed OK.</span>');
+      else lines.push(attention.length || stale.length ? `Everything else OK (${ok.length} shelves).` : `<span class="${ok.length ? 'ok' : 'bad'}">All ${ok.length} shelves OK. Nothing needs attention.</span>`);
+      return lines.join('\n'); }
+    tick();
+    screen(cv, (x, w, h, now) => {
+      if (now - st.last > 2000){ st.last = now; st.clock += 2; tick(); }        // one reading every 2 s, the interval verified in the live test
+      x.fillStyle = '#15191C'; x.fillRect(0, 0, w, h);
+      const VW = Math.min(w*.58, 360), sc = SC[st.s];
+      x.save(); if (st.s === 'moved'){ x.translate(VW*.18, -18); x.rotate(.13); }
+      x.fillStyle = st.s === 'early' ? '#3A3428' : '#2B2620'; x.fillRect(10, 10, VW - 20, h - 20);
+      ROIS.forEach((r, i) => { const col = i % 3, row = Math.floor(i/3), bw = (VW - 40)/3, bx = 20 + col*bw, by = 22 + row*(h - 44)/2, bh = (h - 44)/2 - 14, o = st.live[r] ?? 0;
+        x.fillStyle = '#4A3F33'; x.fillRect(bx, by + bh - 4, bw - 10, 4);
+        const n = Math.round(o*10); for (let k = 0; k < n; k++){ x.fillStyle = ['#8C6B4A', '#6F7F5A', '#9A8A6A', '#7A5F48'][(k + i) % 4]; x.fillRect(bx + 3 + k*(bw - 16)/10, by + 14 + (k % 2)*6, (bw - 16)/10 - 2, bh - 18 - (k % 2)*6); }
+        const lv = level(o), c = lv === 'OK' ? C.ch2 : lv === 'LOW' ? C.ch1 : C.hot;
+        x.strokeStyle = c; x.lineWidth = 1.5; if (st.reason) x.setLineDash([4, 4]); x.strokeRect(bx, by, bw - 10, bh); x.setLineDash([]); x.lineWidth = 1;
+        label(x, st.reason ? `${r.slice(-2)} no reading` : `${r.slice(-2)} ${Math.round(o*100)}%`, bx + 4, by + 11, st.reason ? C.dim : c, 10); });
+      x.restore();
+      if (sc.person){ x.fillStyle = 'rgba(150,158,168,.85)'; x.beginPath(); x.arc(VW*.5, h*.36, 15, 0, 7); x.fill(); rr(x, VW*.5 - 24, h*.36 + 18, 48, h*.6, 12); x.fill(); }
+      label(x, '● CAM 1', 16, h - 14, st.reason ? C.hot : C.ch2, 10);
+      const RX = VW + 16; let y = 26;
+      const row = (k, v, good) => { label(x, k, RX, y, C.dim, 10.5); label(x, v, RX + 112, y, good ? C.ch2 : C.hot, 10.5); y += 20; };
+      label(x, 'OOD guard', RX, y, C.txt, 11, 600); y += 22;
+      row('Brightness', `${sc.b} (band ${Math.round(sc.ref*.5)} to ${Math.round(sc.ref*1.5)})`, !(sc.b < sc.ref*.5 || sc.b > sc.ref*1.5));
+      row('Scene match', `${sc.ncc.toFixed(2)} (min 0.35)`, sc.ncc >= .35);
+      row('Person gate', sc.person ? 'person in frame' : 'clear', !sc.person); y += 6;
+      label(x, st.reason ? 'READING REFUSED' : 'READING ACCEPTED', RX, y, st.reason ? C.hot : C.ch2, 12, 600); y += 18;
+      if (st.reason) label(x, st.reason.length > 34 ? st.reason.slice(0, 34) + '…' : st.reason, RX, y, C.dim, 10);
+      const b2 = st.state.shelf_B2; if (b2 && b2.candidate) label(x, `B2 → ${b2.candidate}: holds ${mmss(Math.min(3600, st.clock - b2.candidate_since))} of 60:00`, RX, h - 14, C.ch1, 10);
+      show(render());
+    });
+  }
+
+  /* ---------------- EPIC: the instructor queue with the shipped triage math ---------------- */
+  function queue(el){
+    head(el, 'Instructor queue · simulated room', 'Triage from the shipped dashboard: urgency × (1 + wait/3 min), waits past 3:00 flagged, silent groups surfaced');
+    const cv = canvas(el, 268);
+    const ctl = panel(el, `<label>Group <select data-k="g">${Array.from({ length:8 }, (_, i) => `<option value="${i + 1}" ${i === 1 ? 'selected' : ''}>${i + 1}</option>`).join('')}</select></label>
+      <div class="seg" role="group" aria-label="Request"><button data-t="not_working" type="button">It’s not working</button><button data-t="wiring" type="button">Check our wiring</button><button data-t="question" type="button">Question</button><button data-t="done" type="button">Done</button></div>
+      <button data-a="resolve" class="pill mini dark" type="button">Resolve top pick</button>
+      <div class="seg" role="group" aria-label="Clock"><button data-x="1" class="on" type="button">1×</button><button data-x="30" type="button">30×</button></div>`);
+    const U = { not_working:4, wiring:3, question:2, done:1 }, NAME = { not_working:'Not working', wiring:'Wiring check', question:'Question', done:'Done' };
+    const TCOL = { not_working:C.hot, wiring:C.ch1, question:C.ch3, done:C.ch2 }, WAIT_ALERT = 180, SILENT_FLOOR = 480, SILENT_MULT = 2;
+    const ACT = ['LED Blink', 'Brightness with Resistors', 'Push Buttons', 'Active Buzzer', 'Water Level Detection', 'Ultrasonic Distance'];
+    let sd = 3; const rnd = () => (sd = (sd*16807) % 2147483647)/2147483647;
+    const st = { t:0, speed:1, g:2, req:[{ g:3, type:'wiring', at:-100 }, { g:5, type:'question', at:-30 }],
+      grp:Array.from({ length:8 }, (_, i) => ({ act:i % 3, since:-(60 + rnd()*200), stuck:i === 5 })) };
+    st.grp[5].since = -400;                                     // group 6 has been quiet on one activity for a while
+    ctl.addEventListener('change', e => { if (e.target.dataset.k === 'g') st.g = +e.target.value; });
+    ctl.addEventListener('click', e => { const b = e.target.closest('[data-t]'); if (b){ st.req = st.req.filter(r => !(r.g === st.g && r.type === b.dataset.t)); st.req.push({ g:st.g, type:b.dataset.t, at:st.t }); }
+      if (e.target.closest('[data-a="resolve"]')){ const top = triage()[0]; if (!top) return;
+        if (top.kind === 'request'){ st.req = st.req.filter(r => r !== top.r); if (top.r.type === 'done'){ const g = st.grp[top.r.g - 1]; g.act = Math.min(ACT.length - 1, g.act + 1); g.since = st.t; } }
+        else { const g = st.grp[top.g - 1]; g.stuck = false; g.since = st.t - 30; } } });
+    seg(ctl, 'x', v => st.speed = +v);
+    function triage(){
+      const open = new Set(st.req.map(r => r.g)), secs = st.grp.map(g => Math.max(0, st.t - g.since)), arr = [...secs].sort((a, b) => a - b), mid = Math.floor(arr.length/2);
+      const median = arr.length % 2 ? arr[mid] : Math.round((arr[mid - 1] + arr[mid])/2);
+      const items = st.req.map(r => { const wait = st.t - r.at; return { kind:'request', r, g:r.g, wait, score:U[r.type]*(1 + (wait/60)/3) }; });
+      st.grp.forEach((g, i) => { const sec = secs[i]; if (open.has(i + 1) || sec < SILENT_FLOOR || median <= 0 || sec/median < SILENT_MULT) return;
+        items.push({ kind:'silent', g:i + 1, sec, score:3.5*(1 + (sec/60)/3) }); });
+      return items.sort((a, b) => b.score - a.score); }
+    let lastT = 0;
+    screen(cv, (x, w, h, now) => {
+      const dt = Math.min(.1, (now - (lastT || now))/1000); lastT = now; st.t += dt*st.speed;
+      // the rest of the room keeps working: a group that is not stuck moves on every few minutes
+      st.grp.forEach(g => { if (!g.stuck && st.t - g.since > 150 + rnd()*400 && rnd() < dt*st.speed*.01){ g.act = Math.min(ACT.length - 1, g.act + 1); g.since = st.t; } });
+      const items = triage(), open = new Map(st.req.map(r => [r.g, r]));
+      x.fillStyle = C.screen; x.fillRect(0, 0, w, h);
+      const GW = Math.min(300, w*.48), cw = GW/4, chh = (h - 40)/2;
+      label(x, 'ROOM', 12, 18, C.dim, 10.5);
+      st.grp.forEach((g, i) => { const gx = 10 + (i % 4)*cw, gy = 28 + Math.floor(i/4)*chh, r = open.get(i + 1), sil = items.find(t => t.kind === 'silent' && t.g === i + 1);
+        x.fillStyle = '#121816'; rr(x, gx, gy, cw - 8, chh - 8, 6); x.fill();
+        x.strokeStyle = r ? TCOL[r.type] : sil ? C.ch1 : C.grid; x.lineWidth = r || sil ? 1.6 : 1; if (sil) x.setLineDash([4, 3]); rr(x, gx, gy, cw - 8, chh - 8, 6); x.stroke(); x.setLineDash([]); x.lineWidth = 1;
+        label(x, `PC ${i + 1}`, gx + 8, gy + 18, i + 1 === st.g ? C.ch1 : C.txt, 11, 600);
+        const a = ACT[g.act]; label(x, a.length > 11 ? a.slice(0, 10) + '…' : a, gx + 8, gy + 36, C.dim, 9.5);
+        label(x, mmss(Math.max(0, st.t - g.since)), gx + 8, gy + 54, C.txt, 10);
+        if (r) label(x, NAME[r.type], gx + 8, gy + chh - 18, TCOL[r.type], 9.5); else if (sil) label(x, 'quiet, slow', gx + 8, gy + chh - 18, C.ch1, 9.5); });
+      const QX = GW + 26; label(x, 'INSTRUCTOR QUEUE, ▶ top pick', QX, 18, C.dim, 10.5); label(x, 'score', w - 60, 18, C.dim, 10);
+      items.slice(0, 8).forEach((it, k) => { const y = 42 + k*27, top = k === 0;
+        if (top){ x.fillStyle = 'rgba(242,87,27,.12)'; x.fillRect(QX - 6, y - 16, w - QX - 4, 24); }
+        const what = it.kind === 'request' ? NAME[it.r.type] : 'Silent: no request, slow vs room', col = it.kind === 'request' ? TCOL[it.r.type] : C.ch1;
+        if (top) label(x, '▶', QX - 2, y, C.hot, 10); label(x, `G${it.g}`, QX + 12, y, C.txt, 11, 600); label(x, what, QX + 44, y, col, 10.5);
+        const t = it.kind === 'request' ? it.wait : it.sec; label(x, mmss(t), w - 120, y, it.kind === 'request' && it.wait >= WAIT_ALERT ? C.hot : C.txt, 10.5);
+        label(x, it.score.toFixed(1), w - 56, y, top ? C.hot : C.dim, 10.5); });
+      if (!items.length) label(x, 'Queue empty', QX, 44, C.ch2, 11);
+      label(x, `room clock ${mmss(st.t)}  ·  ${st.speed}×`, QX, h - 12, C.dim, 10);
+    });
+  }
+
+  /* ---------------- tailscore: the W/L posterior, same prior and score as the code ---------------- */
+  function beta(el){
+    head(el, 'Capper score · live math', 'Beta prior worth 60 picks, centered on break-even at the posted odds; 90-day half-life; score = P(true win rate > break-even)');
+    const cv = canvas(el, 240);
+    const ctl = panel(el, `<label>Wins <input data-k="w" type="range" min="0" max="300" value="8"><span data-o="w">8</span></label>
+      <label>Losses <input data-k="l" type="range" min="0" max="300" value="2"><span data-o="l">2</span></label>
+      <label>Odds <select data-k="odds"><option value="-110" selected>-110</option><option value="-150">-150</option><option value="100">+100</option><option value="150">+150</option></select></label>
+      <label>Record age <input data-k="age" type="range" min="0" max="365" value="0"><span data-o="age">0 d</span></label>
+      <button data-p="8,2" class="pill mini" type="button">8-2 heater</button><button data-p="232,168" class="pill mini" type="button">58% over 400</button>`);
+    const st = { w:8, l:2, odds:-110, age:0 };
+    const sync = () => ['w', 'l', 'age'].forEach(k => { ctl.querySelector(`[data-k="${k}"]`).value = st[k]; ctl.querySelector(`[data-o="${k}"]`).textContent = k === 'age' ? st[k] + ' d' : st[k]; });
+    ctl.addEventListener('input', e => { const k = e.target.dataset.k; if (!k) return; st[k] = +e.target.value; sync(); });
+    ctl.addEventListener('change', e => { const k = e.target.dataset.k; if (k) st[k] = +e.target.value; });
+    ctl.addEventListener('click', e => { const b = e.target.closest('[data-p]'); if (!b) return; [st.w, st.l] = b.dataset.p.split(',').map(Number); st.age = 0; sync(); });
+    const LG = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+    const lgam = z => { if (z < .5) return Math.log(Math.PI/Math.sin(Math.PI*z)) - lgam(1 - z); z -= 1; let a = LG[0]; const t = z + 7.5; for (let i = 1; i < 9; i++) a += LG[i]/(z + i); return .5*Math.log(2*Math.PI) + (z + .5)*Math.log(t) - t + Math.log(a); };
+    const pdf = (p, a, b) => Math.exp((a - 1)*Math.log(p) + (b - 1)*Math.log(1 - p) + lgam(a + b) - lgam(a) - lgam(b));
+    const sf = (q, a, b) => { const n = 2000, hh = (1 - 1e-9 - q)/n; let s = pdf(q, a, b) + pdf(1 - 1e-9, a, b); for (let i = 1; i < n; i++) s += (i % 2 ? 4 : 2)*pdf(q + i*hh, a, b); return Math.min(1, s*hh/3); };
+    let key = '', memo = null;
+    screen(cv, (x, w, h) => {
+      const o = st.odds, be = o < 0 ? -o/(-o + 100) : 100/(o + 100), dec = Math.pow(.5, st.age/90), W = st.w*dec, Lo = st.l*dec;
+      const a0 = 60*be, b0 = 60*(1 - be), a = a0 + W, b = b0 + Lo, k = [a, b, be].join();
+      if (k !== key){ key = k; memo = { score:sf(be, a, b), mean:a/(a + b) }; }
+      x.fillStyle = C.screen; x.fillRect(0, 0, w, h);
+      const x0 = 14, x1 = w - 200, y0 = 22, y1 = h - 30, lo = .25, hi = .85, X = p => x0 + (p - lo)/(hi - lo)*(x1 - x0);
+      const ys = [], yp = []; let m = 0; for (let i = 0; i <= 240; i++){ const p = lo + (hi - lo)*i/240; const v1 = pdf(p, a0, b0), v2 = pdf(p, a, b); ys.push([p, v2]); yp.push([p, v1]); m = Math.max(m, v1, v2); }
+      const Y = v => y1 - v/m*(y1 - y0);
+      x.strokeStyle = C.grid; x.beginPath(); for (let p = .3; p <= .81; p += .1){ x.moveTo(X(p) + .5, y0); x.lineTo(X(p) + .5, y1); } x.stroke();
+      for (let p = .3; p <= .81; p += .1) label(x, Math.round(p*100) + '%', X(p) - 10, y1 + 16, C.dim, 10);
+      x.fillStyle = 'rgba(242,212,32,.16)'; x.beginPath(); x.moveTo(X(be), y1); ys.filter(([p]) => p >= be).forEach(([p, v]) => x.lineTo(X(p), Y(v))); x.lineTo(X(hi), y1); x.fill();
+      trace(x, yp.map(([p, v]) => [X(p), Y(v)]), C.dim, 1.4); trace(x, ys.map(([p, v]) => [X(p), Y(v)]), C.ch1);
+      x.strokeStyle = C.hot; x.setLineDash([4, 4]); x.beginPath(); x.moveTo(X(be) + .5, y0 - 8); x.lineTo(X(be) + .5, y1); x.stroke(); x.setLineDash([]);
+      label(x, `break-even ${(be*100).toFixed(1)}%`, X(be) + 6, y0 + 4, C.hot, 10);
+      label(x, 'prior', x0 + 4, y1 - 6, C.dim, 10); label(x, 'true win rate', x0 + 4, y0 + 4, C.dim, 10);
+      const RX = x1 + 24, n = st.w + st.l;
+      label(x, 'Score', RX, 30, C.dim, 10.5);
+      label(x, memo.score.toFixed(2), RX, 66, memo.score >= .8 ? C.ch2 : memo.score >= .6 ? C.ch1 : C.txt, 32, 600);
+      label(x, 'P(true rate > break-even)', RX, 86, C.dim, 10);
+      label(x, `record ${st.w}-${st.l}${n ? `  (${(st.w/n*100).toFixed(0)}%)` : ''}`, RX, 116, C.txt, 10.5);
+      label(x, `weight after decay ${(dec*100).toFixed(0)}%`, RX, 134, C.txt, 10.5);
+      label(x, `posterior mean ${(memo.mean*100).toFixed(1)}%`, RX, 152, C.ch1, 10.5);
+      label(x, 'New capper: exactly 0.50', RX, 180, C.dim, 10);
+    });
+  }
+
+  return { mount(kind, el){ ({ dac, metal, riscv, theta, can, ipc, phase, galv, digest, queue, beta })[kind](el); }, stopAll };
 })();
 
 /* ---------- the datasheet view ---------- */
@@ -1079,7 +1497,7 @@ function openSheet(id, push = true){
           ${d.problem ? `<section><h3>The problem</h3><p>${d.problem}</p></section>` : ''}
           <section><h3>${d.problem ? 'What I built' : 'Overview'}</h3><ul>${built.map(b => `<li>${b}</li>`).join('')}</ul></section>
           ${fig ? `<section><h3>How it works</h3>${fig}</section>` : ''}
-          ${d.lab ? `<section><h3>Try it: simulated bench</h3><div class="lab" id="labMount"></div></section>` : ''}
+          ${d.lab ? `<section><h3>Try it on the bench</h3>${[].concat(d.lab).map(k => `<div class="lab" data-lab="${k}"></div>`).join('')}</section>` : ''}
           ${d.video ? `<section><h3>Demo</h3><figure class="vid"><video src="${d.video[0]}" controls playsinline preload="metadata">${d.video[2] ? `<track kind="captions" src="${d.video[2]}" srclang="en" label="English" default>` : ''}</video><figcaption class="figcap">${d.video[1]}</figcaption></figure></section>` : ''}
           ${d.photos ? `<section><h3>${d.shotsTitle || 'On the bench'}</h3><div class="photos">${d.photos.map(([src, cap, fit]) => `<figure><img src="${src}" alt="${cap}" loading="lazy"${fit === 'contain' ? ' class="contain"' : ''}><figcaption class="figcap">${cap}</figcaption></figure>`).join('')}</div></section>` : ''}
           ${d.results ? `<section><h3>Results</h3><div class="metrics">${d.results.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('')}</div></section>` : ''}
@@ -1088,7 +1506,7 @@ function openSheet(id, push = true){
         </div>
       </div>
     </article>`;
-  LAB.stopAll(); if (d.lab) LAB.mount(d.lab, sheet.querySelector('#labMount'));
+  LAB.stopAll(); sheet.querySelectorAll('[data-lab]').forEach(n => LAB.mount(n.dataset.lab, n));
   sheet.hidden = false; document.documentElement.classList.add('locked'); sheet.scrollTop = 0;
   if (push) history.replaceState(null, '', '#d-' + id);
   requestAnimationFrame(() => sheet.classList.add('on'));
