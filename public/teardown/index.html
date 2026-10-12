@@ -777,11 +777,13 @@ const DETAIL = {
   S1:{ role:'Founder and developer', team:'FUNCK', tools:'React, Supabase (Postgres, Auth, Edge Functions), Stripe Connect, Resend',
     problem:'Small event organizers need ticketing that works on a phone at the door, with payouts to the organizer.',
     built:['A mobile-first event platform with ticket sales, organizer payouts, and email.','Diagnosed and rebuilt a broken email-verification pipeline (missing queue infrastructure) that was blocking every new signup.','Fixed iOS Safari layout bugs around safe areas and the viewport.'],
-    fig:'funck', figCap:'Architecture.', results:[['Live','at funck.live']] },
+    fig:'funck', figCap:'Architecture.', results:[['Live','at funck.live']],
+    shotsTitle:'The live site', photos:[['funck-phone.jpg','funck.live on a phone, captured Oct 2026.','contain'],['funck-desktop.jpg','The same page on desktop.','contain']] },
   S3:{ role:'Designer and developer', team:'Cal Poly EPIC 2026', tools:'TypeScript, React, Supabase realtime',
     problem:'In a room of high school students wiring Arduinos, the instructor cannot see who is stuck.',
     built:['Per-group help requests from each lab PC, and one live instructor queue with wait timers, stale-request flags, and phone alerts.','A 4-day, 12-activity curriculum (LEDs, sensors, motor control) with verified code, wiring diagrams, and a self-serve troubleshooter.'],
-    fig:'epic', figCap:'Request flow.', results:[['12','activities over 4 days'],['Realtime','across every lab PC']] },
+    fig:'epic', figCap:'Request flow.', results:[['12','activities over 4 days'],['Realtime','across every lab PC']],
+    shotsTitle:'The live tool', photos:[['epic-queue.jpg','The student start screen: each lab PC picks its group (live at amogh.site/epic).','contain']] },
   E1:{ role:'Lab Operations Intern, promoted to Optimization Engineering Intern', team:'Natera, clinical genetic testing', tools:'Python, process mapping',
     problem:'A high-throughput clinical validation and packaging line was slow, with redundant verification steps and manual lookups.',
     built:['Mapped the workflow with the lab, operations, and manufacturing teams and removed redundant verification steps.','Built Python automation for barcode validation and pathology-report retrieval.','Standardized the packaging workflow and wrote the reference documentation the team adopted.'],
@@ -1068,7 +1070,7 @@ function openSheet(id, push = true){
           ${fig ? `<section><h3>How it works</h3>${fig}</section>` : ''}
           ${d.lab ? `<section><h3>Try it: simulated bench</h3><div class="lab" id="labMount"></div></section>` : ''}
           ${d.video ? `<section><h3>Demo</h3><figure class="vid"><video src="${d.video[0]}" controls playsinline preload="metadata"></video><figcaption class="figcap">${d.video[1]}</figcaption></figure></section>` : ''}
-          ${d.photos ? `<section><h3>On the bench</h3><div class="photos">${d.photos.map(([src, cap, fit]) => `<figure><img src="${src}" alt="${cap}" loading="lazy"${fit === 'contain' ? ' class="contain"' : ''}><figcaption class="figcap">${cap}</figcaption></figure>`).join('')}</div></section>` : ''}
+          ${d.photos ? `<section><h3>${d.shotsTitle || 'On the bench'}</h3><div class="photos">${d.photos.map(([src, cap, fit]) => `<figure><img src="${src}" alt="${cap}" loading="lazy"${fit === 'contain' ? ' class="contain"' : ''}><figcaption class="figcap">${cap}</figcaption></figure>`).join('')}</div></section>` : ''}
           ${d.results ? `<section><h3>Results</h3><div class="metrics">${d.results.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('')}</div></section>` : ''}
           ${d.learned ? `<section><h3>What I learned</h3><p>${d.learned}</p></section>` : ''}
           <div class="ptags">${p.tags.map(t => `<span>${t}</span>`).join('')}</div>
