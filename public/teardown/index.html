@@ -270,6 +270,11 @@ html.dark .hero .cue i{border-color:#8A94A1}
 html.dark .hero .cue i::after{background:#8A94A1}
 html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6,8,.78) 46%,#050608 82%)}
 
+.reel{border:0;padding:0;background:#000;border-radius:12px;width:min(1100px,94vw);overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.reel::backdrop{background:rgba(6,7,9,.86)}
+.reel video{display:block;width:100%;aspect-ratio:16/9;background:#000}
+.reel .pill{position:absolute;top:12px;right:12px}
+.replay + .replay{margin-left:8px}
 .replay{margin-left:14px;background:none;border:1px solid currentColor;border-radius:999px;color:inherit;font:500 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:6px 10px;cursor:pointer;opacity:.8}
 .replay:hover{opacity:1}
 
@@ -277,7 +282,6 @@ html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6
 .vid{margin:0;background:#0A0C0F;border:1px solid var(--hair);border-radius:10px;padding:10px;box-shadow:var(--lip),var(--sh-1);text-align:center}
 .fig.illus{margin-bottom:28px}
 .illus img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:6px;background:#0C0E11;display:block}
-.tag-illus{font:500 10.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#F2571B;margin-right:6px}
 .vid video{max-height:520px;max-width:100%;border-radius:6px;background:#000}
 
 /* end */
@@ -345,7 +349,8 @@ html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6
 <div class="hero" id="hero">
   <h1>Amogh Somisetty</h1>
   <p>Electrical engineer at Cal Poly. I build hardware and the software that watches it. Looking for a <b>Summer 2027</b> internship in hardware, GPU, or ML systems.</p>
-  <div class="cue"><i></i>SCROLL<button class="replay" id="replay" type="button">Replay</button></div>
+  <div class="cue"><i></i>SCROLL<button class="replay" id="replay" type="button">Replay</button><button class="replay" id="reelBtn" type="button">Watch the reel · 40 s</button></div>
+<dialog class="reel" id="reelDlg" aria-label="Portfolio reel"><video id="reelVid" src="reel.mp4" poster="reel-poster.jpg" controls playsinline preload="none"></video><button class="pill dark" id="reelX" type="button">Close</button></dialog>
 </div>
 
 <article class="card" id="card" aria-live="polite"></article>
@@ -664,18 +669,28 @@ function placeCard(){
 // Recorded-style foley (ElevenLabs sound effects), fetched only once a visitor turns sound on.
 // The synthesized clicks below remain as the fallback if a file fails to load.
 let soundOn = false, ac = null; const SFX = {};
-function loadSfx(){ ['screws', 'lift', 'seat', 'layer0', 'layer1', 'layer3', 'layer4', 'layer5', 'layer6'].forEach(k => { if (SFX[k] !== undefined) return; SFX[k] = null;
+function loadSfx(){ ['screws', 'lift', 'seat', 'layer0', 'layer1', 'layer3', 'layer4', 'layer5', 'layer6', 'relay', 'alert', 'key'].forEach(k => { if (SFX[k] !== undefined) return; SFX[k] = null;
   fetch('sfx/' + k + '.mp3').then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(b => ac.decodeAudioData(b)).then(buf => { SFX[k] = buf; }, () => {}); }); }
 $('snd').addEventListener('click', () => {
   soundOn = !soundOn; $('snd').setAttribute('aria-pressed', soundOn); $('sndL').textContent = soundOn ? 'Sound on' : 'Sound off';
   $('sndWave').setAttribute('opacity', soundOn ? 1 : .35);
   if (soundOn){ try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); loadSfx(); sfx('seat'); } catch { soundOn = false; } }
+  bed(soundOn);
 });
+// a quiet instrumental bed under the foley, streamed (never decoded whole) and only while sound is on
+let amb = null, ambFade = 0;
+function bed(on){ try {
+  if (on && !amb){ amb = new Audio('sfx/ambient.mp3'); amb.loop = true; amb.preload = 'auto'; amb.volume = 0; }
+  if (!amb) return; clearInterval(ambFade); if (on) amb.play().catch(() => {});
+  const goal = on ? .22 : 0; ambFade = setInterval(() => { const v = amb.volume + (goal - amb.volume)*.12;
+    amb.volume = Math.abs(goal - v) < .004 ? goal : v; if (amb.volume === goal){ clearInterval(ambFade); if (!on) amb.pause(); } }, 50);
+} catch {} }
+document.addEventListener('visibilitychange', () => { if (amb && soundOn){ if (document.hidden) amb.pause(); else amb.play().catch(() => {}); } });
 function noise(dur){ const b = ac.createBuffer(1, ac.sampleRate*dur, ac.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random()*2 - 1; const s = ac.createBufferSource(); s.buffer = b; return s; }
 function click(at, freq = 3200, gain = .35){ const s = noise(.03), f = ac.createBiquadFilter(), g = ac.createGain(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 6;
   g.gain.setValueAtTime(gain, at); g.gain.exponentialRampToValueAtTime(.0008, at + .03); s.connect(f).connect(g).connect(ac.destination); s.start(at); }
 function sfx(kind){ if (!ac) return; const t = ac.currentTime + .01;
-  if (SFX[kind]){ const s = ac.createBufferSource(), g = ac.createGain(); s.buffer = SFX[kind]; g.gain.value = .9; s.connect(g).connect(ac.destination); s.start(t); return; }
+  if (SFX[kind]){ const s = ac.createBufferSource(), g = ac.createGain(); s.buffer = SFX[kind]; g.gain.value = kind === 'key' ? .5 : .9; s.connect(g).connect(ac.destination); s.start(t); return; }
   if (kind === 'screws'){ for (let i = 0; i < 4; i++){ for (let k = 0; k < 3; k++) click(t + i*.11 + k*.028, 2600 + k*500, .22); } }
   if (kind === 'lift'){ const s = noise(.5), f = ac.createBiquadFilter(), g = ac.createGain(); f.type = 'bandpass'; f.Q.value = 1.2; f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(2400, t + .45);
     g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.12, t + .12); g.gain.exponentialRampToValueAtTime(.0001, t + .5); s.connect(f).connect(g).connect(ac.destination); s.start(t); click(t + .02, 1800, .3); }
@@ -698,6 +713,10 @@ function frame(now){
   placeCard();
 }
 requestAnimationFrame(frame);
+// the reel: a 40 s cut of the real renders, photos and demo, scored with ElevenLabs; fetched only when opened
+$('reelBtn') && $('reelBtn').addEventListener('click', () => { const d = $('reelDlg'); d.showModal(); $('reelVid').play().catch(() => {}); });
+$('reelX') && $('reelX').addEventListener('click', () => $('reelDlg').close());
+$('reelDlg') && $('reelDlg').addEventListener('close', () => $('reelVid').pause());
 $('replay') && $('replay').addEventListener('click', () => { if (!seq || reduce) return; scrollTo({ top:0 }); introDone = false; introT = 0; });
 
 /* ======================= catalog ======================= */
@@ -807,11 +826,11 @@ const DETAIL = {
     built:['Mapped the workflow with the lab, operations, and manufacturing teams and removed redundant verification steps.','Built Python automation for barcode validation and pathology-report retrieval.','Standardized the packaging workflow and wrote the reference documentation the team adopted.'],
     fig:'natera', figCap:'Cycle time per batch. Observed estimate; a formal time study was pending.',
     results:[['>40%','faster validation and packaging'],['Promoted','within one internship']] },
-  E2:{ illus:['illus-e2.webp','A heavy-lift quadcopter with its power distribution board exposed, the part of the aircraft this role owns.'] },
+  E2:{ illus:['illus-e2.webp','A heavy-lift quadcopter of the kind Poly UAS flies, with its power distribution board exposed.'] },
   H7:{ illus:['illus-h7.webp','An FPV micro drone pulled apart into the subsystems the analysis mapped: motors and props, frame, flight controller, battery, video transmitter, camera.'] },
   H9:{ lab:'phase', illus:['illus-h9.webp','A hypoeutectic Pb-Sn alloy: dark primary lead-rich dendrites surrounded by lamellar eutectic.'] },
   H10:{ lab:'galv', illus:['illus-h10.webp','Galvanic corrosion at a stainless bolt in an aluminum plate. With water as the electrolyte, the aluminum is the anode and corrodes in a ring around the joint.'] },
-  M3:{ illus:['illus-m3.webp','The whole setup: one webcam on the monitor, sampled every few seconds, with inference and storage on the same machine.'] },
+  M3:{ illus:['illus-m3.webp','The setup study-den is built for: one webcam on the monitor, sampled every few seconds, with inference and storage on the same machine.'] },
   E4:{ illus:['illus-e4.webp','A classroom Arduino lab, one group per bench PC, wiring LEDs and sensors on breadboards. A generic scene, not the EPIC room.'] },
   M5:{ lab:'beta' },
 };
@@ -905,10 +924,12 @@ const LAB = (() => {
   function loop(fn){ let on = true, raf; const tick = t => { if (!on) return; if (!document.hidden) fn(t); raf = requestAnimationFrame(tick); }; raf = requestAnimationFrame(tick);
     const h = { stop(){ on = false; cancelAnimationFrame(raf); } }; live.push(h); return h; }
   function screen(cv, draw){ return loop(now => { const { x, w, h } = fit(cv); draw(x, w, h, now); glass(x, w, h); }); }
-  function panel(el, html){ const p = document.createElement('div'); p.className = 'lab-ctl'; p.innerHTML = html; el.appendChild(p); return p; }
+  function panel(el, html){ const p = document.createElement('div'); p.className = 'lab-ctl'; p.innerHTML = html; el.appendChild(p);
+    p.addEventListener('click', e => { if (e.target.closest('button')) blip('key'); }); return p; }
   function head(el, model, note){ const h = document.createElement('div'); h.className = 'lab-head'; h.innerHTML = `<span class="lab-model">${model}</span><span class="lab-note">${note}</span>`; el.appendChild(h); }
   function logBox(el, cls = ''){ const d = document.createElement(cls ? 'pre' : 'div'); d.className = 'lab-log ' + cls; el.appendChild(d); let last = ''; return html => { if (html !== last){ last = html; d.innerHTML = html; } }; }
   // segmented keys: the pressed key lights, the others in its group go dark
+  const blip = k => { if (soundOn) sfx(k); };
   function seg(ctl, attr, fn){ ctl.addEventListener('click', e => { const b = e.target.closest(`[data-${attr}]`); if (!b) return;
     b.parentElement.querySelectorAll(`[data-${attr}]`).forEach(x => x.classList.toggle('on', x === b)); fn(b.dataset[attr], b); }); }
   function drag(cv, fn){ let on = false; const at = e => { const r = cv.getBoundingClientRect(); fn((e.clientX - r.left)/r.width, (e.clientY - r.top)/r.height); };
@@ -1007,6 +1028,7 @@ const LAB = (() => {
       label(x, `${st.freq.toFixed(0)} Hz`, 12, 44, C.ch1, 30, 600);
       label(x, st.marble ? 'marble present' : 'no marble', 14, 64, st.marble ? C.ch2 : C.txt);
       const rel = st.tripped && now - st.tripAt > RELEASE_MS;
+      if (rel && !st.clicked){ st.clicked = true; blip('relay'); } if (!st.tripped) st.clicked = false;
       label(x, rel ? 'ELECTROMAGNET RELEASED' : st.tripped ? 'releasing…' : 'electromagnet holding', w - 210, 22, rel ? C.hot : C.txt);
       if (st.fw === 'old') label(x, `false trips: ${st.falseTrips}`, w - 130, h - 10, st.falseTrips ? C.hot : C.txt);
     });
@@ -1380,7 +1402,7 @@ const LAB = (() => {
       grp:Array.from({ length:8 }, (_, i) => ({ act:i % 3, since:-(60 + rnd()*200), stuck:i === 5 })) };
     st.grp[5].since = -400;                                     // group 6 has been quiet on one activity for a while
     ctl.addEventListener('change', e => { if (e.target.dataset.k === 'g') st.g = +e.target.value; });
-    ctl.addEventListener('click', e => { const b = e.target.closest('[data-t]'); if (b){ st.req = st.req.filter(r => !(r.g === st.g && r.type === b.dataset.t)); st.req.push({ g:st.g, type:b.dataset.t, at:st.t }); }
+    ctl.addEventListener('click', e => { const b = e.target.closest('[data-t]'); if (b){ st.req = st.req.filter(r => !(r.g === st.g && r.type === b.dataset.t)); st.req.push({ g:st.g, type:b.dataset.t, at:st.t }); blip('alert'); }
       if (e.target.closest('[data-a="resolve"]')){ const top = triage()[0]; if (!top) return;
         if (top.kind === 'request'){ st.req = st.req.filter(r => r !== top.r); if (top.r.type === 'done'){ const g = st.grp[top.r.g - 1]; g.act = Math.min(ACT.length - 1, g.act + 1); g.since = st.t; } }
         else { const g = st.grp[top.g - 1]; g.stuck = false; g.since = st.t - 30; } } });
@@ -1493,7 +1515,7 @@ function openSheet(id, push = true){
         <aside class="sh-spec"><div class="k">DATASHEET</div><dl>${spec.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
           ${p.links ? `<div class="plinks">${p.links.map(([l, u]) => `<a href="${u}" target="_blank" rel="noopener">${l} ↗</a>`).join('')}</div>` : ''}</aside>
         <div class="sh-body">
-          ${d.illus ? `<figure class="fig illus"><img src="${d.illus[0]}" alt="Illustration: ${d.illus[1]}" loading="lazy"><figcaption class="figcap"><b class="tag-illus">Illustration (AI-generated)</b> ${d.illus[1]}</figcaption></figure>` : ''}
+          ${d.illus ? `<figure class="fig illus"><img src="${d.illus[0]}" alt="Illustration: ${d.illus[1]}" loading="lazy"><figcaption class="figcap">${d.illus[1]}</figcaption></figure>` : ''}
           ${d.problem ? `<section><h3>The problem</h3><p>${d.problem}</p></section>` : ''}
           <section><h3>${d.problem ? 'What I built' : 'Overview'}</h3><ul>${built.map(b => `<li>${b}</li>`).join('')}</ul></section>
           ${fig ? `<section><h3>How it works</h3>${fig}</section>` : ''}
@@ -1521,7 +1543,7 @@ addEventListener('keydown', e => { if (sheet.hidden) return; if (e.key === 'Esca
 document.addEventListener('click', e => { const a = e.target.closest('a[href^="#d-"]'); if (!a) return; e.preventDefault(); openSheet(a.getAttribute('href').slice(3)); });
 const dl = /^#d-(\w+)$/.exec(location.hash); if (dl) setTimeout(() => openSheet(dl[1], false), 300);
 
-/* ======================= AI guide (ElevenLabs agent, answers only from this page's text) ======================= */
+/* ======================= AI Amogh (ElevenLabs agent speaking as me, answers only from this page's text) ======================= */
 // loaded once the page is idle so the widget never competes with the scroll stage for frames
 (function guide(){
   let done = false; const go = () => { if (done) return; done = true;
