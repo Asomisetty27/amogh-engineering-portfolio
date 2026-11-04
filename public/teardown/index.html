@@ -3,12 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Amogh Somisetty, Cal Poly electrical engineering. Every project as a product teardown: GPU failure detection, hardware design, vision and ML, and software.">
+<meta name="description" content="Cal Poly electrical engineering student. Theta flagged 3 of 64 failing H100s at Princeton; 48 V drone backplane; RISC-V on FPGA. Seeking a Summer 2027 internship or Jan to Aug 2027 co-op.">
 <meta property="og:title" content="Amogh Somisetty">
-<meta property="og:description" content="Amogh Somisetty, Cal Poly electrical engineering. Every project as a product teardown: GPU failure detection, hardware design, vision and ML, and software.">
-<meta property="og:image" content="https://www.amogh.site/teardown/backplane-iso.jpg">
+<meta property="og:description" content="Cal Poly electrical engineering student. Theta flagged 3 of 64 failing H100s at Princeton; 48 V drone backplane; RISC-V on FPGA. Seeking a Summer 2027 internship or Jan to Aug 2027 co-op.">
+<meta property="og:image" content="https://www.amogh.site/teardown/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://www.amogh.site/teardown/og.jpg">
 <meta name="theme-color" content="#050608">
-<title>Amogh Somisetty</title>
+<title>Amogh Somisetty · Electrical Engineering, Cal Poly</title>
+<link rel="canonical" href="https://www.amogh.site/teardown/">
+<meta property="og:type" content="profile">
+<meta property="og:url" content="https://www.amogh.site/teardown/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Amogh Somisetty", "url": "https://www.amogh.site/teardown/", "image": "https://www.amogh.site/teardown/headshot.jpg", "email": "mailto:somisett@calpoly.edu", "jobTitle": "Electrical engineering student", "affiliation": {"@type": "CollegeOrUniversity", "name": "California Polytechnic State University, San Luis Obispo"}, "alumniOf": {"@type": "CollegeOrUniversity", "name": "California Polytechnic State University, San Luis Obispo"}, "address": {"@type": "PostalAddress", "addressLocality": "San Luis Obispo", "addressRegion": "CA", "addressCountry": "US"}, "sameAs": ["https://github.com/Asomisetty27", "https://www.linkedin.com/in/amoghsomisetty", "https://runtheta.com"], "knowsAbout": ["PCB design", "KiCad", "Hardware validation", "GPU reliability", "SystemVerilog", "FPGA", "Embedded systems", "Computer vision", "Python"]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@500;700&display=swap">
@@ -98,6 +107,14 @@ svg#leaders{position:fixed;inset:0;width:100%;height:100%;z-index:3;pointer-even
 .hero h1{font-size:clamp(40px,6.4vw,92px);font-weight:600;letter-spacing:-.045em;line-height:.95;margin:0 0 14px}
 .hero p{margin:0 auto;max-width:44ch;color:var(--muted);font-size:clamp(16px,1.4vw,18px)}
 .hero p b{color:var(--ink);font-weight:600}
+.hero .replay{white-space:nowrap}
+.hero .proof{list-style:none;margin:16px auto 0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.hero .proof button{font:500 13px/1 var(--display);color:var(--muted);background:rgba(255,255,255,.55);border:1px solid var(--hair);border-radius:999px;padding:8px 12px;cursor:pointer;transition:transform .2s cubic-bezier(.16,1,.3,1),border-color .2s}
+.hero .proof button b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.hero .proof button:hover{transform:translateY(-1px);border-color:#F2571B}
+.hero .proof button:focus-visible{outline:2px solid #F2571B;outline-offset:2px}
+html.dark .hero .proof button{background:rgba(10,12,16,.6);border-color:rgba(255,255,255,.14);color:#9CA6B2}
+html.dark .hero .proof button b{color:#fff}
 .hero .cue{margin-top:20px;font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--muted);display:inline-flex;gap:10px;align-items:center}
 .hero .cue i{display:block;width:18px;height:28px;border:1.5px solid var(--muted);border-radius:10px;position:relative}
 .hero .cue i::after{content:"";position:absolute;left:50%;top:6px;width:2px;height:6px;border-radius:2px;background:var(--muted);transform:translateX(-50%);animation:wheel 1.8s var(--spring) infinite}
@@ -302,7 +319,7 @@ html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6
 .score li::before{content:"+";font-family:var(--mono);color:#2FA36B}
 .mail{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .mail code{font-family:var(--mono);font-size:15px;background:#fff;border:1px solid var(--hair);border-radius:10px;padding:10px 14px;user-select:all}
-.foot{max-width:1100px;margin:56px auto 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:11.5px;color:var(--muted);border-top:1px solid var(--hair);padding-top:16px}
+.foot{max-width:1100px;margin:56px auto 0;padding-bottom:84px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:11.5px;color:var(--muted);border-top:1px solid var(--hair);padding-top:16px}
 
 @media (max-width:900px){
   .bom{display:none}
@@ -316,6 +333,11 @@ html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6
   .acts{gap:6px}
   .pill{padding:0 12px}
   .id b{font-size:13px}
+  .hero{bottom:calc(100px + env(safe-area-inset-bottom,0px))}   /* clear the AI guide launcher */
+  .hero .proof{margin-top:12px;gap:6px}
+  .hero .proof button{font-size:12px;padding:7px 10px}
+  .hero .proof li:nth-child(3){display:none}
+  .hero .cue i,.hero .cue .sc{display:none}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -332,7 +354,7 @@ html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6
 <header class="rail">
   <div class="id"><b>Amogh Somisetty</b><span>Electrical Engineering · Cal Poly</span></div>
   <div class="acts">
-    <span class="pill hide-xs" title="Status"><span class="live"></span>Summer 2027</span>
+    <span class="pill hide-xs" title="Status"><span class="live"></span>Summer 2027 or co-op</span>
     <button class="pill" id="snd" type="button" aria-pressed="false" title="Sound">
       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 6v4h2.6L9 13V3L5.1 6H2.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path id="sndWave" d="M11.2 5.6c1 .7 1 4.1 0 4.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".35"/></svg>
       <span id="sndL">Sound off</span></button>
@@ -348,8 +370,13 @@ html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6
 
 <div class="hero" id="hero">
   <h1>Amogh Somisetty</h1>
-  <p>Electrical engineer at Cal Poly. I build hardware and the software that watches it. Looking for a <b>Summer 2027</b> internship in hardware, GPU, or ML systems.</p>
-  <div class="cue"><i></i>SCROLL<button class="replay" id="replay" type="button">Replay</button><button class="replay" id="reelBtn" type="button">Watch the reel · 40 s</button></div>
+  <p>Electrical engineer at Cal Poly. I build hardware and the software that watches it. Looking for a <b>Summer 2027</b> internship or a <b>Jan to Aug 2027 co-op</b> in hardware, GPU, or ML systems.</p>
+  <ul class="proof" aria-label="Selected results">
+    <li><button type="button" data-sheet="R1"><b>3 of 64</b> failing H100s flagged at Princeton</button></li>
+    <li><button type="button" data-sheet="H1"><b>48 V</b> drone backplane, fabricated</button></li>
+    <li><button type="button" data-sheet="M1"><b>0.920</b> mAP50 shelf vision on Jetson</button></li>
+  </ul>
+  <div class="cue"><i></i><span class="sc">SCROLL</span><button class="replay" id="replay" type="button">Replay</button><button class="replay" id="reelBtn" type="button">Watch the reel · 40 s</button></div>
 <dialog class="reel" id="reelDlg" aria-label="Portfolio reel"><video id="reelVid" src="reel.mp4" poster="reel-poster.jpg" controls playsinline preload="none"></video><button class="pill dark" id="reelX" type="button">Close</button></dialog>
 </div>
 
@@ -364,7 +391,7 @@ html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6
     <div>
       <div class="who"><img src="headshot.jpg" alt="Amogh Somisetty" width="72" height="72"><div><b>Amogh Somisetty</b><span>Electrical Engineering, Cal Poly SLO</span></div></div>
       <h2 id="endH">Contact</h2>
-      <p>I'm looking for a Summer 2027 internship in hardware, GPU, or ML systems. Email is the fastest way to reach me.</p>
+      <p>I'm looking for a Summer 2027 internship or a January to August 2027 co-op in hardware, GPU, or ML systems. U.S. citizen. Email is the fastest way to reach me.</p>
       <div class="mail"><code id="email">somisett@calpoly.edu</code><button class="pill" id="copy" type="button">Copy email</button></div>
       <div class="mail" style="margin-top:12px">
         <a class="pill" href="https://github.com/Asomisetty27" target="_blank" rel="noopener">GitHub</a>
@@ -377,7 +404,7 @@ html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6
       <div class="k">AT A GLANCE</div>
       <dl class="spec" style="border-top:0;padding-top:6px;margin-top:6px">
         <dt>EDUCATION</dt><dd><b>B.S. Electrical Engineering, Cal Poly SLO, June 2028</b></dd>
-        <dt>SEEKING</dt><dd><b>Summer 2027 internship</b></dd>
+        <dt>SEEKING</dt><dd><b>Summer 2027 internship, or Jan to Aug 2027 co-op</b></dd>
         <dt>RESEARCH</dt><dd><b>Theta: 3 of 64 H100s flagged at Princeton</b></dd>
         <dt>EXPERIENCE</dt><dd><b>Natera, Optimization Engineering Intern</b></dd>
         <dt>TEAMS</dt><dd><b>Poly UAS electrical lead; CodeBox projects lead</b></dd>
@@ -400,7 +427,7 @@ const $ = id => document.getElementById(id);
 const CATS = [
   { id:'about', pn:'01', name:'About', title:'Electrical engineering, Cal Poly SLO',
     body:'Third-year B.S. Electrical Engineering student. I design boards, write firmware, and build software that monitors hardware for failures. Everything I have built is below, organized by area.',
-    spec:[['DEGREE','B.S. Electrical Engineering, June 2028'],['SEEKING','Summer 2027 internship: hardware, GPU, ML systems']] },
+    spec:[['DEGREE','B.S. Electrical Engineering, June 2028'],['SEEKING','Summer 2027 internship or Jan to Aug 2027 co-op: hardware, GPU, ML systems']] },
   { id:'research', pn:'02', name:'Research', title:'Research' },
   { id:'hardware', pn:'03', name:'Hardware', title:'Hardware design' },
   { id:'ml', pn:'04', name:'Vision and ML', title:'Computer vision and ML' },
@@ -415,7 +442,7 @@ const PROJECTS = [
   { cat:'research', id:'R1', name:'Theta', sub:'GPU failure detection from telemetry', when:'Mar 2026 \u2013 present', ctx:'Independent research, advised by ex-Intel silicon-validation faculty', status:'Shipped', flagship:true,
     facts:['Run blind on Princeton\u2019s cluster, flagged 3 of 64 H100s. Two never tripped a temperature alarm. Operators confirmed two: one replaced under RMA, one re-measured at +47.8% thermal resistance.',
       'Found a flaw in my own method on a rented 8\u00d7A100 node: baseboard position alone moved healthy readings 52%. Rebuilt it position-conditioned; 3 of 3 flags, zero false positives.',
-      'Production software: pip install runtheta, 488 tests in CI, Kubernetes deployment (Helm chart, Go controller), NVIDIA NVML, DCGM and AMD amdsmi collectors.'],
+      'Production software: pip install runtheta, over 500 tests in CI, Kubernetes deployment (Helm chart, Go controller), NVIDIA NVML, DCGM and AMD amdsmi collectors.'],
     tags:['Python','Go','Kubernetes','NVML / DCGM','Statistics'], links:[['runtheta.com','https://runtheta.com'],['GitHub','https://github.com/Asomisetty27/runtheta']] },
   { cat:'research', id:'R2', name:'Theta operator agent', sub:'LLM layer on top of the detector', when:'Jul 2026', ctx:'Part of Theta', status:'Shipped',
     facts:['Claude API tool-use loop over the same read-only tools Theta’s MCP server exposes, with an independent critic pass that checks each answer against the tool output.',
@@ -507,10 +534,10 @@ const PROJECTS = [
   { cat:'experience', id:'E2', name:'Poly UAS', sub:'Electrical Lead, Avionics & Power', when:'Apr 2026 – present', ctx:'Cal Poly drone competition team', status:'Current',
     facts:['Own the aircraft’s electrical system: the 48 V backplane and the Jetson carrier board above.'], tags:['Leadership','Hardware'] },
   { cat:'experience', id:'E3', name:'CodeBox', sub:'Technical Projects Lead', when:'Sep 2025 – present', ctx:'Cal Poly software and embedded club', status:'Current',
-    facts:['Maintain the club’s starter repository and mentor newer members through setup and hardware debugging.'], tags:['Mentoring'] },
+    facts:['Maintain the club’s starter repository and mentor newer members through setup and hardware debugging.','My team won the March 2026 CodeBox hackathon out of 24 teams with a vision-based object sorter. I owned the link between the Python inference pipeline and the Arduino-driven servo.'], tags:['Mentoring'] },
   { cat:'experience', id:'E4', name:'Cal Poly EPIC', sub:'Lab Assistant, Arduino', when:'Jun – Aug 2026', ctx:'Engineering outreach for precollegiate students', status:'Summer 2026',
     facts:['Taught embedded systems to precollegiate students and built the lab’s help queue.'], tags:['Teaching'] },
-  { cat:'experience', id:'E5', name:'Poly Engineering Consulting', sub:'President', when:'Sep 2024 – present', ctx:'Student consulting organization', status:'Current',
+  { cat:'experience', id:'E5', name:'Poly Engineering Consulting', sub:'Founder and President', when:'Sep 2024 – present', ctx:'Student consulting organization', status:'Current',
     facts:['Lead client-facing engineering project teams.'], tags:['Leadership'] },
   { cat:'experience', id:'E6', name:'CVS Pharmacy', sub:'Pharmacy Technician, state certified', when:'Summers 2023, 2024', ctx:'Dublin, CA', status:'Summer job',
     facts:['Processed prescriptions under time pressure, where an error reaches a patient.'], tags:['Accuracy'] },
@@ -766,7 +793,7 @@ const DETAIL = {
     built:['A peer-relative detector: effective thermal resistance Rθ = ΔT / P, computed by two-way median polish across position- and power-matched peers, with a permutation-null test gating every claim before a signal counts.',
       'A signature-matrix fault classifier (6-axis fingerprint, 3-valued evidence model) that reproduces all three Princeton attributions.',
       'Cross-vendor collectors behind one hardware layer: NVIDIA NVML and DCGM, AMD amdsmi, Redfish BMC.',
-      'Production packaging: pip install runtheta, a Helm chart and a Go controller that writes gpu-health node labels, 488 tests in CI across Python 3.10 to 3.12.'],
+      'Production packaging: pip install runtheta, a Helm chart and a Go controller that writes gpu-health node labels, over 500 tests in CI across Python 3.10 to 3.12.'],
     fig:'theta', figCap:'How a reading becomes a flag.',
     results:[['3 / 64','H100s flagged blind at Princeton'],['2','of them invisible to temperature thresholds'],['+47.8%','thermal resistance, re-measured on a confirmed flag'],['0','false positives after position conditioning']],
     learned:'Stage 1 ran on a free Colab Tesla T4 (n = 7): a 2 °C ambient change drove a 3.5× change in power-recovery time. The most important later result was a flaw I found in my own method. On a rented 8×A100 node, baseboard position alone moved healthy readings 52% at matched power. Rebuilding the detector around position is what made the Princeton result hold up.' },
@@ -776,7 +803,7 @@ const DETAIL = {
     fig:'agent', figCap:'The answer path. Every arrow is read-only.',
     results:[['15','tests against an injected client, no network'],['0','tools that can act on the fleet']],
     learned:'The strongest guardrail is structural. Prompting a model to be careful is weaker than never giving it a tool that can do damage.' },
-  R3:{ role:'Author', team:'Theta research program', tools:'LaTeX, Python, survival analysis',
+  R3:{ role:'First author', team:'Theta research program, with Prof. Souvik Kundu (advisor)', tools:'LaTeX, Python, survival analysis',
     problem:'Most GPU reliability work studies one fleet. I wanted to know which failure patterns hold across very different fleets and cooling regimes.',
     built:['“Peer-Relative Thermal Resistance as a Fleet Health Signal”: the detection method and the Princeton blind validation.','“GPU Failures Remember Events, Not Trajectories”: a failure taxonomy across five production fleets (Titan, Summit, Marconi100, GWDG, and Princeton’s Della).','The five-fleet study is a meta-analysis of mostly public fleet data. Princeton is the one live deployment.'],
     results:[['~50,000','GPUs across five fleets'],['~62,000','service lives'],['2','manuscripts in preparation']], learned:'Venue not yet decided.' },
@@ -1613,6 +1640,7 @@ const dl = /^#d-(\w+)$/.exec(location.hash); if (dl) setTimeout(() => openSheet(
 })();
 
 /* ======================= page ======================= */
+document.querySelectorAll('.proof [data-sheet]').forEach(b => b.addEventListener('click', () => openSheet(b.dataset.sheet)));
 $('again').addEventListener('click', () => scrollTo({ top:0, behavior: reduce ? 'auto' : 'smooth' }));
 $('copy').addEventListener('click', () => { const b = $('copy'), t = $('email').textContent;
   const done = ok => { b.textContent = ok ? 'Copied' : 'Select and copy'; setTimeout(() => b.textContent = 'Copy email', 1600); };
