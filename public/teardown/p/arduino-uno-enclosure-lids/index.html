@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arduino UNO enclosure lids: Parametric, 3D-printed, no hardware · Amogh Somisetty</title>
+<meta name="description" content="Parametric, 3D-printed, no hardware. A parametric OpenSCAD generator: chassis opening, lid and skirt thickness, and clearance are parameters.">
+<link rel="canonical" href="https://www.amogh.site/teardown/p/arduino-uno-enclosure-lids/">
+<meta property="og:type" content="article"><meta property="og:url" content="https://www.amogh.site/teardown/p/arduino-uno-enclosure-lids/">
+<meta property="og:title" content="Arduino UNO enclosure lids: Parametric, 3D-printed, no hardware"><meta property="og:description" content="Parametric, 3D-printed, no hardware. A parametric OpenSCAD generator: chassis opening, lid and skirt thickness, and clearance are parameters.">
+<meta property="og:image" content="https://www.amogh.site/teardown/uno-lid-stealth.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"CreativeWork","name":"Arduino UNO enclosure lids","headline":"Arduino UNO enclosure lids: Parametric, 3D-printed, no hardware","description":"Parametric, 3D-printed, no hardware. A parametric OpenSCAD generator: chassis opening, lid and skirt thickness, and clearance are parameters.","url":"https://www.amogh.site/teardown/p/arduino-uno-enclosure-lids/","image":"https://www.amogh.site/teardown/uno-lid-stealth.jpg","author":{"@type":"Person","name":"Amogh Somisetty","url":"https://www.amogh.site/teardown/"},"keywords":"OpenSCAD, 3D printing"}</script>
+<style>
+:root{--ink:#101318;--muted:#5A6371;--paper:#F3F4F6;--card:#fff;--hair:#D8DCE2;--accent:#F2571B;--display:"Instrument Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 var(--display);-webkit-font-smoothing:antialiased}
+a{color:inherit}.wrap{max-width:820px;margin:0 auto;padding:28px 20px 80px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:14px}
+.top a{text-decoration:none}.pill{display:inline-block;border:1px solid var(--hair);background:var(--card);border-radius:999px;padding:8px 14px;font-weight:500;text-decoration:none}
+.pill.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+.crumb{font:12px var(--mono);color:var(--muted);margin:40px 0 6px;letter-spacing:.04em}
+h1{font-size:clamp(34px,6vw,52px);line-height:1.05;letter-spacing:-.02em;margin:0}.sub{font-size:20px;color:var(--muted);margin:8px 0 24px}
+.status{display:inline-block;font:12px var(--mono);border:1px solid var(--hair);border-radius:999px;padding:4px 10px;margin-bottom:14px}
+dl{display:grid;grid-template-columns:110px 1fr;gap:6px 14px;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:18px;margin:0 0 28px}
+dt{font:12px var(--mono);color:var(--muted);text-transform:uppercase;padding-top:2px}dd{margin:0}
+h2{font-size:20px;margin:32px 0 8px}ul{padding-left:20px}li{margin:6px 0}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.metrics div{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:14px}
+.metrics b{display:block;font-size:22px}.metrics span{color:var(--muted);font-size:14px}
+figure{margin:0 0 16px}figure img{width:100%;border-radius:12px;border:1px solid var(--hair);background:#fff}figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.cta{margin:36px 0;display:flex;gap:10px;flex-wrap:wrap}.nav{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--hair);padding-top:18px;font-size:14px}
+.tags span{display:inline-block;font:12px var(--mono);border:1px solid var(--hair);border-radius:6px;padding:3px 8px;margin:0 6px 6px 0;background:var(--card)}
+@media (max-width:520px){dl{grid-template-columns:1fr}dt{padding-top:8px}}
+</style></head>
+<body><div class="wrap">
+<header class="top"><a href="/teardown/"><b>Amogh Somisetty</b> · Electrical Engineering, Cal Poly</a>
+<span><a class="pill" href="/teardown/#projects">All projects</a> <a class="pill dark" href="/teardown/resume.pdf">Resume</a></span></header>
+<main>
+<div class="crumb">HARDWARE · H13</div>
+<div class="status">Designed</div>
+<h1>Arduino UNO enclosure lids</h1><p class="sub">Parametric, 3D-printed, no hardware</p>
+<dl><dt>Area</dt><dd>Hardware</dd><dt>Role</dt><dd>Designer</dd><dt>Context</dt><dd>Personal project</dd><dt>Team</dt><dd>Personal project</dd><dt>Dates</dt><dd>Nov 2025</dd><dt>Status</dt><dd>Designed</dd><dt>Tools</dt><dd>OpenSCAD, STL export for PLA or PETG</dd></dl>
+<h2>The problem</h2><p>A lid for an Arduino UNO chassis that slides on and stays put with no screws or extra hardware.</p>
+<h2>What I built</h2><ul><li>A parametric OpenSCAD generator: chassis opening, lid and skirt thickness, and clearance are parameters.</li><li>Two closures from one file: grooves that ride rails on the chassis, or self-latching spring tabs that snap under an interior lip.</li><li>Wrap, bridged, and stealth variants, set up to print top face down with no supports.</li></ul>
+
+<h2>On the bench</h2><figure><img src="/teardown/uno-lid-stealth.jpg" alt="Stealth lid, rendered from its STL." loading="lazy"><figcaption>Stealth lid, rendered from its STL.</figcaption></figure><figure><img src="/teardown/uno-lid-wrap.jpg" alt="Wrap lid, rendered from its STL." loading="lazy"><figcaption>Wrap lid, rendered from its STL.</figcaption></figure>
+<h2>Results</h2><div class="metrics"><div><b>0</b><span>screws or extra parts</span></div><div><b>3</b><span>printed variants</span></div><div><b>0.25 mm</b><span>default clearance per side</span></div></div>
+
+
+<p class="tags"><span>OpenSCAD</span><span>3D printing</span></p>
+<div class="cta"><a class="pill dark" href="/teardown/#d-H13">Open the interactive datasheet</a><a class="pill" href="mailto:somisett@calpoly.edu">Email me</a></div>
+</main>
+<nav class="nav"><a href="/teardown/p/custom-radio-link-budget/">← Custom radio link budget</a><a href="/teardown/p/pharmacy-consultation-robot/">Pharmacy consultation robot →</a></nav>
+</div></body></html>

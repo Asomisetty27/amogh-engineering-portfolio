@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>48 V DroneCAN backplane: power-dist-v1, rev A · Amogh Somisetty</title>
+<meta name="description" content="power-dist-v1, rev A. A 2-layer, 120 × 90 mm backplane in KiCad, ERC and DRC clean, replacing the harness.">
+<link rel="canonical" href="https://www.amogh.site/teardown/p/48-v-dronecan-backplane/">
+<meta property="og:type" content="article"><meta property="og:url" content="https://www.amogh.site/teardown/p/48-v-dronecan-backplane/">
+<meta property="og:title" content="48 V DroneCAN backplane: power-dist-v1, rev A"><meta property="og:description" content="power-dist-v1, rev A. A 2-layer, 120 × 90 mm backplane in KiCad, ERC and DRC clean, replacing the harness.">
+<meta property="og:image" content="https://www.amogh.site/teardown/backplane-iso.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"CreativeWork","name":"48 V DroneCAN backplane","headline":"48 V DroneCAN backplane: power-dist-v1, rev A","description":"power-dist-v1, rev A. A 2-layer, 120 × 90 mm backplane in KiCad, ERC and DRC clean, replacing the harness.","url":"https://www.amogh.site/teardown/p/48-v-dronecan-backplane/","image":"https://www.amogh.site/teardown/backplane-iso.jpg","author":{"@type":"Person","name":"Amogh Somisetty","url":"https://www.amogh.site/teardown/"},"keywords":"KiCad, 48 V power, DroneCAN, IPC-2221"}</script>
+<style>
+:root{--ink:#101318;--muted:#5A6371;--paper:#F3F4F6;--card:#fff;--hair:#D8DCE2;--accent:#F2571B;--display:"Instrument Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 var(--display);-webkit-font-smoothing:antialiased}
+a{color:inherit}.wrap{max-width:820px;margin:0 auto;padding:28px 20px 80px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:14px}
+.top a{text-decoration:none}.pill{display:inline-block;border:1px solid var(--hair);background:var(--card);border-radius:999px;padding:8px 14px;font-weight:500;text-decoration:none}
+.pill.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+.crumb{font:12px var(--mono);color:var(--muted);margin:40px 0 6px;letter-spacing:.04em}
+h1{font-size:clamp(34px,6vw,52px);line-height:1.05;letter-spacing:-.02em;margin:0}.sub{font-size:20px;color:var(--muted);margin:8px 0 24px}
+.status{display:inline-block;font:12px var(--mono);border:1px solid var(--hair);border-radius:999px;padding:4px 10px;margin-bottom:14px}
+dl{display:grid;grid-template-columns:110px 1fr;gap:6px 14px;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:18px;margin:0 0 28px}
+dt{font:12px var(--mono);color:var(--muted);text-transform:uppercase;padding-top:2px}dd{margin:0}
+h2{font-size:20px;margin:32px 0 8px}ul{padding-left:20px}li{margin:6px 0}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.metrics div{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:14px}
+.metrics b{display:block;font-size:22px}.metrics span{color:var(--muted);font-size:14px}
+figure{margin:0 0 16px}figure img{width:100%;border-radius:12px;border:1px solid var(--hair);background:#fff}figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.cta{margin:36px 0;display:flex;gap:10px;flex-wrap:wrap}.nav{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--hair);padding-top:18px;font-size:14px}
+.tags span{display:inline-block;font:12px var(--mono);border:1px solid var(--hair);border-radius:6px;padding:3px 8px;margin:0 6px 6px 0;background:var(--card)}
+@media (max-width:520px){dl{grid-template-columns:1fr}dt{padding-top:8px}}
+</style></head>
+<body><div class="wrap">
+<header class="top"><a href="/teardown/"><b>Amogh Somisetty</b> · Electrical Engineering, Cal Poly</a>
+<span><a class="pill" href="/teardown/#projects">All projects</a> <a class="pill dark" href="/teardown/resume.pdf">Resume</a></span></header>
+<main>
+<div class="crumb">HARDWARE · H1</div>
+<div class="status">Fabricated, rev A</div>
+<h1>48 V DroneCAN backplane</h1><p class="sub">power-dist-v1, rev A</p>
+<dl><dt>Area</dt><dd>Hardware</dd><dt>Role</dt><dd>Designer, electrical lead</dd><dt>Context</dt><dd>Poly UAS, Cal Poly drone team</dd><dt>Team</dt><dd>Poly UAS, Cal Poly drone competition team</dd><dt>Dates</dt><dd>Jul – Sep 2026</dd><dt>Status</dt><dd>Fabricated, rev A</dd><dt>Tools</dt><dd>KiCad, IPC-2221, bench power, oscilloscope</dd></dl>
+<h2>The problem</h2><p>The team’s 12S heavy-lift quadcopter ran its power and CAN wiring through a hand-wired harness.</p>
+<h2>What I built</h2><ul><li>A 2-layer, 120 × 90 mm backplane in KiCad, ERC and DRC clean, replacing the harness.</li><li>Four independent 48 V pass-throughs sized per IPC-2221 on 2 oz copper for 14 A continuous and 30 A burst.</li><li>Dual-line CAN TVS protection and switchable 120 Ω bus terminations.</li><li>A written bring-up procedure and a dimensioned drawing for the mechanical team. Taken through fabrication and bring-up.</li></ul>
+<figure><img src="/teardown/backplane-iso.jpg" alt="48 V DroneCAN backplane, ray-traced render" loading="lazy"><figcaption>Ray-traced from the KiCad file (KiCad 10). Rev A; the final tray outline is pending.</figcaption></figure>
+
+<h2>Results</h2><div class="metrics"><div><b>14 A</b><span>continuous per pass-through</span></div><div><b>30 A</b><span>burst</span></div><div><b>4</b><span>independent 48 V channels</span></div><div><b>0</b><span>ERC and DRC errors</span></div></div>
+
+
+<p class="tags"><span>KiCad</span><span>48 V power</span><span>DroneCAN</span><span>IPC-2221</span></p>
+<div class="cta"><a class="pill dark" href="/teardown/#d-H1">Open the interactive datasheet</a><a class="pill" href="mailto:somisett@calpoly.edu">Email me</a></div>
+</main>
+<nav class="nav"><a href="/teardown/p/gpu-node-thermal-twins/">← GPU node thermal twins</a><a href="/teardown/p/jetson-agx-orin-carrier-board/">Jetson AGX Orin carrier board →</a></nav>
+</div></body></html>

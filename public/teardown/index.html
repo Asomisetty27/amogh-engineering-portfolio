@@ -108,6 +108,7 @@ svg#leaders{position:fixed;inset:0;width:100%;height:100%;z-index:3;pointer-even
 .hero p{margin:0 auto;max-width:44ch;color:var(--muted);font-size:clamp(16px,1.4vw,18px)}
 .hero p b{color:var(--ink);font-weight:600}
 .hero .replay{white-space:nowrap}
+.hero .replay.try{border-color:#F2571B;color:inherit}
 .hero .proof{list-style:none;margin:16px auto 0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
 .hero .proof button{font:500 13px/1 var(--display);color:var(--muted);background:rgba(255,255,255,.55);border:1px solid var(--hair);border-radius:999px;padding:8px 12px;cursor:pointer;transition:transform .2s cubic-bezier(.16,1,.3,1),border-color .2s}
 .hero .proof button b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
@@ -115,7 +116,7 @@ svg#leaders{position:fixed;inset:0;width:100%;height:100%;z-index:3;pointer-even
 .hero .proof button:focus-visible{outline:2px solid #F2571B;outline-offset:2px}
 html.dark .hero .proof button{background:rgba(10,12,16,.6);border-color:rgba(255,255,255,.14);color:#9CA6B2}
 html.dark .hero .proof button b{color:#fff}
-.hero .cue{margin-top:20px;font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--muted);display:inline-flex;gap:10px;align-items:center}
+.hero .cue{margin-top:20px;font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--muted);display:inline-flex;flex-wrap:wrap;justify-content:center;gap:10px;align-items:center}
 .hero .cue i{display:block;width:18px;height:28px;border:1.5px solid var(--muted);border-radius:10px;position:relative}
 .hero .cue i::after{content:"";position:absolute;left:50%;top:6px;width:2px;height:6px;border-radius:2px;background:var(--muted);transform:translateX(-50%);animation:wheel 1.8s var(--spring) infinite}
 @keyframes wheel{0%{opacity:0;transform:translate(-50%,0)}30%{opacity:1}100%{opacity:0;transform:translate(-50%,10px)}}
@@ -168,6 +169,13 @@ html.dark .hero .proof button b{color:#fff}
 .proj:hover{border-color:#A3ABB6;transform:translateY(-2px);box-shadow:var(--lip),var(--sh-3)}
 .proj:target{border-color:var(--signal);box-shadow:0 0 0 3px rgba(242,87,27,.15)}
 .proj.flag{grid-column:1/-1}
+.more{margin-top:14px;border:1px dashed var(--hair);border-radius:10px;padding:0 14px}
+.more summary{cursor:pointer;padding:14px 0;font:500 14px/1 var(--display);color:var(--muted);list-style:none}
+.more summary::-webkit-details-marker{display:none}
+.more summary::before{content:'+ ';font-family:var(--mono)}
+.more[open] summary::before{content:'- '}
+.more summary span{font-family:var(--mono);font-size:11px;margin-left:6px}
+.more[open]{padding-bottom:14px}
 .proj.flag ul{columns:2;column-gap:28px}
 .ptop{display:flex;justify-content:space-between;align-items:center}
 .ptop .pid{font-family:var(--mono);font-size:11px;color:var(--muted)}
@@ -225,6 +233,12 @@ html.locked{overflow:hidden}
 .photos img[src='dac-board.jpg'],.pthumb img[src='dac-board.jpg']{object-position:40% 100%}
 .pthumb{margin:-18px -18px 8px;border-bottom:1px solid var(--hair);background:#F4F5F7;border-radius:10px 10px 0 0;overflow:hidden}
 .pthumb img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+/* full-width flagship cards: image on the left, text on the right, so the render never fills the screen */
+@media (min-width:900px){.proj.flag:has(.pthumb){display:grid;grid-template-columns:minmax(0,42%) 1fr;column-gap:24px;align-items:start}
+.proj.flag:has(.pthumb)>*{grid-column:2}
+.proj.flag .pthumb{grid-column:1;grid-row:1/span 9;margin:-18px 0 -16px -18px;border-bottom:0;border-right:1px solid var(--hair);border-radius:10px 0 0 10px;height:calc(100% + 34px)}
+.proj.flag .pthumb img{height:100%;aspect-ratio:auto;min-height:320px}
+.proj.flag:has(.pthumb) ul{columns:1}}
 .avatar{float:right;width:64px;height:64px;border-radius:50%;object-fit:cover;margin:0 0 8px 12px;box-shadow:0 0 0 3px #fff,var(--sh-2)}
 .who{display:flex;align-items:center;gap:14px;margin-bottom:26px}
 .who img{width:72px;height:72px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px #fff,var(--sh-2)}
@@ -319,6 +333,7 @@ html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6
 .score li::before{content:"+";font-family:var(--mono);color:#2FA36B}
 .mail{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .mail code{font-family:var(--mono);font-size:15px;background:#fff;border:1px solid var(--hair);border-radius:10px;padding:10px 14px;user-select:all}
+.end .alt{font-size:14px;color:var(--muted);margin:14px 0 0}.end .alt a{color:var(--ink)}
 .foot{max-width:1100px;margin:56px auto 0;padding-bottom:84px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:11.5px;color:var(--muted);border-top:1px solid var(--hair);padding-top:16px}
 
 @media (max-width:900px){
@@ -376,7 +391,7 @@ html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6
     <li><button type="button" data-sheet="H1"><b>48 V</b> drone backplane, fabricated</button></li>
     <li><button type="button" data-sheet="M1"><b>0.920</b> mAP50 shelf vision on Jetson</button></li>
   </ul>
-  <div class="cue"><i></i><span class="sc">SCROLL</span><button class="replay" id="replay" type="button">Replay</button><button class="replay" id="reelBtn" type="button">Watch the reel · 40 s</button></div>
+  <div class="cue"><i></i><span class="sc">SCROLL</span><button class="replay" id="replay" type="button">Replay</button><button class="replay" id="reelBtn" type="button">Watch the reel · 40 s</button><button class="replay try" id="tryBtn" type="button">Break a GPU, watch Theta catch it</button></div>
 <dialog class="reel" id="reelDlg" aria-label="Portfolio reel"><video id="reelVid" src="reel.mp4" poster="reel-poster.jpg" controls playsinline preload="none"></video><button class="pill dark" id="reelX" type="button">Close</button></dialog>
 </div>
 
@@ -399,6 +414,7 @@ html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6
         <a class="pill dark" href="resume.pdf" target="_blank" rel="noopener">Resume</a>
         <button class="pill" id="again" type="button">Back to top ↑</button>
       </div>
+      <p class="alt">Resume versions: <a href="/apply/resume-gpu-systems.pdf" target="_blank" rel="noopener">GPU and systems</a> · <a href="/apply/resume-fpga-hardware.pdf" target="_blank" rel="noopener">FPGA and hardware</a> · <a href="hire/">30-second view</a></p>
     </div>
     <aside class="score" aria-label="Summary">
       <div class="k">AT A GLANCE</div>
@@ -412,7 +428,7 @@ html.dark .floorfade{background:linear-gradient(180deg,rgba(5,6,8,0) 0%,rgba(5,6
       </dl>
     </aside>
   </div>
-  <div class="foot"><span>San Luis Obispo, CA</span><span>Rendered in Blender Cycles. The mainboard is my KiCad backplane design.</span></div>
+  <div class="foot"><span>San Luis Obispo, CA · Updated November 2026</span><span>Rendered in Blender Cycles. The mainboard is my KiCad backplane design.</span></div>
 </section>
 
 <script>
@@ -426,7 +442,7 @@ const $ = id => document.getElementById(id);
 // verified record (amogh_resume.md and the repos themselves). Private repos get no link.
 const CATS = [
   { id:'about', pn:'01', name:'About', title:'Electrical engineering, Cal Poly SLO',
-    body:'Third-year B.S. Electrical Engineering student. I design boards, write firmware, and build software that monitors hardware for failures. Everything I have built is below, organized by area.',
+    body:'Most of my work has been catching problems before they reach someone. At a pharmacy counter, a wrong prescription reaches a patient. At Natera, I cut redundant checks out of a clinical validation line. Theta flags GPUs whose cooling is failing, including two a temperature alarm never caught. I design boards, write firmware, and build the software that watches them.',
     spec:[['DEGREE','B.S. Electrical Engineering, June 2028'],['SEEKING','Summer 2027 internship or Jan to Aug 2027 co-op: hardware, GPU, ML systems']] },
   { id:'research', pn:'02', name:'Research', title:'Research' },
   { id:'hardware', pn:'03', name:'Hardware', title:'Hardware design' },
@@ -453,7 +469,7 @@ const PROJECTS = [
   { cat:'research', id:'R4', name:'GPU node thermal twins', sub:'CFD geometry for Theta', when:'Jul 2026', ctx:'Theta research program', status:'In progress',
     facts:['Node geometry generated in code for conjugate heat transfer simulation. The first run finished but predicted impossible die temperatures; its autopsy shaped the 8 × H100 twin.'], tags:['CFD','CAD in code','OpenFOAM'] },
   // ---------- hardware
-  { cat:'hardware', id:'H1', name:'48 V DroneCAN backplane', sub:'power-dist-v1, rev A', when:'Jul – Sep 2026', ctx:'Poly UAS, Cal Poly drone team', status:'Fabricated, rev A',
+  { cat:'hardware', id:'H1', name:'48 V DroneCAN backplane', sub:'power-dist-v1, rev A', when:'Jul – Sep 2026', ctx:'Poly UAS, Cal Poly drone team', status:'Fabricated, rev A', flagship:true,
     facts:['2-layer 120 × 90 mm board in KiCad, ERC and DRC clean. Four 48 V pass-throughs sized to IPC-2221 for 14 A continuous and 30 A burst.',
       'Replaced a hand-wired harness. Switchable 120 Ω CAN terminations and TVS protection; taken through fabrication and bring-up.'],
     tags:['KiCad','48 V power','DroneCAN','IPC-2221'] },
@@ -494,7 +510,7 @@ const PROJECTS = [
   { cat:'hardware', id:'H14', name:'Pharmacy consultation robot', sub:'High school concept prototype', when:'Jan 2024', ctx:'High school', status:'Concept, retired',
     facts:['A Blender model of a robot meant to handle patient consultations in outpatient and retail pharmacies. I later concluded the idea was unrealistic and dropped it.'], tags:['Blender','Concept'] },
   // ---------- vision and ML
-  { cat:'ml', id:'M1', name:'Pantry Shelf Vision', sub:'Shelf monitoring for a food pantry', when:'Aug 2026 – present', ctx:'Justice Centered Edge AI, funded, advised by Prof. Souvik Kundu', status:'In deployment',
+  { cat:'ml', id:'M1', name:'Pantry Shelf Vision', sub:'Shelf monitoring for a food pantry', when:'Aug 2026 – present', ctx:'Justice Centered Edge AI, funded, advised by Prof. Souvik Kundu', status:'In deployment', flagship:true,
     facts:['3-stage YOLO11n pipeline reaching 0.920 mAP50 against a 0.898 baseline, chosen by a pre-registered ablation.',
       'Live-tested against a real camera before deployment and fixed 4 defects that simulated frames never showed.',
       'Runs on a Jetson Orin Nano with an Arduino Nicla Vision camera node.'],
@@ -573,6 +589,8 @@ function frameUrl(s, i){ return s.dir + 'f_' + String(i).padStart(4, '0') + '.we
 // compressed frames stay in memory (about 7 MB); only a window around the scroll position is decoded,
 // off the main thread, so drawing never waits on a decode and phones never hold 800 MB of pixels
 const WIN = 16;
+const engaged = new Promise(res => { const go = () => { ['scroll', 'wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(e => removeEventListener(e, go)); res(); };
+  ['scroll', 'wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(e => addEventListener(e, go, { passive:true })); if (scrollY > 0 || location.hash) go(); });
 async function fetchFrame(s, i){
   if (s.blobs[i] !== undefined) return; s.blobs[i] = null;
   try { const r = await fetch(frameUrl(s, i)); if (r.ok) s.blobs[i] = await r.blob(); } catch {}
@@ -581,10 +599,14 @@ async function fetchFrame(s, i){
 async function preload(s){
   const N = s.meta.frames, order = [], seen = new Set(), push = i => { if (i >= 1 && i <= N && !seen.has(i)){ seen.add(i); order.push(i); } };
   for (let i = 1; i <= s.meta.intro; i++) push(i);
-  for (const step of [12, 6, 3, 1]) for (let i = s.meta.intro; i <= N; i += step) push(i);
+  for (let i = s.meta.intro; i <= N; i += 12) push(i);
+  // a visitor who never scrolls only costs the intro and the coarse pass (about 2 MB on a phone);
+  // the fine frames wait for the first scroll, key or touch
+  const coarse = order.length;
+  for (const step of [6, 3, 1]) for (let i = s.meta.intro; i <= N; i += step) push(i);
   // frames near where the reader is scrolled jump the queue, so early scrolling isn't coarse
   let next = 0; const near = () => { const c = Math.round(want); for (let d = 0; d <= 24; d++) for (const i of [c + d, c - d]) if (i >= 1 && i <= N && s.blobs[i] === undefined) return i; return 0; };
-  const worker = async () => { for (;;){ const i = seq === s && near(); if (i){ await fetchFrame(s, i); continue; } while (next < order.length && s.blobs[order[next]] !== undefined) next++; if (next >= order.length) return; await fetchFrame(s, order[next++]); } };
+  const worker = async () => { for (;;){ const i = seq === s && near(); if (i){ await fetchFrame(s, i); continue; } while (next < order.length && s.blobs[order[next]] !== undefined) next++; if (next >= order.length) return; if (next >= coarse) await engaged; await fetchFrame(s, order[next++]);} };
   await Promise.all([worker(), worker(), worker(), worker()]);
 }
 function pump(s){
@@ -766,10 +788,9 @@ $('replay') && $('replay').addEventListener('click', () => { if (!seq || reduce)
 (function catalog(){
   const root = $('projects'), cats = CATS.filter(c => byCat(c.id).length);
   const esc = t => String(t);
-  root.innerHTML = `<div class="cin"><div class="chead"><h2 id="catH">Projects</h2><p>${PROJECTS.length} entries across research, hardware, machine learning, software, and work. Each group matches a layer of the device above.</p>
-    <div class="filters" role="toolbar" aria-label="Filter projects"><button class="fp on" data-f="all" type="button">All</button>${cats.map(c => `<button class="fp" data-f="${c.id}" type="button">${c.name} <span>${byCat(c.id).length}</span></button>`).join('')}</div></div>
-    ${cats.map(c => `<div class="group" id="cat-${c.id}" data-g="${c.id}"><div class="gh"><span class="gpn">${c.pn}</span><h3>${c.title}</h3><span class="gc">${byCat(c.id).length}</span></div>
-      <div class="pgrid">${byCat(c.id).map(p => `<article class="proj${p.flagship ? ' flag' : ''}" id="p-${p.id}">
+  // coursework and small side projects fold under each area, so the flagships carry the first read
+  const MINOR = new Set(['H7','H8','H9','H10','H13','H14','M3','M4','M7','S4','S5','S6','S7']);
+  const card = p => `<article class="proj${p.flagship ? ' flag' : ''}" id="p-${p.id}">
         ${THUMB[p.id] ? `<div class="pthumb"><img src="${THUMB[p.id]}" alt="" loading="lazy"></div>` : ''}
         <div class="ptop"><span class="pid">${p.id}</span><span class="st">${p.status}</span></div>
         <h4>${p.name}</h4><div class="psub">${p.sub}</div>
@@ -777,7 +798,16 @@ $('replay') && $('replay').addEventListener('click', () => { if (!seq || reduce)
         <ul>${p.facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>
         <div class="ptags">${p.tags.map(t => `<span>${t}</span>`).join('')}</div>
         <div class="plinks"><a href="#d-${p.id}" class="ds">Datasheet \u2192</a>${p.links ? p.links.map(([l, u]) => `<a href="${u}" target="_blank" rel="noopener">${l} \u2197</a>`).join('') : ''}</div>
-      </article>`).join('')}</div></div>`).join('')}</div>`;
+      </article>`;
+  const major = PROJECTS.filter(p => !MINOR.has(p.id)).length;
+  root.innerHTML = `<div class="cin"><div class="chead"><h2 id="catH">Projects</h2><p>${major} projects across research, hardware, machine learning, software, and work, plus ${PROJECTS.length - major} coursework and side projects folded under each area. Each group matches a layer of the device above.</p>
+    <div class="filters" role="toolbar" aria-label="Filter projects"><button class="fp on" data-f="all" type="button">All</button>${cats.map(c => `<button class="fp" data-f="${c.id}" type="button">${c.name} <span>${byCat(c.id).length}</span></button>`).join('')}</div></div>
+    ${cats.map(c => { const all = byCat(c.id), big = all.filter(p => !MINOR.has(p.id)), small = all.filter(p => MINOR.has(p.id));
+      return `<div class="group" id="cat-${c.id}" data-g="${c.id}"><div class="gh"><span class="gpn">${c.pn}</span><h3>${c.title}</h3><span class="gc">${all.length}</span></div>
+      <div class="pgrid">${big.map(card).join('')}</div>
+      ${small.length ? `<details class="more"><summary>Coursework and side projects <span>${small.length}</span></summary><div class="pgrid">${small.map(card).join('')}</div></details>` : ''}</div>`; }).join('')}</div>`;
+  const unfold = () => { const t = /^#p-/.test(location.hash) && document.getElementById(location.hash.slice(1)); const d = t && t.closest('details'); if (d) d.open = true; };
+  addEventListener('hashchange', unfold); unfold();
   root.querySelectorAll('.fp').forEach(b => b.addEventListener('click', () => {
     root.querySelectorAll('.fp').forEach(x => x.classList.toggle('on', x === b));
     root.querySelectorAll('.group').forEach(g => g.hidden = !(b.dataset.f === 'all' || g.dataset.g === b.dataset.f));
@@ -1620,7 +1650,7 @@ const dl = /^#d-(\w+)$/.exec(location.hash); if (dl) setTimeout(() => openSheet(
 // loaded once the page is idle so the widget never competes with the scroll stage for frames
 (function guide(){
   let done = false; const go = () => { if (done) return; done = true;
-    const el = document.createElement('elevenlabs-convai'); el.setAttribute('agent-id', 'agent_0201m4pvdphde00s07v11yxqq3rb'); el.setAttribute('avatar-image-url', new URL('guide.png', location.href).href);   /* static avatar: an animated orb would redraw every frame */ document.body.appendChild(el);
+    const el = document.createElement('elevenlabs-convai'); el.setAttribute('agent-id', 'agent_0201m4pvdphde00s07v11yxqq3rb'); el.setAttribute('avatar-image-url', new URL('guide.png', location.href).href); if (innerWidth < 700) el.setAttribute('variant', 'tiny');   /* phones: a small launcher, so the bar never covers project text */   /* static avatar: an animated orb would redraw every frame */ document.body.appendChild(el);
     // the guide can move the page: open a project's datasheet, or scroll the device to an area's layer
     const AREAS = { about:1, research:2, hardware:3, vision_ml:4, software:5, experience:6, outside_work:7 };
     el.addEventListener('elevenlabs-convai:call', ev => { ev.detail.config.clientTools = {
@@ -1641,6 +1671,8 @@ const dl = /^#d-(\w+)$/.exec(location.hash); if (dl) setTimeout(() => openSheet(
 
 /* ======================= page ======================= */
 document.querySelectorAll('.proof [data-sheet]').forEach(b => b.addEventListener('click', () => openSheet(b.dataset.sheet)));
+// the hero's hands-on proof: open Theta's datasheet straight at its simulated fleet console
+$('tryBtn').addEventListener('click', () => { openSheet('R1'); setTimeout(() => { const n = sheet.querySelector('[data-lab="theta"]'); if (n) sheet.scrollTo({ top: (n.closest('section') || n).offsetTop - 70, behavior: reduce ? 'auto' : 'smooth' }); }, 350); });
 $('again').addEventListener('click', () => scrollTo({ top:0, behavior: reduce ? 'auto' : 'smooth' }));
 $('copy').addEventListener('click', () => { const b = $('copy'), t = $('email').textContent;
   const done = ok => { b.textContent = ok ? 'Copied' : 'Select and copy'; setTimeout(() => b.textContent = 'Copy email', 1600); };

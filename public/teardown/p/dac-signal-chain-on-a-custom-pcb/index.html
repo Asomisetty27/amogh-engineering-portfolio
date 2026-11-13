@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DAC signal chain on a custom PCB: 4-bit binary-weighted op-amp DAC · Amogh Somisetty</title>
+<meta name="description" content="4-bit binary-weighted op-amp DAC. Binary-weighted 4-bit DAC (LM1458, 1206 resistor ladder 80k / 40k / 20k / 10k with 10k feedback, ±12 V) on a 1 × 1 in 2-layer PCB.">
+<link rel="canonical" href="https://www.amogh.site/teardown/p/dac-signal-chain-on-a-custom-pcb/">
+<meta property="og:type" content="article"><meta property="og:url" content="https://www.amogh.site/teardown/p/dac-signal-chain-on-a-custom-pcb/">
+<meta property="og:title" content="DAC signal chain on a custom PCB: 4-bit binary-weighted op-amp DAC"><meta property="og:description" content="4-bit binary-weighted op-amp DAC. Binary-weighted 4-bit DAC (LM1458, 1206 resistor ladder 80k / 40k / 20k / 10k with 10k feedback, ±12 V) on a 1 × 1 in 2-layer PCB.">
+<meta property="og:image" content="https://www.amogh.site/teardown/dac-board.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"CreativeWork","name":"DAC signal chain on a custom PCB","headline":"DAC signal chain on a custom PCB: 4-bit binary-weighted op-amp DAC","description":"4-bit binary-weighted op-amp DAC. Binary-weighted 4-bit DAC (LM1458, 1206 resistor ladder 80k / 40k / 20k / 10k with 10k feedback, ±12 V) on a 1 × 1 in 2-layer PCB.","url":"https://www.amogh.site/teardown/p/dac-signal-chain-on-a-custom-pcb/","image":"https://www.amogh.site/teardown/dac-board.jpg","author":{"@type":"Person","name":"Amogh Somisetty","url":"https://www.amogh.site/teardown/"},"keywords":"LTspice, AVR, PCB, Reflow"}</script>
+<style>
+:root{--ink:#101318;--muted:#5A6371;--paper:#F3F4F6;--card:#fff;--hair:#D8DCE2;--accent:#F2571B;--display:"Instrument Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 var(--display);-webkit-font-smoothing:antialiased}
+a{color:inherit}.wrap{max-width:820px;margin:0 auto;padding:28px 20px 80px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:14px}
+.top a{text-decoration:none}.pill{display:inline-block;border:1px solid var(--hair);background:var(--card);border-radius:999px;padding:8px 14px;font-weight:500;text-decoration:none}
+.pill.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+.crumb{font:12px var(--mono);color:var(--muted);margin:40px 0 6px;letter-spacing:.04em}
+h1{font-size:clamp(34px,6vw,52px);line-height:1.05;letter-spacing:-.02em;margin:0}.sub{font-size:20px;color:var(--muted);margin:8px 0 24px}
+.status{display:inline-block;font:12px var(--mono);border:1px solid var(--hair);border-radius:999px;padding:4px 10px;margin-bottom:14px}
+dl{display:grid;grid-template-columns:110px 1fr;gap:6px 14px;background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:18px;margin:0 0 28px}
+dt{font:12px var(--mono);color:var(--muted);text-transform:uppercase;padding-top:2px}dd{margin:0}
+h2{font-size:20px;margin:32px 0 8px}ul{padding-left:20px}li{margin:6px 0}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.metrics div{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:14px}
+.metrics b{display:block;font-size:22px}.metrics span{color:var(--muted);font-size:14px}
+figure{margin:0 0 16px}figure img{width:100%;border-radius:12px;border:1px solid var(--hair);background:#fff}figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.cta{margin:36px 0;display:flex;gap:10px;flex-wrap:wrap}.nav{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--hair);padding-top:18px;font-size:14px}
+.tags span{display:inline-block;font:12px var(--mono);border:1px solid var(--hair);border-radius:6px;padding:3px 8px;margin:0 6px 6px 0;background:var(--card)}
+@media (max-width:520px){dl{grid-template-columns:1fr}dt{padding-top:8px}}
+</style></head>
+<body><div class="wrap">
+<header class="top"><a href="/teardown/"><b>Amogh Somisetty</b> · Electrical Engineering, Cal Poly</a>
+<span><a class="pill" href="/teardown/#projects">All projects</a> <a class="pill dark" href="/teardown/resume.pdf">Resume</a></span></header>
+<main>
+<div class="crumb">HARDWARE · H4</div>
+<div class="status">Course project</div>
+<h1>DAC signal chain on a custom PCB</h1><p class="sub">4-bit binary-weighted op-amp DAC</p>
+<dl><dt>Area</dt><dd>Hardware</dd><dt>Role</dt><dd>Co-designer, with Joyce Han</dd><dt>Context</dt><dd>EE 143, co-designed with Joyce Han</dd><dt>Team</dt><dd>EE 143 capstone, IEEE-format report, Dec 2025</dd><dt>Dates</dt><dd>Fall 2025</dd><dt>Status</dt><dd>Course project</dd><dt>Tools</dt><dd>LTspice, Fusion 360, OSH Park, AVR, oscilloscope, DMM</dd></dl>
+<h2>The problem</h2><p>Take an audio signal all the way through digital and back: condition it, sample it, and rebuild it with a DAC we designed and fabricated ourselves.</p>
+<h2>What I built</h2><ul><li>Binary-weighted 4-bit DAC (LM1458, 1206 resistor ladder 80k / 40k / 20k / 10k with 10k feedback, ±12 V) on a 1 × 1 in 2-layer PCB.</li><li>Full chain: audio source, summing-amp level shifter, Arduino 10-bit ADC, our DAC, oscilloscope and speaker.</li><li>Nine-lab build including a Fusion 360 chassis, bench instrumentation, and hand and reflow soldering.</li></ul>
+
+<h2>On the bench</h2><figure><img src="/teardown/dac-board.jpg" alt="The fabricated 1 × 1 in board." loading="lazy"><figcaption>The fabricated 1 × 1 in board.</figcaption></figure><figure><img src="/teardown/dac-scope.jpg" alt="Measured on a Keysight MSO-X 2022A: the DAC stepping through its codes." loading="lazy"><figcaption>Measured on a Keysight MSO-X 2022A: the DAC stepping through its codes.</figcaption></figure>
+<h2>Results</h2><div class="metrics"><div><b>62.5 mV</b><span>per step</span></div><div><b>±1 LSB</b><span>across all 16 codes</span></div><div><b>1 × 1 in</b><span>2-layer board</span></div><div><b>3</b><span>failure modes resolved</span></div></div>
+<h2>What I learned</h2><p>The ADC loaded the source, fixed with a voltage-follower buffer. The bipolar audio fell outside the ADC’s 0 to 5 V window, fixed with a DC offset. Audible quantization distortion is a real limit of 4 bits, so we documented it instead of hiding it.</p>
+
+<p class="tags"><span>LTspice</span><span>AVR</span><span>PCB</span><span>Reflow</span></p>
+<div class="cta"><a class="pill dark" href="/teardown/#d-H4">Open the interactive datasheet</a><a class="pill" href="mailto:somisett@calpoly.edu">Email me</a></div>
+</main>
+<nav class="nav"><a href="/teardown/p/risc-v-cpu/">← RISC-V CPU (RV32I)</a><a href="/teardown/p/9-stage-electromechanical-system/">9-stage electromechanical system →</a></nav>
+</div></body></html>
